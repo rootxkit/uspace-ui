@@ -22,6 +22,18 @@ follows docs/PLAN.md §12. One line per work package under Unreleased.
   ESLint 10 (eslint-plugin-jsx-a11y supports `^9`), Storybook 10 (the
   plan names Storybook 9), and with it Vitest 5 and Vite 8. Next.js is
   16.3 at this date; the peer stays `>=15`.
+- WP-1: `theme` (`styles/tokens.css` with the light and dark tokens, the
+  shadcn semantic set, the severity, trust, identification, zone and age
+  palettes and the Tailwind `@theme inline` mapping; `ThemeProvider`,
+  `useTheme`, `brandFromEnv`, `tokens`, the `uspace_scheme` cookie reader)
+  and `ui` (the shadcn/ui set of PLAN §3.3 vendored with shadcn 4.21.1,
+  `new-york-v4`, plus `Kbd`, `Stat`, `EmptyState`, `InlineCode`). The
+  palettes are checked for WCAG 2.2 AA contrast and CIEDE2000 separation
+  under simulated deuteranopia and protanopia. `LayerPanel` now uses the
+  `Sheet` and `map.css` the tokens without fallbacks. radix-ui 1.6.7,
+  class-variance-authority 0.7.1, clsx 2.1.1, tailwind-merge 3.7.0,
+  lucide-react 1.49.0, sonner 2.0.8, cmdk 1.1.1; tailwindcss 4.3.3 (peer
+  `^4`, optional).
 - WP-3: `map`: `MapView` (one MapLibre map, the `pmtiles` protocol once
   per page, `SOURCE.json` with a timeout, style re-apply on language or
   scheme with every kit layer re-added through `useStyleLoad`, visible and
