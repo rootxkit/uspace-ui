@@ -499,6 +499,7 @@ pinned exact in `package.json` and locked; peers carry ranges.
 | `@types/geojson` (exact pin) | `model` | `ZoneView.geometry` and `IntentView.volumes` are GeoJSON types that appear in every consumer's declarations, so the types are a dependency, not a dev dependency. Types only, no runtime code (WP-0). |
 | dev: `@vitest/browser-playwright`, `@vitest/coverage-v8`, `vite`, `@storybook/addon-docs`, `@testing-library/dom`, `@types/react`, `@types/react-dom`, `@types/node` | tests, Storybook | The Vitest 4 Playwright provider and v8 coverage; the Vite that Storybook and the browser project run on; MDX docs pages in Storybook 9; the peer of `@testing-library/react`; type packages (WP-0). |
 | dev: `tailwindcss`, `@tailwindcss/vite` | Storybook, the browser and golden tests | Tailwind v4 compiled the way the apps compile it (D4), so the vendored shadcn/ui classes and the token utilities exist in the stories and in axe's contrast checks (WP-1). Build-time only; never in `dist/`. |
+| dev: `@maplibre/maplibre-gl-style-spec` (exact pin, the version `maplibre-gl` already resolves) | tests | MapLibre's own expression parser and style validator: the symbology's expressions are evaluated as MapLibre would and the layers a layer component builds are validated, without a WebGL context (§9 "tested as data"; WP-6). Never imported by `src/` outside tests. |
 
 Rejected: any geometry or geodesy library (the lint rule forbids it for
 everyone, the kit included); `i18next`/`react-intl` (two catalogues and

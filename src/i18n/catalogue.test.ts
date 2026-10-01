@@ -7,6 +7,8 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { DISABLED_BYS, SOURCE_STATES } from "../model/index.js";
+import { RESTRICTION_STATE_KEYS } from "../symbology/restriction.js";
+import { ZONE_PATTERN_KEYS, ZONE_TYPE_KEYS } from "../symbology/zone.js";
 import { en, type Key } from "./en.js";
 import { ALTITUDE_KEYS, HEIGHT_KEYS } from "./format.js";
 import { ka } from "./ka.js";
@@ -103,6 +105,14 @@ const DYNAMIC_KEYS: Readonly<Record<string, readonly string[]>> = {
   "src/i18n/format.ts HEIGHT_KEYS": Object.values(HEIGHT_KEYS),
   // LayerPanel: t(labelKey), the app's own key, from the app's catalogue
   "src/map/MapControls.tsx LayerToggle.labelKey": [],
+  // ZoneCard, ZoneLegend: t(ZONE_TYPE_KEYS[type])
+  "src/symbology/zone.ts ZONE_TYPE_KEYS": Object.values(ZONE_TYPE_KEYS),
+  // ZoneLegend: t(ZONE_PATTERN_KEYS[pattern])
+  "src/symbology/zone.ts ZONE_PATTERN_KEYS": Object.values(ZONE_PATTERN_KEYS),
+  // ZoneCard: t(RESTRICTION_STATE_KEYS[state ?? "unstated"])
+  "src/symbology/restriction.ts RESTRICTION_STATE_KEYS": Object.values(
+    RESTRICTION_STATE_KEYS,
+  ),
 };
 
 describe("keys used in src/", () => {
@@ -117,9 +127,19 @@ describe("keys used in src/", () => {
     );
   });
 
+  // A plural is called by its base key (`t("x", { count })`), which the
+  // catalogue holds as `x_one` / `x_other` (translate.ts).
+  const known = (k: string): boolean =>
+    Object.hasOwn(en, k) || Object.hasOwn(en, `${k}_other`);
+
   it("every literal key exists in en", () => {
-    const unknown = [...used].filter(([k]) => !Object.hasOwn(en, k));
+    const unknown = [...used].filter(([k]) => !known(k));
     expect(unknown).toEqual([]);
+  });
+
+  it("a plural's base key counts as present, a missing one does not", () => {
+    expect(known("zone.legend.count")).toBe(true);
+    expect(known("zone.legend.nope")).toBe(false);
   });
 
   it("every allow-listed dynamic key exists in en", () => {

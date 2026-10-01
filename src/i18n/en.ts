@@ -134,6 +134,45 @@ const catalogue = {
   "map.scheme_dark": "Dark map",
   "map.layers": "Layers",
   "map.layers_close": "Close layers",
+
+  // WP-6: zones and restrictions. Applicability is the server's statement
+  // (spec 02 F3, M17), and the wording says so; the kit never judges it.
+  "zone.type.PROHIBITED": "Prohibited",
+  "zone.type.REQ_AUTHORIZATION": "Authorisation required",
+  "zone.type.CONDITIONAL": "Conditional",
+  "zone.type.NO_RESTRICTION": "No restriction",
+  "zone.type.USPACE": "U-space airspace",
+  "zone.pattern.solid": "solid fill",
+  "zone.pattern.hatched": "hatched",
+  "zone.pattern.dotted": "dotted",
+  "zone.pattern.none": "outline only",
+  "zone.legend.title": "Zone types",
+  "zone.legend.count_one": "{count} zone",
+  "zone.legend.count_other": "{count} zones",
+  "zone.legend.dimmed":
+    "Dimmed: the server reports that the zone does not apply now.",
+  "zone.legend.unstated":
+    "Drawn in full when the server does not say whether the zone applies.",
+  "zone.card.unnamed": "Unnamed zone",
+  "zone.card.identifier": "Identifier",
+  "zone.card.type": "Type",
+  "zone.card.lower": "Lower limit",
+  "zone.card.upper": "Upper limit",
+  "zone.card.message": "Message",
+  "zone.card.applicability": "Applicability",
+  "zone.applicability.applies": "Applies now, as the server reports",
+  "zone.applicability.not_applicable":
+    "Does not apply now, as the server reports",
+  "zone.card.version": "Version",
+  "zone.card.updated": "Updated",
+  "restriction.card.state": "State",
+  "restriction.card.starts": "Starts",
+  "restriction.card.ends": "Ends",
+  "restriction.state.planned": "Planned",
+  "restriction.state.active": "Active",
+  "restriction.state.ended": "Ended",
+  "restriction.state.cancelled": "Cancelled",
+  "restriction.state.unstated": "State not provided",
 } as const;
 
 /** A key of the kit's own catalogue. Apps add keys of their own. */
