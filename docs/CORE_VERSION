@@ -1,0 +1,9 @@
+v1.0.0
+# The uspace-core tag src/model mirrors (scripts/check-enums.sh reads the
+# first line). Bumping it is its own `build:` commit that runs the check.
+#
+# Listed skips: a kit value absent from core at this tag that the check
+# reports as a visible skip instead of a failure. Anything else absent on
+# either side fails. A listed value that core has gained fails too, so the
+# line is removed when the tag is bumped.
+skip IdentBasis provider  PLAN §14 Q18: core v1.1.0 adds BasisProvider
