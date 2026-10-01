@@ -1,0 +1,12 @@
+dist/
+coverage/
+storybook-static/
+.cache/
+pnpm-lock.yaml
+# Plan documents are reviewed prose, not formatted code.
+docs/
+CLAUDE.md
+README.md
+# Kept line for line identical to docs/PLAN.md §3.1 so a reviewer can diff
+# the two (WP-0 done-when).
+src/model/types.ts

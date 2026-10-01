@@ -1,0 +1,13 @@
+# pnpm settings (pnpm 11 reads them here, not from .npmrc). Not a workspace:
+# the package is the repository root.
+engineStrict: true
+saveExact: true
+# Peers are the consumer's (react, next, the eslint plugins); the dev
+# copies this repo needs are listed in devDependencies.
+autoInstallPeers: false
+# esbuild (through vite) works from its platform package; its postinstall
+# only re-checks the binary, so it is not run.
+allowBuilds:
+  esbuild: false
+minimumReleaseAgeExclude:
+  - publint@0.3.25

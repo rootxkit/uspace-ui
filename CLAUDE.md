@@ -150,15 +150,15 @@ and the lab consumes it at build time, pinned by an exact version. Read
 
 ## Commands
 
-The scripts are defined by WP-0; until it lands this list is the
-contract they implement.
+The scripts are defined in `package.json` (WP-0).
 
 ```
-pnpm install --frozen-lockfile   # Node 22 (.nvmrc), pnpm via corepack
-pnpm check          # prettier, eslint (the kit's own rules), tsc, build, publint, attw, api report, size, hostname grep
+pnpm install --frozen-lockfile   # Node 22 (.nvmrc), pnpm via corepack (packageManager)
+pnpm check          # prettier, build, eslint (the kit's own rules, from dist/), tsc, publint, attw, api report, size, hostname grep
 pnpm test           # vitest: node and jsdom projects, with coverage
-pnpm test:browser   # vitest browser mode: stories as tests, axe, golden snapshots
+pnpm test:browser   # vitest browser mode: stories as tests, axe (needs `pnpm exec playwright install chromium` once)
 pnpm storybook      # local Storybook
+pnpm build-storybook   # static Storybook in storybook-static/
 pnpm build          # tsc to dist/
 pnpm api-report     # regenerate docs/api/uspace-ui.api.md (commit the result)
 scripts/check-enums.sh   # compare src/model enumerations with uspace-core at docs/CORE_VERSION (online)
