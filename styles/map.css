@@ -1,7 +1,8 @@
 /* @rootxkit/uspace-ui/styles/map.css (docs/PLAN.md §3.6, WP-3): MapLibre's
    stylesheet and the kit's map controls and notices. Colours come from the
-   theme tokens (styles/tokens.css, WP-1); the fallbacks keep the controls
-   legible before the tokens are loaded. */
+   theme tokens, so the app imports styles/tokens.css too (WP-1). MapView
+   sets `data-theme` to its own scheme, so the controls follow the map's
+   scheme even where it differs from the page's. */
 @import "maplibre-gl/dist/maplibre-gl.css";
 
 .us-map {
@@ -10,14 +11,9 @@
   height: 100%;
   min-height: 12rem;
   overflow: hidden;
-  background: var(--us-surface, #f2f2f2);
-  color: var(--us-text, #1a1a1a);
+  background: var(--us-surface);
+  color: var(--us-text);
   font-family: inherit;
-}
-
-.us-map[data-scheme="dark"] {
-  background: var(--us-surface, #1f1f1f);
-  color: var(--us-text, #f2f2f2);
 }
 
 .us-map-canvas {
@@ -35,10 +31,10 @@
   max-width: min(36rem, calc(100% - 2rem));
   margin: 0;
   padding: 0.5rem 0.75rem;
-  border: 1px solid var(--us-border, #767676);
+  border: 1px solid var(--us-border-strong);
   border-radius: 0.375rem;
-  background: var(--us-surface-raised, #ffffff);
-  color: var(--us-text, #1a1a1a);
+  background: var(--us-surface-raised);
+  color: var(--us-text);
   font-size: 0.875rem;
   line-height: 1.4;
 }
@@ -63,10 +59,10 @@
   min-width: 2.25rem;
   min-height: 2.25rem;
   padding: 0 0.5rem;
-  border: 1px solid var(--us-border, #767676);
+  border: 1px solid var(--us-border-strong);
   border-radius: 0.375rem;
-  background: var(--us-surface-raised, #ffffff);
-  color: var(--us-text, #1a1a1a);
+  background: var(--us-surface-raised);
+  color: var(--us-text);
   font: inherit;
   font-size: 1rem;
   cursor: pointer;
@@ -77,13 +73,12 @@
 }
 
 .us-map-button[aria-pressed="true"] {
-  outline: 2px solid var(--us-focus, #1a5fb4);
+  outline: 2px solid var(--us-focus);
   outline-offset: -2px;
 }
 
-.us-map-button:focus-visible,
-.us-map-sheet input:focus-visible {
-  outline: 3px solid var(--us-focus, #1a5fb4);
+.us-map-button:focus-visible {
+  outline: 3px solid var(--us-focus);
   outline-offset: 2px;
 }
 
@@ -96,47 +91,18 @@
   position: relative;
 }
 
-/* The layer toggles as a sheet beside the controls. */
+/* The layer sheet is the kit's Sheet (src/ui), styled by Tailwind; it
+   renders in a portal outside .us-map and follows the page's scheme. */
 .us-map-sheet {
-  position: absolute;
-  top: 0;
-  right: calc(100% + 0.5rem);
-  min-width: 12rem;
-  padding: 0.75rem;
-  border: 1px solid var(--us-border, #767676);
-  border-radius: 0.375rem;
-  background: var(--us-surface-raised, #ffffff);
-  color: var(--us-text, #1a1a1a);
-  font-size: 0.875rem;
-}
-
-.us-map-sheet ul {
-  margin: 0 0 0.5rem;
-  padding: 0;
-  list-style: none;
-}
-
-.us-map-sheet label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-height: 1.75rem;
+  width: min(20rem, 85vw);
 }
 
 /* The attribution names the OSM extract date; it stays readable. */
 .us-map .maplibregl-ctrl-attrib {
-  background: var(--us-surface-raised, #ffffff);
-  color: var(--us-text, #1a1a1a);
+  background: var(--us-surface-raised);
+  color: var(--us-text);
 }
 
 .us-map .maplibregl-ctrl-attrib a {
   color: inherit;
-}
-
-.us-map[data-scheme="dark"] .us-map-notice,
-.us-map[data-scheme="dark"] .us-map-button,
-.us-map[data-scheme="dark"] .us-map-sheet,
-.us-map[data-scheme="dark"] .maplibregl-ctrl-attrib {
-  background: var(--us-surface-raised, #2b2b2b);
-  color: var(--us-text, #f2f2f2);
 }

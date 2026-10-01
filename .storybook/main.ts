@@ -1,3 +1,4 @@
+import tailwindcss from "@tailwindcss/vite";
 import type { StorybookConfig } from "@storybook/react-vite";
 
 const config: StorybookConfig = {
@@ -13,6 +14,12 @@ const config: StorybookConfig = {
   // third-party request.
   staticDirs: [{ from: "../stories/basemap", to: "/basemap" }],
   core: { disableTelemetry: true },
+  // Tailwind v4, as the consuming apps run it (PLAN D4), so the vendored
+  // shadcn/ui classes and the token utilities exist in the stories.
+  viteFinal: (config) => ({
+    ...config,
+    plugins: [...(config.plugins ?? []), tailwindcss()],
+  }),
 };
 
 export default config;

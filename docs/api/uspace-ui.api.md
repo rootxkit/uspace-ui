@@ -4,15 +4,44 @@
 
 ```ts
 
+import { AlertDialog as AlertDialog_2 } from 'radix-ui';
+import { Checkbox as Checkbox_2 } from 'radix-ui';
+import { ClassProp } from 'class-variance-authority/types';
+import { ClassValue } from 'clsx';
+import { Collapsible as Collapsible_2 } from 'radix-ui';
+import { Command as Command_2 } from 'cmdk';
+import type { ComponentProps } from 'react';
+import { Dialog as Dialog_2 } from 'radix-ui';
+import { DropdownMenu as DropdownMenu_2 } from 'radix-ui';
 import type { ESLint } from 'eslint';
 import type { FitBoundsOptions } from 'maplibre-gl';
 import type * as GeoJSON_2 from 'geojson';
+import { JSX } from 'react';
+import { Label as Label_2 } from 'radix-ui';
 import type { Linter } from 'eslint';
 import type { Map as Map_2 } from 'maplibre-gl';
+import { Popover as Popover_2 } from 'radix-ui';
+import { RadioGroup as RadioGroup_2 } from 'radix-ui';
+import * as React_2 from 'react';
 import { ReactNode } from 'react';
 import { RenderResult } from '@testing-library/react';
 import { Rule } from 'eslint';
+import { ScrollArea as ScrollArea_2 } from 'radix-ui';
+import { Select as Select_2 } from 'radix-ui';
+import { Separator as Separator_2 } from 'radix-ui';
 import type { StyleSpecification } from 'maplibre-gl';
+import { Switch as Switch_2 } from 'radix-ui';
+import { Tabs as Tabs_2 } from 'radix-ui';
+import { toast } from 'sonner';
+import { ToasterProps } from 'sonner';
+import { Tooltip as Tooltip_2 } from 'radix-ui';
+import { VariantProps } from 'class-variance-authority';
+
+// @public
+const AGE_BUCKETS: readonly ["live", "aging", "stale", "unknown"];
+
+// @public (undocumented)
+type AgeBucket = (typeof AGE_BUCKETS)[number];
 
 // @public (undocumented)
 const ALERT_KINDS: readonly ["proximity", "nonconformance", "nonconformance_nearby", "height_exceedance", "zone_incursion", "lost_link", "restriction_activated", "emergency_nearby"];
@@ -21,11 +50,49 @@ const ALERT_KINDS: readonly ["proximity", "nonconformance", "nonconformance_near
 const ALERT_STATES: readonly ["raised", "updated", "cleared"];
 
 // @public (undocumented)
+function AlertDialog(input: React_2.ComponentProps<typeof AlertDialog_2.Root>): React_2.JSX.Element;
+
+// @public (undocumented)
+function AlertDialogAction(input: React_2.ComponentProps<typeof AlertDialog_2.Action> & Pick<React_2.ComponentProps<typeof Button>, "variant" | "size">): React_2.JSX.Element;
+
+// @public (undocumented)
+function AlertDialogCancel(input: React_2.ComponentProps<typeof AlertDialog_2.Cancel> & Pick<React_2.ComponentProps<typeof Button>, "variant" | "size">): React_2.JSX.Element;
+
+// @public (undocumented)
+function AlertDialogContent(input: React_2.ComponentProps<typeof AlertDialog_2.Content> & {
+    size?: "default" | "sm";
+}): React_2.JSX.Element;
+
+// @public (undocumented)
+function AlertDialogDescription(input: React_2.ComponentProps<typeof AlertDialog_2.Description>): React_2.JSX.Element;
+
+// @public (undocumented)
+function AlertDialogFooter(input: React_2.ComponentProps<"div">): React_2.JSX.Element;
+
+// @public (undocumented)
+function AlertDialogHeader(input: React_2.ComponentProps<"div">): React_2.JSX.Element;
+
+// @public (undocumented)
+function AlertDialogMedia(input: React_2.ComponentProps<"div">): React_2.JSX.Element;
+
+// @public (undocumented)
+function AlertDialogOverlay(input: React_2.ComponentProps<typeof AlertDialog_2.Overlay>): React_2.JSX.Element;
+
+// @public (undocumented)
+function AlertDialogPortal(input: React_2.ComponentProps<typeof AlertDialog_2.Portal>): React_2.JSX.Element;
+
+// @public (undocumented)
+function AlertDialogTitle(input: React_2.ComponentProps<typeof AlertDialog_2.Title>): React_2.JSX.Element;
+
+// @public (undocumented)
+function AlertDialogTrigger(input: React_2.ComponentProps<typeof AlertDialog_2.Trigger>): React_2.JSX.Element;
+
+// @public (undocumented)
 type AlertKind = (typeof ALERT_KINDS)[number];
 
 declare namespace alerts {
     export {
-        ENTRY_13 as ENTRY
+        ENTRY_11 as ENTRY
     }
 }
 
@@ -70,24 +137,34 @@ type AltSource = (typeof ALT_SOURCES)[number];
 
 declare namespace api {
     export {
-        ENTRY_5 as ENTRY
+        ENTRY_3 as ENTRY
     }
 }
 
 declare namespace auth_client {
     export {
-        ENTRY_7 as ENTRY
+        ENTRY_5 as ENTRY
     }
 }
 
 declare namespace auth_server {
     export {
-        ENTRY_6 as ENTRY
+        ENTRY_4 as ENTRY
     }
 }
 
 // @public
 function axeCheck(container: HTMLElement): Promise<void>;
+
+// @public (undocumented)
+function Badge(input: React_2.ComponentProps<"span"> & VariantProps<typeof badgeVariants> & {
+    asChild?: boolean;
+}): React_2.JSX.Element;
+
+// @public (undocumented)
+const badgeVariants: (props?: ({
+    variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | null | undefined;
+} & ClassProp) | undefined) => string;
 
 // @public
 const BASEMAP_DEFAULT_PATHS: {
@@ -149,13 +226,180 @@ interface BBoxSubscriptionOptions {
 }
 
 // @public (undocumented)
+interface Brand {
+    accent: string | null;
+    // (undocumented)
+    contact: string | null;
+    // (undocumented)
+    logoUrl: string | null;
+    // (undocumented)
+    name: string;
+    // (undocumented)
+    shortName: string;
+}
+
+// @public (undocumented)
+const BRAND_ENV_PREFIX = "UI_BRAND_";
+
+// @public
+const BRAND_FALLBACK_NAME = "U-space";
+
+// @public
+function brandFromEnv(env: Record<string, string | undefined>, prefix?: string): Brand;
+
+// @public (undocumented)
+function Breadcrumb(input: React_2.ComponentProps<"nav">): React_2.JSX.Element;
+
+// @public (undocumented)
+function BreadcrumbEllipsis(input: React_2.ComponentProps<"span">): React_2.JSX.Element;
+
+// @public (undocumented)
+function BreadcrumbItem(input: React_2.ComponentProps<"li">): React_2.JSX.Element;
+
+// @public (undocumented)
+function BreadcrumbLink(input: React_2.ComponentProps<"a"> & {
+    asChild?: boolean;
+}): React_2.JSX.Element;
+
+// @public (undocumented)
+function BreadcrumbList(input: React_2.ComponentProps<"ol">): React_2.JSX.Element;
+
+// @public (undocumented)
+function BreadcrumbPage(input: React_2.ComponentProps<"span">): React_2.JSX.Element;
+
+// @public (undocumented)
+function BreadcrumbSeparator(input: React_2.ComponentProps<"li">): React_2.JSX.Element;
+
+// @public (undocumented)
+function Button(input: React_2.ComponentProps<"button"> & VariantProps<typeof buttonVariants> & {
+    asChild?: boolean;
+}): React_2.JSX.Element;
+
+// @public (undocumented)
+const buttonVariants: (props?: ({
+    variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | null | undefined;
+    size?: "default" | "xs" | "sm" | "lg" | "icon" | "icon-xs" | "icon-sm" | "icon-lg" | null | undefined;
+} & ClassProp) | undefined) => string;
+
+// @public (undocumented)
+function Card(input: React_2.ComponentProps<"div">): React_2.JSX.Element;
+
+// @public (undocumented)
+function CardAction(input: React_2.ComponentProps<"div">): React_2.JSX.Element;
+
+// @public (undocumented)
+function CardContent(input: React_2.ComponentProps<"div">): React_2.JSX.Element;
+
+// @public (undocumented)
+function CardDescription(input: React_2.ComponentProps<"div">): React_2.JSX.Element;
+
+// @public (undocumented)
+function CardFooter(input: React_2.ComponentProps<"div">): React_2.JSX.Element;
+
+// @public (undocumented)
+function CardHeader(input: React_2.ComponentProps<"div">): React_2.JSX.Element;
+
+// @public (undocumented)
+function CardTitle(input: React_2.ComponentProps<"div">): React_2.JSX.Element;
+
+// @public (undocumented)
+function Checkbox(input: React_2.ComponentProps<typeof Checkbox_2.Root>): React_2.JSX.Element;
+
+// @public (undocumented)
 const CLEAR_REASONS: readonly ["resolved", "stale", "source_disabled", "flight_ended", "acknowledged_timeout", "landed"];
 
 // @public (undocumented)
 type ClearReason = (typeof CLEAR_REASONS)[number];
 
 // @public (undocumented)
+function cn(...inputs: ClassValue[]): string;
+
+// @public (undocumented)
+function Collapsible(input: React.ComponentProps<typeof Collapsible_2.Root>): JSX.Element;
+
+// @public (undocumented)
+function CollapsibleContent(input: React.ComponentProps<typeof Collapsible_2.CollapsibleContent>): JSX.Element;
+
+// @public (undocumented)
+function CollapsibleTrigger(input: React.ComponentProps<typeof Collapsible_2.CollapsibleTrigger>): JSX.Element;
+
+// @public (undocumented)
+const COLOR_SCHEMES: readonly ColorScheme[];
+
+// @public (undocumented)
+type ColorScheme = "light" | "dark" | "system";
+
+// @public (undocumented)
+function Command(input: React_2.ComponentProps<typeof Command_2>): React_2.JSX.Element;
+
+// @public (undocumented)
+function CommandDialog(input: React_2.ComponentProps<typeof Dialog> & {
+    title?: string;
+    description?: string;
+    className?: string;
+    showCloseButton?: boolean;
+}): React_2.JSX.Element;
+
+// @public (undocumented)
+function CommandEmpty(input: React_2.ComponentProps<typeof Command_2.Empty>): React_2.JSX.Element;
+
+// @public (undocumented)
+function CommandGroup(input: React_2.ComponentProps<typeof Command_2.Group>): React_2.JSX.Element;
+
+// @public (undocumented)
+function CommandInput(input: React_2.ComponentProps<typeof Command_2.Input>): React_2.JSX.Element;
+
+// @public (undocumented)
+function CommandItem(input: React_2.ComponentProps<typeof Command_2.Item>): React_2.JSX.Element;
+
+// @public (undocumented)
+function CommandList(input: React_2.ComponentProps<typeof Command_2.List>): React_2.JSX.Element;
+
+// @public (undocumented)
+function CommandSeparator(input: React_2.ComponentProps<typeof Command_2.Separator>): React_2.JSX.Element;
+
+// @public (undocumented)
+function CommandShortcut(input: React_2.ComponentProps<"span">): React_2.JSX.Element;
+
+// @public (undocumented)
 const config: Linter.Config[];
+
+// @public (undocumented)
+const DARK_QUERY = "(prefers-color-scheme: dark)";
+
+// @public (undocumented)
+function Dialog(input: React_2.ComponentProps<typeof Dialog_2.Root>): React_2.JSX.Element;
+
+// @public (undocumented)
+function DialogClose(input: React_2.ComponentProps<typeof Dialog_2.Close>): React_2.JSX.Element;
+
+// @public (undocumented)
+function DialogContent(input: React_2.ComponentProps<typeof Dialog_2.Content> & {
+    showCloseButton?: boolean;
+}): React_2.JSX.Element;
+
+// @public (undocumented)
+function DialogDescription(input: React_2.ComponentProps<typeof Dialog_2.Description>): React_2.JSX.Element;
+
+// @public (undocumented)
+function DialogFooter(input: React_2.ComponentProps<"div"> & {
+    showCloseButton?: boolean;
+}): React_2.JSX.Element;
+
+// @public (undocumented)
+function DialogHeader(input: React_2.ComponentProps<"div">): React_2.JSX.Element;
+
+// @public (undocumented)
+function DialogOverlay(input: React_2.ComponentProps<typeof Dialog_2.Overlay>): React_2.JSX.Element;
+
+// @public (undocumented)
+function DialogPortal(input: React_2.ComponentProps<typeof Dialog_2.Portal>): React_2.JSX.Element;
+
+// @public (undocumented)
+function DialogTitle(input: React_2.ComponentProps<typeof Dialog_2.Title>): React_2.JSX.Element;
+
+// @public (undocumented)
+function DialogTrigger(input: React_2.ComponentProps<typeof Dialog_2.Trigger>): React_2.JSX.Element;
 
 // @public (undocumented)
 const DISABLED_BYS: readonly ["type", "instance", "default_deny"];
@@ -164,49 +408,111 @@ const DISABLED_BYS: readonly ["type", "instance", "default_deny"];
 type DisabledBy = (typeof DISABLED_BYS)[number];
 
 // @public (undocumented)
-const ENTRY = "theme";
+function DropdownMenu(input: React_2.ComponentProps<typeof DropdownMenu_2.Root>): React_2.JSX.Element;
 
 // @public (undocumented)
-const ENTRY_10 = "legend";
+function DropdownMenuCheckboxItem(input: React_2.ComponentProps<typeof DropdownMenu_2.CheckboxItem>): React_2.JSX.Element;
 
 // @public (undocumented)
-const ENTRY_11 = "live";
+function DropdownMenuContent(input: React_2.ComponentProps<typeof DropdownMenu_2.Content>): React_2.JSX.Element;
 
 // @public (undocumented)
-const ENTRY_12 = "status";
+function DropdownMenuGroup(input: React_2.ComponentProps<typeof DropdownMenu_2.Group>): React_2.JSX.Element;
 
 // @public (undocumented)
-const ENTRY_13 = "alerts";
+function DropdownMenuItem(input: React_2.ComponentProps<typeof DropdownMenu_2.Item> & {
+    inset?: boolean;
+    variant?: "default" | "destructive";
+}): React_2.JSX.Element;
 
 // @public (undocumented)
-const ENTRY_14 = "table";
+function DropdownMenuLabel(input: React_2.ComponentProps<typeof DropdownMenu_2.Label> & {
+    inset?: boolean;
+}): React_2.JSX.Element;
 
 // @public (undocumented)
-const ENTRY_15 = "form";
+function DropdownMenuPortal(input: React_2.ComponentProps<typeof DropdownMenu_2.Portal>): React_2.JSX.Element;
 
 // @public (undocumented)
-const ENTRY_2 = "ui";
+function DropdownMenuRadioGroup(input: React_2.ComponentProps<typeof DropdownMenu_2.RadioGroup>): React_2.JSX.Element;
 
 // @public (undocumented)
-const ENTRY_3 = "i18n";
+function DropdownMenuRadioItem(input: React_2.ComponentProps<typeof DropdownMenu_2.RadioItem>): React_2.JSX.Element;
 
 // @public (undocumented)
-const ENTRY_4 = "fonts";
+function DropdownMenuSeparator(input: React_2.ComponentProps<typeof DropdownMenu_2.Separator>): React_2.JSX.Element;
 
 // @public (undocumented)
-const ENTRY_5 = "api";
+function DropdownMenuShortcut(input: React_2.ComponentProps<"span">): React_2.JSX.Element;
 
 // @public (undocumented)
-const ENTRY_6 = "auth/server";
+function DropdownMenuSub(input: React_2.ComponentProps<typeof DropdownMenu_2.Sub>): React_2.JSX.Element;
 
 // @public (undocumented)
-const ENTRY_7 = "auth/client";
+function DropdownMenuSubContent(input: React_2.ComponentProps<typeof DropdownMenu_2.SubContent>): React_2.JSX.Element;
 
 // @public (undocumented)
-const ENTRY_8 = "symbology";
+function DropdownMenuSubTrigger(input: React_2.ComponentProps<typeof DropdownMenu_2.SubTrigger> & {
+    inset?: boolean;
+}): React_2.JSX.Element;
 
 // @public (undocumented)
-const ENTRY_9 = "layers";
+function DropdownMenuTrigger(input: React_2.ComponentProps<typeof DropdownMenu_2.Trigger>): React_2.JSX.Element;
+
+// @public
+function EmptyState(props: EmptyStateProps): ReactNode;
+
+// @public (undocumented)
+interface EmptyStateProps {
+    action?: ReactNode;
+    // (undocumented)
+    className?: string;
+    // (undocumented)
+    description?: ReactNode;
+    // (undocumented)
+    icon?: ReactNode;
+    // (undocumented)
+    title: ReactNode;
+}
+
+// @public (undocumented)
+const ENTRY = "i18n";
+
+// @public (undocumented)
+const ENTRY_10 = "status";
+
+// @public (undocumented)
+const ENTRY_11 = "alerts";
+
+// @public (undocumented)
+const ENTRY_12 = "table";
+
+// @public (undocumented)
+const ENTRY_13 = "form";
+
+// @public (undocumented)
+const ENTRY_2 = "fonts";
+
+// @public (undocumented)
+const ENTRY_3 = "api";
+
+// @public (undocumented)
+const ENTRY_4 = "auth/server";
+
+// @public (undocumented)
+const ENTRY_5 = "auth/client";
+
+// @public (undocumented)
+const ENTRY_6 = "symbology";
+
+// @public (undocumented)
+const ENTRY_7 = "layers";
+
+// @public (undocumented)
+const ENTRY_8 = "legend";
+
+// @public (undocumented)
+const ENTRY_9 = "live";
 
 declare namespace eslint {
     export {
@@ -265,19 +571,19 @@ function fixtures(): Fixtures;
 
 declare namespace fonts {
     export {
-        ENTRY_4 as ENTRY
+        ENTRY_2 as ENTRY
     }
 }
 
 declare namespace form {
     export {
-        ENTRY_15 as ENTRY
+        ENTRY_13 as ENTRY
     }
 }
 
 declare namespace i18n {
     export {
-        ENTRY_3 as ENTRY
+        ENTRY
     }
 }
 
@@ -316,6 +622,12 @@ type IdentReason = (typeof IDENT_REASONS)[number];
 
 // @public (undocumented)
 type IdentStatus = (typeof IDENT_STATUSES)[number];
+
+// @public
+function InlineCode(input: ComponentProps<"code">): ReactNode;
+
+// @public (undocumented)
+function Input(input: React_2.ComponentProps<"input">): React_2.JSX.Element;
 
 // @public (undocumented)
 interface IntentView {
@@ -371,7 +683,7 @@ const isSeverity: (x: unknown) => x is "info" | "warning" | "critical";
 const isSourceState: (x: unknown) => x is "disabled" | "stale" | "healthy" | "lagging" | "unreachable" | "never_heard";
 
 // @public (undocumented)
-const isTimeSource: (x: unknown) => x is "provider" | "broadcast" | "source_clock" | "receiver" | "system";
+const isTimeSource: (x: unknown) => x is "system" | "provider" | "broadcast" | "source_clock" | "receiver";
 
 // @public (undocumented)
 const isTrust: (x: unknown) => x is "authenticated" | "provider" | "surveillance" | "broadcast" | "sensor" | "simulated";
@@ -384,6 +696,9 @@ const isViolationKind: (x: unknown) => x is "zone_incursion" | "height_120m" | "
 
 // @public (undocumented)
 const isZoneType: (x: unknown) => x is "PROHIBITED" | "REQ_AUTHORIZATION" | "CONDITIONAL" | "NO_RESTRICTION" | "USPACE";
+
+// @public
+function Kbd(input: ComponentProps<"kbd">): ReactNode;
 
 // @public
 interface KitBrand {
@@ -405,6 +720,9 @@ type KitLang = "ka" | "en";
 // @public (undocumented)
 type KitScheme = "light" | "dark" | "system";
 
+// @public (undocumented)
+function Label(input: React_2.ComponentProps<typeof Label_2.Root>): React_2.JSX.Element;
+
 // @public
 function LayerPanel(props: LayerPanelProps): ReactNode;
 
@@ -419,7 +737,7 @@ interface LayerPanelProps {
 
 declare namespace layers {
     export {
-        ENTRY_9 as ENTRY
+        ENTRY_7 as ENTRY
     }
 }
 
@@ -436,13 +754,13 @@ interface LayerToggle {
 
 declare namespace legend {
     export {
-        ENTRY_10 as ENTRY
+        ENTRY_8 as ENTRY
     }
 }
 
 declare namespace live {
     export {
-        ENTRY_11 as ENTRY
+        ENTRY_9 as ENTRY
     }
 }
 
@@ -667,11 +985,58 @@ declare namespace model {
     }
 }
 
+// @public (undocumented)
+function Pagination(input: React_2.ComponentProps<"nav">): React_2.JSX.Element;
+
+// @public (undocumented)
+function PaginationContent(input: React_2.ComponentProps<"ul">): React_2.JSX.Element;
+
+// @public (undocumented)
+function PaginationEllipsis(input: React_2.ComponentProps<"span">): React_2.JSX.Element;
+
+// @public (undocumented)
+function PaginationItem(input: React_2.ComponentProps<"li">): React_2.JSX.Element;
+
+// Warning: (ae-forgotten-export) The symbol "PaginationLinkProps" needs to be exported by the entry point entry.d.ts
+//
+// @public (undocumented)
+function PaginationLink(input: PaginationLinkProps): React_2.JSX.Element;
+
+// @public (undocumented)
+function PaginationNext(input: React_2.ComponentProps<typeof PaginationLink>): React_2.JSX.Element;
+
+// @public (undocumented)
+function PaginationPrevious(input: React_2.ComponentProps<typeof PaginationLink>): React_2.JSX.Element;
+
+// @public (undocumented)
+function parseScheme(v: string | null | undefined): ColorScheme | null;
+
 // @public
 function parseSourceInfo(body: unknown): BasemapInfo | null;
 
 // @public
 const plugin: ESLint.Plugin;
+
+// @public (undocumented)
+function Popover(input: React_2.ComponentProps<typeof Popover_2.Root>): React_2.JSX.Element;
+
+// @public (undocumented)
+function PopoverAnchor(input: React_2.ComponentProps<typeof Popover_2.Anchor>): React_2.JSX.Element;
+
+// @public (undocumented)
+function PopoverContent(input: React_2.ComponentProps<typeof Popover_2.Content>): React_2.JSX.Element;
+
+// @public (undocumented)
+function PopoverDescription(input: React_2.ComponentProps<"p">): React_2.JSX.Element;
+
+// @public (undocumented)
+function PopoverHeader(input: React_2.ComponentProps<"div">): React_2.JSX.Element;
+
+// @public (undocumented)
+function PopoverTitle(input: React_2.ComponentProps<"h2">): React_2.JSX.Element;
+
+// @public (undocumented)
+function PopoverTrigger(input: React_2.ComponentProps<typeof Popover_2.Trigger>): React_2.JSX.Element;
 
 // @public (undocumented)
 interface Problem {
@@ -691,6 +1056,12 @@ interface Problem {
     type: string;
 }
 
+// @public (undocumented)
+function RadioGroup(input: React_2.ComponentProps<typeof RadioGroup_2.Root>): React_2.JSX.Element;
+
+// @public (undocumented)
+function RadioGroupItem(input: React_2.ComponentProps<typeof RadioGroup_2.Item>): React_2.JSX.Element;
+
 // @public
 function renderWithKit(ui: ReactNode, opts?: RenderWithKitOptions): RenderResult;
 
@@ -706,6 +1077,9 @@ interface RenderWithKitOptions {
 }
 
 // @public (undocumented)
+type ResolvedScheme = "light" | "dark";
+
+// @public (undocumented)
 const RESTRICTION_STATES: readonly ["planned", "active", "ended", "cancelled"];
 
 // @public (undocumented)
@@ -718,6 +1092,53 @@ const rules: {
     noBusinessLogicInRoutes: Rule.RuleModule;
     noHandWrittenApiTypes: Rule.RuleModule;
 };
+
+// @public (undocumented)
+const SCHEME_COOKIE = "uspace_scheme";
+
+// @public
+function schemeFromCookie(cookie: string | null | undefined): ColorScheme | null;
+
+// @public (undocumented)
+function ScrollArea(input: React_2.ComponentProps<typeof ScrollArea_2.Root>): React_2.JSX.Element;
+
+// @public (undocumented)
+function ScrollBar(input: React_2.ComponentProps<typeof ScrollArea_2.ScrollAreaScrollbar>): React_2.JSX.Element;
+
+// @public (undocumented)
+function Select(input: React_2.ComponentProps<typeof Select_2.Root>): React_2.JSX.Element;
+
+// @public (undocumented)
+function SelectContent(input: React_2.ComponentProps<typeof Select_2.Content>): React_2.JSX.Element;
+
+// @public (undocumented)
+function SelectGroup(input: React_2.ComponentProps<typeof Select_2.Group>): React_2.JSX.Element;
+
+// @public (undocumented)
+function SelectItem(input: React_2.ComponentProps<typeof Select_2.Item>): React_2.JSX.Element;
+
+// @public (undocumented)
+function SelectLabel(input: React_2.ComponentProps<typeof Select_2.Label>): React_2.JSX.Element;
+
+// @public (undocumented)
+function SelectScrollDownButton(input: React_2.ComponentProps<typeof Select_2.ScrollDownButton>): React_2.JSX.Element;
+
+// @public (undocumented)
+function SelectScrollUpButton(input: React_2.ComponentProps<typeof Select_2.ScrollUpButton>): React_2.JSX.Element;
+
+// @public (undocumented)
+function SelectSeparator(input: React_2.ComponentProps<typeof Select_2.Separator>): React_2.JSX.Element;
+
+// @public (undocumented)
+function SelectTrigger(input: React_2.ComponentProps<typeof Select_2.Trigger> & {
+    size?: "sm" | "default";
+}): React_2.JSX.Element;
+
+// @public (undocumented)
+function SelectValue(input: React_2.ComponentProps<typeof Select_2.Value>): React_2.JSX.Element;
+
+// @public (undocumented)
+function Separator(input: React_2.ComponentProps<typeof Separator_2.Root>): React_2.JSX.Element;
 
 // @public (undocumented)
 interface SessionDisplay {
@@ -736,6 +1157,36 @@ const SEVERITIES: readonly ["info", "warning", "critical"];
 
 // @public (undocumented)
 type Severity = (typeof SEVERITIES)[number];
+
+// @public (undocumented)
+function Sheet(input: React_2.ComponentProps<typeof Dialog_2.Root>): React_2.JSX.Element;
+
+// @public (undocumented)
+function SheetClose(input: React_2.ComponentProps<typeof Dialog_2.Close>): React_2.JSX.Element;
+
+// @public (undocumented)
+function SheetContent(input: React_2.ComponentProps<typeof Dialog_2.Content> & {
+    side?: "top" | "right" | "bottom" | "left";
+    showCloseButton?: boolean;
+}): React_2.JSX.Element;
+
+// @public (undocumented)
+function SheetDescription(input: React_2.ComponentProps<typeof Dialog_2.Description>): React_2.JSX.Element;
+
+// @public (undocumented)
+function SheetFooter(input: React_2.ComponentProps<"div">): React_2.JSX.Element;
+
+// @public (undocumented)
+function SheetHeader(input: React_2.ComponentProps<"div">): React_2.JSX.Element;
+
+// @public (undocumented)
+function SheetTitle(input: React_2.ComponentProps<typeof Dialog_2.Title>): React_2.JSX.Element;
+
+// @public (undocumented)
+function SheetTrigger(input: React_2.ComponentProps<typeof Dialog_2.Trigger>): React_2.JSX.Element;
+
+// @public (undocumented)
+function Skeleton(input: React.ComponentProps<"div">): JSX.Element;
 
 // @public
 const SOURCE_INFO_TIMEOUT_MS = 5000;
@@ -768,9 +1219,25 @@ interface SourceView {
     state: SourceState;
 }
 
+// @public
+function Stat(props: StatProps): ReactNode;
+
+// @public
+const STAT_UNKNOWN = "\u2014";
+
+// @public (undocumented)
+interface StatProps {
+    // (undocumented)
+    className?: string;
+    // (undocumented)
+    label: ReactNode;
+    unit?: ReactNode;
+    value: ReactNode | null;
+}
+
 declare namespace status_2 {
     export {
-        ENTRY_12 as ENTRY
+        ENTRY_10 as ENTRY
     }
 }
 
@@ -780,17 +1247,63 @@ type StyleLoadHandler = (map: Map_2) => void;
 // @public
 function subscriptionBBox(b: BBox, marginFraction: number, quantizeDeg: number): BBox;
 
+// @public (undocumented)
+function Switch(input: React_2.ComponentProps<typeof Switch_2.Root> & {
+    size?: "sm" | "default";
+}): React_2.JSX.Element;
+
 declare namespace symbology {
     export {
-        ENTRY_8 as ENTRY
+        ENTRY_6 as ENTRY
     }
 }
 
+// @public (undocumented)
+function Table(input: React_2.ComponentProps<"table">): React_2.JSX.Element;
+
 declare namespace table {
     export {
-        ENTRY_14 as ENTRY
+        ENTRY_12 as ENTRY
     }
 }
+
+// @public (undocumented)
+function TableBody(input: React_2.ComponentProps<"tbody">): React_2.JSX.Element;
+
+// @public (undocumented)
+function TableCaption(input: React_2.ComponentProps<"caption">): React_2.JSX.Element;
+
+// @public (undocumented)
+function TableCell(input: React_2.ComponentProps<"td">): React_2.JSX.Element;
+
+// @public (undocumented)
+function TableFooter(input: React_2.ComponentProps<"tfoot">): React_2.JSX.Element;
+
+// @public (undocumented)
+function TableHead(input: React_2.ComponentProps<"th">): React_2.JSX.Element;
+
+// @public (undocumented)
+function TableHeader(input: React_2.ComponentProps<"thead">): React_2.JSX.Element;
+
+// @public (undocumented)
+function TableRow(input: React_2.ComponentProps<"tr">): React_2.JSX.Element;
+
+// @public (undocumented)
+function Tabs(input: React_2.ComponentProps<typeof Tabs_2.Root>): React_2.JSX.Element;
+
+// @public (undocumented)
+function TabsContent(input: React_2.ComponentProps<typeof Tabs_2.Content>): React_2.JSX.Element;
+
+// @public (undocumented)
+function TabsList(input: React_2.ComponentProps<typeof Tabs_2.List> & VariantProps<typeof tabsListVariants>): React_2.JSX.Element;
+
+// @public (undocumented)
+const tabsListVariants: (props?: ({
+    variant?: "default" | "line" | null | undefined;
+} & ClassProp) | undefined) => string;
+
+// @public (undocumented)
+function TabsTrigger(input: React_2.ComponentProps<typeof Tabs_2.Trigger>): React_2.JSX.Element;
 
 declare namespace test {
     export {
@@ -810,10 +1323,57 @@ declare namespace test {
 // @public (undocumented)
 const TEST_BRAND: KitBrand;
 
+// @public (undocumented)
+function Textarea(input: React_2.ComponentProps<"textarea">): React_2.JSX.Element;
+
 declare namespace theme {
     export {
-        ENTRY
+        BRAND_ENV_PREFIX,
+        BRAND_FALLBACK_NAME,
+        brandFromEnv,
+        Brand,
+        COLOR_SCHEMES,
+        DARK_QUERY,
+        SCHEME_COOKIE,
+        parseScheme,
+        schemeFromCookie,
+        ColorScheme,
+        ResolvedScheme,
+        ThemeProvider,
+        useOptionalTheme,
+        useTheme,
+        ThemeContextValue,
+        ThemeProviderProps,
+        AGE_BUCKETS,
+        tokens,
+        AgeBucket,
+        Tokens
     }
+}
+
+// @public (undocumented)
+interface ThemeContextValue {
+    // (undocumented)
+    brand: Brand;
+    // (undocumented)
+    resolved: ResolvedScheme;
+    // (undocumented)
+    scheme: ColorScheme;
+    // (undocumented)
+    setScheme(s: ColorScheme): void;
+}
+
+// @public (undocumented)
+function ThemeProvider(props: ThemeProviderProps): ReactNode;
+
+// @public (undocumented)
+interface ThemeProviderProps {
+    // (undocumented)
+    brand: Brand;
+    // (undocumented)
+    children?: ReactNode;
+    onSchemeChange?(s: ColorScheme): void;
+    scheme?: ColorScheme;
 }
 
 // @public (undocumented)
@@ -835,6 +1395,39 @@ interface Times {
 
 // @public (undocumented)
 type TimeSource = (typeof TIME_SOURCES)[number];
+
+// @public (undocumented)
+const Toaster: (input: ToasterProps) => JSX.Element;
+
+// @public (undocumented)
+interface Tokens {
+    age: readonly string[];
+    brandAccent: string;
+    // (undocumented)
+    ident: Readonly<Record<IdentStatus, string>>;
+    identNone: string;
+    // (undocumented)
+    severity: Readonly<Record<Severity, string>>;
+    // (undocumented)
+    trust: Readonly<Record<Trust, string>>;
+    // (undocumented)
+    zone: Readonly<Record<ZoneType, string>>;
+}
+
+// @public (undocumented)
+const tokens: Tokens;
+
+// @public (undocumented)
+function Tooltip(input: React_2.ComponentProps<typeof Tooltip_2.Root>): React_2.JSX.Element;
+
+// @public (undocumented)
+function TooltipContent(input: React_2.ComponentProps<typeof Tooltip_2.Content>): React_2.JSX.Element;
+
+// @public (undocumented)
+function TooltipProvider(input: React_2.ComponentProps<typeof Tooltip_2.Provider>): React_2.JSX.Element;
+
+// @public (undocumented)
+function TooltipTrigger(input: React_2.ComponentProps<typeof Tooltip_2.Trigger>): React_2.JSX.Element;
 
 // @public (undocumented)
 interface TrackView {
@@ -893,7 +1486,143 @@ const TRUSTS: readonly ["authenticated", "provider", "surveillance", "broadcast"
 
 declare namespace ui {
     export {
-        ENTRY_2 as ENTRY
+        AlertDialog,
+        AlertDialogAction,
+        AlertDialogCancel,
+        AlertDialogContent,
+        AlertDialogDescription,
+        AlertDialogFooter,
+        AlertDialogHeader,
+        AlertDialogMedia,
+        AlertDialogOverlay,
+        AlertDialogPortal,
+        AlertDialogTitle,
+        AlertDialogTrigger,
+        Badge,
+        badgeVariants,
+        Breadcrumb,
+        BreadcrumbEllipsis,
+        BreadcrumbItem,
+        BreadcrumbLink,
+        BreadcrumbList,
+        BreadcrumbPage,
+        BreadcrumbSeparator,
+        Button,
+        buttonVariants,
+        Card,
+        CardAction,
+        CardContent,
+        CardDescription,
+        CardFooter,
+        CardHeader,
+        CardTitle,
+        Checkbox,
+        cn,
+        Collapsible,
+        CollapsibleContent,
+        CollapsibleTrigger,
+        Command,
+        CommandDialog,
+        CommandEmpty,
+        CommandGroup,
+        CommandInput,
+        CommandItem,
+        CommandList,
+        CommandSeparator,
+        CommandShortcut,
+        Dialog,
+        DialogClose,
+        DialogContent,
+        DialogDescription,
+        DialogFooter,
+        DialogHeader,
+        DialogOverlay,
+        DialogPortal,
+        DialogTitle,
+        DialogTrigger,
+        DropdownMenu,
+        DropdownMenuCheckboxItem,
+        DropdownMenuContent,
+        DropdownMenuGroup,
+        DropdownMenuItem,
+        DropdownMenuLabel,
+        DropdownMenuPortal,
+        DropdownMenuRadioGroup,
+        DropdownMenuRadioItem,
+        DropdownMenuSeparator,
+        DropdownMenuShortcut,
+        DropdownMenuSub,
+        DropdownMenuSubContent,
+        DropdownMenuSubTrigger,
+        DropdownMenuTrigger,
+        Input,
+        Label,
+        Pagination,
+        PaginationContent,
+        PaginationEllipsis,
+        PaginationItem,
+        PaginationLink,
+        PaginationNext,
+        PaginationPrevious,
+        Popover,
+        PopoverAnchor,
+        PopoverContent,
+        PopoverDescription,
+        PopoverHeader,
+        PopoverTitle,
+        PopoverTrigger,
+        RadioGroup,
+        RadioGroupItem,
+        ScrollArea,
+        ScrollBar,
+        Select,
+        SelectContent,
+        SelectGroup,
+        SelectItem,
+        SelectLabel,
+        SelectScrollDownButton,
+        SelectScrollUpButton,
+        SelectSeparator,
+        SelectTrigger,
+        SelectValue,
+        Separator,
+        Sheet,
+        SheetClose,
+        SheetContent,
+        SheetDescription,
+        SheetFooter,
+        SheetHeader,
+        SheetTitle,
+        SheetTrigger,
+        Skeleton,
+        Textarea,
+        Toaster,
+        toast,
+        Switch,
+        Table,
+        TableBody,
+        TableCaption,
+        TableCell,
+        TableFooter,
+        TableHead,
+        TableHeader,
+        TableRow,
+        Tabs,
+        TabsContent,
+        TabsList,
+        TabsTrigger,
+        tabsListVariants,
+        Tooltip,
+        TooltipContent,
+        TooltipProvider,
+        TooltipTrigger,
+        EmptyState,
+        EmptyStateProps,
+        InlineCode,
+        Kbd,
+        STAT_UNKNOWN,
+        Stat,
+        StatProps
     }
 }
 
@@ -907,7 +1636,13 @@ function useMap(): Map_2 | null;
 function useMapContext(): MapContextValue;
 
 // @public
+function useOptionalTheme(): ThemeContextValue | null;
+
+// @public
 function useStyleLoad(add: StyleLoadHandler): void;
+
+// @public
+function useTheme(): ThemeContextValue;
 
 // @public
 function useViewport(): ViewportState;

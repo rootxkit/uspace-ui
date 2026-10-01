@@ -1,9 +1,11 @@
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
+import tailwindcss from "@tailwindcss/vite";
 import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
 
-// Three projects (PLAN §9): `node` for pure code, `jsdom` for components,
-// `browser` for the stories (Playwright Chromium, axe on every story).
+// Four projects (PLAN §9): `node` for pure code, `jsdom` for components,
+// `browser` for the stories (Playwright Chromium, axe on every story),
+// `golden` for the DOM snapshots of the golden set.
 export default defineConfig({
   test: {
     restoreMocks: true,
@@ -55,6 +57,24 @@ export default defineConfig({
                 args: ["--use-gl=angle", "--use-angle=swiftshader"],
               },
             }),
+            instances: [{ browser: "chromium" }],
+          },
+          setupFiles: [".storybook/vitest.setup.ts"],
+        },
+      },
+      {
+        // The golden DOM snapshots (PLAN §9): plain tests that render
+        // composed stories, in a project of their own because the
+        // Storybook plugin replaces a project's `include` with the stories.
+        extends: true,
+        plugins: [tailwindcss()],
+        test: {
+          name: "golden",
+          include: ["stories/golden/**/*.test.tsx"],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright(),
             instances: [{ browser: "chromium" }],
           },
           setupFiles: [".storybook/vitest.setup.ts"],

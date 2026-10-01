@@ -1,7 +1,7 @@
 import type { Map as MapLibreMap } from "maplibre-gl";
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, waitFor, within } from "storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 
 import {
   MapControls,
@@ -190,6 +190,26 @@ export const EnglishDark: Story = {
   play: async ({ canvasElement }) => {
     const map = await loadedMap(canvasElement);
     await expect(map.getStyle().sprite).toContain("/basemap/sprites/v4/dark");
+    // The controls take the dark tokens from the map's own data-theme,
+    // although the page around it is light (styles/tokens.css).
+    const canvas = within(canvasElement);
+    const layers = canvas.getByRole("button", { name: "Layers" });
+    await expect(getComputedStyle(layers).backgroundColor).toBe(
+      "rgb(27, 31, 38)",
+    );
+    // The layer sheet opens with the toggles; axe runs with it open.
+    await userEvent.click(layers);
+    const page = within(canvasElement.ownerDocument.body);
+    const sheet = await page.findByRole("dialog", { name: "Layers" });
+    await expect(
+      within(sheet).getByRole("checkbox", { name: "Zones" }),
+    ).toHaveAttribute("aria-checked", "true");
+    await userEvent.click(
+      within(sheet).getByRole("checkbox", { name: "Tracks" }),
+    );
+    await expect(
+      within(sheet).getByRole("checkbox", { name: "Tracks" }),
+    ).toHaveAttribute("aria-checked", "true");
   },
 };
 

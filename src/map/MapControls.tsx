@@ -2,8 +2,20 @@
 // Zoom, compass, scale, scheme and layer toggles. No geolocation control:
 // a console is a desk, and a browser prompt for location would be a
 // surprise on a state workstation (WP-3 safety notes).
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 
+import {
+  Button,
+  Checkbox,
+  Label,
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "../ui/index.js";
 import type { MapScheme } from "./basemap.js";
 import { useMapContext } from "./context.js";
 import { maplibre } from "./maplibre.js";
@@ -27,76 +39,57 @@ export interface LayerPanelProps {
   lang?: MapLang;
 }
 
-/** The layer toggles as a sheet, opened by a "Layers" button. */
+/**
+ * The layer toggles as a sheet (the kit's shadcn/ui `Sheet`), opened by a
+ * "Layers" button. The sheet traps focus while open; Escape and the close
+ * button return focus to the button.
+ */
 export function LayerPanel(props: LayerPanelProps): ReactNode {
   const { layers, translate = (k: string) => k } = props;
   const ctx = useMapContext();
   const lang = props.lang ?? ctx.lang;
-  const [open, setOpen] = useState(false);
-  const panelId = useId();
-  const button = useRef<HTMLButtonElement>(null);
-  const panel = useRef<HTMLDivElement>(null);
-
-  const close = (): void => {
-    setOpen(false);
-    button.current?.focus();
-  };
-
-  // Focus moves into the sheet when it opens; Escape closes it and returns
-  // focus to the button.
-  useEffect(() => {
-    const el = panel.current;
-    if (!open || el === null) return;
-    el.querySelector("input")?.focus();
-    const onKey = (e: KeyboardEvent): void => {
-      if (e.key !== "Escape") return;
-      setOpen(false);
-      button.current?.focus();
-    };
-    el.addEventListener("keydown", onKey);
-    return () => el.removeEventListener("keydown", onKey);
-  }, [open]);
+  const idPrefix = useId();
+  const title = mapText(lang, "map.layers");
 
   return (
     <div className="us-map-layers">
-      <button
-        ref={button}
-        type="button"
-        className="us-map-button"
-        aria-expanded={open}
-        aria-controls={panelId}
-        onClick={() => setOpen(!open)}
-      >
-        {mapText(lang, "map.layers")}
-      </button>
-      {open && (
-        <div
-          ref={panel}
-          id={panelId}
+      <Sheet>
+        <SheetTrigger className="us-map-button">{title}</SheetTrigger>
+        {/* The upstream close button reads "Close" in English, so the
+            sheet renders its own, translated one. */}
+        <SheetContent
+          lang={lang}
+          showCloseButton={false}
+          aria-describedby={undefined}
           className="us-map-sheet"
-          role="dialog"
-          aria-modal="false"
-          aria-label={mapText(lang, "map.layers")}
         >
-          <ul>
-            {layers.map((l) => (
-              <li key={l.id}>
-                <label>
-                  <input
-                    type="checkbox"
+          <SheetHeader>
+            <SheetTitle>{title}</SheetTitle>
+          </SheetHeader>
+          <ul className="flex flex-col gap-2 px-4">
+            {layers.map((l) => {
+              const id = `${idPrefix}-${l.id}`;
+              return (
+                <li key={l.id} className="flex min-h-7 items-center gap-2">
+                  <Checkbox
+                    id={id}
                     checked={l.visible}
-                    onChange={(e) => l.onChange(e.currentTarget.checked)}
+                    onCheckedChange={(v) => l.onChange(v === true)}
                   />
-                  {translate(l.labelKey)}
-                </label>
-              </li>
-            ))}
+                  <Label htmlFor={id}>{translate(l.labelKey)}</Label>
+                </li>
+              );
+            })}
           </ul>
-          <button type="button" className="us-map-button" onClick={close}>
-            {mapText(lang, "map.layers_close")}
-          </button>
-        </div>
-      )}
+          <SheetFooter>
+            <SheetClose asChild>
+              <Button variant="outline">
+                {mapText(lang, "map.layers_close")}
+              </Button>
+            </SheetClose>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

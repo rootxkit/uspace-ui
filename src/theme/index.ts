@@ -1,3 +1,25 @@
-// Stub until its work package lands (docs/PLAN.md §13); it marks the entry
-// point so publint and attw validate the exports map from WP-0 on.
-export const ENTRY = "theme";
+// `@rootxkit/uspace-ui/theme` (docs/PLAN.md §3.2, WP-1): tokens, the
+// ThemeProvider, branding from configuration, the colour scheme.
+export {
+  BRAND_ENV_PREFIX,
+  BRAND_FALLBACK_NAME,
+  brandFromEnv,
+  type Brand,
+} from "./brand.js";
+export {
+  COLOR_SCHEMES,
+  DARK_QUERY,
+  SCHEME_COOKIE,
+  parseScheme,
+  schemeFromCookie,
+  type ColorScheme,
+  type ResolvedScheme,
+} from "./scheme.js";
+export {
+  ThemeProvider,
+  useOptionalTheme,
+  useTheme,
+  type ThemeContextValue,
+  type ThemeProviderProps,
+} from "./ThemeProvider.js";
+export { AGE_BUCKETS, tokens, type AgeBucket, type Tokens } from "./tokens.js";
