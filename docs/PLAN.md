@@ -485,7 +485,7 @@ pinned exact in `package.json` and locked; peers carry ranges.
 | Package | Entry point | Why it is allowed |
 |---|---|---|
 | `react`, `react-dom` (peer `^19`) | all but `symbology`, `eslint` | The UI framework (`00 §6`). |
-| `next` (peer `>=15`, optional) | `fonts`, `auth/*` | `next/font/local`, `NextRequest`/`NextResponse`. Optional peer so Storybook and vitest run without it. Verify the current major at WP-0 time, not from memory (§14 Q12). |
+| `next` (peer `>=15`, optional; dev pin for the type check) | `fonts`, `auth/*` | `next/font/local`, `NextRequest`/`NextResponse`. Optional peer so Storybook and vitest run without it; the dev copy (exact pin, WP-2) gives `tsc` the `next/font/local` types. Verify the current major at WP-0 time, not from memory (§14 Q12). |
 | `maplibre-gl` (peer `^5`) | `map`, `layers` | The map (`00 §6`). Peer, so the app controls one copy. |
 | `pmtiles`, `@protomaps/basemaps` | `map` | D6: the self-hosted basemap protocol and the style layers the predecessor already used (P1-12). |
 | `tailwindcss` (peer `^4`) | styles | D4. The app runs Tailwind; the kit ships tokens and source classes. |

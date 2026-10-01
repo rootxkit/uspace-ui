@@ -4,6 +4,8 @@
 // surprise on a state workstation (WP-3 safety notes).
 import { useEffect, useId, useState, type ReactNode } from "react";
 
+import { useTFor } from "../i18n/I18nProvider.js";
+import type { Lang } from "../i18n/lang.js";
 import {
   Button,
   Checkbox,
@@ -19,24 +21,26 @@ import {
 import type { MapScheme } from "./basemap.js";
 import { useMapContext } from "./context.js";
 import { maplibre } from "./maplibre.js";
-import { mapText, type MapLang } from "./messages.js";
 
 export interface LayerToggle {
   id: string;
-  /** A catalogue key; rendered through `translate`. */
+  /**
+   * A catalogue key (the kit's or the app's, through the I18nProvider's
+   * catalogues), or resolved by `translate` when that is given.
+   */
   labelKey: string;
   visible: boolean;
   onChange(v: boolean): void;
 }
 
-/** Resolves a layer's `labelKey`. Interim until WP-2's `useT()`. */
+/** Resolves a layer's `labelKey` instead of the catalogues. */
 export type Translate = (key: string) => string;
 
 export interface LayerPanelProps {
   layers: LayerToggle[];
   translate?: Translate;
   /** Defaults to the enclosing MapView's language. */
-  lang?: MapLang;
+  lang?: Lang;
 }
 
 /**
@@ -45,11 +49,12 @@ export interface LayerPanelProps {
  * button return focus to the button.
  */
 export function LayerPanel(props: LayerPanelProps): ReactNode {
-  const { layers, translate = (k: string) => k } = props;
   const ctx = useMapContext();
   const lang = props.lang ?? ctx.lang;
+  const t = useTFor(lang);
+  const { layers, translate = (k: string) => t(k) } = props;
   const idPrefix = useId();
-  const title = mapText(lang, "map.layers");
+  const title = t("map.layers");
 
   return (
     <div className="us-map-layers">
@@ -83,9 +88,7 @@ export function LayerPanel(props: LayerPanelProps): ReactNode {
           </ul>
           <SheetFooter>
             <SheetClose asChild>
-              <Button variant="outline">
-                {mapText(lang, "map.layers_close")}
-              </Button>
+              <Button variant="outline">{t("map.layers_close")}</Button>
             </SheetClose>
           </SheetFooter>
         </SheetContent>
@@ -108,6 +111,7 @@ export function MapControls(props: MapControlsProps): ReactNode {
   const { layers, scheme = false, onSchemeChange, translate } = props;
   const ctx = useMapContext();
   const { map, lang } = ctx;
+  const t = useTFor(lang);
   const [bearing, setBearing] = useState(0);
 
   useEffect(() => {
@@ -131,12 +135,12 @@ export function MapControls(props: MapControlsProps): ReactNode {
     <div
       className="us-map-controls"
       role="group"
-      aria-label={mapText(lang, "map.controls")}
+      aria-label={t("map.controls")}
     >
       <button
         type="button"
         className="us-map-button"
-        aria-label={mapText(lang, "map.zoom_in")}
+        aria-label={t("map.zoom_in")}
         disabled={disabled}
         onClick={() => map?.zoomIn()}
       >
@@ -145,7 +149,7 @@ export function MapControls(props: MapControlsProps): ReactNode {
       <button
         type="button"
         className="us-map-button"
-        aria-label={mapText(lang, "map.zoom_out")}
+        aria-label={t("map.zoom_out")}
         disabled={disabled}
         onClick={() => map?.zoomOut()}
       >
@@ -154,7 +158,7 @@ export function MapControls(props: MapControlsProps): ReactNode {
       <button
         type="button"
         className="us-map-button"
-        aria-label={mapText(lang, "map.north")}
+        aria-label={t("map.north")}
         disabled={disabled}
         onClick={() => map?.resetNorth()}
       >
@@ -173,7 +177,7 @@ export function MapControls(props: MapControlsProps): ReactNode {
           aria-pressed={ctx.scheme === "dark"}
           onClick={() => onSchemeChange(next)}
         >
-          {mapText(lang, "map.scheme_dark")}
+          {t("map.scheme_dark")}
         </button>
       )}
       {layers.length > 0 && (

@@ -112,14 +112,24 @@ content arrives through a props spread the rule cannot see).
 
 ## Known upstream behaviour to remember
 
-- Some vendored components carry English text for screen readers:
-  `DialogContent` and `SheetContent` ("Close"; pass
-  `showCloseButton={false}` and render a translated `DialogClose` /
-  `SheetClose`), `BreadcrumbEllipsis` ("More"), `PaginationEllipsis`
-  ("More pages"), `PaginationPrevious` / `PaginationNext` ("Previous",
-  "Next"), `CommandDialog` (title "Command Palette"; pass `title` and
-  `description`). A console in `ka` passes its own text; the catalogue
-  keys come with WP-2.
+- Some vendored components carry English text, mostly for screen
+  readers. The files stay as upstream wrote them, so a console in `ka`
+  replaces the text through props or by composing the parts, with the
+  `ui.*` keys of the kit's catalogues (`src/i18n/en.ts`, `ka.ts`):
+
+  | Component                              | Upstream text                                                         | Replace with                                                                              | Key                                                          |
+  | -------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+  | `DialogContent`, `SheetContent`        | "Close" (icon button)                                                 | `showCloseButton={false}` and a `DialogClose` / `SheetClose` of your own                  | `ui.close`                                                   |
+  | `DialogFooter showCloseButton`         | "Close" (button)                                                      | leave `showCloseButton` off; render a `DialogClose`                                       | `ui.close`                                                   |
+  | `Breadcrumb`                           | `aria-label="breadcrumb"`                                             | `aria-label` prop                                                                         | `ui.breadcrumb`                                              |
+  | `BreadcrumbEllipsis`                   | "More"                                                                | a `<span>` with your own text; the text is not a prop                                     | `ui.more`                                                    |
+  | `Pagination`                           | `aria-label="pagination"`                                             | `aria-label` prop                                                                         | `ui.pagination`                                              |
+  | `PaginationPrevious`, `PaginationNext` | "Previous", "Next"; `aria-label` "Go to previous/next page"           | a `PaginationLink` with your own content and `aria-label`; the visible text is not a prop | `ui.previous`, `ui.next`, `ui.previous_page`, `ui.next_page` |
+  | `PaginationEllipsis`                   | "More pages"                                                          | a `<span>` with your own text; the text is not a prop                                     | `ui.more_pages`                                              |
+  | `CommandDialog`                        | title "Command Palette", description "Search for a command to run..." | `title` and `description` props                                                           | `ui.command_title`, `ui.command_description`                 |
+
+  The `ui` stories do this in both languages (`stories/ui/texts.ts`).
+
 - `ScrollArea` (Radix) injects a `<style>` element to hide the native
   scrollbar. Under the PLAN §7 CSP (`style-src 'self'`, no
   `'unsafe-inline'`) the browser refuses it, and the native scrollbar

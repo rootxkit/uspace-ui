@@ -55,7 +55,7 @@ export const TabsLight = light(TabsDemo, { play: tabsPlay });
 export const TabsDark = dark(TabsDemo, { play: tabsPlay });
 
 const BreadcrumbDemo: Demo = (t) => (
-  <Breadcrumb>
+  <Breadcrumb aria-label={t.breadcrumb}>
     <BreadcrumbList>
       <BreadcrumbItem>
         <BreadcrumbLink href="#home">{t.crumbHome}</BreadcrumbLink>

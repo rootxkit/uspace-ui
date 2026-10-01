@@ -36,10 +36,4 @@ export {
   type Translate,
 } from "./MapControls.js";
 export { MapView, type MapViewProps } from "./MapView.js";
-export {
-  MAP_MESSAGES,
-  mapText,
-  type MapKey,
-  type MapLang,
-} from "./messages.js";
 export { subscriptionBBox, type BBox, type Viewport } from "./viewport.js";

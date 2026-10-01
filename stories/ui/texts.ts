@@ -1,12 +1,16 @@
-// Story-only sample text in both languages (the kit's catalogues come with
-// WP-2). Nothing here is a user-facing string of the kit itself.
+// Story-only sample text in both languages. Nothing here is a user-facing
+// string of the kit itself, except the replacements for the vendored
+// components' English text, which come from the kit's catalogues (the
+// `ui.*` keys, src/ui/UPGRADING.md).
+import { en as kitEn, ka as kitKa } from "../../src/i18n/index.js";
+
 export type StoryLang = "en" | "ka";
 
 export const TEXTS = {
   en: {
     save: "Save",
     cancel: "Cancel",
-    close: "Close",
+    close: kitEn["ui.close"],
     delete: "Delete",
     outline: "Outline",
     secondary: "Secondary",
@@ -69,9 +73,10 @@ export const TEXTS = {
     crumbHome: "Home",
     crumbZones: "Zones",
     crumbCurrent: "TEST-ZONE-01",
-    pageNav: "Pages",
-    pagePrevious: "Previous page",
-    pageNext: "Next page",
+    pageNav: kitEn["ui.pagination"],
+    breadcrumb: kitEn["ui.breadcrumb"],
+    pagePrevious: kitEn["ui.previous_page"],
+    pageNext: kitEn["ui.next_page"],
     page: "Page",
     collapsibleTrigger: "More details",
     collapsibleBody: "Collapsible content.",
@@ -87,7 +92,7 @@ export const TEXTS = {
   ka: {
     save: "შენახვა",
     cancel: "გაუქმება",
-    close: "დახურვა",
+    close: kitKa["ui.close"],
     delete: "წაშლა",
     outline: "კონტური",
     secondary: "მეორადი",
@@ -150,9 +155,10 @@ export const TEXTS = {
     crumbHome: "მთავარი",
     crumbZones: "ზონები",
     crumbCurrent: "TEST-ZONE-01",
-    pageNav: "გვერდები",
-    pagePrevious: "წინა გვერდი",
-    pageNext: "შემდეგი გვერდი",
+    pageNav: kitKa["ui.pagination"],
+    breadcrumb: kitKa["ui.breadcrumb"],
+    pagePrevious: kitKa["ui.previous_page"],
+    pageNext: kitKa["ui.next_page"],
     page: "გვერდი",
     collapsibleTrigger: "მეტი დეტალი",
     collapsibleBody: "ჩაკეცვადი შიგთავსი.",

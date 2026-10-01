@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { mapText, MAP_MESSAGES } from "./messages.js";
+import { createTranslator } from "../i18n/translate.js";
 import { bboxText, subscriptionBBox, viewportBBox } from "./viewport.js";
 
 describe("subscriptionBBox", () => {
@@ -78,52 +78,10 @@ describe("viewportBBox", () => {
 describe("bboxText", () => {
   it("prints four decimals in lng, lat order", () => {
     expect(
-      mapText(
-        "en",
+      createTranslator("en")(
         "map.bbox",
         bboxText({ minLng: 44.7, minLat: 41.6, maxLng: 44.9, maxLat: 41.8 }),
       ),
     ).toBe("44.7000, 41.6000 to 44.9000, 41.8000 (lng, lat, WGS84)");
-  });
-});
-
-describe("map messages", () => {
-  it("have the same keys in ka and en", () => {
-    expect(Object.keys(MAP_MESSAGES.ka).sort()).toEqual(
-      Object.keys(MAP_MESSAGES.en).sort(),
-    );
-  });
-
-  it("translate every key: no value equals its key or its English", () => {
-    for (const [key, value] of Object.entries(MAP_MESSAGES.en)) {
-      expect(value).not.toBe(key);
-      expect(MAP_MESSAGES.ka[key as keyof typeof MAP_MESSAGES.ka]).not.toBe(
-        value,
-      );
-    }
-  });
-
-  it("have the same placeholders in both languages", () => {
-    const holes = (s: string): string[] => (s.match(/\{\w+\}/g) ?? []).sort();
-    for (const [key, value] of Object.entries(MAP_MESSAGES.en)) {
-      expect(
-        holes(MAP_MESSAGES.ka[key as keyof typeof MAP_MESSAGES.ka]),
-      ).toEqual(holes(value));
-    }
-  });
-
-  it("leave an unknown placeholder visible rather than empty", () => {
-    expect(mapText("en", "map.osm_as_of")).toBe("OSM data as of {date} (UTC)");
-    expect(mapText("en", "map.osm_as_of", { date: "2026-10-01" })).toBe(
-      "OSM data as of 2026-10-01 (UTC)",
-    );
-  });
-
-  it("never say lost", () => {
-    for (const lang of ["en", "ka"] as const) {
-      for (const value of Object.values(MAP_MESSAGES[lang])) {
-        expect(value).not.toMatch(/lost|დაკარგ/i);
-      }
-    }
   });
 });

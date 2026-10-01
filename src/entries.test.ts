@@ -41,18 +41,24 @@ const PLAN_KEYS = [
 ];
 
 // Plan entries not yet in the map, each with the reason and the WP that
-// adds it. publint fails a subpath pattern that matches no file, and no
-// font exists before WP-2.
-const PENDING: Record<string, string> = {
-  "./fonts/*.woff2": "WP-2 adds the key with the first woff2 file",
+// adds it.
+const PENDING: Record<string, string> = {};
+
+// Entries a work package added beyond PLAN §2 (additive, §12), each with
+// the reason, in the map's order after the plan's.
+const ADDED: Record<string, string> = {
+  "./fonts/fonts.css":
+    "WP-2: the @font-face rules and the font-sans stack for Storybook and non-Next consumers",
 };
 
-// Entries that are real (WP-0, WP-1, WP-3); the rest are stubs until their
-// WP.
+// Entries that are real (WP-0, WP-1, WP-2, WP-3); the rest are stubs until
+// their WP.
 const REAL = new Set([
   "./model",
   "./theme",
   "./ui",
+  "./i18n",
+  "./fonts",
   "./map",
   "./eslint",
   "./test",
@@ -63,9 +69,13 @@ const jsKeys = Object.entries(pkg.exports).filter(
 );
 
 describe("exports map", () => {
-  it("has every entry point of PLAN §2 but the pending ones, and package.json", () => {
+  it("has every entry point of PLAN §2 but the pending ones, the added ones, and package.json", () => {
     const expected = PLAN_KEYS.filter((k) => !(k in PENDING));
-    expect(Object.keys(pkg.exports)).toEqual([...expected, "./package.json"]);
+    expect(Object.keys(pkg.exports)).toEqual([
+      ...expected,
+      ...Object.keys(ADDED),
+      "./package.json",
+    ]);
   });
 
   it("lists as pending only plan entries that are absent", () => {

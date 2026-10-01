@@ -1,6 +1,7 @@
 import { cleanup, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { useT } from "../i18n/I18nProvider.js";
 import { axeCheck, formatViolations } from "./axe.js";
 import { renderWithKit, TEST_BRAND } from "./render.js";
 
@@ -32,6 +33,17 @@ describe("renderWithKit", () => {
     expect(root.getAttribute("data-theme")).toBe("dark");
     expect(root.getAttribute("data-brand")).toBe("TEST");
     expect(root.getAttribute("data-now-ms")).toBe("1000");
+  });
+
+  it("provides the kit's i18n in the chosen language", () => {
+    function Label() {
+      return <p>{useT()("map.layers")}</p>;
+    }
+    renderWithKit(<Label />, { lang: "ka" });
+    expect(screen.getByText("ფენები")).toBeDefined();
+    cleanup();
+    renderWithKit(<Label />);
+    expect(screen.getByText("Layers")).toBeDefined();
   });
 
   it("resolves the system scheme to light", () => {

@@ -1,3 +1,56 @@
-// Stub until its work package lands (docs/PLAN.md §13); it marks the entry
-// point so publint and attw validate the exports map from WP-0 on.
-export const ENTRY = "i18n";
+// `@rootxkit/uspace-ui/i18n` (docs/PLAN.md §3.4, WP-2): the ka and en
+// catalogues, the provider and translator, language negotiation and the
+// display formatters.
+export {
+  i18nCounters,
+  missingKeys,
+  resetI18nCounters,
+  type I18nCounter,
+} from "./counters.js";
+export { en, type Key } from "./en.js";
+export {
+  ALTITUDE_KEYS,
+  DASH,
+  HEIGHT_KEYS,
+  fmtAge,
+  fmtAltitude,
+  fmtDistance,
+  fmtHeading,
+  fmtHeight,
+  fmtNum,
+  fmtRegistrationNumber,
+  fmtSpeed,
+  fmtTimeLocal,
+  fmtTimeUTC,
+  type HeightRef,
+} from "./format.js";
+export {
+  I18nProvider,
+  useLang,
+  useOptionalI18n,
+  useT,
+  useTFor,
+  type I18nContextValue,
+  type I18nProviderProps,
+} from "./I18nProvider.js";
+export { ka } from "./ka.js";
+export {
+  DEFAULT_LANG,
+  LANG_COOKIE,
+  LANGS,
+  LOCALES,
+  langFromAcceptLanguage,
+  langFromCookie,
+  negotiateLang,
+  parseLang,
+  type Lang,
+} from "./lang.js";
+export {
+  KIT_CATALOGUES,
+  createTranslator,
+  interpolate,
+  type Catalogue,
+  type Catalogues,
+  type Translate,
+  type Vars,
+} from "./translate.js";

@@ -4,10 +4,14 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 
 import {
+  I18nProvider,
+  type Catalogues,
+  type Lang,
+} from "../../src/i18n/index.js";
+import {
   MapControls,
   MapView,
   type LayerToggle,
-  type MapLang,
   type MapScheme,
 } from "../../src/map/index.js";
 import "../../styles/map.css";
@@ -36,16 +40,17 @@ const LABEL_LAYERS = [
   "pois",
 ];
 
-// Story-only names for the sample layer toggles.
-const LAYER_NAMES: Record<string, string> = {
-  "story.layer.zones": "Zones",
-  "story.layer.tracks": "Tracks",
+// Story-only names for the sample layer toggles, as an app's own
+// catalogue: MapControls resolves `labelKey` through the I18nProvider.
+const LAYER_NAMES: Catalogues = {
+  en: { "story.layer.zones": "Zones", "story.layer.tracks": "Tracks" },
+  ka: { "story.layer.zones": "ზონები", "story.layer.tracks": "ტრეკები" },
 };
 
 const maps = new WeakMap<Element, MapLibreMap>();
 
 interface MapStoryProps {
-  lang: MapLang;
+  lang: Lang;
   scheme: MapScheme;
   basemapPath?: string;
 }
@@ -71,27 +76,24 @@ function MapStory({ lang, scheme, basemapPath }: MapStoryProps) {
   ];
   const base = storyBaseUrl();
   return (
-    <div ref={setHost} style={{ height: 480 }} data-testid="map-host">
-      <MapView
-        basemap={{
-          baseUrl: basemapPath === undefined ? base : base + basemapPath,
-        }}
-        initial={TBILISI}
-        lang={lang}
-        scheme={current}
-        onLoad={(m) => {
-          if (host !== null) maps.set(host, m);
-          host?.setAttribute("data-loaded", "true");
-        }}
-      >
-        <MapControls
-          layers={layers}
-          scheme
-          onSchemeChange={setScheme}
-          translate={(k) => LAYER_NAMES[k] ?? k}
-        />
-      </MapView>
-    </div>
+    <I18nProvider lang={lang} catalogues={LAYER_NAMES}>
+      <div ref={setHost} style={{ height: 480 }} data-testid="map-host">
+        <MapView
+          basemap={{
+            baseUrl: basemapPath === undefined ? base : base + basemapPath,
+          }}
+          initial={TBILISI}
+          lang={lang}
+          scheme={current}
+          onLoad={(m) => {
+            if (host !== null) maps.set(host, m);
+            host?.setAttribute("data-loaded", "true");
+          }}
+        >
+          <MapControls layers={layers} scheme onSchemeChange={setScheme} />
+        </MapView>
+      </div>
+    </I18nProvider>
   );
 }
 

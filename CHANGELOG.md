@@ -44,3 +44,15 @@ follows docs/PLAN.md §12. One line per work package under Unreleased.
   Tbilisi extract for the stories. maplibre-gl 5.24.0 (peer `^5`; 6.x
   exists and was not taken, the plan names 5), pmtiles 4.5.0,
   @protomaps/basemaps 5.7.2.
+- WP-2: `i18n` (`ka` and `en` catalogues with the common, map and `ui`
+  keys and the R-05, C-12, B-11, G-10 and datum wording pinned by tests;
+  `I18nProvider`, `useT` with `{name}` and `_one`/`_other`, `useLang`,
+  `useTFor`, `negotiateLang` over `uspace_lang` and `Accept-Language`,
+  `missingKeys()`; formatters that name every datum and unit, say UTC and
+  keep a registration secret part off the screen) and `fonts` (Noto Sans
+  2.015 and Noto Sans Georgian 2.005 woff2 subsets, OFL, 97 796 bytes,
+  next/font loaders with `unicode-range`, `fonts/fonts.css`,
+  `mapFontstack`). The map's interim `messages.ts` (`mapText`,
+  `MAP_MESSAGES`, `MapKey`, `MapLang`) is gone: its strings are in the
+  catalogues and `MapView` takes `Lang`. fontkit 2.0.4 and next 16.3.8
+  as dev pins.
