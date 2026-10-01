@@ -2,3 +2,4 @@
 *.woff2 binary
 *.pmtiles binary
 *.png binary
+*.pbf binary

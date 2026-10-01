@@ -48,7 +48,7 @@ const PENDING: Record<string, string> = {
 };
 
 // Entries that are real in WP-0; the rest are stubs until their WP.
-const REAL = new Set(["./model", "./eslint", "./test"]);
+const REAL = new Set(["./model", "./map", "./eslint", "./test"]);
 
 const jsKeys = Object.entries(pkg.exports).filter(
   (e): e is [string, ExportTarget] => typeof e[1] === "object",

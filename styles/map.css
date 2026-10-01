@@ -1,2 +1,142 @@
-/* Stub until WP-3 writes the map stylesheet (docs/PLAN.md §3.6). It exists so
-   the exports map entry "./styles/map.css" resolves from WP-0 on. */
+/* @rootxkit/uspace-ui/styles/map.css (docs/PLAN.md §3.6, WP-3): MapLibre's
+   stylesheet and the kit's map controls and notices. Colours come from the
+   theme tokens (styles/tokens.css, WP-1); the fallbacks keep the controls
+   legible before the tokens are loaded. */
+@import "maplibre-gl/dist/maplibre-gl.css";
+
+.us-map {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 12rem;
+  overflow: hidden;
+  background: var(--us-surface, #f2f2f2);
+  color: var(--us-text, #1a1a1a);
+  font-family: inherit;
+}
+
+.us-map[data-scheme="dark"] {
+  background: var(--us-surface, #1f1f1f);
+  color: var(--us-text, #f2f2f2);
+}
+
+.us-map-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+/* Every empty state is a visible notice (LESSONS E-02), never a blank. */
+.us-map-notice {
+  position: absolute;
+  top: 0.75rem;
+  left: 50%;
+  z-index: 3;
+  transform: translateX(-50%);
+  max-width: min(36rem, calc(100% - 2rem));
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--us-border, #767676);
+  border-radius: 0.375rem;
+  background: var(--us-surface-raised, #ffffff);
+  color: var(--us-text, #1a1a1a);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.us-map-notice-webgl {
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.us-map-controls {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.us-map-button {
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  padding: 0 0.5rem;
+  border: 1px solid var(--us-border, #767676);
+  border-radius: 0.375rem;
+  background: var(--us-surface-raised, #ffffff);
+  color: var(--us-text, #1a1a1a);
+  font: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.us-map-button:disabled {
+  cursor: not-allowed;
+}
+
+.us-map-button[aria-pressed="true"] {
+  outline: 2px solid var(--us-focus, #1a5fb4);
+  outline-offset: -2px;
+}
+
+.us-map-button:focus-visible,
+.us-map-sheet input:focus-visible {
+  outline: 3px solid var(--us-focus, #1a5fb4);
+  outline-offset: 2px;
+}
+
+.us-map-compass {
+  display: inline-block;
+  font-weight: 700;
+}
+
+.us-map-layers {
+  position: relative;
+}
+
+/* The layer toggles as a sheet beside the controls. */
+.us-map-sheet {
+  position: absolute;
+  top: 0;
+  right: calc(100% + 0.5rem);
+  min-width: 12rem;
+  padding: 0.75rem;
+  border: 1px solid var(--us-border, #767676);
+  border-radius: 0.375rem;
+  background: var(--us-surface-raised, #ffffff);
+  color: var(--us-text, #1a1a1a);
+  font-size: 0.875rem;
+}
+
+.us-map-sheet ul {
+  margin: 0 0 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.us-map-sheet label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 1.75rem;
+}
+
+/* The attribution names the OSM extract date; it stays readable. */
+.us-map .maplibregl-ctrl-attrib {
+  background: var(--us-surface-raised, #ffffff);
+  color: var(--us-text, #1a1a1a);
+}
+
+.us-map .maplibregl-ctrl-attrib a {
+  color: inherit;
+}
+
+.us-map[data-scheme="dark"] .us-map-notice,
+.us-map[data-scheme="dark"] .us-map-button,
+.us-map[data-scheme="dark"] .us-map-sheet,
+.us-map[data-scheme="dark"] .maplibregl-ctrl-attrib {
+  background: var(--us-surface-raised, #2b2b2b);
+  color: var(--us-text, #f2f2f2);
+}
