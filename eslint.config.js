@@ -16,4 +16,12 @@ export default [
     ],
   },
   ...kit,
+  {
+    // Vendored shadcn/ui output (src/ui/UPGRADING.md): kept unchanged, so a
+    // rule it trips is relaxed here, for that file only, with the reason.
+    // PaginationLink renders its children through a props spread, which
+    // the rule cannot see.
+    files: ["src/ui/pagination.tsx"],
+    rules: { "jsx-a11y/anchor-has-content": "off" },
+  },
 ];

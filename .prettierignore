@@ -10,3 +10,8 @@ README.md
 # Kept line for line identical to docs/PLAN.md §3.1 so a reviewer can diff
 # the two (WP-0 done-when).
 src/model/types.ts
+# Vendored shadcn/ui output, kept as the CLI wrote it so an upgrade is a
+# plain diff (src/ui/UPGRADING.md). The kit's own files there are checked.
+src/ui/*.tsx
+# Golden DOM snapshots are compared byte for byte by vitest.
+stories/golden/__snapshots__/
