@@ -11,7 +11,7 @@ is never committed here.
 |---|---|
 | `basemap.pmtiles` | Protomaps daily build `20261001`, bbox `44.77,41.68,44.83,41.73`, zooms 0 to 14, 39 tiles, 3.3 MB |
 | `SOURCE.json` | `bounds` (TileJSON order), `osm_data_as_of`, the build and the licence |
-| `fonts/Noto Sans {Regular,Medium,Italic}/` | glyph PBFs for the ranges the story labels use: `0-255`, `256-511` (Latin), `4096-4351` (Georgian Mkhedruli), `7168-7423` (Georgian Mtavruli), `8192-8447` (punctuation) |
+| `fonts/Noto Sans {Regular,Medium,Italic}/` | glyph PBFs for the ranges the story labels use: `0-255`, `256-511` (Latin), `4096-4351` (Georgian Mkhedruli), `7168-7423` (Georgian Mtavruli), `8192-8447` (punctuation), `8448-8703` (letterlike symbols such as №) |
 | `sprites/v4/{light,dark}{,@2x}.{json,png}` | the Protomaps icon sheets |
 | `fonts/OFL.txt` | the font licence, shipped with the glyphs |
 | `extract.py` | the script that cut `basemap.pmtiles` and wrote `SOURCE.json` |
@@ -35,7 +35,7 @@ commit `028c18f713baecad011301ff7a69acc39bcc2ae7`:
 ```sh
 c=028c18f713baecad011301ff7a69acc39bcc2ae7
 for fs in "Noto Sans Regular" "Noto Sans Medium" "Noto Sans Italic"; do
-  for r in 0-255 256-511 4096-4351 7168-7423 8192-8447; do
+  for r in 0-255 256-511 4096-4351 7168-7423 8192-8447 8448-8703; do
     curl -fsS -o "fonts/$fs/$r.pbf" \
       "https://raw.githubusercontent.com/protomaps/basemaps-assets/$c/fonts/${fs// /%20}/$r.pbf"
   done

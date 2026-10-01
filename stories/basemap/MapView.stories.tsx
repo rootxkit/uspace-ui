@@ -115,15 +115,31 @@ async function loadedMap(canvasElement: HTMLElement): Promise<MapLibreMap> {
   return map;
 }
 
-/** Every resource the page fetched came from the story's own origin. */
-async function expectSameOriginOnly(): Promise<void> {
+/**
+ * Every resource the page fetched came from the story's own origin. Glyph
+ * requests come from MapLibre's worker and are not in the page's resource
+ * timeline, so the style's own URLs are checked as well.
+ */
+async function expectSameOriginOnly(map: MapLibreMap): Promise<void> {
+  const origin = window.location.origin;
   const urls = performance
     .getEntriesByType("resource")
     .map((e) => e.name)
     .filter((u) => !u.startsWith("data:") && !u.startsWith("blob:"));
-  const foreign = urls.filter((u) => !u.startsWith(window.location.origin));
+  const foreign = urls.filter((u) => !u.startsWith(origin));
   await expect(foreign).toEqual([]);
   await expect(urls.some((u) => u.includes("/basemap/"))).toBe(true);
+  const style = map.getStyle();
+  const styleUrls = [
+    style.glyphs,
+    typeof style.sprite === "string" ? style.sprite : undefined,
+    ...Object.values(style.sources).map((src) =>
+      "url" in src && typeof src.url === "string"
+        ? src.url.replace(/^pmtiles:\/\//, "")
+        : undefined,
+    ),
+  ].filter((u): u is string => u !== undefined);
+  await expect(styleUrls.filter((u) => !u.startsWith(origin))).toEqual([]);
 }
 
 async function renderedNames(map: MapLibreMap): Promise<string[]> {
@@ -145,7 +161,7 @@ export const EnglishLight: Story = {
       expect(attribution?.textContent).toContain("OSM data as of 2026-10-01"),
     );
     await expect(map.getStyle().sprite).toContain("/basemap/sprites/v4/light");
-    await expectSameOriginOnly();
+    await expectSameOriginOnly(map);
   },
 };
 
@@ -165,7 +181,7 @@ export const GeorgianLight: Story = {
     await expect(
       JSON.stringify(map.getLayoutProperty("places_locality", "text-field")),
     ).toContain("name:ka");
-    await expectSameOriginOnly();
+    await expectSameOriginOnly(map);
   },
 };
 
@@ -196,8 +212,8 @@ export const NoBasemap: Story = {
         timeout: 10000,
       }),
     ).toBeTruthy();
-    await loadedMap(canvasElement);
-    await expectSameOriginOnly();
+    const map = await loadedMap(canvasElement);
+    await expectSameOriginOnly(map);
   },
 };
 
