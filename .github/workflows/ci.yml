@@ -1,0 +1,187 @@
+# CI of @rootxkit/uspace-ui (docs/PLAN.md §10 jobs 1-7). release.yml is
+# WP-13a and pages.yml is WP-13. Branch protection is the owner's.
+name: ci
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+    paths:
+      - "**"
+      - "!docs/**"
+      - "!**/*.md"
+      - "docs/api/**"
+      - "docs/CORE_VERSION"
+  pull_request:
+    paths:
+      - "**"
+      - "!docs/**"
+      - "!**/*.md"
+      - "docs/api/**"
+      - "docs/CORE_VERSION"
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # prettier, build, eslint (the kit's own config), tsc, publint, attw,
+      # api-extractor (fails on a stale report), size budgets, hostname grep
+      - run: pnpm check
+
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+      - name: Coverage summary
+        if: always()
+        run: |
+          if [ -f coverage/coverage-summary.json ]; then
+            node -e 'const t=require("./coverage/coverage-summary.json").total; console.log("| metric | % |\n|---|---|\n" + ["statements","branches","functions","lines"].map(k => `| ${k} | ${t[k].pct} |`).join("\n"))' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No coverage summary was written." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 7
+          if-no-files-found: warn
+
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Playwright version
+        id: pw
+        run: echo "version=$(pnpm exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v6
+        id: pw-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+      - if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install --with-deps chromium
+      - if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: pnpm exec playwright install-deps chromium
+      # stories as tests, axe on every story
+      - run: pnpm test:browser
+      - if: github.event_name == 'pull_request'
+        run: pnpm build-storybook
+      - if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v7
+        with:
+          name: storybook-static
+          path: storybook-static/
+          retention-days: 7
+
+  fonts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      # WP-2 adds the fonts and their glyph coverage and size tests. Until
+      # then this job says so in its summary instead of passing over nothing
+      # in silence.
+      - name: Fonts present?
+        id: present
+        run: |
+          if ls fonts/*.woff2 >/dev/null 2>&1; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "SKIPPED: no fonts/*.woff2 yet (WP-2); no glyph or size check ran." | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "::notice title=fonts skipped::no fonts/*.woff2 yet (WP-2)"
+          fi
+      - if: steps.present.outputs.present == 'true'
+        uses: pnpm/action-setup@v6
+      - if: steps.present.outputs.present == 'true'
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - if: steps.present.outputs.present == 'true'
+        run: pnpm install --frozen-lockfile
+      - if: steps.present.outputs.present == 'true'
+        run: pnpm exec vitest run --project node src/fonts
+
+  example:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      # WP-13 adds examples/next-app (next build, its lint, the generated
+      # types diff). Until then this job says so in its summary.
+      - name: Example present?
+        run: |
+          if [ -f examples/next-app/package.json ]; then
+            echo "examples/next-app exists but this job has no steps for it yet; WP-13 writes them." >&2
+            exit 1
+          fi
+          echo "SKIPPED: no examples/next-app yet (WP-13); nothing was built." | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "::notice title=example skipped::no examples/next-app yet (WP-13)"
+
+  gitleaks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GITLEAKS_VERSION: 8.30.1
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Install gitleaks
+        run: |
+          base="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}"
+          tarball="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl -sSfL -o "$tarball" "$base/$tarball"
+          curl -sSfL -o checksums.txt "$base/gitleaks_${GITLEAKS_VERSION}_checksums.txt"
+          grep " $tarball\$" checksums.txt | sha256sum -c -
+          tar -xzf "$tarball" gitleaks
+      - run: ./gitleaks git --redact --verbose .
+
+  enums:
+    # Required on main, best-effort on pull requests (PLAN §10 job 7).
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+    continue-on-error: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: sh scripts/check-enums.sh
