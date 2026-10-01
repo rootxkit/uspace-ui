@@ -1,3 +1,22 @@
-// Stub until its work package lands (docs/PLAN.md §13); it marks the entry
-// point so publint and attw validate the exports map from WP-0 on.
-export const ENTRY = "map";
+// `@rootxkit/uspace-ui/map` (docs/PLAN.md §3.6, WP-3): the MapLibre map,
+// the self-hosted basemap, viewport and bbox hooks, map controls.
+export {
+  BASEMAP_DEFAULT_PATHS,
+  BASEMAP_SOURCE_ID,
+  SOURCE_INFO_TIMEOUT_MS,
+  basemapAttribution,
+  basemapStyle,
+  basemapUrl,
+  loadBasemapInfo,
+  parseSourceInfo,
+  type BasemapConfig,
+  type BasemapInfo,
+  type MapScheme,
+} from "./basemap.js";
+export { mapCounters, type MapCounter } from "./counters.js";
+export {
+  MAP_MESSAGES,
+  mapText,
+  type MapKey,
+  type MapLang,
+} from "./messages.js";

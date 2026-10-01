@@ -1,0 +1,9 @@
+{
+  "source": "https://build.protomaps.com/20261001.pmtiles",
+  "build": "20261001",
+  "bounds": [44.77, 41.68, 44.83, 41.73],
+  "max_zoom": 14,
+  "osm_data_as_of": "2026-10-01T04:00:00Z",
+  "fetched_at": "2026-10-01T21:17:49Z",
+  "licence": "Map data (c) OpenStreetMap contributors, ODbL. Fonts: SIL OFL."
+}
