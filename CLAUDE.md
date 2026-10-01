@@ -57,7 +57,12 @@ and the lab consumes it at build time, pinned by an exact version. Read
    Fixtures use `GEO-TEST-*` and `TEST*`. The session JWT lives in an
    `HttpOnly` cookie set by `auth/server`; browser code never sees it;
    the BFF never verifies it (`00 §6.2`). No PII in a URL or in
-   `localStorage`.
+   `localStorage`. The session and cookie contract is shared with all
+   four systems (`docs/PLAN.md §6.3`): cookies `uspace_session` /
+   `uspace_csrf`, header `X-CSRF-Token`, three BFF routes, session
+   claims `roles: [string]` and `realm`, the WebSocket opened
+   same-origin on the cookie. No ticket route, no token in a URL or a
+   subprotocol; changing any of it is a plan change in five repos.
 8. **Never hand-write an API type.** Each `web/` generates `paths` from
    its system's `api/openapi.yaml` with `uspace-ui-gen-api`; the kit's
    own types are view models in `src/model/`, whose enumerations mirror
@@ -74,6 +79,20 @@ and the lab consumes it at build time, pinned by an exact version. Read
     a one-line reason in the commit body and a row in `docs/PLAN.md §4`.
     Nothing that computes geometry; nothing that phones home; nothing
     with a native binary.
+12. **One console frame, one error body.** Every browser-facing
+    WebSocket frame is the `04 §2` envelope plus a `body` named by
+    `schema`, with `console/status/v1`, `console/snapshot/v1` and
+    `console/subscribe/v1` as `docs/PLAN.md §6.3` defines them; the
+    schemas are owned by `uspace-lab/schemas/common/`, not here. Every
+    API error is `application/problem+json` with `errors: [{field,
+    reason}]` and `truncated?`. The kit is written to these and to
+    nothing else; a system that deviates is a reconciliation finding,
+    not an adapter in this repo.
+13. **npmjs only, pnpm only.** The package is published to npmjs under
+    `@rootxkit` with trusted publishing and provenance; pre-releases
+    under the `next` dist-tag. No `github:` dependency, no tarball, no
+    GitHub Packages, no `NPM_TOKEN`. This repo and every consumer use
+    pnpm with `packageManager` pinned and `--frozen-lockfile`.
 
 ## Testing rules (from LESSONS E-01 to E-04, E-10, E-11)
 
@@ -112,7 +131,7 @@ and the lab consumes it at build time, pinned by an exact version. Read
 - Conventional Commits, one logical change per commit, imperative
   subject under 72 characters, the work package and milestone in
   brackets at the end: `feat(layers): add ZoneLayer with hover cards
-  [WP-6 U-M1]`, `test(live): replay a 4401 ticket expiry [WP-8 U-M2]`.
+  [WP-6 U-M1]`, `test(live): replay a 4401 session expiry [WP-8 U-M2]`.
   Types: `feat`, `fix`, `test`, `refactor`, `perf`, `docs`, `build`,
   `ci`, `chore`. Scope is the entry point (`model`, `theme`, `ui`,
   `i18n`, `fonts`, `map`, `api`, `auth`, `symbology`, `layers`,
