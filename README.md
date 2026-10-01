@@ -22,11 +22,16 @@ kit's view models in an adapter it owns.
 
 Planning. `docs/PLAN.md` and the work package briefs are on `main`;
 WP-0 (scaffold, frozen view models, lint rules, CI) is the first code.
-The first release `v0.1.0` (U-M1 of the roadmap, with the CISP's C-M1)
-ships the theme, `ui`, `i18n` and fonts, the map with the zone layer
-and legend, the API adapter, the BFF helpers and the ESLint config.
-Tracks, live feed, status, table and form follow in `0.2`; alerts and
-the traffic layers in `0.3`; `v1.0.0` when two consoles use them.
+The first publish is a pre-release, `0.1.0-rc.1` on npmjs under the
+`next` dist-tag (WP-13a), as soon as the scaffold, theme, i18n, map,
+API adapter and BFF helpers merge, so the CISP's `web/` can start on
+it. The first release `v0.1.0` (U-M1 of the roadmap, with the CISP's
+C-M1) ships the theme, `ui`, `i18n` and fonts, the map with the zone,
+restriction and legend components, the API adapter, the BFF helpers
+and the ESLint config. Tracks, live feed, status, table and form follow
+in `0.2`; alerts and the traffic layers in `0.3`; `v1.0.0` when two
+consoles use them. Distribution is npmjs only, with provenance; every
+consumer installs with pnpm and an exact pin.
 
 ## Links
 
@@ -35,16 +40,16 @@ the traffic layers in `0.3`; `v1.0.0` when two consoles use them.
   performance budgets, testing, CI, consumption, versioning, work
   packages and waves, open questions)
 - Work packages: [`docs/WORKPACKAGES/`](docs/WORKPACKAGES/) (WP-0 to
-  WP-14)
+  WP-14, plus WP-13a for the rc publish)
 - Rules for contributors and agents: [`CLAUDE.md`](CLAUDE.md)
 - Spec: `uspace-lab/docs/spec/` (`00 §6.3` names this package; `07`
   U-M1 is its first milestone)
 - Storybook: published to GitHub Pages from `main` once WP-13 lands
 
-## Consuming (from `v0.1.0`)
+## Consuming (from `0.1.0-rc.1`)
 
 ```
-pnpm add @rootxkit/uspace-ui@<exact version> maplibre-gl
+pnpm add @rootxkit/uspace-ui@<exact version> maplibre-gl   # npmjs only; rc versions are under the `next` dist-tag, pinned exactly too
 ```
 
 ```css
