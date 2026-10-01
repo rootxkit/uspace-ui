@@ -3,7 +3,7 @@ import type { Map as MapLibreMap } from "maplibre-gl";
 import { createContext, useContext, useEffect, useRef } from "react";
 
 import type { MapScheme } from "./basemap.js";
-import type { MapLang } from "./messages.js";
+import type { Lang } from "../i18n/lang.js";
 import type { BBox, Viewport } from "./viewport.js";
 
 /** Adds a kit layer's sources and layers to a freshly loaded style. */
@@ -12,7 +12,7 @@ export type StyleLoadHandler = (map: MapLibreMap) => void;
 export interface MapContextValue {
   /** The map after its `load` event; null before, and with no WebGL. */
   map: MapLibreMap | null;
-  lang: MapLang;
+  lang: Lang;
   scheme: MapScheme;
   initial: Viewport;
   /** The initial view's bbox, measured from the container (see viewportBBox). */

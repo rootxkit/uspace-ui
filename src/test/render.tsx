@@ -1,10 +1,12 @@
 import { render, type RenderResult } from "@testing-library/react";
 import type { ReactNode } from "react";
 
-// The signature is final (PLAN §3.18). The providers are stubs until the
-// theme (WP-1) and i18n (WP-2) providers land: the wrapper carries the
-// options as attributes so a test can see them, and WP-1/WP-2 replace it
-// with ThemeProvider and I18nProvider without changing a caller.
+import { I18nProvider } from "../i18n/I18nProvider.js";
+
+// The signature is final (PLAN §3.18). The language is the kit's
+// I18nProvider (WP-2); the theme is still a stub wrapper carrying the
+// options as attributes so a test can see them, until ThemeProvider
+// replaces it without changing a caller.
 
 export type KitLang = "ka" | "en";
 export type KitScheme = "light" | "dark" | "system";
@@ -58,7 +60,7 @@ export function renderWithKit(
       data-now-ms={opts.now === undefined ? undefined : String(opts.now)}
       data-testid="kit-root"
     >
-      {ui}
+      <I18nProvider lang={lang}>{ui}</I18nProvider>
     </div>,
   );
 }

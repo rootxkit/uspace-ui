@@ -1,6 +1,7 @@
 import { createElement } from "react";
 import type { Decorator, Preview } from "@storybook/react-vite";
 
+import { I18nProvider } from "../src/i18n/index.js";
 import { ThemeProvider, type Brand } from "../src/theme/index.js";
 import { TooltipProvider } from "../src/ui/index.js";
 import "./preview.css";
@@ -14,10 +15,12 @@ const STORY_BRAND: Brand = {
   accent: null,
 };
 
-// Every story runs inside the kit's ThemeProvider; `globals.scheme` and
-// `globals.lang` choose the scheme and the language, from the toolbar or
-// per story (`globals: { scheme: "dark", lang: "ka" }`), so a story file
-// exports one story per scheme and each one runs axe (WP-1).
+// Every story runs inside the kit's ThemeProvider and I18nProvider;
+// `globals.scheme` and `globals.lang` choose the scheme and the language,
+// from the toolbar or per story (`globals: { scheme: "dark", lang: "ka" }`),
+// so a story file exports one story per scheme and each one runs axe
+// (WP-1). The fonts come from fonts/fonts.css (preview.css), as in an app
+// without Next.js.
 const withKit: Decorator = (Story, context) => {
   const scheme = context.globals["scheme"] === "dark" ? "dark" : "light";
   const lang = context.globals["lang"] === "ka" ? "ka" : "en";
@@ -25,12 +28,16 @@ const withKit: Decorator = (Story, context) => {
     ThemeProvider,
     { brand: STORY_BRAND, scheme },
     createElement(
-      TooltipProvider,
-      null,
+      I18nProvider,
+      { lang },
       createElement(
-        "div",
-        { lang, className: "bg-background p-4 text-foreground" },
-        createElement(Story),
+        TooltipProvider,
+        null,
+        createElement(
+          "div",
+          { lang, className: "bg-background p-4 text-foreground" },
+          createElement(Story),
+        ),
       ),
     ),
   );

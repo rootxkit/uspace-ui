@@ -5,7 +5,8 @@ import { layers, namedFlavor } from "@protomaps/basemaps";
 import type { LayerSpecification, StyleSpecification } from "maplibre-gl";
 
 import { countMap } from "./counters.js";
-import { mapText, type MapLang } from "./messages.js";
+import type { Lang } from "../i18n/lang.js";
+import { createTranslator } from "../i18n/translate.js";
 
 export interface BasemapConfig {
   /** Absolute origin (and base path) the paths below are appended to. */
@@ -66,17 +67,16 @@ function osmDate(asOf: string): string {
 /** The attribution of the basemap source, with the extract's OSM date. */
 export function basemapAttribution(
   info: BasemapInfo | null,
-  lang: MapLang,
+  lang: Lang,
 ): string {
-  if (info === null) return mapText(lang, "map.no_basemap_attribution");
+  const t = createTranslator(lang);
+  if (info === null) return t("map.no_basemap_attribution");
   const parts = [
     '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>',
   ];
   if (info.osmDataAsOf !== null) {
     parts.push(
-      escapeHtml(
-        mapText(lang, "map.osm_as_of", { date: osmDate(info.osmDataAsOf) }),
-      ),
+      escapeHtml(t("map.osm_as_of", { date: osmDate(info.osmDataAsOf) })),
     );
   }
   parts.push('<a href="https://protomaps.com">Protomaps</a>');
@@ -110,7 +110,7 @@ function georgianLabels(layer: LayerSpecification): LayerSpecification {
 export function basemapStyle(
   cfg: BasemapConfig,
   info: BasemapInfo | null,
-  lang: MapLang,
+  lang: Lang,
   scheme: MapScheme,
 ): StyleSpecification {
   const flavor = namedFlavor(scheme);

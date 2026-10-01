@@ -26,9 +26,10 @@ import {
   type MapContextValue,
   type StyleLoadHandler,
 } from "./context.js";
+import { useTFor } from "../i18n/I18nProvider.js";
+import type { Lang } from "../i18n/lang.js";
 import { countMap } from "./counters.js";
 import { maplibre, registerPmtilesProtocol } from "./maplibre.js";
-import { mapText, type MapLang } from "./messages.js";
 import {
   bboxOf,
   bboxText,
@@ -42,7 +43,7 @@ export interface MapViewProps {
   basemap: BasemapConfig;
   /** The first camera; the app's configuration, never a kit default. */
   initial: Viewport;
-  lang: MapLang;
+  lang: Lang;
   scheme: MapScheme;
   /** On load and on every `moveend`, with the bbox in `[lng, lat]` order. */
   onViewport?(v: Viewport, bbox: BBox): void;
@@ -53,10 +54,11 @@ export interface MapViewProps {
   className?: string;
 }
 
-type Applied = { info: BasemapInfo | null; lang: MapLang; scheme: MapScheme };
+type Applied = { info: BasemapInfo | null; lang: Lang; scheme: MapScheme };
 
 export function MapView(props: MapViewProps): ReactNode {
   const { basemap, initial, lang, scheme, children, className } = props;
+  const t = useTFor(lang);
   const { baseUrl, sourceInfoPath } = basemap;
   const container = useRef<HTMLDivElement>(null);
   const latest = useRef(props);
@@ -198,16 +200,16 @@ export function MapView(props: MapViewProps): ReactNode {
         ref={container}
         className="us-map-canvas"
         role="region"
-        aria-label={mapText(lang, "map.region")}
+        aria-label={t("map.region")}
       />
       {info === undefined && (
         <p className="us-map-notice" role="status">
-          {mapText(lang, "map.loading")}
+          {t("map.loading")}
         </p>
       )}
       {info === null && !noWebgl && (
         <p className="us-map-notice" role="status" data-notice="no-basemap">
-          {mapText(lang, "map.no_basemap")}
+          {t("map.no_basemap")}
         </p>
       )}
       {noWebgl && (
@@ -216,10 +218,8 @@ export function MapView(props: MapViewProps): ReactNode {
           role="status"
           data-notice="no-webgl"
         >
-          {mapText(lang, "map.webgl_unavailable")}{" "}
-          <span data-bbox="">
-            {mapText(lang, "map.bbox", bboxText(initialBBox))}
-          </span>
+          {t("map.webgl_unavailable")}{" "}
+          <span data-bbox="">{t("map.bbox", bboxText(initialBBox))}</span>
         </p>
       )}
       <MapContext.Provider value={ctx}>{children}</MapContext.Provider>
