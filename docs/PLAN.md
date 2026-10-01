@@ -496,6 +496,8 @@ pinned exact in `package.json` and locked; peers carry ranges.
 | `react-hook-form`, `zod`, `@hookform/resolvers` | `form` | Form state and schema validation; `zod` schemas are the app's, the kit maps errors. |
 | `eslint`, `typescript-eslint`, `eslint-plugin-react-hooks`, `eslint-plugin-jsx-a11y` (peers of `/eslint`) | `eslint` | D11. |
 | dev: `typescript`, `vitest`, `@vitest/browser`, `playwright`, `@testing-library/react`, `@testing-library/user-event`, `jsdom`, `storybook`, `@storybook/react-vite`, `@storybook/addon-a11y`, `@storybook/addon-vitest`, `axe-core`, `prettier`, `publint`, `@arethetypeswrong/cli`, `@microsoft/api-extractor`, `fontkit`, `openapi-typescript` | tests, build, release | §9, §10, §12. `fontkit` reads the font `cmap` for D7. `api-extractor` writes the API report the semver gate diffs (§12). |
+| `@types/geojson` (exact pin) | `model` | `ZoneView.geometry` and `IntentView.volumes` are GeoJSON types that appear in every consumer's declarations, so the types are a dependency, not a dev dependency. Types only, no runtime code (WP-0). |
+| dev: `@vitest/browser-playwright`, `@vitest/coverage-v8`, `vite`, `@storybook/addon-docs`, `@testing-library/dom`, `@types/react`, `@types/react-dom`, `@types/node` | tests, Storybook | The Vitest 4 Playwright provider and v8 coverage; the Vite that Storybook and the browser project run on; MDX docs pages in Storybook 9; the peer of `@testing-library/react`; type packages (WP-0). |
 
 Rejected: any geometry or geodesy library (the lint rule forbids it for
 everyone, the kit included); `i18next`/`react-intl` (two catalogues and

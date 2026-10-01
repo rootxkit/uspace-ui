@@ -1,0 +1,11 @@
+node_modules/
+dist/
+coverage/
+storybook-static/
+.cache/
+*.tgz
+*.log
+.vitest-attachments/
+__screenshots__/
+.env
+.env.*

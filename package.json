@@ -1,0 +1,215 @@
+{
+  "name": "@rootxkit/uspace-ui",
+  "version": "0.0.0",
+  "description": "Shared UI kit of the U-space systems: theme, map, symbology, i18n, live feed, table, form and BFF helpers. Renders, never judges.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rootxkit/uspace-ui.git"
+  },
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "files": [
+    "dist",
+    "styles",
+    "fonts"
+  ],
+  "exports": {
+    "./model": {
+      "types": "./dist/model/index.d.ts",
+      "default": "./dist/model/index.js"
+    },
+    "./theme": {
+      "types": "./dist/theme/index.d.ts",
+      "default": "./dist/theme/index.js"
+    },
+    "./ui": {
+      "types": "./dist/ui/index.d.ts",
+      "default": "./dist/ui/index.js"
+    },
+    "./i18n": {
+      "types": "./dist/i18n/index.d.ts",
+      "default": "./dist/i18n/index.js"
+    },
+    "./fonts": {
+      "types": "./dist/fonts/index.d.ts",
+      "default": "./dist/fonts/index.js"
+    },
+    "./map": {
+      "types": "./dist/map/index.d.ts",
+      "default": "./dist/map/index.js"
+    },
+    "./api": {
+      "types": "./dist/api/index.d.ts",
+      "default": "./dist/api/index.js"
+    },
+    "./auth/server": {
+      "types": "./dist/auth/server/index.d.ts",
+      "default": "./dist/auth/server/index.js"
+    },
+    "./auth/client": {
+      "types": "./dist/auth/client/index.d.ts",
+      "default": "./dist/auth/client/index.js"
+    },
+    "./symbology": {
+      "types": "./dist/symbology/index.d.ts",
+      "default": "./dist/symbology/index.js"
+    },
+    "./layers": {
+      "types": "./dist/layers/index.d.ts",
+      "default": "./dist/layers/index.js"
+    },
+    "./legend": {
+      "types": "./dist/legend/index.d.ts",
+      "default": "./dist/legend/index.js"
+    },
+    "./live": {
+      "types": "./dist/live/index.d.ts",
+      "default": "./dist/live/index.js"
+    },
+    "./status": {
+      "types": "./dist/status/index.d.ts",
+      "default": "./dist/status/index.js"
+    },
+    "./alerts": {
+      "types": "./dist/alerts/index.d.ts",
+      "default": "./dist/alerts/index.js"
+    },
+    "./table": {
+      "types": "./dist/table/index.d.ts",
+      "default": "./dist/table/index.js"
+    },
+    "./form": {
+      "types": "./dist/form/index.d.ts",
+      "default": "./dist/form/index.js"
+    },
+    "./eslint": {
+      "types": "./dist/eslint/index.d.ts",
+      "default": "./dist/eslint/index.js"
+    },
+    "./test": {
+      "types": "./dist/test/index.d.ts",
+      "default": "./dist/test/index.js"
+    },
+    "./styles/tokens.css": "./styles/tokens.css",
+    "./styles/map.css": "./styles/map.css",
+    "./package.json": "./package.json"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@11.9.0",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "node scripts/clean.mjs dist && tsc -p tsconfig.build.json",
+    "check": "pnpm run check:format && pnpm run build && pnpm run check:lint && pnpm run check:types && pnpm run check:package && pnpm run check:api && pnpm run check:size && pnpm run check:hostnames",
+    "check:format": "prettier --check .",
+    "check:lint": "eslint --max-warnings 0 .",
+    "check:types": "tsc --noEmit -p tsconfig.json",
+    "check:package": "publint --strict && attw --pack . --profile esm-only --format table-flipped --exclude-entrypoints ./styles/tokens.css ./styles/map.css ./package.json",
+    "check:api": "node scripts/api-report.mjs",
+    "check:size": "node scripts/size-check.mjs",
+    "check:hostnames": "sh scripts/check-hostnames.sh",
+    "api-report": "node scripts/api-report.mjs --local",
+    "format": "prettier --write .",
+    "test": "vitest run --coverage --project node --project jsdom",
+    "test:browser": "vitest run --project browser",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build -o storybook-static"
+  },
+  "sizeBudgets": {
+    "map+layers+symbology+legend": {
+      "paths": [
+        "dist/map",
+        "dist/layers",
+        "dist/symbology",
+        "dist/legend"
+      ],
+      "maxGzipBytes": 61440
+    },
+    "table": {
+      "paths": [
+        "dist/table"
+      ],
+      "maxGzipBytes": 40960
+    },
+    "form": {
+      "paths": [
+        "dist/form"
+      ],
+      "maxGzipBytes": 30720
+    }
+  },
+  "dependencies": {
+    "@types/geojson": "7946.0.16"
+  },
+  "peerDependencies": {
+    "@testing-library/react": "^16",
+    "axe-core": "^4",
+    "eslint": "^9",
+    "eslint-plugin-jsx-a11y": "^6",
+    "eslint-plugin-react-hooks": "^7",
+    "next": ">=15",
+    "react": "^19",
+    "react-dom": "^19",
+    "typescript-eslint": "^8"
+  },
+  "peerDependenciesMeta": {
+    "@testing-library/react": {
+      "optional": true
+    },
+    "axe-core": {
+      "optional": true
+    },
+    "eslint": {
+      "optional": true
+    },
+    "eslint-plugin-jsx-a11y": {
+      "optional": true
+    },
+    "eslint-plugin-react-hooks": {
+      "optional": true
+    },
+    "next": {
+      "optional": true
+    },
+    "typescript-eslint": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "0.18.5",
+    "@microsoft/api-extractor": "7.59.3",
+    "@storybook/addon-a11y": "9.1.20",
+    "@storybook/addon-docs": "9.1.20",
+    "@storybook/addon-vitest": "9.1.20",
+    "@storybook/react-vite": "9.1.20",
+    "@testing-library/dom": "10.4.2",
+    "@testing-library/react": "16.3.3",
+    "@types/node": "22.20.4",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitest/browser": "4.1.11",
+    "@vitest/browser-playwright": "4.1.11",
+    "@vitest/coverage-v8": "4.1.11",
+    "axe-core": "4.13.0",
+    "eslint": "9.39.5",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "jsdom": "27.4.0",
+    "playwright": "1.63.0",
+    "prettier": "3.9.9",
+    "publint": "0.3.25",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "storybook": "9.1.20",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.71.0",
+    "vite": "7.3.6",
+    "vitest": "4.1.11"
+  }
+}
