@@ -56,3 +56,15 @@ follows docs/PLAN.md §12. One line per work package under Unreleased.
   `MAP_MESSAGES`, `MapKey`, `MapLang`) is gone: its strings are in the
   catalogues and `MapView` takes `Lang`. fontkit 2.0.4 and next 16.3.8
   as dev pins.
+- WP-6: zones. `symbology` (`zoneToken`, `zonePattern`, `zoneOpacity`,
+  `zoneStyle` and the restriction line per state; PROHIBITED solid,
+  REQ_AUTHORIZATION hatched, CONDITIONAL dotted, NO_RESTRICTION and
+  USPACE outline only, told apart by weight; dimmed only on the server's
+  `applies: false` or a planned, ended or cancelled restriction, never on
+  `applies: null`; LESSONS Z-10, T-09, spec 02 F2, F3), `layers`
+  (`useLayer` with one `setData` per animation frame and re-add on
+  `style.load`, `ZoneLayer`, `RestrictionLayer`, `ZoneCard` with limits,
+  applicability as served, version and update time, `layerCounters`) and
+  `legend` (`ZoneLegend`). The jsdom MapLibre mock gains images,
+  `getLayoutProperty` and the `remove` event.
+  @maplibre/maplibre-gl-style-spec 24.10.0 as a dev pin.
