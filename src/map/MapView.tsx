@@ -191,6 +191,7 @@ export function MapView(props: MapViewProps): ReactNode {
     <div
       className={className ? `us-map ${className}` : "us-map"}
       data-scheme={scheme}
+      data-theme={scheme}
       lang={lang}
     >
       <div

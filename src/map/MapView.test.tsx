@@ -173,6 +173,16 @@ describe("MapView", () => {
     );
   });
 
+  it("scopes the theme tokens to its own scheme", async () => {
+    // The controls read --us-* tokens, which follow the nearest data-theme,
+    // so a dark map on a light page has dark controls.
+    const { result } = await renderLoadedMap();
+    const root = result.container.querySelector(".us-map");
+    expect(root?.getAttribute("data-theme")).toBe("light");
+    result.rerender(<MapView {...mapProps({ scheme: "dark" })} />);
+    expect(root?.getAttribute("data-theme")).toBe("dark");
+  });
+
   it("stops calling a layer that unmounted", async () => {
     const onAdd = vi.fn();
     const { map, result } = await renderLoadedMap(<StyleProbe onAdd={onAdd} />);

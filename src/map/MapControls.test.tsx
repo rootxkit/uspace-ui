@@ -4,6 +4,7 @@ import {
   fireEvent,
   render,
   screen,
+  waitFor,
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -169,8 +170,8 @@ describe("LayerPanel", () => {
     const zones = screen.getByRole("checkbox", { name: "T:layer.zones" });
     const tracks = screen.getByRole("checkbox", { name: "T:layer.tracks" });
     expect(document.activeElement).toBe(zones);
-    expect((zones as HTMLInputElement).checked).toBe(true);
-    expect((tracks as HTMLInputElement).checked).toBe(false);
+    expect(zones.getAttribute("aria-checked")).toBe("true");
+    expect(tracks.getAttribute("aria-checked")).toBe("false");
     fireEvent.click(tracks);
     expect(layers[1]?.onChange).toHaveBeenCalledWith(true);
     fireEvent.click(zones);
@@ -179,14 +180,22 @@ describe("LayerPanel", () => {
     expect(screen.getByRole("dialog")).toBeTruthy();
     fireEvent.keyDown(zones, { key: "Escape" });
     expect(screen.queryByRole("dialog")).toBeNull();
-    expect(document.activeElement).toBe(open);
+    // The sheet's focus scope hands focus back after it unmounts.
+    await waitFor(() => expect(document.activeElement).toBe(open));
   });
 
   it("closes with its close button", async () => {
     await renderLoadedMap(<LayerPanel layers={toggles()} lang="ka" />);
-    fireEvent.click(screen.getByRole("button", { name: "ფენები" }));
+    const open = screen.getByRole("button", { name: "ფენები" });
+    fireEvent.click(open);
+    // The sheet renders in a portal, outside the map, and carries the
+    // map's language itself.
+    const sheet = screen.getByRole("dialog", { name: "ფენები" });
+    expect(sheet.getAttribute("lang")).toBe("ka");
+    expect(sheet.closest(".us-map")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "ფენების დახურვა" }));
     expect(screen.queryByRole("dialog")).toBeNull();
+    await waitFor(() => expect(document.activeElement).toBe(open));
   });
 
   it("shows the label key when no translation is given", async () => {
