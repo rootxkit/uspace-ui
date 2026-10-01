@@ -47,8 +47,16 @@ const PENDING: Record<string, string> = {
   "./fonts/*.woff2": "WP-2 adds the key with the first woff2 file",
 };
 
-// Entries that are real in WP-0; the rest are stubs until their WP.
-const REAL = new Set(["./model", "./map", "./eslint", "./test"]);
+// Entries that are real (WP-0, WP-1, WP-3); the rest are stubs until their
+// WP.
+const REAL = new Set([
+  "./model",
+  "./theme",
+  "./ui",
+  "./map",
+  "./eslint",
+  "./test",
+]);
 
 const jsKeys = Object.entries(pkg.exports).filter(
   (e): e is [string, ExportTarget] => typeof e[1] === "object",
