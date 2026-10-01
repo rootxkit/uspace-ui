@@ -13,10 +13,19 @@ export {
   type BasemapInfo,
   type MapScheme,
 } from "./basemap.js";
+export {
+  useMap,
+  useMapContext,
+  useStyleLoad,
+  type MapContextValue,
+  type StyleLoadHandler,
+} from "./context.js";
 export { mapCounters, type MapCounter } from "./counters.js";
+export { MapView, type MapViewProps } from "./MapView.js";
 export {
   MAP_MESSAGES,
   mapText,
   type MapKey,
   type MapLang,
 } from "./messages.js";
+export { type BBox, type Viewport } from "./viewport.js";
