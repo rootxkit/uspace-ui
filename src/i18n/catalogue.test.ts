@@ -8,6 +8,7 @@ import { describe, expect, it } from "vitest";
 
 import { DISABLED_BYS, SOURCE_STATES } from "../model/index.js";
 import { en, type Key } from "./en.js";
+import { ALTITUDE_KEYS, HEIGHT_KEYS } from "./format.js";
 import { ka } from "./ka.js";
 
 const catalogues = { en, ka } as const;
@@ -94,6 +95,12 @@ function sourceFiles(dir: string): string[] {
 // Each table is typed `Key`, so the compiler checks them; this list says
 // the dynamic calls were looked at.
 const DYNAMIC_KEYS: Readonly<Record<string, readonly string[]>> = {
+  // fmtAltitude: t(ALTITUDE_KEYS[ref])
+  "src/i18n/format.ts ALTITUDE_KEYS": Object.values(ALTITUDE_KEYS).filter(
+    (k): k is Key => k !== null,
+  ),
+  // fmtHeight: t(HEIGHT_KEYS[ref])
+  "src/i18n/format.ts HEIGHT_KEYS": Object.values(HEIGHT_KEYS),
   // LayerPanel: t(labelKey), the app's own key, from the app's catalogue
   "src/map/MapControls.tsx LayerToggle.labelKey": [],
 };
@@ -106,7 +113,7 @@ describe("keys used in src/", () => {
 
   it("finds the t() calls (the grep is not vacuous)", () => {
     expect([...used.keys()]).toEqual(
-      expect.arrayContaining(["map.zoom_in", "map.osm_as_of"]),
+      expect.arrayContaining(["map.zoom_in", "map.osm_as_of", "age.seconds"]),
     );
   });
 
