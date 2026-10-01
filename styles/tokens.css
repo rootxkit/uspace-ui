@@ -1,2 +1,223 @@
-/* Stub until WP-1 writes the design tokens (docs/PLAN.md §3.2). It exists so
-   the exports map entry "./styles/tokens.css" resolves from WP-0 on. */
+/* @rootxkit/uspace-ui/styles/tokens.css (docs/PLAN.md §3.2, D4, WP-1).
+
+   The kit's design tokens as CSS custom properties. The app imports this
+   file after its own `@import "tailwindcss";` and adds the kit's compiled
+   components to its scan with `@source`. Everything here is plain CSS
+   except the `@custom-variant` and `@theme inline` blocks at the end,
+   which Tailwind v4 reads and a browser ignores.
+
+   Schemes: the light values apply on `:root` and under any element with
+   `data-theme="light"`; the dark values under `data-theme="dark"`.
+   ThemeProvider sets `data-theme` on <html>; a subtree (the map, a
+   preview) may carry its own.
+
+   The four semantic palettes (severity, trust class, identification
+   status, zone type) and the age buckets say nothing about meaning;
+   WP-6 and WP-7 decide that. They are chosen so that every colour meets
+   WCAG 2.2 AA against both surfaces of its scheme (3:1 for graphics,
+   4.5:1 for severity, which is also used as text) and every pair within
+   a palette stays apart under simulated deuteranopia and protanopia.
+   src/theme/tokens.test.ts is the proof; change a value only with that
+   test green. A changed meaning is a major (PLAN §12).
+
+   No organisation colour lives here: `--us-brand-accent` is a neutral
+   default that ThemeProvider overrides from `Brand.accent`. */
+
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Surfaces, text, borders, focus. */
+  --us-surface: #f6f7f9;
+  --us-surface-raised: #ffffff;
+  --us-surface-sunken: #eceef2;
+  --us-text: #16181d;
+  --us-text-muted: #4f5561;
+  --us-border: #d5d9e0;
+  --us-border-strong: #7a818c;
+  --us-focus: #1f5fc4;
+  --us-hover: #e8ebf0;
+  --us-danger: #b3261e;
+  --us-on-danger: #ffffff;
+  --us-brand-accent: #1f5fc4;
+  --us-on-brand-accent: #ffffff;
+
+  /* Severity (spec 04 §3.3). */
+  --us-severity-info: #1366ea;
+  --us-severity-warning: #c04e01;
+  --us-severity-critical: #88122b;
+
+  /* Trust class (spec 04 §2). */
+  --us-trust-authenticated: #11591c;
+  --us-trust-provider: #1184e1;
+  --us-trust-surveillance: #5112a4;
+  --us-trust-broadcast: #cb7e09;
+  --us-trust-sensor: #109c8d;
+  --us-trust-simulated: #4c4e55;
+
+  /* Identification status (spec 04 §3.2); `none` = no identification. */
+  --us-ident-registered: #257051;
+  --us-ident-suspended: #c47b08;
+  --us-ident-unknown_operator: #ac0202;
+  --us-ident-unidentified: #222124;
+  --us-ident-none: #848b8b;
+
+  /* Zone type (spec 00 §5, ED-318 spelling). */
+  --us-zone-PROHIBITED: #861325;
+  --us-zone-REQ_AUTHORIZATION: #ab4303;
+  --us-zone-CONDITIONAL: #b18a01;
+  --us-zone-NO_RESTRICTION: #2d805c;
+  --us-zone-USPACE: #0d67cf;
+
+  /* Age buckets; the thresholds arrive in the status frame (PLAN §6.3). */
+  --us-age-live: #185520;
+  --us-age-aging: #c1830d;
+  --us-age-stale: #8d8994;
+  --us-age-unknown: #0d0d0f;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --us-surface: #111418;
+  --us-surface-raised: #1b1f26;
+  --us-surface-sunken: #232832;
+  --us-text: #eef0f3;
+  --us-text-muted: #a3aab5;
+  --us-border: #2f3540;
+  --us-border-strong: #7d8592;
+  --us-focus: #78a9ff;
+  --us-hover: #2a303b;
+  --us-danger: #f0544a;
+  --us-on-danger: #111418;
+  --us-brand-accent: #78a9ff;
+  --us-on-brand-accent: #0b1220;
+
+  --us-severity-info: #87c0f6;
+  --us-severity-warning: #ffba33;
+  --us-severity-critical: #e96582;
+
+  --us-trust-authenticated: #38b47a;
+  --us-trust-provider: #4e75e8;
+  --us-trust-surveillance: #caa9eb;
+  --us-trust-broadcast: #ed6c15;
+  --us-trust-sensor: #22efcd;
+  --us-trust-simulated: #7c7f87;
+
+  --us-ident-registered: #44ec9f;
+  --us-ident-suspended: #ff9b02;
+  --us-ident-unknown_operator: #e74c58;
+  --us-ident-unidentified: #f7f7f8;
+  --us-ident-none: #796e81;
+
+  --us-zone-PROHIBITED: #e64c64;
+  --us-zone-REQ_AUTHORIZATION: #fc7f08;
+  --us-zone-CONDITIONAL: #fff841;
+  --us-zone-NO_RESTRICTION: #48eaa4;
+  --us-zone-USPACE: #6c8fde;
+
+  --us-age-live: #50c793;
+  --us-age-aging: #fe710f;
+  --us-age-stale: #6c7069;
+  --us-age-unknown: #f7f7f8;
+}
+
+/* The shadcn/ui semantic set, mapped onto the kit's tokens. Every value
+   is a reference, so it follows the scheme of the nearest data-theme. */
+:root,
+[data-theme="light"],
+[data-theme="dark"] {
+  --background: var(--us-surface);
+  --foreground: var(--us-text);
+  --card: var(--us-surface-raised);
+  --card-foreground: var(--us-text);
+  --popover: var(--us-surface-raised);
+  --popover-foreground: var(--us-text);
+  --primary: var(--us-brand-accent);
+  --primary-foreground: var(--us-on-brand-accent);
+  --secondary: var(--us-surface-sunken);
+  --secondary-foreground: var(--us-text);
+  --muted: var(--us-surface-sunken);
+  --muted-foreground: var(--us-text-muted);
+  --accent: var(--us-hover);
+  --accent-foreground: var(--us-text);
+  --destructive: var(--us-danger);
+  --border: var(--us-border);
+  --input: var(--us-border-strong);
+  --ring: var(--us-focus);
+  --radius: 0.5rem;
+}
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+}
+
+/* Tailwind: `dark:` follows data-theme, not the media query, so the
+   scheme chosen in the console wins over the system preference. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Tailwind: utilities for the shadcn set and the semantic palettes, such
+   as `bg-primary`, `text-severity-critical`, `border-zone-PROHIBITED`. */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-brand-accent: var(--us-brand-accent);
+
+  --color-severity-info: var(--us-severity-info);
+  --color-severity-warning: var(--us-severity-warning);
+  --color-severity-critical: var(--us-severity-critical);
+
+  --color-trust-authenticated: var(--us-trust-authenticated);
+  --color-trust-provider: var(--us-trust-provider);
+  --color-trust-surveillance: var(--us-trust-surveillance);
+  --color-trust-broadcast: var(--us-trust-broadcast);
+  --color-trust-sensor: var(--us-trust-sensor);
+  --color-trust-simulated: var(--us-trust-simulated);
+
+  --color-ident-registered: var(--us-ident-registered);
+  --color-ident-suspended: var(--us-ident-suspended);
+  --color-ident-unknown_operator: var(--us-ident-unknown_operator);
+  --color-ident-unidentified: var(--us-ident-unidentified);
+  --color-ident-none: var(--us-ident-none);
+
+  --color-zone-PROHIBITED: var(--us-zone-PROHIBITED);
+  --color-zone-REQ_AUTHORIZATION: var(--us-zone-REQ_AUTHORIZATION);
+  --color-zone-CONDITIONAL: var(--us-zone-CONDITIONAL);
+  --color-zone-NO_RESTRICTION: var(--us-zone-NO_RESTRICTION);
+  --color-zone-USPACE: var(--us-zone-USPACE);
+
+  --color-age-live: var(--us-age-live);
+  --color-age-aging: var(--us-age-aging);
+  --color-age-stale: var(--us-age-stale);
+  --color-age-unknown: var(--us-age-unknown);
+}
