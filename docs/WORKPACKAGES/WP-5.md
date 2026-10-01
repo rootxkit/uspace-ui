@@ -2,13 +2,17 @@
 
 Branch `feat/WP-5-bff-auth`. Milestone U-M1. Owns `src/auth/`
 exclusively. Depends on WP-0 (and WP-1 `ui` for the login form's
-widgets; start on WP-0, rebase). Consumers: every `web/` (the four BFF
-routes), WP-8 (`live` fetches its WS ticket through the BFF).
+widgets; start on WP-0, rebase). Consumers: every `web/` (the three BFF
+routes), WP-8 (`live` relies on the session cookie the BFF set: the
+browser sends it on the same-origin WebSocket upgrade; there is no
+ticket, reconciliation M22).
 
 ## Read first
 
-1. `docs/PLAN.md` §3.16, §6.3 (the BFF route set and cookie names are a
-   published contract), §7 (every row), §14 Q9.
+1. `docs/PLAN.md` §3.1 (`SessionDisplay`), §3.16, §6.3 (the session and
+   cookie contract: route set, cookie names, the reconciled session JWT
+   shape, WebSocket authentication; adopted by all four systems), §7
+   (every row), §14 Q9 (decided: `roles[]`, `realm`).
 2. Spec `06 §3` (the `HttpOnly`, `SameSite=Strict` cookie holding the
    session JWT, forwarded as a bearer; CSRF tokens; no credential in
    browser JavaScript; MFA mandatory for some roles), `00 §6.2` ("The
@@ -41,24 +45,32 @@ streamed, upstream timeout via its own `AbortController`, no redirect
 following, upstream status and headers passed through including
 `Retry-After`, `ETag`, `Sunset`, `Content-Type: application/problem+json`;
 a hop-by-hop header list removed), `bffHandlers(opts)` producing the
-four route handlers: `login` (POST JSON `{username, password, otp?}` to
+three route handlers: `login` (POST JSON `{username, password, otp?}` to
 the API's login path given in `opts`, on 2xx stores the returned JWT
 and issues a CSRF cookie, on 401/429 passes the problem and
 `Retry-After` through, never logs the body), `logout` (clears both
 cookies and, if `opts.apiLogoutPath`, tells the API), `proxy`
-(`forward` for `/_bff/api/*` → `opts.apiBase`), `wsTicket` (POST to the
-API's ticket path with the bearer and returns the ticket JSON; the
-browser then opens the WS with the ticket, never with the session JWT).
+(`forward` for `/_bff/api/*` → `opts.apiBase`). There is no WebSocket
+ticket route (M22): the BFF cannot proxy a WebSocket and a ticket in a
+query string ends up in access logs; the browser opens the system's WS
+same-origin and the `uspace_session` cookie travels on the upgrade,
+where the WS process checks `Origin` and verifies it. `README.md` says
+this in the BFF section so no `web/` adds a ticket route of its own.
 `sessionClaimsUnverified(jwt)`: base64url-decodes the payload without
-verifying, returns `sub`, `exp`, and `role`/`realm`/`scope` when present;
-the name and the doc comment say it is for display only.
+verifying, returns `sub`, `exp`, `roles` (an array; `[]` when the claim
+is absent or not an array, never derived from `scope`) and `realm`
+(`null` when absent); the name and the doc comment say it is for
+display only. The reconciled session shape it reads (PLAN §6.3, M20):
+`scope = "session"`, `roles: [string]`, `realm` ∈ `console` / `police`
+/ `portal`, `aud` = the system's own host, `jti`, `exp` ≤ 12 h.
 
 **Client.** `SessionProvider`, `useSession`, `LoginForm` (username,
 password with `autocomplete="current-password"`, optional OTP field
 with `autocomplete="one-time-code"`, submit to `action`, shows the
 problem `detail` and a countdown from `retryAfterS`, never puts a value
 in the URL, clears the password field on failure), `RequireRole`
-(display gating), `csrfToken()`.
+(display gating: renders children when `session.roles` intersects
+`anyOf`), `csrfToken()`.
 
 ## Tests
 
@@ -74,17 +86,22 @@ in the URL, clears the password field on failure), `RequireRole`
   problem body through unchanged; times out upstream with its own
   controller and returns 504 with a problem body; `login` on 2xx sets
   cookies and on 401 does not (pair); the login body never appears in
-  any log call (spy on `console`); `wsTicket` returns the API's ticket
-  and never the session JWT (assert the response body does not contain
-  the cookie value).
+  any log call (spy on `console`); `bffHandlers` returns exactly the
+  three handlers and no `wsTicket` key (a type-level test, so a
+  consumer that mounts a fourth route fails to compile against the kit).
 - `sessionClaimsUnverified`: a token with a bad signature still decodes
   (that is the point; the test names it), a malformed token gives
-  `null`, an `exp` in the past is still returned (display decides).
+  `null`, an `exp` in the past is still returned (display decides); a
+  payload with `roles: ["supervisor", "incident_officer"]` returns both
+  in order; a payload with no `roles` returns `[]`; a payload with
+  `roles: "supervisor"` (a string, the pre-reconciliation shape) returns
+  `[]` and is counted, never `["supervisor"]`; `realm` is passed
+  through and `null` when absent.
 - Client (jsdom): `LoginForm` submits with `fetch` to `action`; on 429
   with `Retry-After: 30` shows the countdown and disables submit until
   it reaches zero (fake timers); the password input is cleared on
-  failure; `RequireRole` renders children for a matching role and the
-  fallback otherwise (pair).
+  failure; `RequireRole` renders children when one of several `roles`
+  matches, and the fallback when none does or `roles` is empty (pair).
 - Stories: `LoginForm` in both languages and schemes with `axe`;
   golden DOM snapshot.
 
@@ -93,8 +110,10 @@ in the URL, clears the password field on failure), `RequireRole`
 - [ ] PLAN §3.16 implemented; API report updated; `auth/server` carries
   `import "server-only"` and `attw` shows it is not importable from a
   browser condition.
-- [ ] The four handlers mounted in a route file example in `README.md`
-  (the real example app is WP-13).
+- [ ] The three handlers mounted in a route file example in `README.md`
+  (the real example app is WP-13), with the sentence that the WebSocket
+  is opened same-origin on the cookie and that the kit has no ticket
+  route.
 - [ ] No credential-shaped string in the repo (`gitleaks` green; a
   reviewer reads the fixtures).
 - [ ] `pnpm check`, `pnpm test`, `pnpm test:browser` outputs in the PR.
@@ -110,6 +129,6 @@ log line, a URL or a WS handshake. The kit does not verify tokens
 ## Commits
 
 `feat(auth): add the session and CSRF cookie helpers for the BFF [WP-5 U-M1]`,
-`feat(auth): add the allow-listed BFF forward and the four route handlers [WP-5 U-M1]`,
+`feat(auth): add the allow-listed BFF forward and the three route handlers [WP-5 U-M1]`,
 `feat(auth): add the client session provider, login form and display gating [WP-5 U-M1]`,
-`test(auth): cover cookie attributes, CSRF pairs, forwarding refusals and the ticket path [WP-5 U-M1]`.
+`test(auth): cover cookie attributes, CSRF pairs, forwarding refusals and the roles claim [WP-5 U-M1]`.

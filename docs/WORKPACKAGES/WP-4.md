@@ -2,20 +2,25 @@
 
 Branch `feat/WP-4-api-adapter`. Milestone U-M1. Owns `src/api/`,
 `bin/uspace-ui-gen-api` exclusively. Depends on WP-0. Consumers: WP-8
-(`live` uses the client for tickets), WP-10 (`form` maps field errors),
-every `web/`.
+(`live` surfaces `ApiError` and `retryAfterS`), WP-10 (`form` maps
+field errors), every `web/`.
 
 ## Read first
 
-1. `docs/PLAN.md` §1.1 ("never hand-write an API type"), §3.7, §6.4,
-   §11 (how a `web/` wires the client), §14 Q2, Q14.
+1. `docs/PLAN.md` §1.1 ("never hand-write an API type"), §3.7 (including
+   the reconciled error body: `errors[]`, `truncated?`, `type` slug
+   URIs), §6.4, §11 (how a `web/` wires the client), §14 Q2, Q3, Q14
+   (decided).
 2. Spec `00 §6.2` (TypeScript types generated Go → TypeScript only;
    `openapi-typescript`), `00 §7` (an endpoint not in the OpenAPI file
    does not exist; `Sunset` header on deprecated majors), `02 §1`
    (versioning: unknown fields ignored; `ETag` = version; `Sunset`),
-   `02 F3` (`metadata.updateDateTime`, dataset `version`, `cis_version`,
-   `cis_age_s`), `02 F5` (geo-awareness `stale` marker), `06 §3`
-   (bearer forwarded by the BFF; the browser sends a cookie).
+   `02 F3` (dataset `version`, `cis_version`, `cis_age_s`; the CISP's
+   top-level `cis_updated_at` and the core `ed318.Metadata` names
+   `issued` / `provider`, which replaced the spec's `updateDateTime` /
+   `originator` in the reconciliation, M15), `02 F5` (geo-awareness
+   `stale` marker), `06 §3` (bearer forwarded by the BFF; the browser
+   sends a cookie).
 3. LESSONS B-10 (503 with `Retry-After` is a refusal the client retries,
    never 401/403 semantics), S-15 (login limits are the API's), the
    utm rule "do not add retry loops around commands that have side
@@ -37,12 +42,17 @@ every `web/`.
   `X-Request-Id` when present), and `sunset` (from `Sunset`, surfaced as
   a one-time console warning and a counter so a deprecated major is
   noticed before it dies). On 401 it calls `onUnauthorized` once.
-- `parseProblem`, `fieldErrorsOf`, `freshnessOf(res, body, pick)`:
-  `etag` from the header, `version`/`updatedAt`/`ageS`/`stale` from the
-  body fields the caller points at with `pick` (`{ version: "cis_version",
-  ageS: "cis_age_s", stale: "stale", updatedAt: "metadata.updateDateTime" }`
-  as the default pick, matching `02 F3`/`F5`); the kit never guesses a
-  field it was not pointed at.
+- `parseProblem` (reads the slug off a `type` of the form
+  `https://schemas.uspace.ge/problems/<slug>` into `ApiError.slug`, so a
+  status component can label `cis_stale` or `unauthenticated` by key;
+  `truncated` kept on the `Problem`), `fieldErrorsOf`,
+  `freshnessOf(res, body, pick)`: `etag` from the header,
+  `version`/`updatedAt`/`ageS`/`stale` from the body fields the caller
+  points at with `pick` (`{ version: "cis_version", ageS: "cis_age_s",
+  stale: "stale", updatedAt: "cis_updated_at" }` as the default pick,
+  matching `02 F3`/`F5` as reconciled (M15); an app reading the
+  authority's export points `updatedAt` at `metadata.issued`); the kit
+  never guesses a field it was not pointed at.
 - No retry logic at all; a `retryAfterS` is data for the status
   components.
 - `bin/uspace-ui-gen-api`: `node` script that runs the pinned
@@ -56,7 +66,9 @@ every `web/`.
 
 - With an in-process `fetch` stub (no network): 2xx passes typed data
   through; 404 with a problem body yields `ApiError.problem` with
-  `errors` mapped to `FieldError[]`; 404 with a plain body yields
+  `errors` mapped to `FieldError[]`, `slug` from `type` and `truncated`
+  passed through (and `slug: null` for a `type` outside the problems
+  domain: pair); 404 with a plain body yields
   `problem: null` and a message with the status; 503 + `Retry-After: 7`
   gives `retryAfterS === 7`; `Retry-After` as an HTTP date is converted
   with a fixed `now`; 401 calls `onUnauthorized` exactly once over two
@@ -64,8 +76,9 @@ every `web/`.
   not (E-01 pair); `Accept-Language` follows `lang()`; `Sunset` warns
   once and counts.
 - `freshnessOf`: header-only, body-only, both, neither; a `stale: true`
-  marker; a dotted path into `metadata.updateDateTime`; a pick pointing
-  at an absent field yields `null`, never `0` or `""`.
+  marker; the default pick on a CISP-shaped body (`cis_updated_at`); a
+  dotted path into `metadata.issued`; a pick pointing at an absent
+  field yields `null`, never `0` or `""`.
 - Type-level: a fixture OpenAPI file under `src/api/test/fixture.yaml`
   is generated into `paths` in a test setup step and
   `createClient<paths>` is used with a wrong path and a wrong body in

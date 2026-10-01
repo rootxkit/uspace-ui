@@ -53,7 +53,9 @@ consoles, the USSP operator portal.
 - `symbology/ident.ts`: `identToken`, `identOrder`, `needsAttention`
   (the list from G-03, used for ordering and the legend note only),
   `identHintKey(status, reason, basis)` for the detail text, including
-  the `as_broadcast` caveat and the `mismatch` line.
+  the `as_broadcast` caveat, the `provider` caveat ("reported by a
+  provider, unverified": a Display Provider flight is a peer's claim,
+  PLAN §14 Q18) and the `mismatch` line; total over `IdentBasis`.
 - `symbology/age.ts`: `ageBucket(ageS, staleAfterS)` with the thirds
   rule of PLAN §3.8; no default `staleAfterS`.
 - `symbology/severity.ts`: `severityToken`, `severityOrder`.
@@ -78,8 +80,9 @@ consoles, the USSP operator portal.
   switch); `trustShape("broadcast")` is the hollow variant and no other
   trust is hollow (pair); `ageBucket` boundaries with a chosen
   `staleAfterS` (live/aging/stale/unknown, each hit); `identHintKey`
-  for `registered`+`as_broadcast` yields the caveat key and
-  `registered`+`authenticated` does not (pair); `mismatch: true` yields
+  for `registered`+`as_broadcast` yields the broadcast caveat key,
+  `registered`+`provider` the provider caveat key, and
+  `registered`+`authenticated` neither (triple); `mismatch: true` yields
   the mismatch line whatever the status.
 - `TrackLayer` with the WP-3 mock: out-of-order update ignored and
   counted, in-order applied (pair); a `backlog` sample extends the trail

@@ -19,9 +19,14 @@ to `v0.1.0`.
    is type `USPACE`), `02 F1` (the ED-318 feature fields: `type`,
    `variant`, `reason[]`, `message`, `limitedApplicability`, vertical
    limits with reference), `02 F2` (restriction states `planned`,
-   `active`, `ended`, `cancelled`; reason `DAR`), `02 F3` (`?at=`
-   returns applicable features; `version`, `metadata.updateDateTime`),
-   `04 §3.4`.
+   `active`, `ended`, `cancelled`; reason `DAR`, identifier `DAR` +
+   4 base-36, no hyphen: reconciliation M10), `02 F3` (`?at=` returns
+   applicable features; `?applies_at=` annotates every feature with
+   `extendedProperties.cis_applicability` ∈ `applies` /
+   `not_applicable` / `unknown` without filtering, reconciliation M17,
+   which is what an app maps onto `ZoneView.applies`; `version`,
+   `cis_updated_at` and core's `metadata.issued` / `metadata.provider`,
+   M15), `04 §3.4`.
 3. LESSONS Z-10 (severity per restriction is policy; the *colour per
    type* here must not contradict it: PROHIBITED reads as the gravest),
    Z-09 (a zone whose limit could not be judged is the *alert's*
@@ -59,8 +64,10 @@ to `v0.1.0`.
   for the hover card; click → `onSelect(identifier)`; hover card shows
   name, type (i18n), limits with reference and unit, `message`, the
   applicability as the API said it (`applies`: "applies now" / "not
-  applying now" / nothing when `null`), `version` and `updatedAt`
-  (Art. 9(2): time of update and version are shown wherever a zone is).
+  applying now" / nothing when `null`; the app sets it from
+  `cis_applicability` of a `?applies_at=` response, PLAN §6.4, and the
+  kit never asks why), `version` and `updatedAt` (Art. 9(2): time of
+  update and version are shown wherever a zone is).
 - `RestrictionLayer`: ED-318 features with reason `DAR`, same hover
   card plus the state and `starts_at`/`ends_at` as the API spelled them
   (fields taken from `ZoneView` plus `restrictionState`).

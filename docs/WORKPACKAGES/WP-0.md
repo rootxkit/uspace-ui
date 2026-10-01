@@ -14,11 +14,16 @@ depends on it, so it is small and reviewed first.
    map), §3.1 (`model`, to be written here exactly), §3.17 (`eslint`),
    §3.18 (`test`), §4 (dependencies), §9, §10, §12.
 2. `uspace-core/core/*.go` at the tag in `docs/CORE_VERSION` (write that
-   file: `v0.2.0` today): every string constant of `VerticalRef`,
-   `AltSource`, `TimeSource`, `Trust`, `Severity`, `ZoneType`,
-   `IdentStatus`, `IdentReason`, `IdentBasis`, and `FieldError`. The
-   kit mirrors them; read them, do not type them from memory (E-03 in
-   spirit: a name is a wire format).
+   file: `v1.0.0`, the released tag; verify it exists, do not assume):
+   every string constant of `VerticalRef`, `AltSource`, `TimeSource`,
+   `Trust`, `Severity`, `ZoneType`, `IdentStatus`, `IdentReason`,
+   `IdentBasis`, and `FieldError`. The kit mirrors them; read them, do
+   not type them from memory (E-03 in spirit: a name is a wire format).
+   One exception, written down: `IdentBasis` carries `"provider"` ahead
+   of core (PLAN §14 Q18; core v1.1.0 adds `BasisProvider`), so the
+   enum check treats a kit value absent from core as a *listed* skip,
+   named in `docs/CORE_VERSION` beside the tag, and anything else as a
+   failure.
 3. Spec `04 §2` (envelope, trust), `04 §3.2` (identification), `04 §3.3`
    (alert kinds, states, clear reasons; violation kinds), `02 F2`
    (restriction states), `00 §5` (ED-318 zone types), `00 §6` (the lint
@@ -42,7 +47,9 @@ present now, pointing at a stub `index.ts` that exports nothing but a
 `const ENTRY = "map"` style marker so `publint`/`attw` validate the map
 from day one), `sideEffects: ["*.css"]`, `files`, `engines`, exact
 dependency pins, peers as ranges, `publishConfig: { access: "public",
-provenance: true }`. Prettier. Vitest with three projects: `node`
+provenance: true }` (npmjs is the only registry, PLAN D10; no
+`.npmrc` registry override, no GitHub Packages line). Prettier. Vitest
+with three projects: `node`
 (pure), `jsdom` (components), `browser` (Playwright Chromium, stories).
 Storybook 9 with `react-vite`, `addon-a11y`, `addon-vitest`; one story
 (`stories/Welcome.mdx`) so the browser job has something to run.
@@ -77,7 +84,7 @@ them with the arrays. Online, best-effort on PRs, required on `main`
 (PLAN §10 job 7). `size-check.mjs` reading budgets from `package.json`.
 
 **CI.** `.github/workflows/ci.yml` exactly as PLAN §10 jobs 1–7
-(release and pages workflows are WP-13). `concurrency` with
+(`release.yml` is WP-13a, `pages.yml` is WP-13). `concurrency` with
 cancel-in-progress, `timeout-minutes`, path filters, caches for pnpm and
 Playwright. Branch protection is the owner's.
 

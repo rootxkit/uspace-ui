@@ -17,6 +17,13 @@ mirror exactly) and the predecessor `rootxkit/utm/web-pilot` (reference for
 hard-won display behaviour only: basemap, feed state, source wording,
 identification badges, null formatting).
 
+Reconciled on 2026-10-02 against the four system plans (the cross-plan
+decisions document; its mismatch ids `M-nn` and question ids are cited
+where a row was changed by it): one console frame, one session and
+cookie contract, one error body, npmjs-only distribution with an early
+`0.1.0-rc`, pnpm everywhere, the lab-built basemap served by the
+deployment repo. The three owner-only questions of §14 stay open.
+
 Sections: 1 scope, role boundary and decisions; 2 package layout and
 dependency graph; 3 public API per entry point; 4 third-party dependencies;
 5 lessons and spec rules per package; 6 data, bus and the published
@@ -64,9 +71,9 @@ pinned by each `web/`; additive within a major.
 | D7 | Fonts ship in the package (Noto Sans and Noto Sans Georgian, OFL, woff2 subsets) and are loaded with `next/font/local` through `/fonts`; a CI test reads each file's `cmap` and fails if any Georgian block (Mkhedruli U+10D0–U+10FF, Mtavruli U+1C90–U+1CBF, Nuskhuri U+2D00–U+2D2F, Asomtavruli U+10A0–U+10CF) is missing a glyph. | "A font that has full Georgian glyphs" is checked, not assumed (E-02). No Google Fonts request from a console (D6). |
 | D8 | The live feed client (`/live`) is a generic, reconnect-forever WebSocket store that understands the common envelope of `04 §2` and the console frame of §6.3, never a system's business messages. Message bodies are passed to app adapters typed by the app's generated types. | B-08 (reconnect forever, start degraded), C-08 (replay on connect is the server's duty; the client shows what it was given and its age), `05 §5` (`dropped_frames` visible), `05 §6` (freeze with age shown). |
 | D9 | Visual testing is Storybook 9 with stories run as tests in vitest browser mode (Playwright Chromium), `axe` on every story, DOM snapshots of a named golden set, and a static Storybook published to GitHub Pages from `main`. No hosted visual-diff service. | CI-cheap on a public repo: Pages and Actions are free; a paid snapshot service is a recurring cost and a secret. Map pixels are not snapshotted (WebGL in CI is noise); the style expressions the symbology produces are tested instead (§9). |
-| D10 | Published to the public npm registry under the `@rootxkit` scope with provenance, from a tag workflow using OIDC trusted publishing (no long-lived token in secrets). GitHub Packages is the fallback (§14 Q1). | Consumers (`web/` CI, Docker builds, the owner's machines) install without a token; provenance ties each version to a commit and a workflow run (`06 §4` supply chain). |
+| D10 | Published to the public npm registry under the `@rootxkit` scope with provenance, from a tag workflow using OIDC trusted publishing (no long-lived token in secrets). npmjs is the only distribution channel: no GitHub Packages, no `github:` tag dependency, no tarball (reconciliation M32). The first publish is a pre-release, `0.1.0-rc.1`, as soon as WP-0..WP-5 merge (WP-13a), so the CISP's `web/` starts on an rc and bumps. | Consumers (`web/` CI, Docker builds, the owner's machines) install without a token; provenance ties each version to a commit and a workflow run (`06 §4` supply chain). A git-tag dependency would need a `prepare` build with the full devDependencies inside every system's Docker build. |
 | D11 | The kit ships its ESLint flat config (`/eslint`) with the rules the spec requires of every `web/`: no geometry or geodesy imports, no database or bus client imports, no business logic in route handlers, no hand-written API types in the generated directory. | `00 §6` ("a Next.js file importing geometry or geodesy libraries fails lint"), `07` KT-3 ("no-geometry-import and no-server-side-business-logic rules"). Writing the rule once here is how five apps get it the same. |
-| D12 | The first tag `v0.1.0` is U-M1 (with C-M1); `v1.0.0` follows the first two consoles in production use of the track and alert components (the authority's A-M2 picture and the USSP's S-M2 console), when §3's API is declared stable. | Spec `07`. A kit's API is proven by its second consumer, not its first. |
+| D12 | The first release `v0.1.0` is U-M1 (with C-M1; pre-releases `0.1.0-rc.N` precede it, D10); `v1.0.0` follows the first two consoles in production use of the track and alert components (the authority's A-M2 picture and the USSP's S-M2 console), when §3's API is declared stable. | Spec `07`. A kit's API is proven by its second consumer, not its first. |
 
 ---
 
@@ -159,7 +166,7 @@ export type Severity = "info" | "warning" | "critical";
 export type ZoneType = "PROHIBITED" | "REQ_AUTHORIZATION" | "CONDITIONAL" | "NO_RESTRICTION" | "USPACE";   // ED-318 spelling (00 §5)
 export type IdentStatus = "registered" | "suspended" | "unknown_operator" | "unidentified";
 export type IdentReason = "matched" | "session_binding" | "uas_suspended" | "uas_revoked" | "operator_suspended" | "operator_revoked" | "serial_unknown" | "not_a_serial" | "operator_absent" | "operator_mismatch" | "owner_unknown" | "not_in_registry" | "serial_conflict" | "no_serial" | "registry_unavailable";
-export type IdentBasis = "authenticated" | "as_broadcast";
+export type IdentBasis = "authenticated" | "as_broadcast" | "provider";   // `provider` = a Display Provider peer's claim, neither authenticated nor broadcast (core v1.1.0 `BasisProvider`, reconciliation Q-A8); rendered with its own caveat, never as `authenticated`
 export type TimeSource = "source_clock" | "broadcast" | "receiver" | "provider" | "system";
 export type AlertKind = "proximity" | "nonconformance" | "nonconformance_nearby" | "height_exceedance" | "zone_incursion" | "lost_link" | "restriction_activated" | "emergency_nearby";
 export type ViolationKind = "height_120m" | "zone_incursion" | "unregistered" | "no_authorisation" | "identification_mismatch" | "rid_absent";
@@ -195,7 +202,8 @@ export interface IntentView { intentId: string; authorisationNumber: string | nu
 export interface SourceView { sourceType: string; instanceId: string | null; state: SourceState; disabledBy: DisabledBy | null; disabledByWho: string | null; lastSeenAt: string | null; lagS: number | null; accepted: number; refused: number }
 export interface FeedStatus { connection: "connecting" | "live" | "down"; sinceMs: number; droppedFrames: number; degraded: string[]; policyVersion: string | null; staleAfterS: number | null; liveMaxAgeS: number | null; serverTs: string | null }
 export interface FieldError { field: string; reason: string }      // uspace-core core.FieldError (its CLAUDE.md rule 5: an error names the field and the reason)
-export interface Problem { type: string; title: string; status: number; detail: string | null; instance: string | null; errors: FieldError[] }   // §14 Q2
+export interface Problem { type: string; title: string; status: number; detail: string | null; instance: string | null; errors: FieldError[]; truncated?: boolean }   // §14 Q2 (decided, M28): `type` = https://schemas.uspace.ge/problems/<slug>; `errors` capped at 100 by the server, `truncated: true` when it was cut; the form kit says "and more" on it
+export interface SessionDisplay { sub: string; roles: string[]; realm: string; exp: number }   // the session JWT claims the BFF decodes for display (M20): `roles` is always an array (one element where a system has single-role users); `realm` is `console` (default), `police` (authority) or `portal` (USSP operators)
 ```
 
 ### 3.2 `theme` (WP-1)
@@ -295,7 +303,7 @@ export interface ClientOptions { baseUrl: string; fetch?: typeof fetch; csrfToke
 export function createClient<Paths extends {}>(opts: ClientOptions): Client<Paths>   // openapi-fetch under the hood; Paths is the app's generated `paths`; adds Accept-Language, X-CSRF-Token on unsafe methods, credentials: "same-origin"
 export class ApiError extends Error { readonly status: number; readonly problem: Problem | null; readonly retryAfterS: number | null; readonly requestId: string | null }
 export function parseProblem(res: Response): Promise<Problem | null>   // application/problem+json (§14 Q2); otherwise null
-export interface Freshness { etag: string | null; version: string | null; updatedAt: string | null; ageS: number | null; stale: boolean }   // from ETag, metadata.updateDateTime, cis_version, cis_age_s and `stale` markers (02 F3, F5 geo-awareness) as headers or body fields the app points at
+export interface Freshness { etag: string | null; version: string | null; updatedAt: string | null; ageS: number | null; stale: boolean }   // from ETag, cis_updated_at (or metadata.issued, the core ed318 name; M15 retired updateDateTime), cis_version, cis_age_s and `stale` markers (02 F3, F5 geo-awareness) as headers or body fields the app points at
 export function freshnessOf(res: Response, body: unknown, pick?: FreshnessPick): Freshness
 export function fieldErrorsOf(err: unknown): FieldError[]   // [] when not a Problem
 ```
@@ -304,6 +312,15 @@ The kit never retries a non-idempotent request (utm "What not to do").
 A `503` with `Retry-After` is surfaced as `retryAfterS` (B-10) and the
 status components render it as "refused, retry in N s", not as an error
 of the console.
+
+The error body is the same on every national API (reconciliation M28):
+`{type, title, status, detail, instance, errors: [{field, reason}],
+truncated?}`, `type` = `https://schemas.uspace.ge/problems/<slug>` with
+`slug` the refusal name (`unauthenticated`, `forbidden`, `signature`,
+`cis_stale`, ...), `field` = the JSON path as `core.FieldError` writes
+it. `parseProblem` reads the slug off `type` so a status component can
+label a refusal by key; an unknown slug is shown by its `title`. The
+USSP's `conflicts[]` is on the decision body, never on the problem.
 
 ### 3.8 `symbology` (WP-6 zones, WP-7 tracks)
 
@@ -353,9 +370,9 @@ export function SeverityLegend(): JSX.Element;  export function AgeLegend(props:
 ### 3.11 `live` (WP-8)
 
 ```ts
-export interface FeedOptions { url: string | (() => Promise<string>); protocols?: string[]; backoff?: { initialMs: number; maxMs: number; factor: number }; onFrame(frame: ConsoleFrame): void; now?: () => number }
-export interface ConsoleFrame { schema: string; msgId: string; ts: string | null; rxTs: string; capturedAt: string | null; backlog: boolean; body: unknown }   // the common envelope of 04 §2 plus `body`; §6.3 names the frames
-export function useFeed(opts: FeedOptions): FeedStatus   // reconnects forever (B-08); status frames update droppedFrames, degraded, policyVersion, staleAfterS; close code 4401 -> re-fetch url (a ticket) then reconnect; never gives up, never throws
+export interface FeedOptions { url: string | (() => Promise<string>); protocols?: string[]; backoff?: { initialMs: number; maxMs: number; factor: number }; onFrame(frame: ConsoleFrame): void; onUnauthorized?(): void; now?: () => number }   // `url` stays generic (a string, or a function for an app that must compute it); a console passes its system's same-origin WS path and the browser sends the session cookie on the upgrade (M22); there is no ticket
+export interface ConsoleFrame { schema: string; msgId: string; producer: string; ts: string | null; rxTs: string; capturedAt: string | null; timeSource: TimeSource; backlog: boolean; body: unknown }   // the common envelope of 04 §2 plus `body`; §6.3 names the frames; `uspace-lab/schemas/common/envelope/v1`
+export function useFeed(opts: FeedOptions): FeedStatus   // reconnects forever (B-08); status frames update droppedFrames, degraded, policyVersion, staleAfterS; close code 4401 = the session is gone: `onUnauthorized` once (the app re-logins), connection `down`, retries continue so a renewed session resumes without a reload; never gives up, never throws
 export function createTrackStore(opts: { trailPoints: number; maxTracks: number }): TrackStore   // bounded (E-10): oldest evicted and counted; receivedAtMs stamped on insert
 export interface TrackStore { upsert(t: Omit<TrackView, "receivedAtMs">): void; remove(id: string, reason: ClearReason | "source_disabled"): void; get(id): TrackView | undefined; snapshot(): ReadonlyMap<string, TrackView>; subscribe(fn): () => void; counters(): Readonly<Record<string, number>> }
 export function createAlertStore(): AlertStore    // raised/updated replace by alertId; cleared keeps the alert for `clearedHoldMs` with its clear numbers and reason (C-14), then drops it; acknowledged flag per console (not recorded; recording is the app's POST)
@@ -414,17 +431,17 @@ export function clearSession(res: NextResponse, opts: SessionCookieOptions): voi
 export function readSessionToken(req: NextRequest | ReadonlyRequestCookies, opts?): string | null
 export function issueCsrf(res: NextResponse, opts): string; export function checkCsrf(req: NextRequest, opts): boolean   // double submit: cookie value equals X-CSRF-Token header on unsafe methods
 export function forward(req: NextRequest, target: URL, opts: { session: SessionCookieOptions; allowPaths: RegExp[]; timeoutMs: number }): Promise<Response>   // the one BFF proxy: adds Authorization: Bearer <session>, strips cookies, copies Accept-Language and Content-Type, passes status and problem bodies through; refuses a path not in allowPaths with 404; never follows redirects
-export function bffHandlers(opts): { login: RouteHandler; logout: RouteHandler; proxy: RouteHandler; wsTicket: RouteHandler }   // the four routes every web/ mounts under /_bff/* (02 §3); login POSTs the credentials to the API's login endpoint over the server side and sets the cookie; the browser never sees the JWT
-export function sessionClaimsUnverified(jwt: string): { sub: string | null; role: string | null; realm: string | null; exp: number | null } | null   // display only (which menu to show); authorisation is the API's; the name says so
+export function bffHandlers(opts): { login: RouteHandler; logout: RouteHandler; proxy: RouteHandler }   // the three routes every web/ mounts under /_bff/* (02 §3); login POSTs the credentials to the API's login endpoint over the server side and sets the cookie; the browser never sees the JWT. No WebSocket ticket route (M22): the BFF cannot proxy a WebSocket and a ticket in a query string is logged; the WS process accepts the session cookie on a same-origin upgrade with an `Origin` allow-list and verifies it with the shared verifier
+export function sessionClaimsUnverified(jwt: string): { sub: string | null; roles: string[]; realm: string | null; exp: number | null } | null   // display only (which menu to show); authorisation is the API's; the name says so. Reads the reconciled session shape (M20): `sub`, `exp`, `roles: [string]`, `realm`; a `roles` claim that is absent or not an array gives `[]`, never a guess from `scope`
 ```
 
 Client:
 
 ```ts
-export function SessionProvider(props: { session: { sub: string; role: string; realm: string | null; exp: number } | null; children }): JSX.Element   // the server component reads the cookie, decodes for display, passes it down
+export function SessionProvider(props: { session: SessionDisplay | null; children }): JSX.Element   // the server component reads the cookie, decodes for display, passes it down (§3.1 `SessionDisplay`: `sub`, `roles[]`, `realm`, `exp`)
 export function useSession(): { session: ...; signOut(): Promise<void> }
 export function LoginForm(props: { action: string; mfa?: boolean; onSuccess(): void }): JSX.Element   // POSTs to /_bff/login; the password field is never logged, never put in the URL, autocomplete per spec
-export function RequireRole(props: { anyOf: string[]; children; fallback?: ReactNode }): JSX.Element   // display gating only
+export function RequireRole(props: { anyOf: string[]; children; fallback?: ReactNode }): JSX.Element   // display gating only; matches when `session.roles` intersects `anyOf`
 export function csrfToken(): string | null   // reads the non-HttpOnly csrf cookie for the api client
 ```
 
@@ -531,8 +548,8 @@ next user; `06 §5`).
 None. The kit never holds a NATS client (`00 §6`); `noServerClientsInWeb`
 makes that a lint failure in every consumer too. What a console receives
 is the WebSocket its own system serves (`02 §3`: `/v1/picture/*`,
-`/v1/traffic`, `/v1/stream`, `/v1/manned-traffic/stream`), over the BFF
-ticket route.
+`/v1/traffic`, `/v1/stream`, `/v1/manned-traffic/stream`), opened
+same-origin with the session cookie on the upgrade (§6.3, M22).
 
 ### 6.3 Contracts this package publishes
 
@@ -540,47 +557,56 @@ ticket route.
 |---|---|---|
 | The package API of §3 and the `exports` map of §2 | `docs/api/uspace-ui.api.md` (api-extractor report, committed) | every `web/` |
 | The view-model enumerations, mirroring `uspace-core/core` | `model/` | every `web/` adapter; the lab's schema examples test |
-| The console frame | below | every system's WS process and the kit's `live` |
-| The BFF route set `/_bff/login`, `/_bff/logout`, `/_bff/api/*`, `/_bff/ws-ticket`, cookie names `uspace_session` (HttpOnly, SameSite=Strict, Secure) and `uspace_csrf`, header `X-CSRF-Token` | `auth/server` | every `web/`; the Caddy config in each deploy |
+| The console frame (adopted by all four systems, M29; the schemas live in `uspace-lab/schemas/common/`) | below | every system's WS process and the kit's `live` |
+| The session and cookie contract (adopted by all four systems, M20, M21, M22): the BFF route set `/_bff/login`, `/_bff/logout`, `/_bff/api/*`; cookie names `uspace_session` (`HttpOnly; Secure; SameSite=Strict`, the API-issued session JWT) and `uspace_csrf` (readable, double-submit), header `X-CSRF-Token` on unsafe methods; the session JWT shape the kit decodes for display: `iss` = the system's issuer, `aud` = the system's own host, `sub` = account id, `scope = "session"`, `roles: [string]`, `realm` (`console` / `police` / `portal`), `jti`, `exp` ≤ 12 h, `kid`; WebSocket authentication = the session cookie on a same-origin upgrade with an `Origin` allow-list, close code `4401` = re-login; no ticket route | `auth/server`, `live` | every `web/` and every WS process; the Caddy config in `uspace-deploy` |
 | The basemap bundle layout `/basemap/basemap.pmtiles`, `/basemap/SOURCE.json` (`bounds`, `osm_data_as_of`), `/basemap/fonts/{fontstack}/{range}.pbf`, `/basemap/sprites/v4/{light,dark}.*` and the fontstack name | `map`, `fonts` | the lab's basemap build; each compose and Caddy |
 | Branding variables `UI_BRAND_NAME`, `UI_BRAND_SHORT_NAME`, `UI_BRAND_LOGO_URL`, `UI_BRAND_CONTACT`, `UI_BRAND_ACCENT`; language cookie `uspace_lang` and `Accept-Language` negotiation | `theme`, `i18n` | each deploy's config bundle (`06 §4`) |
 | The lint rules of §3.17 | `eslint` | every `web/` CI |
 
-**The console frame** (proposed; §14 Q5 asks the four system planners
-to adopt it so one `live` client serves every console). Every WebSocket
-message from a system to a console is one JSON object carrying the
-common envelope of `04 §2` (`schema`, `msg_id`, `producer`, `ts`,
-`rx_ts`, `captured_at`, `time_source`, `backlog`) and a `body` whose
-shape is named by `schema`. Frames the kit understands by `schema`:
+**The console frame** (adopted by all four systems in the cross-plan
+reconciliation, M29; §14 Q5). Every WebSocket message from a system to
+a console is one JSON object carrying the common envelope of `04 §2`
+(`schema`, `msg_id`, `producer`, `ts`, `rx_ts`, `captured_at`,
+`time_source`, `backlog`) and a `body` whose shape is named by `schema`.
+The JSON Schemas and examples of `envelope/v1`, `console/status/v1`,
+`console/snapshot/v1` and `console/subscribe/v1` are owned by
+`uspace-lab/schemas/common/` (lab WP-L1), not by this repo or by any
+system; the kit's `live` tests and WP-14's fixtures consume them.
+Machine-facing streams (the ANSP's F4 feed, the USSP's `/v1/traffic`)
+carry the same envelope, so one client code path parses both; only
+their bodies differ. Frames the kit understands by `schema`:
 
 | `schema` | Body | Kit behaviour |
 |---|---|---|
-| `console/status/v1` | `{connection_id, server_ts, policy_version, stale_after_s, live_max_age_s, dropped_frames, degraded[], sources[]}` sent on connect and every 2 s (`04 §3.6` `source/status/v1` cadence) | `FeedStatus`; thresholds for the age buckets; `SourceView`s; server clock offset for captured-age display |
-| `console/snapshot/v1` | `{tracks[], alerts[], manned[]}` on connect and on re-subscribe (C-08 replay) | stores replaced, not merged; a track absent from the snapshot is dropped as `resolved` |
+| `console/status/v1` | `{connection_id, server_ts, policy_version, stale_after_s, live_max_age_s, dropped_frames, degraded[], sources[]}` sent on connect and every 2 s (`04 §3.6` `source/status/v1` cadence); optional per-system extras the kit renders when present and ignores when absent: `datasets{}` and `cis_version` (CISP), `projection_age_s` and `dp_state` (authority), `cis_age_s` (any CIS consumer), `nats` (bus state), `resync_since` (the CISP's resync: "re-fetch everything changed since T") | `FeedStatus`; thresholds for the age buckets; `SourceView`s; server clock offset for captured-age display; `DegradedBanner` shows `cis_age_s` and the `datasets{}` ages; a `resync_since` is passed to `onFrame` as a status frame so the app refetches |
+| `console/snapshot/v1` | `{tracks[], alerts[], manned[], zones_version}` on connect and on re-subscribe (C-08 replay) | stores replaced, not merged; a track absent from the snapshot is dropped as `resolved` |
 | `track/telemetry/v1`, `track/manned/v1` | per `04 §3.1` | app adapter to `TrackView` / `MannedView`; `backlog: true` goes to the trail, never to the live position |
 | `alert/v1`, `violation/v1` | per `04 §3.3` | app adapter to `AlertView`; `state` drives raise/update/clear |
 | `cis/change/v1` | per `04 §3.4` | the app refetches the dataset; the kit shows "zones updated to version V at T" |
+| `traffic/product/v1` | per `02 F5` (the USSP's traffic information to operators) | app adapter to `TrackView`s and `AlertView`s; the same stores |
 | anything else | — | passed to `onFrame` untouched, counted as `frames_unhandled` |
 
 Subscription control from the client is one frame
 `{schema: "console/subscribe/v1", body: {bbox, layers[]}}` sent on open
 and whenever `useBBoxSubscription` fires; the server answers with a
-snapshot. A system that cannot adopt this shape wraps its stream in its
-own adapter and still gets the stores and the status components; what it
-loses is the shared status frame, which is why the question is asked.
+snapshot. The adapter seam (`onFrame`) remains for a machine-facing body
+the kit does not catalogue; the envelope and the three `console/*`
+frames are not optional for a browser-facing WebSocket.
 
 ### 6.4 Contracts this package depends on
 
 | From | What | Status |
 |---|---|---|
 | each system repo | `api/openapi.yaml` (OpenAPI 3.1), from which the app generates `paths` with `openapi-typescript` and passes it to `createClient<Paths>` | the kit never reads a system's spec; it ships the generator wrapper so every app generates the same way (WP-4) |
-| `uspace-lab/schemas/` (KT-2) | JSON Schemas and examples of `track/telemetry/v1`, `track/manned/v1`, `alert/v1`, `violation/v1`, `cis/change/v1`, `source/status/v1` | **does not exist yet** at `uspace-lab@2b98ee8`; WP-14 wires the examples into `test/fixtures` when it does; until then the fixtures are synthetic and the enumerations are pinned to spec text |
+| `uspace-lab/schemas/` (KT-2) | `schemas/common/`: `envelope/v1`, `track/telemetry/v1`, `source/status/v1`, `zone/applicable/v1`, `console/status/v1`, `console/snapshot/v1`, `console/subscribe/v1`, `problem/v1` (shapes produced by several systems, M14); mirrored per-system schemas of `track/manned/v1` (ANSP), `alert/v1`, `traffic/product/v1` (USSP), `violation/v1` (authority), `cis/change/v1` (CISP); each with examples | **does not exist yet** at `uspace-lab@2b98ee8`; lab WP-L1 creates it (common schemas first); WP-14 wires the examples into `test/fixtures` when it does; until then the fixtures are synthetic and the enumerations are pinned to spec text (§14 Q16) |
 | `uspace-core` | the string values of `core` enumerations (`Trust`, `Severity`, `ZoneType`, `IdentStatus`, `IdentReason`, `IdentBasis`, `AltSource`, `VerticalRef`, `TimeSource`), `core.FieldError` shape, `ed318` field names | mirrored by hand in `model/` with a test; a divergence is a kit bug |
 | the lab | the basemap bundle (D6) | predecessor `utm/infra/basemap/fetch_basemap.sh` is the reference; §14 Q4 |
-| the authority | the session JWT the console login returns (claims `sub`, `role`, `realm`, `exp`) for display gating | `00 §6.2`; the kit decodes without verifying and says so in the function name |
-| every API | an error body the form kit can map: `application/problem+json` with `errors: [{field, reason}]` | §14 Q2 |
-| every WS process | the console frame of §6.3 | §14 Q5 |
-| every API that serves a picture or a feed | the display thresholds (`stale_after_s`, `live_max_age_s`) in the status frame or a `GET /v1/policy` the app reads | §14 Q6 |
+| every system's `api` | the session JWT the console login returns, in the reconciled shape (`sub`, `roles[]`, `realm`, `exp`, `scope = "session"`) for display gating | `00 §6.2`; M20 decided; the kit decodes without verifying and says so in the function name |
+| every API | an error body the form kit can map: `application/problem+json` with `errors: [{field, reason}]`, `truncated?` | §14 Q2, decided (M28) |
+| every WS process | the console frame of §6.3; the session cookie accepted on a same-origin upgrade with an `Origin` check | §14 Q5, decided (M29, M22) |
+| every API that serves a picture or a feed | the display thresholds (`stale_after_s`, `live_max_age_s`) in the status frame | §14 Q6, decided (M29) |
+| the CISP read API and the authority's `GET /v1/zones/export` | `?applies_at=<RFC 3339>`: annotate every feature with `extendedProperties.cis_applicability` ∈ `applies` / `not_applicable` / `unknown`, no filtering, beside the filtering `?at=` | §14 Q3, decided (M17); the app maps `cis_applicability` onto `ZoneView.applies` (`applies` → `true`, `not_applicable` → `false`, `unknown` → `null`) |
+| `uspace-deploy` and the lab | `/basemap/*` served by the deployment's Caddy from one shared read-only volume on every host; the bundle built by lab WP-L3 | §14 Q4, decided (M38) |
 
 ---
 
@@ -591,6 +617,7 @@ loses is the shared status frame, which is why the question is asked.
 | No credential in browser JavaScript (`06 §3`) | `LoginForm` posts to `/_bff/login`; the session JWT lives in an `HttpOnly` cookie; `auth/client` never sees it; `sessionClaimsUnverified` runs server side on the cookie and passes a display struct down. `gitleaks` in CI. |
 | CSRF | double-submit token on every unsafe BFF call; `createClient` adds the header; `checkCsrf` refuses without it. |
 | The BFF is a proxy with an allow-list | `forward()` refuses paths outside `allowPaths`, strips cookies, never follows redirects, bounds the timeout, passes `Retry-After` through. |
+| WebSocket authentication (M22) | the browser opens the system's WS same-origin and sends the `uspace_session` cookie on the upgrade; the WS process checks `Origin` against its allow-list and verifies the cookie with the shared verifier. No ticket, no token in a query string (it would be logged), no BFF proxying of WebSockets. A `4401` close means the session is gone and the kit asks the app to re-login. |
 | No PII in URLs (safety rules of this project; `06 §5`) | `useTableUrlState` and every link helper refuse keys named like identity fields (`name`, `email`, `phone`, `address`, `registration_number` secret part) — a test pins the list. |
 | No judgement in TypeScript (`06` T12) | the `/eslint` rules, applied to the kit itself in its own CI. |
 | Supply chain (`06 §4`) | exact pins, `pnpm install --frozen-lockfile`, Dependabot, `pnpm audit` as a non-gating report, provenance on publish (D10), `SECURITY.md` with a 90-day policy. |
@@ -651,7 +678,7 @@ global state (timers, `matchMedia`, cookies) and pass shuffled.
 apply (§1.1); the integration surface is the consumer app and the WS
 frame, both exercised above with a mock WS server (`live` tests run
 against an in-process `ws` server that replays recorded frame sequences,
-including a 4401 ticket expiry, a 60 s silence and a `backlog` burst).
+including a 4401 session expiry, a 60 s silence and a `backlog` burst).
 
 Coverage: a work package is done at ≥ 90 % statement coverage of its
 entry points, with every branch that produces a distinct wording or a
@@ -695,11 +722,14 @@ bitten by). Jobs on push to `main`, tags `v*` and pull requests;
 deploy to GitHub Pages (`actions/deploy-pages`). This is the living
 visual reference (D9).
 
-`.github/workflows/release.yml`: on tag `v*`: the `check`, `test`,
-`browser` and `fonts` jobs again on the tag, then `pnpm publish
---provenance --access public` with `id-token: write` (D10), then a
-GitHub release with the CHANGELOG section. The tag must equal
-`package.json` `version` or the job fails before publishing.
+`.github/workflows/release.yml` (written by WP-13a, first run on
+`v0.1.0-rc.1`): on tag `v*`: the `check`, `test`, `browser` and `fonts`
+jobs again on the tag, then `pnpm publish --provenance --access public`
+with `id-token: write` (D10), with `--tag next` when the version has a
+pre-release suffix so `latest` never points at an rc, then a GitHub
+release (marked pre-release for an rc) with the CHANGELOG section. The
+tag must equal `package.json` `version` or the job fails before
+publishing.
 
 Branch protection on `main` requires jobs 1–6.
 
@@ -714,8 +744,15 @@ The kit is not deployed. Each system's `web/` consumes it:
 
 ```jsonc
 // web/package.json
-"dependencies": { "@rootxkit/uspace-ui": "0.3.1", "maplibre-gl": "5.x", "next": "...", "react": "19.x", "react-dom": "19.x" }
+"packageManager": "pnpm@<exact>",   // pnpm everywhere (M34): corepack, `pnpm install --frozen-lockfile`, `pnpm-lock.yaml` committed; no npm ci, no package-lock.json
+"dependencies": { "@rootxkit/uspace-ui": "0.3.1", "maplibre-gl": "5.x", "next": "...", "react": "19.x", "react-dom": "19.x" }   // exact pin from npmjs only (M32): never a `github:` tag, never a tarball
 ```
+
+Minimum kit version per consumer (M33): CISP `web/` ≥ `0.1.0-rc.1`
+then `0.1.0` (public map, console shell); ANSP WP-11 ≥ `0.1`
+(`RestrictionLayer`), ANSP WP-12 ≥ `0.3` (`MannedLayer`); authority
+WP-21 ≥ `0.2` (`live`, `TrackLayer`); USSP WP-17 ≥ `0.2` for the intents
+pages (`form`, `table`) and ≥ `0.3` for the traffic pages (`alerts`).
 
 ```css
 /* web/app/globals.css */
@@ -741,11 +778,33 @@ export const api = createClient<paths>({ baseUrl: "/_bff/api", csrfToken });
 export function toTrackView(t: components["schemas"]["Track"]): Omit<TrackView, "receivedAtMs"> { ... }
 ```
 
+Every `web/` also (M38, M22, M21):
+
+- sets the kit's Content Security Policy (§7: `connect-src 'self'` for
+  the API, the WS and the basemap; `font-src 'self'`; `worker-src
+  blob:`; no `unsafe-eval`) in its `next.config`, as `examples/next-app`
+  shows; a console makes no third-party request, ever;
+- serves the kit's fonts through `next/font/local` from `/fonts`
+  (`fontClassName` on `<html>`); no Google Fonts;
+- reads the basemap at `/basemap/` (`BasemapConfig.baseUrl`), which the
+  deployment's Caddy (`uspace-deploy`) serves from one shared read-only
+  volume on every host with range requests and long cache headers; the
+  bundle is built by the lab (WP-L3) as a release artefact with a size
+  budget (a Georgia-wide extract with city-level zooms for Tbilisi,
+  Kutaisi, Batumi and Poti, `z ≤ 12` elsewhere, under about 1 GB); the
+  `web/` image contains no tiles;
+- mounts the three BFF routes under `/_bff/*`, uses the cookie names
+  `uspace_session` / `uspace_csrf` and opens its WebSocket same-origin
+  with the cookie (§6.3 session contract); its `api` and WS processes
+  verify that cookie with the shared `core/auth.Verifier`.
+
 Upgrade policy for consumers: a `web/` pins an exact version and bumps
 it in its own PR, running its own lint, build and the kit's example
 stories against its adapters. Two majors of the kit are maintained for
 six months (§12), so a system is never forced to upgrade in step with
-another.
+another. Pre-releases (`0.1.0-rc.N`) are published under the npm dist-tag
+`next`; a consumer pins them exactly like a release and bumps to `0.1.0`
+when it is tagged.
 
 Images: each system's CI builds its `web/` with `next build` (`output:
 standalone`) into that system's image; the droplet never builds Next.js
@@ -760,15 +819,21 @@ Storybook is served at `https://rootxkit.github.io/uspace-ui/` from
 
 ## 12. Versioning and release
 
-- `v0.1.0` = U-M1 (`07`): theme and tokens, `ui`, `i18n` with the font,
-  `map` with the basemap, `ZoneLayer` and `ZoneLegend`, `auth/*`, `api`,
-  `eslint`, the example app; the CISP public map and console build on it
-  and nothing else. Tagged by the owner from `main`.
+- `v0.1.0-rc.1` (WP-13a, M32): the first publish, as soon as WP-0..WP-5
+  merge: `model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api`, `auth/*`,
+  `eslint`, `test`; dist-tag `next`. `rc.2`, `rc.3`, ... follow each
+  merge that the CISP's `web/` needs (WP-6 first). An rc may still
+  change an export; the CHANGELOG says what moved.
+- `v0.1.0` = U-M1 (`07`): the rc entry points plus `ZoneLayer`,
+  `RestrictionLayer` and `ZoneLegend` (WP-6; `RestrictionLayer` is in
+  `0.1.0` because the ANSP's N-M1 console, WP-11, needs it: M33), and
+  the example app; the CISP public map and console build on it and
+  nothing else. Tagged by the owner from `main`.
 - `v0.2.0`: `live`, `status`, `TrackLayer`, `TrackLegend`,
   `IdentificationLegend`, `table`, `form` (the authority's A-M1/A-M2 and
   the USSP's S-M1 consoles).
 - `v0.3.0`: `alerts`, `AlertLayer`, `MannedLayer`, `IntentLayer`,
-  `RestrictionLayer`, `ReceiverLayer` (S-M2, S-M3, N-M1).
+  `ReceiverLayer` (S-M2, S-M3, N-M2).
 - `v1.0.0` (D12): the API report of §3 declared stable, the semver gate
   in CI, the lab's schema examples wired, two consoles in use.
 - From `v1`: within a major only additive changes (new exports, new
@@ -823,7 +888,8 @@ outputs (E-04).
 | WP-10 | `form` | `src/form/` | WP-1, WP-2, WP-4 | U-M2 |
 | WP-11 | `alerts` | `src/alerts/`, `src/layers/AlertLayer` | WP-7, WP-8 | U-M3 |
 | WP-12 | `traffic-layers` | `src/symbology/manned*`, `src/symbology/intent*`, `src/layers/{Manned,Intent,Receiver}Layer`, `src/status/TrackDetail` (the selected-track panel with the Remote ID block) | WP-6, WP-7, WP-8 | U-M3 |
-| WP-13 | `release-0.1` | `examples/next-app/`, `README.md` consumer section, `release.yml`, `pages.yml`, first publish | WP-1..WP-6 | U-M1 (tag `v0.1.0`) |
+| WP-13a | `rc-publish` | `.github/workflows/release.yml`, the publish configuration (`publishConfig`, `files`, dist-tag rule), `CHANGELOG.md` `0.1.0-rc.N` sections, the npm trusted-publishing set-up with the owner | WP-0..WP-5 merged (the rc ships what is on `main`) | U-M1 (tags `v0.1.0-rc.N`; first publish) |
+| WP-13 | `release-0.1` | `examples/next-app/`, `README.md` consumer section, `docs/CONSUMING.md`, `pages.yml`, the `0.1.0` changelog and tag | WP-1..WP-6, WP-13a | U-M1 (tag `v0.1.0`) |
 | WP-14 | `v1-gate` | semver gate, `scripts/check-enums.sh`, lab schema fixtures, API report freeze, `v1.0.0` | WP-7..WP-13 | U-M4 (tag `v1.0.0`) |
 
 Waves (what can run in parallel):
@@ -831,17 +897,19 @@ Waves (what can run in parallel):
 ```
 wave 0 (first, one agent):        WP-0
 wave 1 (5 agents, after WP-0):    WP-1  WP-2  WP-3  WP-4  WP-5
-wave 2 (after 1, 2, 3 / 2, 4):    WP-6 (needs 1, 2, 3)   WP-7 (needs 1, 2, 3)   WP-8 (needs 2, 4)   WP-9 (needs 1, 2)   WP-10 (needs 1, 2, 4)
-wave 3 (after 6 and 5):           WP-13 -> tag v0.1.0 = U-M1 (with cisp C-M1)
+wave 2 (after 1, 2, 3 / 2, 4):    WP-6 (needs 1, 2, 3)   WP-7 (needs 1, 2, 3)   WP-8 (needs 2, 4)   WP-9 (needs 1, 2)   WP-10 (needs 1, 2, 4)   WP-13a (needs 0..5 merged) -> tag v0.1.0-rc.1, then rc.2 after WP-6
+wave 3 (after 6 and 13a):         WP-13 -> tag v0.1.0 = U-M1 (with cisp C-M1)
 wave 3 (after 7, 8 / 6, 7, 8):    WP-11 (needs 7, 8)     WP-12 (needs 6, 7, 8)   -> tag v0.2.0 / v0.3.0
 wave 4:                           WP-14 -> tag v1.0.0 = U-M4
 ```
 
-Critical path: WP-0 → WP-3 → WP-6 → WP-13 (v0.1.0, which C-M1 waits
-for); then WP-7 → WP-11 → WP-14. WP-0 is small and reviewed first. WP-3
-starts the day WP-0's PR opens, against the frozen `model` types; WP-6
-and WP-7 start against WP-3's signatures of §3.6 the day its PR opens
-and rebase when it merges.
+Critical path: WP-0 → WP-3 → WP-6 → WP-13a (`0.1.0-rc.N`, which the
+CISP's WP-9 `web/` scaffold starts on) → WP-13 (`v0.1.0`, which C-M1
+waits for); then WP-7 → WP-11 → WP-14. The rc publish is the external
+leg of demo 1 and nothing else gates it. WP-0 is small and reviewed
+first. WP-3 starts the day WP-0's PR opens, against the frozen `model`
+types; WP-6 and WP-7 start against WP-3's signatures of §3.6 the day its
+PR opens and rebase when it merges.
 
 Cross-WP conflicts are avoided by exclusive directory ownership. Shared
 files: `CHANGELOG.md` (one line per WP under Unreleased, in the WP's last
@@ -851,7 +919,8 @@ by re-running the tool), the two catalogues `src/i18n/ka.ts` and
 the parity test catches a lost key in a merge), and `stories/golden/`
 (each WP adds its own files).
 
-Milestones: U-M0 scaffold merged; **U-M1** = `v0.1.0` with C-M1 (`07`);
+Milestones: U-M0 scaffold merged; `v0.1.0-rc.1` published (WP-13a);
+**U-M1** = `v0.1.0` with C-M1 (`07`);
 U-M2 = `v0.2.0` with A-M1/A-M2 and S-M1; U-M3 = `v0.3.0` with S-M2/S-M3
 and N-M1; U-M4 = `v1.0.0`.
 
@@ -859,22 +928,29 @@ and N-M1; U-M4 = `v1.0.0`.
 
 ## 14. Spec gaps and open questions for the owner
 
-| # | Gap | Resolution in this plan | Needs the owner? |
+The cross-plan reconciliation of 2026-10-02 decided every row that a
+coordinator could decide (marked **decided**, with the mismatch id
+`M-nn` it applies). Three rows need the owner (Q1, Q7, Q11): they stay
+**open** and carry the default the plan applies until the owner answers;
+the default is a proposal, not the answer.
+
+| # | Gap | Resolution in this plan | Status |
 |---|---|---|---|
-| Q1 | Registry: "npm or GitHub Packages". GitHub Packages needs a token to *install* even a public package (every `web/` CI, every Docker build, every developer machine); npmjs needs the `@rootxkit` scope and supports OIDC trusted publishing with provenance, so no secret is stored anywhere. | D10: npmjs with trusted publishing; `release.yml` is written for it. If the scope is not available or the owner prefers GitHub Packages, WP-13 switches the registry line and adds `NODE_AUTH_TOKEN` to every consumer's CI. | **Yes**: confirm the npm scope `@rootxkit` (or the name) and that the package is public. |
-| Q2 | The spec fixes no error body for the national APIs. The form kit needs a field-addressed error and `uspace-core` already names the field and reason (`core.FieldError`, `ed269.Problems` with a JSON path). | `model.Problem`: RFC 9457 `application/problem+json` with `type`, `title`, `status`, `detail`, `instance`, plus `errors: [{field, reason}]`; `field` is the JSON path as core writes it. Proposed to the four system planners; the kit degrades to "request failed, status N" for anything else. | **Yes**: adopt across the systems (one line in each plan's API section). |
-| Q3 | Zone applicability on a console: the kit must dim a zone that does not apply now (`limitedApplicability`), but evaluating applicability is a judgement (`ed269.Applies`, T-09) and must not run in TypeScript. `02 F3` offers `GET /v1/{dataset}?at=` which returns only the applicable features. | `ZoneView.applies` is `boolean | null` and the kit dims only on `false`. The app either fetches twice (all, and `at=now`) and sets `applies` from the difference, or the CISP read API adds `applies_at` to each feature when `at=` is given. Proposed: the second, as an additive optional field in the CISP's OpenAPI; the authority's own zone API does the same. | **Yes**: the CISP and authority planners add the field, or the apps double-fetch. |
-| Q4 | Who builds and hosts the basemap bundle (PMTiles extract of Georgia, Protomaps glyphs *including Georgian ranges* for the fontstack, sprites), how big it is (the predecessor's was hundreds of MB) and how it is refreshed. The kit assumes the `/basemap/` layout of §6.3. | The lab builds it from the predecessor's `infra/basemap/fetch_basemap.sh` as a release artefact with `SOURCE.json`; each system's compose mounts it read-only and Caddy serves it with range requests and long cache headers; the kit's `fonts.mapFontstack` names the glyph set. Storybook uses a tiny Tbilisi-only extract committed under `stories/basemap/` (a few MB) so stories render offline. | **Yes**: confirm the lab owns the bundle and the droplet has the disk (and whether a smaller extract is acceptable for the demo). |
-| Q5 | No browser-facing WS frame is specified; `02 §3` names the endpoints and `04 §2` the envelope. Four systems could invent four stream shapes. | §6.3 proposes one console frame (`console/status/v1`, `console/snapshot/v1`, `console/subscribe/v1`, plus the catalogued messages as bodies). The `live` client is written to it; an adapter seam remains for a system that cannot comply. | **Yes**: the four system planners adopt the frame or name their deviation. |
-| Q6 | Display thresholds (`stale_after_s`, `live_max_age_s`) are policy rows per system (`04 §3.3`); the kit refuses to default them (INV-03) and must get them from the API. | The status frame of §6.3 carries them; apps without the frame read a policy endpoint and pass them as props. Until a system provides them, its console cannot colour age, and the age chip shows the raw seconds without a bucket (visible, not wrong). | Covered by Q5. |
-| Q7 | Visual regression without a hosted service (cost, secret) means no pixel diff of the map. | D9: stories as tests, `axe`, DOM snapshots of a golden set, Pages-hosted Storybook as the reviewed reference; symbology tested as expressions. If the owner wants pixel diffs later, Playwright `toHaveScreenshot` on the golden set with committed PNGs can be added without a service, accepting Linux-only rendering. | Decide: accept, or fund pixel snapshots. |
-| Q8 | Which font: Noto Sans Georgian alone has no Latin; a single family with both is Noto Sans (no Georgian) plus Noto Sans Georgian. Mtavruli (U+1C90) is required for upper-case Georgian since Unicode 11. | D7: both families bundled, `unicode-range` split, the glyph test covers all four Georgian blocks. Alternative families (BPG, Sylfaen) have licence or coverage problems for a public repo. | Confirm Noto; otherwise name the family and its licence. |
-| Q9 | The console session JWT's claim names for display gating (`role`, `realm`) are not fixed by the spec (`00 §6.2` fixes `iss`, `aud`, `sub`, `scope`, `exp`, `jti`, `kid`). | `sessionClaimsUnverified` reads `sub`, `exp` and, if present, `role`, `realm`, `scope`; the authority's and USSP's planners name the claim that carries the `01` role. The kit gates display only. | **Yes**: authority and USSP planners name the role claim. |
-| Q10 | Branding config bundle shape (`06 §4` says it exists outside the repo; nothing names its keys). | §6.3 proposes five `UI_BRAND_*` variables and a static `/brand/` directory for the logo; a missing name renders the role ("U-space authority"), never an organisation. | Confirm or rename. |
-| Q11 | Accessibility obligations for Georgian public interfaces (`08` Q15) are unanswered. | WCAG 2.2 AA is the target and `axe` gates CI; the public map and the registry check page are the first to be audited by hand (WP-13). | Confirm the target with the ministry. |
-| Q12 | Next.js and React majors at implementation time (this plan says `next >=15`, `react ^19` from the stack decisions); Storybook and vitest browser mode versions move quickly. | WP-0 pins what is current on its day, records the versions in `CHANGELOG.md`, and the peers stay ranges. Nothing in this plan depends on a feature newer than Next.js App Router, React 19 and Tailwind v4. | None; a note for WP-0 to verify, not assume. |
-| Q13 | Tailwind v4 `@source` scanning of a compiled package versus a prebuilt stylesheet. | D4: `@source` (one theme, tree-shaken utilities); the example app proves it. A prebuilt `uspace-ui.css` can be added as an additive export for a non-Tailwind consumer (the lab dashboard?) without changing anything else. | None. |
-| Q14 | Should the kit ship the OpenAPI → TypeScript generation (`openapi-typescript`) as a CLI so all five `web/` generate identically, and check the output is committed and current? | WP-4 ships `uspace-ui-gen-api <openapi.yaml> <out.d.ts>` (a thin wrapper that pins the generator version and writes a header the `noHandWrittenApiTypes` rule recognises) and a CI snippet each `web/` copies. | None; the system planners may ignore it. |
-| Q15 | Acknowledgement persistence: `02 F5` records acknowledgements at the USSP (`POST /v1/alerts/{id}/ack`); the authority's violations have review, not acks; the predecessor's console ack was per console and not recorded (P6-07). | The kit's `acknowledged` flag is per console and the `onAcknowledge` callback is the app's to persist; `AlertToaster` silences the tone on the local flag so an operator is never left with a tone they cannot stop while the API is down (B-10 thinking). | None. |
-| Q16 | `uspace-lab/schemas/` and `uspace-lab/api/` (KT-2) do not exist at `uspace-lab@2b98ee8`, so the schema-example conformance hook cannot be wired now. | Synthetic fixtures until then; WP-14 wires the examples and pins the lab commit in `docs/LAB_VERSION`; the enumeration check against `uspace-core` source runs from WP-0. | **Yes**: KT-2 is on the lab's plate; the UI's `v1.0.0` waits for it. |
-| Q17 | Public display of network identification (`09`, unverified items: F3411 public-display obfuscation rules) is unverified in the spec; if a public flight map is ever built on the kit, obfuscation is a server rule. | The kit renders what it is given; no public-map-specific component is planned. Recorded so that nobody adds client-side rounding as "privacy". | None. |
+| Q1 | Registry: "npm or GitHub Packages". GitHub Packages needs a token to *install* even a public package (every `web/` CI, every Docker build, every developer machine); npmjs needs the `@rootxkit` scope and supports OIDC trusted publishing with provenance, so no secret is stored anywhere. | D10: npmjs with trusted publishing, and nothing else (M32: no `github:` tag installs, no GitHub Packages fallback); `release.yml` is written for it (WP-13a). | **Open, owner-only**: the owner confirms access to the `@rootxkit` npm scope (an account matter) and that the package is public, and enables trusted publishing for this repository's `release.yml`. Default until then: npmjs under `@rootxkit`; WP-13a cannot publish without it and says so rather than switching registries. |
+| Q2 | The spec fixes no error body for the national APIs. The form kit needs a field-addressed error and `uspace-core` already names the field and reason (`core.FieldError`, `ed269.Problems` with a JSON path). | `model.Problem`: RFC 9457 `application/problem+json` with `type`, `title`, `status`, `detail`, `instance`, `errors: [{field, reason}]`, `truncated?`; `field` is the JSON path as core writes it; `type` = `https://schemas.uspace.ge/problems/<slug>`. The kit degrades to "request failed, status N" for anything else. | **Decided** (M28): adopted by all four systems; `problem/v1` lives in `uspace-lab/schemas/common/`. |
+| Q3 | Zone applicability on a console: the kit must dim a zone that does not apply now (`limitedApplicability`), but evaluating applicability is a judgement (`ed269.Applies`, T-09) and must not run in TypeScript. `02 F3` offers `GET /v1/{dataset}?at=` which returns only the applicable features. | `ZoneView.applies` is `boolean | null` and the kit dims only on `false`. The CISP read API and the authority's `GET /v1/zones/export` add `?applies_at=<RFC 3339>`, which annotates every feature with `extendedProperties.cis_applicability` ∈ `applies` / `not_applicable` / `unknown` without filtering (the filtering `?at=` stays). The app maps it onto `applies`; no double fetch. | **Decided** (M17): additive on both APIs. |
+| Q4 | Who builds and hosts the basemap bundle (PMTiles extract of Georgia, Protomaps glyphs *including Georgian ranges* for the fontstack, sprites), how big it is (the predecessor's was hundreds of MB) and how it is refreshed. The kit assumes the `/basemap/` layout of §6.3. | The lab builds it (lab WP-L3) from the predecessor's `infra/basemap/fetch_basemap.sh` as a release artefact with `SOURCE.json` and a size budget: a Georgia-wide extract with city-level zooms for Tbilisi, Kutaisi, Batumi and Poti and `z ≤ 12` elsewhere, under about 1 GB. The deployment repo (`uspace-deploy`) serves `/basemap/*` from one shared read-only volume on every host (Caddy `file_server`, range requests, long cache headers; one copy for five systems). The kit's `fonts.mapFontstack` names the glyph set. Storybook uses a tiny Tbilisi-only extract committed under `stories/basemap/` (a few MB) so stories render offline. | **Decided** (M38). The droplet's disk is part of the sizing question the reconciliation leaves to the owner (its §2.1, "droplet sizing"). |
+| Q5 | No browser-facing WS frame is specified; `02 §3` names the endpoints and `04 §2` the envelope. Four systems could invent four stream shapes. | §6.3's console frame (`console/status/v1`, `console/snapshot/v1`, `console/subscribe/v1`, plus the catalogued messages as bodies) on every browser-facing WebSocket of the four systems; the CISP's `resync` becomes a status frame with `resync_since`, the ANSP's `feed/status/v1` is retired for `console/status/v1`, the authority's `{viewport}` becomes `console/subscribe/v1`. Machine-facing streams carry the same envelope. The schemas are owned by `uspace-lab/schemas/common/`. | **Decided** (M29, M12, M14): adopted by all four systems. |
+| Q6 | Display thresholds (`stale_after_s`, `live_max_age_s`) are policy rows per system (`04 §3.3`); the kit refuses to default them (INV-03) and must get them from the API. | The status frame of §6.3 carries them (`policy_version`, `stale_after_s`, `live_max_age_s`) on connect and every 2 s. Until a system sends them, its console cannot colour age, and the age chip shows the raw seconds without a bucket (visible, not wrong). | **Decided** (M29): thresholds come in `console/status/v1`. |
+| Q7 | Visual regression without a hosted service (cost, secret) means no pixel diff of the map. | D9: stories as tests, `axe`, DOM snapshots of a golden set, Pages-hosted Storybook as the reviewed reference; symbology tested as expressions. If the owner wants pixel diffs later, Playwright `toHaveScreenshot` on the golden set with committed PNGs can be added without a service, accepting Linux-only rendering. | **Open, owner-only** (spending money on pixel snapshots is the owner's). Default until answered: accept D9. |
+| Q8 | Which font: Noto Sans Georgian alone has no Latin; a single family with both is Noto Sans (no Georgian) plus Noto Sans Georgian. Mtavruli (U+1C90) is required for upper-case Georgian since Unicode 11. | D7: both families bundled, `unicode-range` split, the glyph test covers all four Georgian blocks. Alternative families (BPG, Sylfaen) have licence or coverage problems for a public repo. | **Decided** (M38): Noto Sans + Noto Sans Georgian, OFL, bundled, loaded by every `web/` through `next/font/local`. |
+| Q9 | The console session JWT's claim names for display gating are not fixed by the spec (`00 §6.2` fixes `iss`, `aud`, `sub`, `scope`, `exp`, `jti`, `kid`). | One session shape in every system (§6.3 contract): `scope = "session"`, `roles: [string]`, `realm` (`console` / `police` / `portal`), `aud` = the system's own host, `jti` = session id, `exp` ≤ 12 h. `sessionClaimsUnverified` reads `sub`, `exp`, `roles[]`, `realm`; `RequireRole` intersects `roles`. The kit gates display only. | **Decided** (M20, M21): the authority's role model is the largest, so `roles` is always an array. |
+| Q10 | Branding config bundle shape (`06 §4` says it exists outside the repo; nothing names its keys). | §6.3's five `UI_BRAND_*` variables and a static `/brand/` directory for the logo; a missing name renders the role ("U-space authority"), never an organisation. | **Decided**: as proposed (branding is configuration, `06 §4`). |
+| Q11 | Accessibility obligations for Georgian public interfaces (`08` Q15) are unanswered. | WCAG 2.2 AA is the target and `axe` gates CI; the public map and the registry check page are the first to be audited by hand (WP-13). | **Open, owner-only** (the ministry answers spec Q15). Default until answered: WCAG 2.2 AA, `axe` gates CI, hand audit in WP-13. |
+| Q12 | Next.js and React majors at implementation time (this plan says `next >=15`, `react ^19` from the stack decisions); Storybook and vitest browser mode versions move quickly. | WP-0 pins what is current on its day, records the versions in `CHANGELOG.md`, and the peers stay ranges. Nothing in this plan depends on a feature newer than Next.js App Router, React 19 and Tailwind v4. | **Decided**: WP-0 verifies, does not assume. |
+| Q13 | Tailwind v4 `@source` scanning of a compiled package versus a prebuilt stylesheet. | D4: `@source` (one theme, tree-shaken utilities); the example app proves it. A prebuilt `uspace-ui.css` can be added as an additive export for a non-Tailwind consumer (the lab dashboard?) without changing anything else. | **Decided**: `@source`; a prebuilt stylesheet only if a non-Tailwind consumer appears. |
+| Q14 | Should the kit ship the OpenAPI → TypeScript generation (`openapi-typescript`) as a CLI so all five `web/` generate identically, and check the output is committed and current? | WP-4 ships `uspace-ui-gen-api <openapi.yaml> <out.d.ts>` (a thin wrapper that pins the generator version and writes a header the `noHandWrittenApiTypes` rule recognises) and a CI snippet each `web/` copies. | **Decided**: every `web/` uses it. |
+| Q15 | Acknowledgement persistence: `02 F5` records acknowledgements at the USSP (`POST /v1/alerts/{id}/ack`); the authority's violations have review, not acks; the predecessor's console ack was per console and not recorded (P6-07). | The kit's `acknowledged` flag is per console and the `onAcknowledge` callback is the app's to persist; `AlertToaster` silences the tone on the local flag so an operator is never left with a tone they cannot stop while the API is down (B-10 thinking). | **Decided**: as proposed. |
+| Q16 | `uspace-lab/schemas/` and `uspace-lab/api/` (KT-2) do not exist at `uspace-lab@2b98ee8`, so the schema-example conformance hook cannot be wired now. | Synthetic fixtures until then; WP-14 wires the examples and pins the lab commit in `docs/LAB_VERSION`; the enumeration check against `uspace-core` source runs from WP-0. | **Decided** (M31, lab WP-L1 `contracts-aggregate` starts day 1 with `schemas/common/`): synthetic fixtures until it lands; the kit's `v1.0.0` waits for it. |
+| Q17 | Public display of network identification (`09`, unverified items: F3411 public-display obfuscation rules) is unverified in the spec; if a public flight map is ever built on the kit, obfuscation is a server rule. | The kit renders what it is given; no public-map-specific component is planned. Recorded so that nobody adds client-side rounding as "privacy". | **Decided**: a server rule; no client-side obfuscation. |
+| Q18 | `IdentBasis` gained `provider` (reconciliation Q-A8: a Display Provider flight is a peer's claim, neither authenticated nor broadcast). Core ships `BasisProvider` in v1.1.0; the authority sends `as_broadcast` until then. | `model.IdentBasis` carries `provider` from WP-0 so the symbology's exhaustive switches and the R-05 wording cover it before any API sends it; the `provider` caveat wording ("reported by a provider, unverified") is in both catalogues; the enum check against core passes once v1.1.0 is in `docs/CORE_VERSION` and is a visible skip before. | **Decided** (Q-A8): additive. |
