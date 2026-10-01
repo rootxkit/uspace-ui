@@ -5,11 +5,14 @@
 ```ts
 
 import type { ESLint } from 'eslint';
+import type { FitBoundsOptions } from 'maplibre-gl';
 import type * as GeoJSON_2 from 'geojson';
 import type { Linter } from 'eslint';
-import type { ReactNode } from 'react';
+import type { Map as Map_2 } from 'maplibre-gl';
+import { ReactNode } from 'react';
 import { RenderResult } from '@testing-library/react';
 import { Rule } from 'eslint';
+import type { StyleSpecification } from 'maplibre-gl';
 
 // @public (undocumented)
 const ALERT_KINDS: readonly ["proximity", "nonconformance", "nonconformance_nearby", "height_exceedance", "zone_incursion", "lost_link", "restriction_activated", "emergency_nearby"];
@@ -22,7 +25,7 @@ type AlertKind = (typeof ALERT_KINDS)[number];
 
 declare namespace alerts {
     export {
-        ENTRY_14 as ENTRY
+        ENTRY_13 as ENTRY
     }
 }
 
@@ -67,24 +70,83 @@ type AltSource = (typeof ALT_SOURCES)[number];
 
 declare namespace api {
     export {
-        ENTRY_6 as ENTRY
+        ENTRY_5 as ENTRY
     }
 }
 
 declare namespace auth_client {
     export {
-        ENTRY_8 as ENTRY
+        ENTRY_7 as ENTRY
     }
 }
 
 declare namespace auth_server {
     export {
-        ENTRY_7 as ENTRY
+        ENTRY_6 as ENTRY
     }
 }
 
 // @public
 function axeCheck(container: HTMLElement): Promise<void>;
+
+// @public
+const BASEMAP_DEFAULT_PATHS: {
+    readonly pmtilesPath: "/basemap/basemap.pmtiles";
+    readonly glyphsPath: "/basemap/fonts/{fontstack}/{range}.pbf";
+    readonly spritesPath: "/basemap/sprites/v4/{flavor}";
+    readonly sourceInfoPath: "/basemap/SOURCE.json";
+};
+
+// @public
+const BASEMAP_SOURCE_ID = "protomaps";
+
+// @public
+function basemapAttribution(info: BasemapInfo | null, lang: MapLang): string;
+
+// @public (undocumented)
+interface BasemapConfig {
+    baseUrl: string;
+    glyphsPath?: string;
+    pmtilesPath?: string;
+    sourceInfoPath?: string;
+    spritesPath?: string;
+}
+
+// @public
+interface BasemapInfo {
+    bounds: [[number, number], [number, number]];
+    // (undocumented)
+    osmDataAsOf: string | null;
+}
+
+// @public
+function basemapStyle(cfg: BasemapConfig, info: BasemapInfo | null, lang: MapLang, scheme: MapScheme): StyleSpecification;
+
+// Warning: (ae-forgotten-export) The symbol "PathKey" needs to be exported by the entry point entry.d.ts
+//
+// @public
+function basemapUrl(cfg: BasemapConfig, key: PathKey): string;
+
+// @public
+interface BBox {
+    // (undocumented)
+    maxLat: number;
+    // (undocumented)
+    maxLng: number;
+    // (undocumented)
+    minLat: number;
+    // (undocumented)
+    minLng: number;
+}
+
+// @public (undocumented)
+interface BBoxSubscriptionOptions {
+    debounceMs: number;
+    marginFraction: number;
+    // (undocumented)
+    onChange(bbox: BBox): void;
+    quantizeDeg: number;
+}
 
 // @public (undocumented)
 const CLEAR_REASONS: readonly ["resolved", "stale", "source_disabled", "flight_ended", "acknowledged_timeout", "landed"];
@@ -105,25 +167,22 @@ type DisabledBy = (typeof DISABLED_BYS)[number];
 const ENTRY = "theme";
 
 // @public (undocumented)
-const ENTRY_10 = "layers";
+const ENTRY_10 = "legend";
 
 // @public (undocumented)
-const ENTRY_11 = "legend";
+const ENTRY_11 = "live";
 
 // @public (undocumented)
-const ENTRY_12 = "live";
+const ENTRY_12 = "status";
 
 // @public (undocumented)
-const ENTRY_13 = "status";
+const ENTRY_13 = "alerts";
 
 // @public (undocumented)
-const ENTRY_14 = "alerts";
+const ENTRY_14 = "table";
 
 // @public (undocumented)
-const ENTRY_15 = "table";
-
-// @public (undocumented)
-const ENTRY_16 = "form";
+const ENTRY_15 = "form";
 
 // @public (undocumented)
 const ENTRY_2 = "ui";
@@ -135,19 +194,19 @@ const ENTRY_3 = "i18n";
 const ENTRY_4 = "fonts";
 
 // @public (undocumented)
-const ENTRY_5 = "map";
+const ENTRY_5 = "api";
 
 // @public (undocumented)
-const ENTRY_6 = "api";
+const ENTRY_6 = "auth/server";
 
 // @public (undocumented)
-const ENTRY_7 = "auth/server";
+const ENTRY_7 = "auth/client";
 
 // @public (undocumented)
-const ENTRY_8 = "auth/client";
+const ENTRY_8 = "symbology";
 
 // @public (undocumented)
-const ENTRY_9 = "symbology";
+const ENTRY_9 = "layers";
 
 declare namespace eslint {
     export {
@@ -212,7 +271,7 @@ declare namespace fonts {
 
 declare namespace form {
     export {
-        ENTRY_16 as ENTRY
+        ENTRY_15 as ENTRY
     }
 }
 
@@ -285,7 +344,7 @@ const isAlertKind: (x: unknown) => x is "proximity" | "nonconformance" | "noncon
 const isAlertState: (x: unknown) => x is "raised" | "updated" | "cleared";
 
 // @public (undocumented)
-const isAltSource: (x: unknown) => x is "geodetic" | "pressure" | "network" | "none";
+const isAltSource: (x: unknown) => x is "none" | "geodetic" | "pressure" | "network";
 
 // @public (undocumented)
 const isClearReason: (x: unknown) => x is "resolved" | "stale" | "source_disabled" | "flight_ended" | "acknowledged_timeout" | "landed";
@@ -303,13 +362,13 @@ const isIdentReason: (x: unknown) => x is "matched" | "session_binding" | "uas_s
 const isIdentStatus: (x: unknown) => x is "registered" | "suspended" | "unknown_operator" | "unidentified";
 
 // @public (undocumented)
-const isRestrictionState: (x: unknown) => x is "planned" | "active" | "ended" | "cancelled";
+const isRestrictionState: (x: unknown) => x is "ended" | "planned" | "active" | "cancelled";
 
 // @public (undocumented)
 const isSeverity: (x: unknown) => x is "info" | "warning" | "critical";
 
 // @public (undocumented)
-const isSourceState: (x: unknown) => x is "stale" | "disabled" | "healthy" | "lagging" | "unreachable" | "never_heard";
+const isSourceState: (x: unknown) => x is "disabled" | "stale" | "healthy" | "lagging" | "unreachable" | "never_heard";
 
 // @public (undocumented)
 const isTimeSource: (x: unknown) => x is "provider" | "broadcast" | "source_clock" | "receiver" | "system";
@@ -346,23 +405,49 @@ type KitLang = "ka" | "en";
 // @public (undocumented)
 type KitScheme = "light" | "dark" | "system";
 
+// @public
+function LayerPanel(props: LayerPanelProps): ReactNode;
+
+// @public (undocumented)
+interface LayerPanelProps {
+    lang?: MapLang;
+    // (undocumented)
+    layers: LayerToggle[];
+    // (undocumented)
+    translate?: Translate;
+}
+
 declare namespace layers {
+    export {
+        ENTRY_9 as ENTRY
+    }
+}
+
+// @public (undocumented)
+interface LayerToggle {
+    // (undocumented)
+    id: string;
+    labelKey: string;
+    // (undocumented)
+    onChange(v: boolean): void;
+    // (undocumented)
+    visible: boolean;
+}
+
+declare namespace legend {
     export {
         ENTRY_10 as ENTRY
     }
 }
 
-declare namespace legend {
+declare namespace live {
     export {
         ENTRY_11 as ENTRY
     }
 }
 
-declare namespace live {
-    export {
-        ENTRY_12 as ENTRY
-    }
-}
+// @public
+function loadBasemapInfo(cfg: BasemapConfig, signal: AbortSignal, timeoutMs?: number): Promise<BasemapInfo | null>;
 
 // @public (undocumented)
 interface MannedView {
@@ -398,8 +483,123 @@ interface MannedView {
 
 declare namespace map {
     export {
-        ENTRY_5 as ENTRY
+        BASEMAP_DEFAULT_PATHS,
+        BASEMAP_SOURCE_ID,
+        SOURCE_INFO_TIMEOUT_MS,
+        basemapAttribution,
+        basemapStyle,
+        basemapUrl,
+        loadBasemapInfo,
+        parseSourceInfo,
+        BasemapConfig,
+        BasemapInfo,
+        MapScheme,
+        useMap,
+        useMapContext,
+        useStyleLoad,
+        MapContextValue,
+        StyleLoadHandler,
+        mapCounters,
+        MapCounter,
+        useBBoxSubscription,
+        useViewport,
+        BBoxSubscriptionOptions,
+        ViewportState,
+        LayerPanel,
+        MapControls,
+        LayerPanelProps,
+        LayerToggle,
+        MapControlsProps,
+        Translate,
+        MapView,
+        MapViewProps,
+        MAP_MESSAGES,
+        mapText,
+        MapKey,
+        MapLang,
+        subscriptionBBox,
+        BBox,
+        Viewport
     }
+}
+
+// @public (undocumented)
+const MAP_MESSAGES: Readonly<Record<MapLang, Readonly<Record<MapKey, string>>>>;
+
+// @public (undocumented)
+interface MapContextValue {
+    // (undocumented)
+    initial: Viewport;
+    initialBBox: BBox;
+    // (undocumented)
+    lang: MapLang;
+    map: Map_2 | null;
+    onStyleLoad(handler: StyleLoadHandler): () => void;
+    // (undocumented)
+    scheme: MapScheme;
+}
+
+// @public (undocumented)
+function MapControls(props: MapControlsProps): ReactNode;
+
+// @public (undocumented)
+interface MapControlsProps {
+    // (undocumented)
+    layers: LayerToggle[];
+    locate?: false;
+    // (undocumented)
+    onSchemeChange?(scheme: MapScheme): void;
+    scheme?: boolean;
+    // (undocumented)
+    translate?: Translate;
+}
+
+// @public (undocumented)
+type MapCounter =
+/** SOURCE.json absent, refused, timed out or malformed: the null path. */
+"basemap_missing"
+/** SOURCE.json arrived but did not have the contract's shape. */
+| "basemap_source_malformed"
+/** The map could not be created (no WebGL). */
+| "webgl_unavailable";
+
+// @public
+function mapCounters(): Readonly<Record<MapCounter, number>>;
+
+// Warning: (ae-forgotten-export) The symbol "en" needs to be exported by the entry point entry.d.ts
+//
+// @public (undocumented)
+type MapKey = keyof typeof en;
+
+// @public (undocumented)
+type MapLang = "ka" | "en";
+
+// @public (undocumented)
+type MapScheme = "light" | "dark";
+
+// @public
+function mapText(lang: MapLang, key: MapKey, vars?: Readonly<Record<string, string>>): string;
+
+// @public (undocumented)
+function MapView(props: MapViewProps): ReactNode;
+
+// @public (undocumented)
+interface MapViewProps {
+    attributionExtra?: string;
+    // (undocumented)
+    basemap: BasemapConfig;
+    // (undocumented)
+    children?: ReactNode;
+    // (undocumented)
+    className?: string;
+    initial: Viewport;
+    // (undocumented)
+    lang: MapLang;
+    // (undocumented)
+    onLoad?(map: Map_2): void;
+    onViewport?(v: Viewport, bbox: BBox): void;
+    // (undocumented)
+    scheme: MapScheme;
 }
 
 declare namespace model {
@@ -468,6 +668,9 @@ declare namespace model {
 }
 
 // @public
+function parseSourceInfo(body: unknown): BasemapInfo | null;
+
+// @public
 const plugin: ESLint.Plugin;
 
 // @public (undocumented)
@@ -534,6 +737,9 @@ const SEVERITIES: readonly ["info", "warning", "critical"];
 // @public (undocumented)
 type Severity = (typeof SEVERITIES)[number];
 
+// @public
+const SOURCE_INFO_TIMEOUT_MS = 5000;
+
 // @public (undocumented)
 const SOURCE_STATES: readonly ["disabled", "healthy", "stale", "lagging", "unreachable", "never_heard"];
 
@@ -564,19 +770,25 @@ interface SourceView {
 
 declare namespace status_2 {
     export {
-        ENTRY_13 as ENTRY
+        ENTRY_12 as ENTRY
     }
 }
 
+// @public
+type StyleLoadHandler = (map: Map_2) => void;
+
+// @public
+function subscriptionBBox(b: BBox, marginFraction: number, quantizeDeg: number): BBox;
+
 declare namespace symbology {
     export {
-        ENTRY_9 as ENTRY
+        ENTRY_8 as ENTRY
     }
 }
 
 declare namespace table {
     export {
-        ENTRY_15 as ENTRY
+        ENTRY_14 as ENTRY
     }
 }
 
@@ -670,6 +882,9 @@ interface TrackView {
     vspeedMs: number | null;
 }
 
+// @public
+type Translate = (key: string) => string;
+
 // @public (undocumented)
 type Trust = (typeof TRUSTS)[number];
 
@@ -682,11 +897,48 @@ declare namespace ui {
     }
 }
 
+// @public
+function useBBoxSubscription(opts: BBoxSubscriptionOptions): void;
+
+// @public
+function useMap(): Map_2 | null;
+
+// @public
+function useMapContext(): MapContextValue;
+
+// @public
+function useStyleLoad(add: StyleLoadHandler): void;
+
+// @public
+function useViewport(): ViewportState;
+
 // @public (undocumented)
 const VERTICAL_REFS: readonly ["AGL", "AMSL", "WGS84"];
 
 // @public (undocumented)
 type VerticalRef = (typeof VERTICAL_REFS)[number];
+
+// @public (undocumented)
+interface Viewport {
+    // (undocumented)
+    bearing: number;
+    center: [number, number];
+    // (undocumented)
+    pitch: number;
+    // (undocumented)
+    zoom: number;
+}
+
+// @public (undocumented)
+interface ViewportState {
+    bbox: BBox;
+    // (undocumented)
+    fitBounds(b: BBox, opts?: FitBoundsOptions): void;
+    // (undocumented)
+    flyTo(v: Partial<Viewport>): void;
+    // (undocumented)
+    viewport: Viewport;
+}
 
 // @public (undocumented)
 const VIOLATION_KINDS: readonly ["height_120m", "zone_incursion", "unregistered", "no_authorisation", "identification_mismatch", "rid_absent"];

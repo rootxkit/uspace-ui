@@ -22,3 +22,13 @@ follows docs/PLAN.md §12. One line per work package under Unreleased.
   ESLint 10 (eslint-plugin-jsx-a11y supports `^9`), Storybook 10 (the
   plan names Storybook 9), and with it Vitest 5 and Vite 8. Next.js is
   16.3 at this date; the peer stays `>=15`.
+- WP-3: `map`: `MapView` (one MapLibre map, the `pmtiles` protocol once
+  per page, `SOURCE.json` with a timeout, style re-apply on language or
+  scheme with every kit layer re-added through `useStyleLoad`, visible and
+  counted no-basemap and no-WebGL notices), `basemapStyle` (Protomaps
+  layers, `name:ka` labels in `ka`, the OSM date in the attribution),
+  `useViewport`, `useBBoxSubscription`, `MapControls` and `LayerPanel`,
+  `mapCounters`, `styles/map.css`, the MapLibre mock for jsdom and a 3.3 MB
+  Tbilisi extract for the stories. maplibre-gl 5.24.0 (peer `^5`; 6.x
+  exists and was not taken, the plan names 5), pmtiles 4.5.0,
+  @protomaps/basemaps 5.7.2.

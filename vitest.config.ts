@@ -16,6 +16,8 @@ export default defineConfig({
         "src/**/*.test.{ts,tsx}",
         "src/**/*.testing.ts",
         "src/**/*.d.ts",
+        // The MapLibre mock for jsdom (WP-3), shared with the layer WPs.
+        "src/map/test/**",
       ],
       reporter: ["text", "text-summary", "json-summary"],
       thresholds: { statements: 90 },
@@ -42,6 +44,8 @@ export default defineConfig({
         plugins: [storybookTest({ configDir: ".storybook" })],
         test: {
           name: "browser",
+          // A map story waits for tiles and glyphs on SwiftShader.
+          testTimeout: 30000,
           browser: {
             enabled: true,
             headless: true,
