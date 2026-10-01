@@ -14,6 +14,8 @@ import type { ComponentProps } from 'react';
 import { Dialog as Dialog_2 } from 'radix-ui';
 import { DropdownMenu as DropdownMenu_2 } from 'radix-ui';
 import type { ESLint } from 'eslint';
+import type { ExpressionSpecification } from 'maplibre-gl';
+import type { FilterSpecification } from 'maplibre-gl';
 import type { FitBoundsOptions } from 'maplibre-gl';
 import type * as GeoJSON_2 from 'geojson';
 import { JSX } from 'react';
@@ -25,6 +27,7 @@ import { Popover as Popover_2 } from 'radix-ui';
 import { RadioGroup as RadioGroup_2 } from 'radix-ui';
 import * as React_2 from 'react';
 import { ReactNode } from 'react';
+import { ReactPortal } from 'react';
 import { RenderResult } from '@testing-library/react';
 import { Rule } from 'eslint';
 import { ScrollArea as ScrollArea_2 } from 'radix-ui';
@@ -93,7 +96,7 @@ type AlertKind = (typeof ALERT_KINDS)[number];
 
 declare namespace alerts {
     export {
-        ENTRY_9 as ENTRY
+        ENTRY_6 as ENTRY
     }
 }
 
@@ -374,6 +377,9 @@ function CommandShortcut(input: React_2.ComponentProps<"span">): React_2.JSX.Ele
 // @public (undocumented)
 const config: Linter.Config[];
 
+// @public (undocumented)
+function countLayer(counter: LayerCounter): void;
+
 // @public
 function createTranslator(lang: Lang, catalogues?: Catalogues): Translate;
 
@@ -419,6 +425,9 @@ function DialogTitle(input: React_2.ComponentProps<typeof Dialog_2.Title>): Reac
 
 // @public (undocumented)
 function DialogTrigger(input: React_2.ComponentProps<typeof Dialog_2.Trigger>): React_2.JSX.Element;
+
+// @public
+const DIMMED_RESTRICTION_STATES: readonly RestrictionState[];
 
 // @public (undocumented)
 const DISABLED_BYS: readonly ["type", "instance", "default_deny"];
@@ -501,34 +510,25 @@ const en: Readonly<Record<Key, string>>;
 const ENTRY = "api";
 
 // @public (undocumented)
-const ENTRY_10 = "table";
-
-// @public (undocumented)
-const ENTRY_11 = "form";
-
-// @public (undocumented)
 const ENTRY_2 = "auth/server";
 
 // @public (undocumented)
 const ENTRY_3 = "auth/client";
 
 // @public (undocumented)
-const ENTRY_4 = "symbology";
+const ENTRY_4 = "live";
 
 // @public (undocumented)
-const ENTRY_5 = "layers";
+const ENTRY_5 = "status";
 
 // @public (undocumented)
-const ENTRY_6 = "legend";
+const ENTRY_6 = "alerts";
 
 // @public (undocumented)
-const ENTRY_7 = "live";
+const ENTRY_7 = "table";
 
 // @public (undocumented)
-const ENTRY_8 = "status";
-
-// @public (undocumented)
-const ENTRY_9 = "alerts";
+const ENTRY_8 = "form";
 
 declare namespace eslint {
     export {
@@ -661,7 +661,7 @@ declare namespace fonts {
 
 declare namespace form {
     export {
-        ENTRY_11 as ENTRY
+        ENTRY_8 as ENTRY
     }
 }
 
@@ -673,6 +673,17 @@ const HEIGHT_KEYS: Readonly<Record<HeightRef, Key>>;
 
 // @public (undocumented)
 type HeightRef = "TakeoffLocation" | "GroundLevel";
+
+// @public
+const HOVER_OFFSET_PX = 12;
+
+// @public
+function HoverCard(props: {
+    map: Map_2;
+    hover: PointerHover;
+    zone: RestrictionView;
+    restriction?: boolean;
+}): ReactPortal;
 
 declare namespace i18n {
     export {
@@ -928,6 +939,16 @@ const LANGS: readonly Lang[];
 // @public
 const LATIN_UNICODE_RANGE = "U+0000-017F, U+018F, U+0192, U+0218-021B, U+0237, U+0259, U+02BB-02BC, U+02C6-02DD, U+0300-0304, U+0306-0308, U+030A-030C, U+0327-0328, U+0370-03FF, U+0400-04FF, U+1E9E, U+2000-206F, U+20AC, U+20B8, U+20BD, U+20BE, U+2116, U+2122, U+2190-2193, U+2212";
 
+// @public (undocumented)
+type LayerCounter =
+/** Data handed to a layer that a newer value replaced in the same frame. */
+"update_superseded"
+/** A colour token that did not resolve to `#rrggbb` on the map's element. */
+| "token_unresolved";
+
+// @public
+function layerCounters(): Readonly<Record<LayerCounter, number>>;
+
 // @public
 function LayerPanel(props: LayerPanelProps): ReactNode;
 
@@ -942,7 +963,39 @@ interface LayerPanelProps {
 
 declare namespace layers {
     export {
-        ENTRY_5 as ENTRY
+        countLayer,
+        layerCounters,
+        resetLayerCountersForTests,
+        LayerCounter,
+        RESTRICTION_FILL_OPACITY,
+        RESTRICTION_LAYER_ID,
+        RestrictionLayer,
+        restrictionLayerIds,
+        RestrictionLayerIds,
+        RestrictionLayerProps,
+        UNRESOLVED_COLOUR,
+        putImage,
+        resolveColour,
+        useLayer,
+        UseLayerOptions,
+        ZoneCard,
+        RestrictionView,
+        ZoneCardProps,
+        setSourceData,
+        useFeaturePointer,
+        zoneFeatureCollection,
+        PointerHover,
+        ZoneFeatureCollection,
+        HOVER_OFFSET_PX,
+        HoverCard,
+        ZONE_LABEL_SIZE_PX,
+        ZONE_LAYER_ID,
+        ZoneLayer,
+        putZonePatterns,
+        resolveZoneColours,
+        zoneLayerIds,
+        ZoneLayerIds,
+        ZoneLayerProps
     }
 }
 
@@ -959,13 +1012,15 @@ interface LayerToggle {
 
 declare namespace legend {
     export {
-        ENTRY_6 as ENTRY
+        ZoneLegend,
+        ZoneSwatch,
+        ZoneLegendProps
     }
 }
 
 declare namespace live {
     export {
-        ENTRY_7 as ENTRY
+        ENTRY_4 as ENTRY
     }
 }
 
@@ -1213,6 +1268,9 @@ function PaginationNext(input: React_2.ComponentProps<typeof PaginationLink>): R
 // @public (undocumented)
 function PaginationPrevious(input: React_2.ComponentProps<typeof PaginationLink>): React_2.JSX.Element;
 
+// @public
+function parseHexColour(s: string): Rgb | null;
+
 // @public (undocumented)
 function parseLang(v: string | null | undefined): Lang | null;
 
@@ -1223,7 +1281,31 @@ function parseScheme(v: string | null | undefined): ColorScheme | null;
 function parseSourceInfo(body: unknown): BasemapInfo | null;
 
 // @public
+const PATTERN_TILE_PX = 8;
+
+// @public
+const PATTERNED_ZONE_TYPES: readonly ZoneType[];
+
+// @public (undocumented)
+interface PatternImage {
+    data: Uint8Array;
+    // (undocumented)
+    height: number;
+    // (undocumented)
+    width: number;
+}
+
+// @public
 const plugin: ESLint.Plugin;
+
+// @public
+interface PointerHover {
+    // (undocumented)
+    identifier: string;
+    x: number;
+    // (undocumented)
+    y: number;
+}
 
 // @public (undocumented)
 function Popover(input: React_2.ComponentProps<typeof Popover_2.Root>): React_2.JSX.Element;
@@ -1264,6 +1346,12 @@ interface Problem {
     type: string;
 }
 
+// @public
+function putImage(map: Map_2, name: string, image: PatternImage): void;
+
+// @public
+function putZonePatterns(map: Map_2, colours: ZoneColours): void;
+
 // @public (undocumented)
 function RadioGroup(input: React_2.ComponentProps<typeof RadioGroup_2.Root>): React_2.JSX.Element;
 
@@ -1287,14 +1375,92 @@ interface RenderWithKitOptions {
 // @public
 function resetI18nCounters(): void;
 
+// @public
+function resetLayerCountersForTests(): void;
+
+// @public
+function resolveColour(map: Map_2, token: string): string;
+
 // @public (undocumented)
 type ResolvedScheme = "light" | "dark";
+
+// @public
+function resolveZoneColours(map: Map_2): ZoneColours;
+
+// @public
+const RESTRICTION_FILL_OPACITY = 0.15;
+
+// @public (undocumented)
+const RESTRICTION_LAYER_ID = "us-restrictions";
+
+// @public (undocumented)
+const RESTRICTION_LINE_KEYS: readonly RestrictionLineKey[];
+
+// @public
+const RESTRICTION_STATE_KEYS: Readonly<Record<RestrictionState | "unstated", Key>>;
 
 // @public (undocumented)
 const RESTRICTION_STATES: readonly ["planned", "active", "ended", "cancelled"];
 
 // @public (undocumented)
+function RestrictionLayer(props: RestrictionLayerProps): JSX.Element | null;
+
+// @public (undocumented)
+interface RestrictionLayerIds {
+    // (undocumented)
+    fill: string;
+    // (undocumented)
+    lines: Readonly<Record<RestrictionLineKey, string>>;
+    // (undocumented)
+    source: string;
+}
+
+// @public (undocumented)
+function restrictionLayerIds(id: string): RestrictionLayerIds;
+
+// @public (undocumented)
+interface RestrictionLayerProps {
+    id?: string;
+    onSelect?(id: string): void;
+    // (undocumented)
+    restrictions: readonly RestrictionView[];
+    visible?: boolean;
+}
+
+// @public
+interface RestrictionLine {
+    dash: readonly number[] | null;
+    // (undocumented)
+    opacity: number;
+    // (undocumented)
+    widthPx: number;
+}
+
+// @public
+function restrictionLine(s: RestrictionState | null): RestrictionLine;
+
+// @public
+function restrictionLineFilter(k: RestrictionLineKey): FilterSpecification;
+
+// @public
+type RestrictionLineKey = RestrictionState | "unstated";
+
+// @public (undocumented)
 type RestrictionState = (typeof RESTRICTION_STATES)[number];
+
+// @public
+function restrictionStateToken(s: RestrictionState): string;
+
+// @public
+interface RestrictionView extends ZoneView {
+    // (undocumented)
+    endsAt?: string | null;
+    // (undocumented)
+    startsAt?: string | null;
+}
+
+// @public (undocumented)
+type Rgb = readonly [number, number, number];
 
 // @public (undocumented)
 const rules: {
@@ -1321,6 +1487,9 @@ function Select(input: React_2.ComponentProps<typeof Select_2.Root>): React_2.JS
 
 // @public (undocumented)
 function SelectContent(input: React_2.ComponentProps<typeof Select_2.Content>): React_2.JSX.Element;
+
+// @public
+const SELECTED_EXTRA_WIDTH_PX = 2;
 
 // @public (undocumented)
 function SelectGroup(input: React_2.ComponentProps<typeof Select_2.Group>): React_2.JSX.Element;
@@ -1362,6 +1531,9 @@ interface SessionDisplay {
     // (undocumented)
     sub: string;
 }
+
+// @public
+function setSourceData(sourceId: string): (map: Map_2, data: ZoneFeatureCollection) => void;
 
 // @public (undocumented)
 const SEVERITIES: readonly ["info", "warning", "critical"];
@@ -1448,7 +1620,7 @@ interface StatProps {
 
 declare namespace status_2 {
     export {
-        ENTRY_8 as ENTRY
+        ENTRY_5 as ENTRY
     }
 }
 
@@ -1465,7 +1637,38 @@ function Switch(input: React_2.ComponentProps<typeof Switch_2.Root> & {
 
 declare namespace symbology {
     export {
-        ENTRY_4 as ENTRY
+        RESTRICTION_LINE_KEYS,
+        RESTRICTION_STATE_KEYS,
+        restrictionLine,
+        restrictionLineFilter,
+        restrictionStateToken,
+        RestrictionLine,
+        RestrictionLineKey,
+        DIMMED_RESTRICTION_STATES,
+        PATTERN_TILE_PX,
+        PATTERNED_ZONE_TYPES,
+        SELECTED_EXTRA_WIDTH_PX,
+        ZONE_DIMMED_OPACITY,
+        ZONE_LEGEND_ORDER,
+        ZONE_PATTERN_KEYS,
+        ZONE_TYPE_KEYS,
+        parseHexColour,
+        zoneDimExpression,
+        zoneLineWidthPx,
+        zoneOpacity,
+        zoneOrder,
+        zonePattern,
+        zonePatternFillOpacity,
+        zonePatternImage,
+        zonePatternImageId,
+        zoneStyle,
+        zoneToken,
+        PatternImage,
+        Rgb,
+        ZoneColours,
+        ZoneFeatureProperties,
+        ZonePattern,
+        ZoneStyle
     }
 }
 
@@ -1474,7 +1677,7 @@ function Table(input: React_2.ComponentProps<"table">): React_2.JSX.Element;
 
 declare namespace table {
     export {
-        ENTRY_10 as ENTRY
+        ENTRY_7 as ENTRY
     }
 }
 
@@ -1841,13 +2044,32 @@ declare namespace ui {
 }
 
 // @public
+const UNRESOLVED_COLOUR = "#808080";
+
+// @public
 function useBBoxSubscription(opts: BBoxSubscriptionOptions): void;
+
+// @public
+function useFeaturePointer(map: Map_2 | null, layerId: string, onSelect: ((identifier: string) => void) | undefined): PointerHover | null;
 
 // @public (undocumented)
 function useLang(): {
     lang: Lang;
     setLang(l: Lang): void;
 };
+
+// @public
+function useLayer<D>(opts: UseLayerOptions<D>): Map_2 | null;
+
+// @public (undocumented)
+interface UseLayerOptions<D> {
+    build(map: Map_2): readonly string[];
+    // (undocumented)
+    data: D;
+    id: string;
+    update(map: Map_2, data: D): void;
+    visible?: boolean | ((layerId: string) => boolean);
+}
 
 // @public
 function useMap(): Map_2 | null;
@@ -1916,8 +2138,173 @@ type ViolationKind = (typeof VIOLATION_KINDS)[number];
 // @public (undocumented)
 const WCAG_22_AA_TAGS: readonly string[];
 
+// @public
+const ZONE_DIMMED_OPACITY = 0.35;
+
+// @public
+const ZONE_LABEL_SIZE_PX = 12;
+
+// @public
+const ZONE_LAYER_ID = "us-zones";
+
+// @public
+const ZONE_LEGEND_ORDER: readonly ZoneType[];
+
+// @public
+const ZONE_PATTERN_KEYS: Readonly<Record<ZonePattern, Key>>;
+
+// @public
+const ZONE_TYPE_KEYS: Readonly<Record<ZoneType, Key>>;
+
 // @public (undocumented)
 const ZONE_TYPES: readonly ["PROHIBITED", "REQ_AUTHORIZATION", "CONDITIONAL", "NO_RESTRICTION", "USPACE"];
+
+// @public (undocumented)
+function ZoneCard(props: ZoneCardProps): JSX.Element;
+
+// @public (undocumented)
+interface ZoneCardProps {
+    // (undocumented)
+    className?: string;
+    // (undocumented)
+    lang: Lang;
+    restriction?: boolean;
+    // (undocumented)
+    zone: RestrictionView;
+}
+
+// @public
+type ZoneColours = Readonly<Record<ZoneType, string>>;
+
+// @public
+function zoneDimExpression(): ExpressionSpecification;
+
+// @public (undocumented)
+type ZoneFeatureCollection = GeoJSON_2.FeatureCollection<GeoJSON_2.Geometry, ZoneFeatureProperties>;
+
+// @public
+function zoneFeatureCollection(zones: readonly ZoneView[], selectedId: string | null): ZoneFeatureCollection;
+
+// @public
+interface ZoneFeatureProperties {
+    // (undocumented)
+    applies: boolean | null;
+    // (undocumented)
+    identifier: string;
+    // (undocumented)
+    lowerLimitM: number | null;
+    // (undocumented)
+    lowerRef: string | null;
+    // (undocumented)
+    name: string | null;
+    // (undocumented)
+    restrictionState: RestrictionState | null;
+    // (undocumented)
+    selected: boolean;
+    // (undocumented)
+    type: ZoneType;
+    // (undocumented)
+    upperLimitM: number | null;
+    // (undocumented)
+    upperRef: string | null;
+}
+
+// @public (undocumented)
+function ZoneLayer(props: ZoneLayerProps): JSX.Element | null;
+
+// @public (undocumented)
+interface ZoneLayerIds {
+    // (undocumented)
+    fill: string;
+    // (undocumented)
+    label: string;
+    // (undocumented)
+    line: string;
+    // (undocumented)
+    pattern: string;
+    // (undocumented)
+    source: string;
+}
+
+// @public (undocumented)
+function zoneLayerIds(id: string): ZoneLayerIds;
+
+// @public (undocumented)
+interface ZoneLayerProps {
+    id?: string;
+    labels?: boolean;
+    onSelect?(id: string): void;
+    // (undocumented)
+    selectedId?: string | null;
+    visible?: boolean;
+    // (undocumented)
+    zones: readonly ZoneView[];
+}
+
+// @public (undocumented)
+function ZoneLegend(props: ZoneLegendProps): JSX.Element;
+
+// @public (undocumented)
+interface ZoneLegendProps {
+    // (undocumented)
+    className?: string;
+    counts?: Partial<Record<ZoneType, number>>;
+    defaultCollapsed?: boolean;
+}
+
+// @public
+function zoneLineWidthPx(t: ZoneType): number;
+
+// @public
+function zoneOpacity(z: Pick<ZoneView, "applies" | "restrictionState">): number;
+
+// @public (undocumented)
+function zoneOrder(): readonly ZoneType[];
+
+// @public
+type ZonePattern = "solid" | "hatched" | "dotted" | "none";
+
+// @public
+function zonePattern(t: ZoneType): ZonePattern;
+
+// @public
+function zonePatternFillOpacity(p: ZonePattern): number;
+
+// @public
+function zonePatternImage(pattern: "hatched" | "dotted", rgb: Rgb): PatternImage;
+
+// @public
+function zonePatternImageId(t: ZoneType): string | null;
+
+// @public (undocumented)
+interface ZoneStyle {
+    // (undocumented)
+    fillColor: ExpressionSpecification;
+    // (undocumented)
+    fillOpacity: ExpressionSpecification;
+    // (undocumented)
+    fillPattern: ExpressionSpecification;
+    // (undocumented)
+    lineColor: ExpressionSpecification;
+    // (undocumented)
+    lineOpacity: ExpressionSpecification;
+    // (undocumented)
+    lineWidth: ExpressionSpecification;
+    patternFilter: FilterSpecification;
+    // (undocumented)
+    patternOpacity: ExpressionSpecification;
+}
+
+// @public
+function zoneStyle(colours: ZoneColours): ZoneStyle;
+
+// @public
+function ZoneSwatch(props: {
+    type: ZoneType;
+}): JSX.Element;
+
+// @public
+function zoneToken(t: ZoneType): string;
 
 // @public (undocumented)
 type ZoneType = (typeof ZONE_TYPES)[number];

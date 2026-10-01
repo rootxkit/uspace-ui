@@ -52,6 +52,8 @@ export class MockMap {
   }[] = [];
   readonly sources = new Map<string, MockSource>();
   readonly layers = new Map<string, ML.LayerSpecification>();
+  /** Images added with addImage (WP-6: zone fill patterns). */
+  readonly images = new Map<string, unknown>();
   readonly controls: { control: unknown; position: unknown }[] = [];
   center: { lng: number; lat: number };
   zoom: number;
@@ -129,6 +131,7 @@ export class MockMap {
     this.style = style;
     this.sources.clear();
     this.layers.clear();
+    this.images.clear();
     this.setStyleCalls.push({ style, options });
     if (MockMap.autoLoad) queueMicrotask(() => this.fire("style.load"));
     return this;
@@ -163,6 +166,29 @@ export class MockMap {
 
   removeLayer(id: string): this {
     this.layers.delete(id);
+    return this;
+  }
+
+  getLayoutProperty(id: string, name: string): unknown {
+    const layout = this.layers.get(id)?.layout as
+      Record<string, unknown> | undefined;
+    return layout?.[name];
+  }
+
+  hasImage(id: string): boolean {
+    return this.images.has(id);
+  }
+
+  addImage(id: string, image: unknown): this {
+    if (this.images.has(id)) {
+      throw new Error(`An image named "${id}" already exists.`);
+    }
+    this.images.set(id, image);
+    return this;
+  }
+
+  updateImage(id: string, image: unknown): this {
+    this.images.set(id, image);
     return this;
   }
 
@@ -249,6 +275,8 @@ export class MockMap {
 
   remove(): void {
     this.removed = true;
+    // MapLibre fires `remove` once the map is gone (Map.remove()).
+    this.fire("remove");
     this.controls.length = 0;
     this.handlers.clear();
   }

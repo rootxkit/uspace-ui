@@ -12,10 +12,17 @@ import {
   useT,
 } from "../../src/i18n/index.js";
 import * as typography from "../i18n/Typography.stories.js";
+import * as zones from "../zones/Zones.stories.js";
 import * as palettes from "./Palettes.stories.js";
 
 const { PalettesLight, PalettesDark } = composeStories(palettes);
 const { Georgian, English } = composeStories(typography);
+const {
+  LegendEnglishLight,
+  LegendGeorgianDark,
+  HoverCardEnglish,
+  HoverCardGeorgian,
+} = composeStories(zones);
 
 // One element per line, so a reviewed diff reads line by line.
 const pretty = (html: string): string => `${html.replace(/></g, ">\n<")}\n`;
@@ -74,6 +81,45 @@ it("typography.ka", async () => {
 it("typography.en", async () => {
   await expect(await snapshotStory(English)).toMatchFileSnapshot(
     "./__snapshots__/typography.en.html",
+  );
+});
+
+// React's generated ids depend on how many ids were made before, so they
+// are numbered in order of appearance; the references stay matched.
+function stableIds(html: string): string {
+  const ids = [...html.matchAll(/ id="([^"]+)"/g)].map((m) => m[1] ?? "");
+  let out = html;
+  ids.forEach((id, i) => {
+    out = out.split(id).join(`id-${i}`);
+  });
+  return out;
+}
+
+async function snapshotStable(story: typeof Georgian): Promise<string> {
+  return stableIds(await snapshotStory(story));
+}
+
+it("zone-legend.en", async () => {
+  await expect(await snapshotStable(LegendEnglishLight)).toMatchFileSnapshot(
+    "./__snapshots__/zone-legend.en.html",
+  );
+});
+
+it("zone-legend.ka", async () => {
+  await expect(await snapshotStable(LegendGeorgianDark)).toMatchFileSnapshot(
+    "./__snapshots__/zone-legend.ka.html",
+  );
+});
+
+it("zone-card.en", async () => {
+  await expect(await snapshotStable(HoverCardEnglish)).toMatchFileSnapshot(
+    "./__snapshots__/zone-card.en.html",
+  );
+});
+
+it("zone-card.ka", async () => {
+  await expect(await snapshotStable(HoverCardGeorgian)).toMatchFileSnapshot(
+    "./__snapshots__/zone-card.ka.html",
   );
 });
 
