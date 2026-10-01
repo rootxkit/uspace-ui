@@ -21,6 +21,20 @@ export {
   type StyleLoadHandler,
 } from "./context.js";
 export { mapCounters, type MapCounter } from "./counters.js";
+export {
+  useBBoxSubscription,
+  useViewport,
+  type BBoxSubscriptionOptions,
+  type ViewportState,
+} from "./hooks.js";
+export {
+  LayerPanel,
+  MapControls,
+  type LayerPanelProps,
+  type LayerToggle,
+  type MapControlsProps,
+  type Translate,
+} from "./MapControls.js";
 export { MapView, type MapViewProps } from "./MapView.js";
 export {
   MAP_MESSAGES,
@@ -28,4 +42,4 @@ export {
   type MapKey,
   type MapLang,
 } from "./messages.js";
-export { type BBox, type Viewport } from "./viewport.js";
+export { subscriptionBBox, type BBox, type Viewport } from "./viewport.js";
