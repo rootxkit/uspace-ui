@@ -20,6 +20,7 @@ import { JSX } from 'react';
 import { Label as Label_2 } from 'radix-ui';
 import type { Linter } from 'eslint';
 import type { Map as Map_2 } from 'maplibre-gl';
+import { NextFontWithVariable } from 'next/dist/compiled/@next/font';
 import { Popover as Popover_2 } from 'radix-ui';
 import { RadioGroup as RadioGroup_2 } from 'radix-ui';
 import * as React_2 from 'react';
@@ -92,7 +93,7 @@ type AlertKind = (typeof ALERT_KINDS)[number];
 
 declare namespace alerts {
     export {
-        ENTRY_11 as ENTRY
+        ENTRY_9 as ENTRY
     }
 }
 
@@ -132,24 +133,27 @@ interface AlertView {
 // @public (undocumented)
 const ALT_SOURCES: readonly ["geodetic", "pressure", "network", "none"];
 
+// @public
+const ALTITUDE_KEYS: Readonly<Record<VerticalRef | AltSource, Key | null>>;
+
 // @public (undocumented)
 type AltSource = (typeof ALT_SOURCES)[number];
 
 declare namespace api {
     export {
-        ENTRY_3 as ENTRY
+        ENTRY
     }
 }
 
 declare namespace auth_client {
     export {
-        ENTRY_5 as ENTRY
+        ENTRY_3 as ENTRY
     }
 }
 
 declare namespace auth_server {
     export {
-        ENTRY_4 as ENTRY
+        ENTRY_2 as ENTRY
     }
 }
 
@@ -163,7 +167,7 @@ function Badge(input: React_2.ComponentProps<"span"> & VariantProps<typeof badge
 
 // @public (undocumented)
 const badgeVariants: (props?: ({
-    variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | null | undefined;
+    variant?: "link" | "default" | "destructive" | "outline" | "secondary" | "ghost" | null | undefined;
 } & ClassProp) | undefined) => string;
 
 // @public
@@ -178,7 +182,7 @@ const BASEMAP_DEFAULT_PATHS: {
 const BASEMAP_SOURCE_ID = "protomaps";
 
 // @public
-function basemapAttribution(info: BasemapInfo | null, lang: MapLang): string;
+function basemapAttribution(info: BasemapInfo | null, lang: Lang): string;
 
 // @public (undocumented)
 interface BasemapConfig {
@@ -197,7 +201,7 @@ interface BasemapInfo {
 }
 
 // @public
-function basemapStyle(cfg: BasemapConfig, info: BasemapInfo | null, lang: MapLang, scheme: MapScheme): StyleSpecification;
+function basemapStyle(cfg: BasemapConfig, info: BasemapInfo | null, lang: Lang, scheme: MapScheme): StyleSpecification;
 
 // Warning: (ae-forgotten-export) The symbol "PathKey" needs to be exported by the entry point entry.d.ts
 //
@@ -277,7 +281,7 @@ function Button(input: React_2.ComponentProps<"button"> & VariantProps<typeof bu
 
 // @public (undocumented)
 const buttonVariants: (props?: ({
-    variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | null | undefined;
+    variant?: "link" | "default" | "destructive" | "outline" | "secondary" | "ghost" | null | undefined;
     size?: "default" | "xs" | "sm" | "lg" | "icon" | "icon-xs" | "icon-sm" | "icon-lg" | null | undefined;
 } & ClassProp) | undefined) => string;
 
@@ -301,6 +305,12 @@ function CardHeader(input: React_2.ComponentProps<"div">): React_2.JSX.Element;
 
 // @public (undocumented)
 function CardTitle(input: React_2.ComponentProps<"div">): React_2.JSX.Element;
+
+// @public
+type Catalogue = Readonly<Record<string, string>>;
+
+// @public (undocumented)
+type Catalogues = Partial<Record<Lang, Catalogue>>;
 
 // @public (undocumented)
 function Checkbox(input: React_2.ComponentProps<typeof Checkbox_2.Root>): React_2.JSX.Element;
@@ -364,8 +374,17 @@ function CommandShortcut(input: React_2.ComponentProps<"span">): React_2.JSX.Ele
 // @public (undocumented)
 const config: Linter.Config[];
 
+// @public
+function createTranslator(lang: Lang, catalogues?: Catalogues): Translate;
+
 // @public (undocumented)
 const DARK_QUERY = "(prefers-color-scheme: dark)";
+
+// @public (undocumented)
+const DASH = "\u2014";
+
+// @public
+const DEFAULT_LANG: Lang;
 
 // @public (undocumented)
 function Dialog(input: React_2.ComponentProps<typeof Dialog_2.Root>): React_2.JSX.Element;
@@ -476,43 +495,40 @@ interface EmptyStateProps {
 }
 
 // @public (undocumented)
-const ENTRY = "i18n";
+const en: Readonly<Record<Key, string>>;
 
 // @public (undocumented)
-const ENTRY_10 = "status";
+const ENTRY = "api";
 
 // @public (undocumented)
-const ENTRY_11 = "alerts";
+const ENTRY_10 = "table";
 
 // @public (undocumented)
-const ENTRY_12 = "table";
+const ENTRY_11 = "form";
 
 // @public (undocumented)
-const ENTRY_13 = "form";
+const ENTRY_2 = "auth/server";
 
 // @public (undocumented)
-const ENTRY_2 = "fonts";
+const ENTRY_3 = "auth/client";
 
 // @public (undocumented)
-const ENTRY_3 = "api";
+const ENTRY_4 = "symbology";
 
 // @public (undocumented)
-const ENTRY_4 = "auth/server";
+const ENTRY_5 = "layers";
 
 // @public (undocumented)
-const ENTRY_5 = "auth/client";
+const ENTRY_6 = "legend";
 
 // @public (undocumented)
-const ENTRY_6 = "symbology";
+const ENTRY_7 = "live";
 
 // @public (undocumented)
-const ENTRY_7 = "layers";
+const ENTRY_8 = "status";
 
 // @public (undocumented)
-const ENTRY_8 = "legend";
-
-// @public (undocumented)
-const ENTRY_9 = "live";
+const ENTRY_9 = "alerts";
 
 declare namespace eslint {
     export {
@@ -569,22 +585,179 @@ interface Fixtures {
 // @public
 function fixtures(): Fixtures;
 
+// @public
+function fmtAge(ageS: number | null, lang: Lang): string;
+
+// @public
+function fmtAltitude(v: number | null, ref: VerticalRef | AltSource | null, lang: Lang): string;
+
+// @public
+function fmtDistance(m: number | null, lang: Lang): string;
+
+// @public
+function fmtHeading(deg: number | null): string;
+
+// @public
+function fmtHeight(v: number | null, ref: HeightRef | null, lang: Lang): string;
+
+// @public
+function fmtNum(v: number | null | undefined, digits?: number, unit?: string, lang?: Lang): string;
+
+// @public
+function fmtRegistrationNumber(publicPart: string | null): string;
+
+// @public
+function fmtSpeed(ms: number | null, lang: Lang): string;
+
+// @public
+function fmtTimeLocal(iso: string | null, lang: Lang, tz: string): string;
+
+// @public
+function fmtTimeUTC(iso: string | null, lang: Lang, opts?: {
+    seconds?: boolean;
+}): string;
+
+// @public
+const FONT_FILES: readonly FontFile[];
+
+// @public
+const FONT_VARIABLES: {
+    readonly latin: "--us-font-latin";
+    readonly georgian: "--us-font-georgian";
+};
+
+// @public
+const fontClassName: string;
+
+// @public
+const fontFamily: string;
+
+// @public (undocumented)
+interface FontFile {
+    // (undocumented)
+    family: "Noto Sans" | "Noto Sans Georgian";
+    // (undocumented)
+    file: string;
+    // (undocumented)
+    unicodeRange: string;
+    // (undocumented)
+    weight: 400 | 700;
+}
+
 declare namespace fonts {
     export {
-        ENTRY_2 as ENTRY
+        FONT_FILES,
+        FONT_VARIABLES,
+        GEORGIAN_UNICODE_RANGE,
+        LATIN_UNICODE_RANGE,
+        fontFamily,
+        mapFontstack,
+        FontFile,
+        notoSans,
+        notoSansGeorgian,
+        fontClassName
     }
 }
 
 declare namespace form {
     export {
-        ENTRY_13 as ENTRY
+        ENTRY_11 as ENTRY
     }
 }
 
+// @public
+const GEORGIAN_UNICODE_RANGE = "U+10A0-10FF, U+1C90-1CBF, U+2D00-2D2F";
+
+// @public
+const HEIGHT_KEYS: Readonly<Record<HeightRef, Key>>;
+
+// @public (undocumented)
+type HeightRef = "TakeoffLocation" | "GroundLevel";
+
 declare namespace i18n {
     export {
-        ENTRY
+        i18nCounters,
+        missingKeys,
+        resetI18nCounters,
+        I18nCounter,
+        en,
+        Key,
+        ALTITUDE_KEYS,
+        DASH,
+        HEIGHT_KEYS,
+        fmtAge,
+        fmtAltitude,
+        fmtDistance,
+        fmtHeading,
+        fmtHeight,
+        fmtNum,
+        fmtRegistrationNumber,
+        fmtSpeed,
+        fmtTimeLocal,
+        fmtTimeUTC,
+        HeightRef,
+        I18nProvider,
+        useLang,
+        useOptionalI18n,
+        useT,
+        useTFor,
+        I18nContextValue,
+        I18nProviderProps,
+        ka,
+        DEFAULT_LANG,
+        LANG_COOKIE,
+        LANGS,
+        LOCALES,
+        langFromAcceptLanguage,
+        langFromCookie,
+        negotiateLang,
+        parseLang,
+        Lang,
+        KIT_CATALOGUES,
+        createTranslator,
+        interpolate,
+        Catalogue,
+        Catalogues,
+        Translate,
+        Vars
     }
+}
+
+// @public (undocumented)
+interface I18nContextValue {
+    catalogues: Catalogues;
+    // (undocumented)
+    lang: Lang;
+    // (undocumented)
+    setLang(l: Lang): void;
+    // (undocumented)
+    t: Translate;
+}
+
+// @public (undocumented)
+type I18nCounter =
+/** A `ka` lookup that found nothing in `ka` and showed the `en` text. */
+"missing_ka"
+/** A key in neither language: the key itself was shown. */
+| "missing_key"
+/** A registration number whose secret part was cut off (06 §5). */
+| "registration_secret_refused"
+/** A time without a zone designator, or not a time: shown as a dash. */
+| "time_refused";
+
+// @public
+function i18nCounters(): Readonly<Record<I18nCounter, number>>;
+
+// @public (undocumented)
+function I18nProvider(props: I18nProviderProps): JSX.Element;
+
+// @public (undocumented)
+interface I18nProviderProps {
+    catalogues?: Catalogues;
+    // (undocumented)
+    children?: ReactNode;
+    lang: Lang;
+    onLangChange?(l: Lang): void;
 }
 
 // @public (undocumented)
@@ -649,6 +822,9 @@ interface IntentView {
     volumes: GeoJSON_2.Polygon[];
 }
 
+// @public
+function interpolate(template: string, vars?: Vars): string;
+
 // @public (undocumented)
 const isAlertKind: (x: unknown) => x is "proximity" | "nonconformance" | "nonconformance_nearby" | "height_exceedance" | "zone_incursion" | "lost_link" | "restriction_activated" | "emergency_nearby";
 
@@ -674,16 +850,16 @@ const isIdentReason: (x: unknown) => x is "matched" | "session_binding" | "uas_s
 const isIdentStatus: (x: unknown) => x is "registered" | "suspended" | "unknown_operator" | "unidentified";
 
 // @public (undocumented)
-const isRestrictionState: (x: unknown) => x is "ended" | "planned" | "active" | "cancelled";
+const isRestrictionState: (x: unknown) => x is "planned" | "active" | "ended" | "cancelled";
 
 // @public (undocumented)
 const isSeverity: (x: unknown) => x is "info" | "warning" | "critical";
 
 // @public (undocumented)
-const isSourceState: (x: unknown) => x is "disabled" | "stale" | "healthy" | "lagging" | "unreachable" | "never_heard";
+const isSourceState: (x: unknown) => x is "healthy" | "disabled" | "stale" | "lagging" | "unreachable" | "never_heard";
 
 // @public (undocumented)
-const isTimeSource: (x: unknown) => x is "system" | "provider" | "broadcast" | "source_clock" | "receiver";
+const isTimeSource: (x: unknown) => x is "provider" | "broadcast" | "source_clock" | "receiver" | "system";
 
 // @public (undocumented)
 const isTrust: (x: unknown) => x is "authenticated" | "provider" | "surveillance" | "broadcast" | "sensor" | "simulated";
@@ -697,8 +873,19 @@ const isViolationKind: (x: unknown) => x is "zone_incursion" | "height_120m" | "
 // @public (undocumented)
 const isZoneType: (x: unknown) => x is "PROHIBITED" | "REQ_AUTHORIZATION" | "CONDITIONAL" | "NO_RESTRICTION" | "USPACE";
 
+// @public (undocumented)
+const ka: Readonly<Record<Key, string>>;
+
 // @public
 function Kbd(input: ComponentProps<"kbd">): ReactNode;
+
+// Warning: (ae-forgotten-export) The symbol "catalogue" needs to be exported by the entry point entry.d.ts
+//
+// @public
+type Key = keyof typeof catalogue;
+
+// @public (undocumented)
+const KIT_CATALOGUES: Readonly<Record<Lang, Catalogue>>;
 
 // @public
 interface KitBrand {
@@ -723,21 +910,39 @@ type KitScheme = "light" | "dark" | "system";
 // @public (undocumented)
 function Label(input: React_2.ComponentProps<typeof Label_2.Root>): React_2.JSX.Element;
 
+// @public (undocumented)
+type Lang = "ka" | "en";
+
+// @public (undocumented)
+const LANG_COOKIE = "uspace_lang";
+
+// @public
+function langFromAcceptLanguage(header: string | null | undefined): Lang | null;
+
+// @public
+function langFromCookie(cookie: string | null | undefined): Lang | null;
+
+// @public (undocumented)
+const LANGS: readonly Lang[];
+
+// @public
+const LATIN_UNICODE_RANGE = "U+0000-017F, U+018F, U+0192, U+0218-021B, U+0237, U+0259, U+02BB-02BC, U+02C6-02DD, U+0300-0304, U+0306-0308, U+030A-030C, U+0327-0328, U+0370-03FF, U+0400-04FF, U+1E9E, U+2000-206F, U+20AC, U+20B8, U+20BD, U+20BE, U+2116, U+2122, U+2190-2193, U+2212";
+
 // @public
 function LayerPanel(props: LayerPanelProps): ReactNode;
 
 // @public (undocumented)
 interface LayerPanelProps {
-    lang?: MapLang;
+    lang?: Lang;
     // (undocumented)
     layers: LayerToggle[];
     // (undocumented)
-    translate?: Translate;
+    translate?: Translate_2;
 }
 
 declare namespace layers {
     export {
-        ENTRY_7 as ENTRY
+        ENTRY_5 as ENTRY
     }
 }
 
@@ -754,18 +959,21 @@ interface LayerToggle {
 
 declare namespace legend {
     export {
-        ENTRY_8 as ENTRY
+        ENTRY_6 as ENTRY
     }
 }
 
 declare namespace live {
     export {
-        ENTRY_9 as ENTRY
+        ENTRY_7 as ENTRY
     }
 }
 
 // @public
 function loadBasemapInfo(cfg: BasemapConfig, signal: AbortSignal, timeoutMs?: number): Promise<BasemapInfo | null>;
+
+// @public
+const LOCALES: Readonly<Record<Lang, string>>;
 
 // @public (undocumented)
 interface MannedView {
@@ -828,13 +1036,9 @@ declare namespace map {
         LayerPanelProps,
         LayerToggle,
         MapControlsProps,
-        Translate,
+        Translate_2 as Translate,
         MapView,
         MapViewProps,
-        MAP_MESSAGES,
-        mapText,
-        MapKey,
-        MapLang,
         subscriptionBBox,
         BBox,
         Viewport
@@ -842,15 +1046,12 @@ declare namespace map {
 }
 
 // @public (undocumented)
-const MAP_MESSAGES: Readonly<Record<MapLang, Readonly<Record<MapKey, string>>>>;
-
-// @public (undocumented)
 interface MapContextValue {
     // (undocumented)
     initial: Viewport;
     initialBBox: BBox;
     // (undocumented)
-    lang: MapLang;
+    lang: Lang;
     map: Map_2 | null;
     onStyleLoad(handler: StyleLoadHandler): () => void;
     // (undocumented)
@@ -869,7 +1070,7 @@ interface MapControlsProps {
     onSchemeChange?(scheme: MapScheme): void;
     scheme?: boolean;
     // (undocumented)
-    translate?: Translate;
+    translate?: Translate_2;
 }
 
 // @public (undocumented)
@@ -884,19 +1085,11 @@ type MapCounter =
 // @public
 function mapCounters(): Readonly<Record<MapCounter, number>>;
 
-// Warning: (ae-forgotten-export) The symbol "en" needs to be exported by the entry point entry.d.ts
-//
-// @public (undocumented)
-type MapKey = keyof typeof en;
-
-// @public (undocumented)
-type MapLang = "ka" | "en";
+// @public
+const mapFontstack = "Noto Sans Regular";
 
 // @public (undocumented)
 type MapScheme = "light" | "dark";
-
-// @public
-function mapText(lang: MapLang, key: MapKey, vars?: Readonly<Record<string, string>>): string;
 
 // @public (undocumented)
 function MapView(props: MapViewProps): ReactNode;
@@ -912,13 +1105,16 @@ interface MapViewProps {
     className?: string;
     initial: Viewport;
     // (undocumented)
-    lang: MapLang;
+    lang: Lang;
     // (undocumented)
     onLoad?(map: Map_2): void;
     onViewport?(v: Viewport, bbox: BBox): void;
     // (undocumented)
     scheme: MapScheme;
 }
+
+// @public
+function missingKeys(): number;
 
 declare namespace model {
     export {
@@ -985,6 +1181,15 @@ declare namespace model {
     }
 }
 
+// @public
+function negotiateLang(acceptLanguage: string | null, cookie: string | null): Lang;
+
+// @public
+const notoSans: NextFontWithVariable;
+
+// @public
+const notoSansGeorgian: NextFontWithVariable;
+
 // @public (undocumented)
 function Pagination(input: React_2.ComponentProps<"nav">): React_2.JSX.Element;
 
@@ -1007,6 +1212,9 @@ function PaginationNext(input: React_2.ComponentProps<typeof PaginationLink>): R
 
 // @public (undocumented)
 function PaginationPrevious(input: React_2.ComponentProps<typeof PaginationLink>): React_2.JSX.Element;
+
+// @public (undocumented)
+function parseLang(v: string | null | undefined): Lang | null;
 
 // @public (undocumented)
 function parseScheme(v: string | null | undefined): ColorScheme | null;
@@ -1075,6 +1283,9 @@ interface RenderWithKitOptions {
     // (undocumented)
     scheme?: KitScheme;
 }
+
+// @public
+function resetI18nCounters(): void;
 
 // @public (undocumented)
 type ResolvedScheme = "light" | "dark";
@@ -1237,7 +1448,7 @@ interface StatProps {
 
 declare namespace status_2 {
     export {
-        ENTRY_10 as ENTRY
+        ENTRY_8 as ENTRY
     }
 }
 
@@ -1254,7 +1465,7 @@ function Switch(input: React_2.ComponentProps<typeof Switch_2.Root> & {
 
 declare namespace symbology {
     export {
-        ENTRY_6 as ENTRY
+        ENTRY_4 as ENTRY
     }
 }
 
@@ -1263,7 +1474,7 @@ function Table(input: React_2.ComponentProps<"table">): React_2.JSX.Element;
 
 declare namespace table {
     export {
-        ENTRY_12 as ENTRY
+        ENTRY_10 as ENTRY
     }
 }
 
@@ -1475,8 +1686,11 @@ interface TrackView {
     vspeedMs: number | null;
 }
 
+// @public (undocumented)
+type Translate = (key: string, vars?: Vars) => string;
+
 // @public
-type Translate = (key: string) => string;
+type Translate_2 = (key: string) => string;
 
 // @public (undocumented)
 type Trust = (typeof TRUSTS)[number];
@@ -1629,11 +1843,20 @@ declare namespace ui {
 // @public
 function useBBoxSubscription(opts: BBoxSubscriptionOptions): void;
 
+// @public (undocumented)
+function useLang(): {
+    lang: Lang;
+    setLang(l: Lang): void;
+};
+
 // @public
 function useMap(): Map_2 | null;
 
 // @public
 function useMapContext(): MapContextValue;
+
+// @public
+function useOptionalI18n(): I18nContextValue | null;
 
 // @public
 function useOptionalTheme(): ThemeContextValue | null;
@@ -1642,10 +1865,19 @@ function useOptionalTheme(): ThemeContextValue | null;
 function useStyleLoad(add: StyleLoadHandler): void;
 
 // @public
+function useT(): Translate;
+
+// @public
+function useTFor(lang: Lang): Translate;
+
+// @public
 function useTheme(): ThemeContextValue;
 
 // @public
 function useViewport(): ViewportState;
+
+// @public (undocumented)
+type Vars = Readonly<Record<string, string | number>>;
 
 // @public (undocumented)
 const VERTICAL_REFS: readonly ["AGL", "AMSL", "WGS84"];
