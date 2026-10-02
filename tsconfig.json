@@ -19,5 +19,8 @@
     "types": ["node"],
     "noEmit": true
   },
-  "include": ["src", "stories", ".storybook", "scripts", "vitest.config.ts"]
+  "include": ["src", "stories", ".storybook", "scripts", "vitest.config.ts"],
+  // Typed by the paths generated in a test step (src/api/test/types.test.ts
+  // runs tsc on them with src/api/test/tsconfig.json).
+  "exclude": ["src/api/test"]
 }

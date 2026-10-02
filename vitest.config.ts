@@ -20,6 +20,8 @@ export default defineConfig({
         "src/**/*.d.ts",
         // The MapLibre mock for jsdom (WP-3), shared with the layer WPs.
         "src/map/test/**",
+        // The api fixtures, generated types and test helpers (WP-4).
+        "src/api/test/**",
       ],
       reporter: ["text", "text-summary", "json-summary"],
       thresholds: { statements: 90 },

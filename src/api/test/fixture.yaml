@@ -1,0 +1,189 @@
+# The OpenAPI 3.1 fixture of the api tests (WP-4). Synthetic: GEO-TEST-*
+# identifiers, no host (spec 06 §4). Generated into `paths` by
+# uspace-ui-gen-api in types.test.ts; the client tests are typed by it.
+openapi: 3.1.0
+info:
+  title: uspace-ui api fixture
+  version: 0.0.0
+servers:
+  - url: /
+paths:
+  /v1/zones:
+    get:
+      operationId: listZones
+      parameters:
+        - name: applies_at
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: A CISP-shaped dataset answer (02 F3, M15).
+          headers:
+            ETag:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ZoneSet"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/zones/{identifier}/notes:
+    post:
+      operationId: addZoneNote
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteInput"
+      responses:
+        "201":
+          description: The note.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Note"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/notes/{id}:
+    put:
+      operationId: replaceNote
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteInput"
+      responses:
+        "200":
+          description: The note.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Note"
+        default:
+          $ref: "#/components/responses/Problem"
+    patch:
+      operationId: editNote
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteInput"
+      responses:
+        "200":
+          description: The note.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Note"
+        default:
+          $ref: "#/components/responses/Problem"
+    delete:
+      operationId: deleteNote
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted.
+        default:
+          $ref: "#/components/responses/Problem"
+components:
+  responses:
+    Problem:
+      description: An error, as RFC 9457 problem details (M28).
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+  schemas:
+    ZoneSet:
+      type: object
+      required: [cis_dataset, cis_version, cis_updated_at, features]
+      properties:
+        cis_dataset:
+          type: string
+        cis_version:
+          type: integer
+        cis_updated_at:
+          type: string
+          format: date-time
+        cis_age_s:
+          type: number
+        stale:
+          type: boolean
+        features:
+          type: array
+          items:
+            type: object
+            required: [identifier]
+            properties:
+              identifier:
+                type: string
+    NoteInput:
+      type: object
+      required: [text]
+      properties:
+        text:
+          type: string
+    Note:
+      type: object
+      required: [id, text]
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+    Problem:
+      type: object
+      required: [type, title, status]
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+            required: [field, reason]
+            properties:
+              field:
+                type: string
+              reason:
+                type: string
+        truncated:
+          type: boolean

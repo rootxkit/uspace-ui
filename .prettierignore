@@ -15,3 +15,7 @@ src/model/types.ts
 src/ui/*.tsx
 # Golden DOM snapshots are compared byte for byte by vitest.
 stories/golden/__snapshots__/
+# The system OpenAPI files the api tests generate from, copied unchanged,
+# and what the tests generate from them (WP-4).
+src/api/test/systems/
+src/api/test/generated/
