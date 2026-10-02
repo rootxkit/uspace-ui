@@ -1,0 +1,216 @@
+// The one BFF proxy (docs/PLAN.md §3.16, §7; spec 02 §3, 06 §3): the
+// browser talks to `/_bff/api/*` with its cookies; the BFF talks to the
+// system's API with `Authorization: Bearer <session>` and no cookie. It
+// refuses a path outside the allow-list without calling upstream, checks
+// the CSRF pair on unsafe methods, never follows a redirect, bounds the
+// upstream call with its own timeout (LESSONS E-14: not the browser
+// request's signal), and passes the API's status, problem bodies and
+// headers (`Retry-After`, `ETag`, `Sunset`) through unchanged.
+//
+// Nothing here logs: a request or answer body may hold a credential.
+import { NextResponse, type NextRequest } from "next/server.js";
+
+import { PROBLEM_TYPE_PREFIX } from "../../api/problem.js";
+import { isUnsafeMethod } from "../contract.js";
+import {
+  checkCsrf,
+  clearSession,
+  readSessionToken,
+  type SessionCookieOptions,
+} from "./cookies.js";
+import { countAuth } from "./counters.js";
+
+export interface ForwardOptions {
+  /** The cookie options: the session cookie is read, and cleared on a 401. */
+  session: SessionCookieOptions;
+  /**
+   * The upstream paths this route may reach, matched against the target's
+   * normalised pathname. Anchor them (`/^\/v1\/zones(\/|$)/`).
+   */
+  allowPaths: RegExp[];
+  /** How long the BFF waits for the API's answer headers. Configuration. */
+  timeoutMs: number;
+  /** The fetch to use; the platform's by default. */
+  fetch?: typeof fetch;
+}
+
+/** Request headers copied to the API; everything else is dropped. */
+export const FORWARDED_REQUEST_HEADERS: readonly string[] = [
+  "accept",
+  "accept-language",
+  "content-type",
+  "if-match",
+  "if-none-match",
+  "user-agent",
+  // The client address the reverse proxy recorded: the API's per-address
+  // sign-in limits (LESSONS S-15) read it when the BFF is a trusted proxy.
+  "x-forwarded-for",
+];
+
+/**
+ * Response headers never passed back: the hop-by-hop set (RFC 9110
+ * §7.6.1), cookies (the BFF owns the browser's cookie jar), and the
+ * encoding and length the platform's fetch has already undone.
+ */
+export const DROPPED_RESPONSE_HEADERS: readonly string[] = [
+  "connection",
+  "keep-alive",
+  "proxy-authenticate",
+  "proxy-authorization",
+  "proxy-connection",
+  "te",
+  "trailer",
+  "transfer-encoding",
+  "upgrade",
+  "set-cookie",
+  "content-encoding",
+  "content-length",
+];
+
+/** An `application/problem+json` answer of the BFF itself (M28 shape). */
+export function problemResponse(
+  status: number,
+  slug: string,
+  title: string,
+  detail: string | null = null,
+  errors: { field: string; reason: string }[] = [],
+): NextResponse {
+  return new NextResponse(
+    JSON.stringify({
+      type: `${PROBLEM_TYPE_PREFIX}${slug}`,
+      title,
+      status,
+      detail,
+      instance: null,
+      errors,
+    }),
+    {
+      status,
+      headers: {
+        "Content-Type": "application/problem+json",
+        "Cache-Control": "no-store",
+      },
+    },
+  );
+}
+
+/** The forwarded subset of the browser's headers. */
+export function upstreamHeaders(req: NextRequest): Headers {
+  const out = new Headers();
+  for (const name of FORWARDED_REQUEST_HEADERS) {
+    const v = req.headers.get(name);
+    if (v !== null) out.set(name, v);
+  }
+  return out;
+}
+
+/** The API's headers minus the dropped set. */
+export function downstreamHeaders(upstream: Response): Headers {
+  const out = new Headers(upstream.headers);
+  for (const name of DROPPED_RESPONSE_HEADERS) out.delete(name);
+  return out;
+}
+
+export type UpstreamResult =
+  { ok: true; response: Response } | { ok: false; response: NextResponse };
+
+/**
+ * One call to the API under the BFF's own timeout and controller, with
+ * redirects not followed. A timeout is a 504 problem and a failure before
+ * an answer a 502 problem, both counted.
+ */
+export async function callUpstream(
+  url: URL,
+  init: RequestInit & { duplex?: "half" },
+  timeoutMs: number,
+  fetchImpl: typeof fetch = fetch,
+): Promise<UpstreamResult> {
+  const controller = new AbortController();
+  let timedOut = false;
+  const timer = setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, timeoutMs);
+  try {
+    const response = await fetchImpl(url, {
+      ...init,
+      redirect: "manual",
+      signal: controller.signal,
+    });
+    return { ok: true, response };
+  } catch {
+    if (timedOut) {
+      countAuth("upstream_timeout");
+      return {
+        ok: false,
+        response: problemResponse(
+          504,
+          "upstream_timeout",
+          "Upstream timeout",
+          `no answer within ${timeoutMs} ms`,
+        ),
+      };
+    }
+    countAuth("upstream_unreachable");
+    return {
+      ok: false,
+      response: problemResponse(
+        502,
+        "upstream_unreachable",
+        "Upstream unreachable",
+      ),
+    };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * Forwards `req` to `target` (docs/PLAN.md §3.16). Refusals happen before
+ * any upstream call: a target path outside `allowPaths` is a 404 problem,
+ * an unsafe method without a matching CSRF pair a 403 problem. The answer
+ * is the API's own status, body and headers (minus the dropped set); on a
+ * 401 the BFF also clears both cookies (the session is gone).
+ */
+export async function forward(
+  req: NextRequest,
+  target: URL,
+  opts: ForwardOptions,
+): Promise<Response> {
+  if (!opts.allowPaths.some((re) => re.test(target.pathname))) {
+    countAuth("proxy_path_refused");
+    return problemResponse(404, "not_found", "Not found");
+  }
+  if (!checkCsrf(req, opts.session)) {
+    countAuth("csrf_refused");
+    return problemResponse(
+      403,
+      "csrf_refused",
+      "CSRF check failed",
+      "send the uspace_csrf cookie's value as X-CSRF-Token",
+    );
+  }
+  const headers = upstreamHeaders(req);
+  const token = readSessionToken(req, opts.session);
+  if (token !== null) headers.set("Authorization", `Bearer ${token}`);
+  const hasBody = isUnsafeMethod(req.method) && req.body !== null;
+  const result = await callUpstream(
+    target,
+    {
+      method: req.method,
+      headers,
+      ...(hasBody ? { body: req.body, duplex: "half" as const } : {}),
+    },
+    opts.timeoutMs,
+    opts.fetch,
+  );
+  if (!result.ok) return result.response;
+  const upstream = result.response;
+  const res = new NextResponse(upstream.body, {
+    status: upstream.status,
+    statusText: upstream.statusText,
+    headers: downstreamHeaders(upstream),
+  });
+  if (upstream.status === 401) clearSession(res, opts.session);
+  return res;
+}
