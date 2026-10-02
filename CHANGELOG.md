@@ -68,6 +68,16 @@ follows docs/PLAN.md §12. One line per work package under Unreleased.
   `legend` (`ZoneLegend`). The jsdom MapLibre mock gains images,
   `getLayoutProperty` and the `remove` event.
   @maplibre/maplibre-gl-style-spec 24.10.0 as a dev pin.
+- WP-5: `auth/server` (`import "server-only"`; `setSession`,
+  `clearSession`, `readSessionToken`, `issueCsrf`, `checkCsrf`,
+  `forward`, `bffHandlers` with exactly `login`, `logout` and `proxy`,
+  `sessionClaimsUnverified`, `sessionDisplay`, `issueCspNonce`,
+  `authCounters`) and `auth/client` (`SessionProvider`, `useSession`,
+  `LoginForm`, `RequireRole`, `csrfToken`). Sign-in follows the API's two
+  steps (password, then MFA code) inside one BFF request; the challenge
+  and the session token never reach the page. `ui` gains
+  `CspNonceProvider`, which ScrollArea reads for its injected style.
+  server-only 0.0.1.
 - WP-4: `api`: `createClient<Paths>` over openapi-fetch (same-origin
   credentials, `X-CSRF-Token` on POST, PUT, PATCH and DELETE,
   `Accept-Language` from `lang()`, a per-request timeout, no retry of any

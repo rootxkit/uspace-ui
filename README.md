@@ -97,6 +97,86 @@ A non-2xx answer rejects with an `ApiError` (`status`, `problem`,
 `slug`, `retryAfterS`, `requestId`, `sunset`); the client never
 retries.
 
+### BFF session (`auth/server`, `auth/client`)
+
+The BFF is three routes and nothing else (the session contract every
+system shares): `/_bff/login`, `/_bff/logout` and `/_bff/api/*`. The
+session JWT the API issues lives in the `HttpOnly; Secure;
+SameSite=Strict` cookie `uspace_session`; the page never sees it. The
+readable `uspace_csrf` cookie goes back as `X-CSRF-Token` on every
+unsafe request (`createClient({ csrfToken })` does it); sign-in, which
+has no CSRF cookie yet, requires a same-origin `Origin`. The BFF never
+verifies a token: the API decides every request.
+
+Next.js ignores App Router folders whose name starts with `_`, so the
+URL `/_bff/...` lives in a folder named `%5Fbff`:
+
+```ts
+// web/src/lib/bff/handlers.ts
+import { bffHandlers } from "@rootxkit/uspace-ui/auth/server";
+
+export const bff = bffHandlers({
+  apiBase: process.env.API_INTERNAL_URL!, // the API as the web container reaches it
+  apiLoginPath: "/v1/auth/login",
+  apiMfaPath: "/v1/auth/mfa", // the API's second sign-in step, when it has one
+  apiLogoutPath: "/v1/auth/logout",
+  session: { secure: true, maxAgeS: 12 * 3600 },
+  allowPaths: [/^\/v1\/(zones|restrictions)(\/|$)/], // what the console may reach
+  timeoutMs: 10_000,
+});
+```
+
+```ts
+// web/src/app/%5Fbff/login/route.ts
+import { bff } from "@/lib/bff/handlers";
+export const POST = bff.login;
+
+// web/src/app/%5Fbff/logout/route.ts
+import { bff } from "@/lib/bff/handlers";
+export const POST = bff.logout;
+
+// web/src/app/%5Fbff/api/[...path]/route.ts
+import { bff } from "@/lib/bff/handlers";
+export const { GET, POST, PUT, PATCH, DELETE } = {
+  GET: bff.proxy, POST: bff.proxy, PUT: bff.proxy, PATCH: bff.proxy, DELETE: bff.proxy,
+};
+```
+
+```tsx
+// web/src/app/layout.tsx (server component)
+import { cookies, headers } from "next/headers";
+import { CSP_NONCE_HEADER, readSessionToken, sessionDisplay } from "@rootxkit/uspace-ui/auth/server";
+import { SessionProvider } from "@rootxkit/uspace-ui/auth/client";
+import { CspNonceProvider } from "@rootxkit/uspace-ui/ui";
+
+const session = sessionDisplay(readSessionToken(await cookies())); // display only, unverified
+const nonce = (await headers()).get(CSP_NONCE_HEADER) ?? undefined;
+// <CspNonceProvider nonce={nonce}><SessionProvider session={session}>...</SessionProvider></CspNonceProvider>
+```
+
+Sign-in is `<LoginForm action="/_bff/login" onSuccess={...} />`. When
+the API answers the password with an MFA challenge, the BFF keeps the
+challenge to itself and the form asks for the one-time code; the next
+submit carries username, password and code, and the BFF runs both API
+steps. A refusal shows the API's `detail`, and a `429` counts its
+`Retry-After` down. `RequireRole` hides what a role does not use; it
+grants nothing.
+
+**WebSockets: there is no ticket route.** The BFF cannot proxy a
+WebSocket, and a ticket in a query string ends up in access logs. The
+browser opens the system's WebSocket same-origin; the `uspace_session`
+cookie travels on the upgrade, where the WS process checks `Origin`
+against its allow-list and verifies the cookie. A close with `4401`
+means "sign in again". Do not add a ticket route to a `web/`;
+`bffHandlers` has no fourth handler to mount.
+
+**CSP nonce.** Radix ScrollArea injects a `<style>` element, which the
+console CSP (`style-src 'self'`, no `'unsafe-inline'`) refuses. The
+app's middleware calls `issueCspNonce()` per request, adds
+`'nonce-<value>'` to `style-src`, and passes the value in the
+`CSP_NONCE_HEADER` request header; the layout above hands it to
+`CspNonceProvider`.
+
 Entry points: `@rootxkit/uspace-ui/{model,theme,ui,i18n,fonts,map,api,
 auth/server,auth/client,symbology,layers,legend,live,status,alerts,
 table,form,eslint,test}`. The full step list for a `web/` app is in
