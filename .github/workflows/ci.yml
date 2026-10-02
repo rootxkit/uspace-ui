@@ -144,7 +144,7 @@ jobs:
         run: node scripts/consumer-test.mjs "${{ steps.pack.outputs.tarball }}"
       - name: What a tag would release
         run: |
-          files=$(tar -tzf "${{ steps.pack.outputs.tarball }}" | wc -l)
+          files=$(tar -tzf "${{ steps.pack.outputs.tarball }}.planted-missing" | wc -l)
           kind=release
           if [ "$(node scripts/release.mjs prerelease)" = true ]; then kind=pre-release; fi
           {
