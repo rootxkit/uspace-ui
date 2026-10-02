@@ -198,6 +198,27 @@ app's middleware calls `issueCspNonce()` per request, adds
 `CSP_NONCE_HEADER` request header; the layout above hands it to
 `CspNonceProvider`.
 
+The middleware must overwrite `x-nonce` on every request and never read
+it. The browser can send its own `x-nonce`. A middleware that keeps an
+incoming value (`get(...) ?? issueCspNonce()`) lets the client choose
+the nonce, which defeats the policy. Always `set`, on a copy of the
+request headers:
+
+```ts
+// web/src/proxy.ts (Next.js middleware)
+import { NextResponse, type NextRequest } from "next/server";
+import { CSP_NONCE_HEADER, issueCspNonce } from "@rootxkit/uspace-ui/auth/server";
+
+export function proxy(req: NextRequest) {
+  const nonce = issueCspNonce(); // fresh per request, never taken from the request
+  const headers = new Headers(req.headers);
+  headers.set(CSP_NONCE_HEADER, nonce); // set, not append: replaces any client value
+  const res = NextResponse.next({ request: { headers } });
+  res.headers.set("Content-Security-Policy", `style-src 'self' 'nonce-${nonce}'; ...`);
+  return res;
+}
+```
+
 Entry points: `@rootxkit/uspace-ui/{model,theme,ui,i18n,fonts,map,api,
 auth/server,auth/client,symbology,layers,legend,live,status,alerts,
 table,form,eslint,test}`. The full step list for a `web/` app is in

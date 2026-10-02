@@ -5,7 +5,9 @@
 // nonce. The app's middleware (Next.js `proxy.ts`) calls `issueCspNonce`,
 // puts `'nonce-<value>'` in its `style-src` and `script-src`, and passes
 // the value to its server components in the `CSP_NONCE_HEADER` request
-// header; the root layout reads it and wraps the page in the kit's
+// header, which it always overwrites (`set`) and never reads: a client can
+// send its own `x-nonce`, and a value taken from the request is chosen by
+// the client; the root layout reads it and wraps the page in the kit's
 // `CspNonceProvider` (`@rootxkit/uspace-ui/ui`), which ScrollArea reads.
 
 /** The request header the middleware passes the nonce to the layout in. */
