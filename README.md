@@ -22,16 +22,14 @@ kit's view models in an adapter it owns.
 
 Planning. `docs/PLAN.md` and the work package briefs are on `main`;
 WP-0 (scaffold, frozen view models, lint rules, CI) is the first code.
-The first publish is a pre-release, `0.1.0-rc.1` on npmjs under the
-`next` dist-tag (WP-13a), as soon as the scaffold, theme, i18n, map,
-API adapter and BFF helpers merge, so the CISP's `web/` can start on
-it. The first release `v0.1.0` (U-M1 of the roadmap, with the CISP's
+The first release is a pre-release, `0.1.0-rc.1`, a GitHub Release
+asset (WP-13a; see Installing), so the CISP's `web/` can start on it. The first release `v0.1.0` (U-M1 of the roadmap, with the CISP's
 C-M1) ships the theme, `ui`, `i18n` and fonts, the map with the zone,
 restriction and legend components, the API adapter, the BFF helpers
 and the ESLint config. Tracks, live feed, status, table and form follow
 in `0.2`; alerts and the traffic layers in `0.3`; `v1.0.0` when two
-consoles use them. Distribution is npmjs only, with provenance; every
-consumer installs with pnpm and an exact pin.
+consoles use them. Distribution is GitHub Release tarballs; every
+consumer installs with pnpm, pinned to one release asset URL.
 
 ## Links
 
@@ -45,11 +43,33 @@ consumer installs with pnpm and an exact pin.
 - Spec: `uspace-lab/docs/spec/` (`00 §6.3` names this package; `07`
   U-M1 is its first milestone)
 
-## Consuming (from `0.1.0-rc.1`)
+## Installing
 
+Each release is a GitHub Release of this repository with two assets:
+the `pnpm pack` tarball `rootxkit-uspace-ui-<version>.tgz` and
+`SHA256SUMS`. The kit is not on npmjs. The owner chose release tarballs
+on 2026-10-02, because publishing to npm needs an npm account and scope
+that are not available; PLAN D10 records the change, and
+[`docs/RELEASING.md`](docs/RELEASING.md) keeps npm as a switched-off
+path for later. Depend on the asset URL of one release, exactly:
+
+```jsonc
+// web/package.json
+"dependencies": {
+  "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v0.1.0-rc.1/rootxkit-uspace-ui-0.1.0-rc.1.tgz",
+  "maplibre-gl": "5.x"
+}
 ```
-pnpm add @rootxkit/uspace-ui@<exact version> maplibre-gl   # npmjs only; rc versions are under the `next` dist-tag, pinned exactly too
-```
+
+`pnpm install` records the tarball's integrity in `pnpm-lock.yaml`, and
+`pnpm install --frozen-lockfile` refuses an asset whose bytes changed.
+The repository is public, so no token is needed. The tarball is built
+output only: there is no `prepare` step and no devDependency to install.
+Pre-releases (`0.1.0-rc.N`) are marked as such on GitHub and are pinned
+the same way; to upgrade, replace the URL and commit the lockfile. Never
+depend on a `github:` spec or a branch.
+
+## Consuming (from `0.1.0-rc.1`)
 
 ```css
 /* web/app/globals.css */

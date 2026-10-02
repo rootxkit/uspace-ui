@@ -1,11 +1,12 @@
-# CI of @rootxkit/uspace-ui (docs/PLAN.md §10 jobs 1-7). release.yml is
-# WP-13a. Branch protection is the owner's.
+# CI of @rootxkit/uspace-ui (docs/PLAN.md §10 jobs 1-8). Branch protection
+# is the owner's. On a tag, release.yml calls this workflow (workflow_call)
+# so the release runs the same jobs, and releases the tarball the `pack`
+# job built and tested (WP-13a).
 name: ci
 
 on:
   push:
     branches: [main]
-    tags: ["v*"]
     paths:
       - "**"
       - "!docs/**"
@@ -19,9 +20,19 @@ on:
       - "!**/*.md"
       - "docs/api/**"
       - "docs/CORE_VERSION"
+  workflow_call:
+    outputs:
+      tarball-name:
+        description: File name of the packed tarball (the `package` artifact)
+        value: ${{ jobs.pack.outputs.name }}
+      tarball-sha256:
+        description: SHA-256 of the packed tarball
+        value: ${{ jobs.pack.outputs.sha256 }}
 
 concurrency:
-  group: ci-${{ github.ref }}
+  # github.workflow is the caller's name under workflow_call, so a release
+  # never shares (or cancels) the group of a push or pull request run.
+  group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -96,6 +107,51 @@ jobs:
         run: pnpm exec playwright install-deps chromium
       # components in Chromium, axe after every test, golden snapshots
       - run: pnpm test:browser
+
+  pack:
+    # The release path without releasing (WP-13a): the tarball a tag would
+    # attach, checked for exactly `files`, linted as packed, installed by URL
+    # into a scratch consumer. release.yml downloads this job's artifact.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      name: ${{ steps.pack.outputs.name }}
+      sha256: ${{ steps.pack.outputs.sha256 }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: pnpm pack, and check the tarball holds exactly `files`
+        id: pack
+        run: node scripts/pack-test.mjs --out "$RUNNER_TEMP/pack"
+      - name: publint and attw on the packed tarball
+        run: |
+          pnpm exec publint run --strict "${{ steps.pack.outputs.tarball }}"
+          pnpm exec attw "${{ steps.pack.outputs.tarball }}" --profile esm-only --format table-flipped --exclude-entrypoints ./styles/tokens.css ./styles/map.css ./fonts/fonts.css ./package.json
+      - name: Install by URL into a scratch consumer
+        run: node scripts/consumer-test.mjs "${{ steps.pack.outputs.tarball }}"
+      - name: What a tag would release
+        run: |
+          files=$(tar -tzf "${{ steps.pack.outputs.tarball }}" | wc -l)
+          kind=release
+          if [ "$(node scripts/release.mjs prerelease)" = true ]; then kind=pre-release; fi
+          {
+            echo "Would release ${{ steps.pack.outputs.name }} ($files files) as a GitHub $kind on tag v$(node -p 'require("./package.json").version')"
+            echo ""
+            echo "- sha256: \`${{ steps.pack.outputs.sha256 }}\`"
+            echo "- consumer dependency: \`\"@rootxkit/uspace-ui\": \"$(node scripts/release.mjs url)\"\`"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: package
+          path: ${{ steps.pack.outputs.tarball }}
+          retention-days: 7
+          if-no-files-found: error
 
   fonts:
     runs-on: ubuntu-latest

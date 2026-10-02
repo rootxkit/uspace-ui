@@ -20,9 +20,11 @@ identification badges, null formatting).
 Reconciled on 2026-10-02 against the four system plans (the cross-plan
 decisions document; its mismatch ids `M-nn` and question ids are cited
 where a row was changed by it): one console frame, one session and
-cookie contract, one error body, npmjs-only distribution with an early
-`0.1.0-rc`, pnpm everywhere, the lab-built basemap served by the
-deployment repo. The three owner-only questions of §14 stay open.
+cookie contract, one error body, distribution with an early
+`0.1.0-rc` (GitHub Release tarballs since the owner's change of
+2026-10-02, which supersedes D10's npmjs-only rule), pnpm everywhere, the lab-built basemap served by the
+deployment repo. Two owner-only questions of §14 stay open; the owner decided Q1
+(distribution) on 2026-10-02, superseding D10 and M32.
 
 Sections: 1 scope, role boundary and decisions; 2 package layout and
 dependency graph; 3 public API per entry point; 4 third-party dependencies;
@@ -35,7 +37,8 @@ work packages and waves; 14 spec gaps and open questions.
 
 ## 1. Scope, role boundary and decisions
 
-`uspace-ui` is an npm package, `@rootxkit/uspace-ui`, consumed at build
+`uspace-ui` is an npm-format package, `@rootxkit/uspace-ui`, released as a
+GitHub Release tarball (D10) and consumed at build
 time by the `web/` Next.js app of every system (`uspace-cisp`,
 `uspace-authority`, `uspace-ussp`, `uspace-ansp`, and the lab's results
 dashboard). Spec `00 §6.3`: the shadcn/ui theme and design tokens, the
@@ -71,7 +74,7 @@ pinned by each `web/`; additive within a major.
 | D7 | Fonts ship in the package (Noto Sans and Noto Sans Georgian, OFL, woff2 subsets) and are loaded with `next/font/local` through `/fonts`; a CI test reads each file's `cmap` and fails if any Georgian block (Mkhedruli U+10D0–U+10FF, Mtavruli U+1C90–U+1CBF, Nuskhuri U+2D00–U+2D2F, Asomtavruli U+10A0–U+10CF) is missing a glyph. | "A font that has full Georgian glyphs" is checked, not assumed (E-02). No Google Fonts request from a console (D6). |
 | D8 | The live feed client (`/live`) is a generic, reconnect-forever WebSocket store that understands the common envelope of `04 §2` and the console frame of §6.3, never a system's business messages. Message bodies are passed to app adapters typed by the app's generated types. | B-08 (reconnect forever, start degraded), C-08 (replay on connect is the server's duty; the client shows what it was given and its age), `05 §5` (`dropped_frames` visible), `05 §6` (freeze with age shown). |
 | D9 | Visual testing is plain component tests in vitest browser mode (Playwright Chromium) under `browser/`: each test renders the component in the kit's providers in a chosen scheme and language, `axe` runs after every test, and a named golden set has DOM snapshots. No Storybook and no GitHub Pages site (the owner removed Storybook, and the Pages site planned for it, on 2026-10-02). No hosted visual-diff service. | CI-cheap: Actions is free on a public repo; a paid snapshot service is a recurring cost and a secret. Map pixels are not snapshotted (WebGL in CI is noise); the style expressions the symbology produces are tested instead (§9). |
-| D10 | Published to the public npm registry under the `@rootxkit` scope with provenance, from a tag workflow using OIDC trusted publishing (no long-lived token in secrets). npmjs is the only distribution channel: no GitHub Packages, no `github:` tag dependency, no tarball (reconciliation M32). The first publish is a pre-release, `0.1.0-rc.1`, as soon as WP-0..WP-5 merge (WP-13a), so the CISP's `web/` starts on an rc and bumps. | Consumers (`web/` CI, Docker builds, the owner's machines) install without a token; provenance ties each version to a commit and a workflow run (`06 §4` supply chain). A git-tag dependency would need a `prepare` build with the full devDependencies inside every system's Docker build. |
+| D10 | **Superseded on 2026-10-02 by the owner (this also supersedes reconciliation M32's "npmjs only").** Distributed as GitHub Release assets of this repository: on a tag `v<version>`, `release.yml` runs every CI job and attaches the `pnpm pack` tarball (`rootxkit-uspace-ui-<version>.tgz`), built and tested by CI's `pack` job, and a `SHA256SUMS` file, using the run's `GITHUB_TOKEN` (`contents: write` on that job only). A version with a pre-release suffix is a GitHub pre-release. Consumers depend on the exact asset URL; the pnpm lockfile pins its integrity. Still excluded: GitHub Packages, a `github:` tag dependency, a branch. The first release is a pre-release, `0.1.0-rc.1` (WP-13a), so the CISP's `web/` starts on an rc and bumps. npmjs with OIDC trusted publishing and provenance stays a documented, switched-off path (`publishConfig` kept; `docs/RELEASING.md` "Switching to npm later"). *Was:* npmjs only under `@rootxkit`, with trusted publishing and provenance, rc under the `next` dist-tag; no GitHub Packages, no `github:` dependency, no tarball. | *Why the change:* publishing to npm needs an npm account and the `@rootxkit` scope set up by the owner, and that is not available (§14 Q1). A release tarball keeps what D10 wanted: consumers install without a token (the repository is public), the asset is built output with no `prepare` step (M32's objection to a `github:` dependency was a build with all devDependencies inside every Docker image, which a tarball does not need), every version is tied to a tag and a workflow run, and the lockfile's integrity makes a changed asset fail `--frozen-lockfile`. What it gives up: npm provenance attestations and resolution by version number. |
 | D11 | The kit ships its ESLint flat config (`/eslint`) with the rules the spec requires of every `web/`: no geometry or geodesy imports, no database or bus client imports, no business logic in route handlers, no hand-written API types in the generated directory. | `00 §6` ("a Next.js file importing geometry or geodesy libraries fails lint"), `07` KT-3 ("no-geometry-import and no-server-side-business-logic rules"). Writing the rule once here is how five apps get it the same. |
 | D12 | The first release `v0.1.0` is U-M1 (with C-M1; pre-releases `0.1.0-rc.N` precede it, D10); `v1.0.0` follows the first two consoles in production use of the track and alert components (the authority's A-M2 picture and the USSP's S-M2 console), when §3's API is declared stable. | Spec `07`. A kit's API is proven by its second consumer, not its first. |
 
@@ -628,7 +631,7 @@ frames are not optional for a browser-facing WebSocket.
 | WebSocket authentication (M22) | the browser opens the system's WS same-origin and sends the `uspace_session` cookie on the upgrade; the WS process checks `Origin` against its allow-list and verifies the cookie with the shared verifier. No ticket, no token in a query string (it would be logged), no BFF proxying of WebSockets. A `4401` close means the session is gone and the kit asks the app to re-login. |
 | No PII in URLs (safety rules of this project; `06 §5`) | `useTableUrlState` and every link helper refuse keys named like identity fields (`name`, `email`, `phone`, `address`, `registration_number` secret part) — a test pins the list. |
 | No judgement in TypeScript (`06` T12) | the `/eslint` rules, applied to the kit itself in its own CI. |
-| Supply chain (`06 §4`) | exact pins, `pnpm install --frozen-lockfile`, Dependabot, `pnpm audit` as a non-gating report, provenance on publish (D10), `SECURITY.md` with a 90-day policy. |
+| Supply chain (`06 §4`) | exact pins, `pnpm install --frozen-lockfile`, Dependabot, `pnpm audit` as a non-gating report, release tarballs built and tested in CI and pinned by lockfile integrity, with `SHA256SUMS` (D10; npm provenance if the npm path is switched on), `SECURITY.md` with a 90-day policy. |
 | Content Security Policy | the kit documents the CSP every `web/` sets (`connect-src 'self'` for API, WS and the basemap; `worker-src blob:` for MapLibre; `font-src 'self'`; no `unsafe-eval`) and `examples/next-app` ships it; a browser test (`browser/csp/`) loads under it. |
 | Public repository | no hostname, no organisation name, no logo in the repo; `GEO-TEST-*` and `TEST*` fixtures only; a CI grep for `chikox.net` fails outside `examples/*/README.md`. |
 | Display is not authorisation | `RequireRole` hides, the API decides. Every component that triggers an audited act collects a reason and calls back; it never calls an API itself. |
@@ -699,9 +702,10 @@ distinct visual state covered by a named test.
 `.github/workflows/ci.yml` (written by WP-0; it does not exist on
 `plan/initial` because there is nothing to run yet, and a workflow that
 is green over nothing is the kind of success path this project has been
-bitten by). Jobs on push to `main`, tags `v*` and pull requests;
-`ubuntu-latest`; Node 22 from `.nvmrc`; pnpm from `packageManager`;
-`concurrency: ci-${{ github.ref }}` with cancel-in-progress; every job
+bitten by). Jobs on push to `main` and pull requests, and on tags `v*`
+through `release.yml` (`workflow_call`); `ubuntu-latest`; Node 22 from
+`.nvmrc`; pnpm from `packageManager`; `concurrency: ci-${{
+github.workflow }}-${{ github.ref }}` with cancel-in-progress; every job
 `timeout-minutes: 15`; path filter ignores `docs/**` and `*.md` except
 `docs/api/**` (the API report is code). No scheduled job.
 
@@ -724,16 +728,27 @@ bitten by). Jobs on push to `main`, tags `v*` and pull requests;
 7. `enums` (`main` only, required; best-effort on PRs): `scripts/check-enums.sh`
    against `uspace-core` at the tag in `docs/CORE_VERSION`.
 
-`.github/workflows/release.yml` (written by WP-13a, first run on
-`v0.1.0-rc.1`): on tag `v*`: the `check`, `test`, `browser` and `fonts`
-jobs again on the tag, then `pnpm publish --provenance --access public`
-with `id-token: write` (D10), with `--tag next` when the version has a
-pre-release suffix so `latest` never points at an rc, then a GitHub
-release (marked pre-release for an rc) with the CHANGELOG section. The
-tag must equal `package.json` `version` or the job fails before
-publishing.
+8. `pack` (WP-13a): `pnpm build`, `pnpm pack` with the pack test (the
+   tarball holds exactly `files`, nothing from `src/`, `browser/`,
+   `docs/`, `scripts/`, `.github/`, and every `exports` and `bin`
+   target), publint and attw on the tarball, then the consumer test: the
+   tarball served under its release URL path and installed by URL into a
+   scratch pnpm project (lockfile integrity, every subpath resolves, the
+   entry points type-check under `NodeNext` and `Bundler`, the bin runs,
+   changed bytes refused by `--frozen-lockfile`). Uploads the tarball as
+   the `package` artifact and writes a "would release" line.
 
-Branch protection on `main` requires jobs 1–6.
+`.github/workflows/release.yml` (written by WP-13a, first run on
+`v0.1.0-rc.1`): on tag `v*`: a `tag` job that fails unless the tag is
+`v<version>` and `CHANGELOG.md` has the version's section; then all of
+`ci.yml` on the tag through `workflow_call`; then a `release` job with
+`contents: write` (only there) and the run's `GITHUB_TOKEN` that takes
+the `pack` artifact, checks its SHA-256, writes `SHA256SUMS`, and
+creates the GitHub Release with both files and the CHANGELOG section,
+marked pre-release when the version has a pre-release suffix, and reads
+it back (flag, assets, the downloaded bytes). No registry publish (D10).
+
+Branch protection on `main` requires jobs 1–6 and 8.
 
 Caches: pnpm store (`actions/setup-node` with `cache: pnpm`), Playwright
 browsers, Next.js build cache for the example. No Docker in this repo.
@@ -747,7 +762,7 @@ The kit is not deployed. Each system's `web/` consumes it:
 ```jsonc
 // web/package.json
 "packageManager": "pnpm@<exact>",   // pnpm everywhere (M34): corepack, `pnpm install --frozen-lockfile`, `pnpm-lock.yaml` committed; no npm ci, no package-lock.json
-"dependencies": { "@rootxkit/uspace-ui": "0.3.1", "maplibre-gl": "5.x", "next": "...", "react": "19.x", "react-dom": "19.x" }   // exact pin from npmjs only (M32): never a `github:` tag, never a tarball
+"dependencies": { "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v0.3.1/rootxkit-uspace-ui-0.3.1.tgz", "maplibre-gl": "5.x", "next": "...", "react": "19.x", "react-dom": "19.x" }   // one release asset URL (D10): the lockfile pins its integrity; never a `github:` spec or a branch
 ```
 
 Minimum kit version per consumer (M33): CISP `web/` ≥ `0.1.0-rc.1`
@@ -804,8 +819,8 @@ Upgrade policy for consumers: a `web/` pins an exact version and bumps
 it in its own PR, running its own lint, build and tests against its
 adapters. Two majors of the kit are maintained for
 six months (§12), so a system is never forced to upgrade in step with
-another. Pre-releases (`0.1.0-rc.N`) are published under the npm dist-tag
-`next`; a consumer pins them exactly like a release and bumps to `0.1.0`
+another. Pre-releases (`0.1.0-rc.N`) are GitHub pre-releases; a consumer
+pins their asset URL exactly like a release's and moves to `0.1.0`'s
 when it is tagged.
 
 Images: each system's CI builds its `web/` with `next build` (`output:
@@ -814,15 +829,18 @@ standalone`) into that system's image; the droplet never builds Next.js
 memory beyond its JS; the 3.8 GB droplet constraint is the systems'
 concern and the kit's bundle budget (§8) is its contribution.
 
-This repo hosts nothing: the npm package is its only artefact (D9).
+This repo hosts nothing: the release tarball is its only artefact (D9,
+D10).
 
 ---
 
 ## 12. Versioning and release
 
-- `v0.1.0-rc.1` (WP-13a, M32): the first publish, as soon as WP-0..WP-5
-  merge: `model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api`, `auth/*`,
-  `eslint`, `test`; dist-tag `next`. `rc.2`, `rc.3`, ... follow each
+- `v0.1.0-rc.1` (WP-13a, D10): the first release, a GitHub pre-release,
+  as soon as WP-0..WP-5 merge: `model`, `theme`, `ui`, `i18n`, `fonts`,
+  `map`, `api`, `auth/*`, `eslint`, `test`, and whatever else is on
+  `main` by then (its CHANGELOG section lists what ships and what does
+  not). `rc.2`, `rc.3`, ... follow each
   merge that the CISP's `web/` needs (WP-6 first). An rc may still
   change an export; the CHANGELOG says what moved.
 - `v0.1.0` = U-M1 (`07`): the rc entry points plus `ZoneLayer`,
@@ -889,7 +907,7 @@ outputs (E-04).
 | WP-10 | `form` | `src/form/` | WP-1, WP-2, WP-4 | U-M2 |
 | WP-11 | `alerts` | `src/alerts/`, `src/layers/AlertLayer` | WP-7, WP-8 | U-M3 |
 | WP-12 | `traffic-layers` | `src/symbology/manned*`, `src/symbology/intent*`, `src/layers/{Manned,Intent,Receiver}Layer`, `src/status/TrackDetail` (the selected-track panel with the Remote ID block) | WP-6, WP-7, WP-8 | U-M3 |
-| WP-13a | `rc-publish` | `.github/workflows/release.yml`, the publish configuration (`publishConfig`, `files`, dist-tag rule), `CHANGELOG.md` `0.1.0-rc.N` sections, the npm trusted-publishing set-up with the owner | WP-0..WP-5 merged (the rc ships what is on `main`) | U-M1 (tags `v0.1.0-rc.N`; first publish) |
+| WP-13a | `rc-publish` | `.github/workflows/release.yml`, CI's `pack` job, the release configuration (`files`, `version`, the pre-release rule; `publishConfig` kept for a later npm switch), `CHANGELOG.md` `0.1.0-rc.N` sections, `docs/RELEASING.md` (D10: GitHub Release tarballs) | WP-0..WP-5 merged (the rc ships what is on `main`) | U-M1 (tags `v0.1.0-rc.N`; first publish) |
 | WP-13 | `release-0.1` | `examples/next-app/`, `README.md` consumer section, `docs/CONSUMING.md`, the `0.1.0` changelog and tag | WP-1..WP-6, WP-13a | U-M1 (tag `v0.1.0`) |
 | WP-14 | `v1-gate` | semver gate, `scripts/check-enums.sh`, lab schema fixtures, API report freeze, `v1.0.0` | WP-7..WP-13 | U-M4 (tag `v1.0.0`) |
 
@@ -920,7 +938,7 @@ by re-running the tool), the two catalogues `src/i18n/ka.ts` and
 the parity test catches a lost key in a merge), and `browser/golden/`
 (each WP adds its own entries and snapshots).
 
-Milestones: U-M0 scaffold merged; `v0.1.0-rc.1` published (WP-13a);
+Milestones: U-M0 scaffold merged; `v0.1.0-rc.1` released (WP-13a);
 **U-M1** = `v0.1.0` with C-M1 (`07`);
 U-M2 = `v0.2.0` with A-M1/A-M2 and S-M1; U-M3 = `v0.3.0` with S-M2/S-M3
 and N-M1; U-M4 = `v1.0.0`.
@@ -931,13 +949,13 @@ and N-M1; U-M4 = `v1.0.0`.
 
 The cross-plan reconciliation of 2026-10-02 decided every row that a
 coordinator could decide (marked **decided**, with the mismatch id
-`M-nn` it applies). Three rows need the owner (Q1, Q7, Q11): they stay
+`M-nn` it applies). Two rows need the owner (Q7, Q11; the owner decided Q1 on 2026-10-02): they stay
 **open** and carry the default the plan applies until the owner answers;
 the default is a proposal, not the answer.
 
 | # | Gap | Resolution in this plan | Status |
 |---|---|---|---|
-| Q1 | Registry: "npm or GitHub Packages". GitHub Packages needs a token to *install* even a public package (every `web/` CI, every Docker build, every developer machine); npmjs needs the `@rootxkit` scope and supports OIDC trusted publishing with provenance, so no secret is stored anywhere. | D10: npmjs with trusted publishing, and nothing else (M32: no `github:` tag installs, no GitHub Packages fallback); `release.yml` is written for it (WP-13a). | **Open, owner-only**: the owner confirms access to the `@rootxkit` npm scope (an account matter) and that the package is public, and enables trusted publishing for this repository's `release.yml`. Default until then: npmjs under `@rootxkit`; WP-13a cannot publish without it and says so rather than switching registries. |
+| Q1 | Registry: "npm or GitHub Packages". GitHub Packages needs a token to *install* even a public package (every `web/` CI, every Docker build, every developer machine); npmjs needs the `@rootxkit` scope and supports OIDC trusted publishing with provenance, so no secret is stored anywhere. | D10 as changed by the owner on 2026-10-02: neither registry; GitHub Release tarballs pinned by URL and lockfile integrity, because the npm account and scope are not available. npmjs with trusted publishing stays a switched-off path (`docs/RELEASING.md`). | **Decided by the owner** (2026-10-02): GitHub Release tarballs. Reopens only if the owner sets up the `@rootxkit` npm scope and trusted publishing and asks for the switch. |
 | Q2 | The spec fixes no error body for the national APIs. The form kit needs a field-addressed error and `uspace-core` already names the field and reason (`core.FieldError`, `ed269.Problems` with a JSON path). | `model.Problem`: RFC 9457 `application/problem+json` with `type`, `title`, `status`, `detail`, `instance`, `errors: [{field, reason}]`, `truncated?`; `field` is the JSON path as core writes it; `type` = `https://schemas.uspace.ge/problems/<slug>`. The kit degrades to "request failed, status N" for anything else. | **Decided** (M28): adopted by all four systems; `problem/v1` lives in `uspace-lab/schemas/common/`. |
 | Q3 | Zone applicability on a console: the kit must dim a zone that does not apply now (`limitedApplicability`), but evaluating applicability is a judgement (`ed269.Applies`, T-09) and must not run in TypeScript. `02 F3` offers `GET /v1/{dataset}?at=` which returns only the applicable features. | `ZoneView.applies` is `boolean | null` and the kit dims only on `false`. The CISP read API and the authority's `GET /v1/zones/export` add `?applies_at=<RFC 3339>`, which annotates every feature with `extendedProperties.cis_applicability` ∈ `applies` / `not_applicable` / `unknown` without filtering (the filtering `?at=` stays). The app maps it onto `applies`; no double fetch. | **Decided** (M17): additive on both APIs. |
 | Q4 | Who builds and hosts the basemap bundle (PMTiles extract of Georgia, Protomaps glyphs *including Georgian ranges* for the fontstack, sprites), how big it is (the predecessor's was hundreds of MB) and how it is refreshed. The kit assumes the `/basemap/` layout of §6.3. | The lab builds it (lab WP-L3) from the predecessor's `infra/basemap/fetch_basemap.sh` as a release artefact with `SOURCE.json` and a size budget: a Georgia-wide extract with city-level zooms for Tbilisi, Kutaisi, Batumi and Poti and `z ≤ 12` elsewhere, under about 1 GB. The deployment repo (`uspace-deploy`) serves `/basemap/*` from one shared read-only volume on every host (Caddy `file_server`, range requests, long cache headers; one copy for five systems). The kit's `fonts.mapFontstack` names the glyph set. The browser tests use a tiny Tbilisi-only extract committed under `browser/public/basemap/` (a few MB) so they render offline. | **Decided** (M38). The droplet's disk is part of the sizing question the reconciliation leaves to the owner (its §2.1, "droplet sizing"). |

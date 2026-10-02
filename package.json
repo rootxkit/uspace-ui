@@ -1,6 +1,6 @@
 {
   "name": "@rootxkit/uspace-ui",
-  "version": "0.0.0",
+  "version": "0.1.0-rc.1",
   "description": "Shared UI kit of the U-space systems: theme, map, symbology, i18n, live feed, table, form and BFF helpers. Renders, never judges.",
   "repository": {
     "type": "git",
@@ -14,7 +14,9 @@
     "bin",
     "dist",
     "styles",
-    "fonts"
+    "fonts",
+    "README.md",
+    "CHANGELOG.md"
   ],
   "exports": {
     "./model": {
@@ -112,11 +114,12 @@
   },
   "scripts": {
     "build": "node scripts/clean.mjs dist && tsc -p tsconfig.build.json",
-    "check": "pnpm run check:format && pnpm run build && pnpm run check:lint && pnpm run check:types && pnpm run check:package && pnpm run check:api && pnpm run check:size && pnpm run check:hostnames",
+    "check": "pnpm run check:format && pnpm run build && pnpm run check:lint && pnpm run check:types && pnpm run check:package && pnpm run check:pack && pnpm run check:api && pnpm run check:size && pnpm run check:hostnames",
     "check:format": "prettier --check .",
     "check:lint": "eslint --max-warnings 0 .",
     "check:types": "tsc --noEmit -p tsconfig.json",
     "check:package": "publint --strict && attw --pack . --profile esm-only --format table-flipped --exclude-entrypoints ./styles/tokens.css ./styles/map.css ./fonts/fonts.css ./package.json",
+    "check:pack": "node scripts/pack-test.mjs",
     "check:api": "node scripts/api-report.mjs",
     "check:size": "node scripts/size-check.mjs",
     "check:hostnames": "sh scripts/check-hostnames.sh",

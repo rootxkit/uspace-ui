@@ -88,10 +88,14 @@ and the lab consumes it at build time, pinned by an exact version. Read
     reason}]` and `truncated?`. The kit is written to these and to
     nothing else; a system that deviates is a reconciliation finding,
     not an adapter in this repo.
-13. **npmjs only, pnpm only.** The package is published to npmjs under
-    `@rootxkit` with trusted publishing and provenance; pre-releases
-    under the `next` dist-tag. No `github:` dependency, no tarball, no
-    GitHub Packages, no `NPM_TOKEN`. This repo and every consumer use
+13. **GitHub Release tarballs, pnpm only.** The package is released as
+    a GitHub Release asset (the `pnpm pack` tarball and `SHA256SUMS`)
+    by `release.yml` on a `v*` tag; a pre-release version is a GitHub
+    pre-release. Consumers depend on the exact asset URL and their
+    lockfile pins its integrity (PLAN D10, as changed by the owner on
+    2026-10-02; `docs/RELEASING.md`). No `github:` dependency, no
+    branch, no GitHub Packages, no `NPM_TOKEN`; publishing to npmjs is
+    a documented, switched-off path. This repo and every consumer use
     pnpm with `packageManager` pinned and `--frozen-lockfile`.
 
 ## Testing rules (from LESSONS E-01 to E-04, E-10, E-11)

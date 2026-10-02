@@ -1,0 +1,109 @@
+# Release of @rootxkit/uspace-ui (WP-13a, docs/RELEASING.md). On a tag
+# v<version>: the tag must equal package.json `version`, then every CI job
+# runs on the tag (ci.yml through workflow_call, including `pack`, which
+# builds the tarball and installs it into a scratch consumer), then the
+# tarball `pack` built is attached to a GitHub Release with SHA256SUMS.
+# A version with a pre-release suffix (0.1.0-rc.1) is a GitHub pre-release.
+#
+# Distribution is the GitHub Release asset, not npmjs (PLAN D10, superseded
+# on 2026-10-02): consumers depend on the asset URL and their pnpm lockfile
+# pins its integrity. Publishing to npmjs is a documented, switched-off path
+# (docs/RELEASING.md "Switching to npm later"); nothing here publishes to a
+# registry and no token other than this run's GITHUB_TOKEN is used.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  tag:
+    name: tag = version, notes present
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      # Fails before anything is built when the tag and the version differ.
+      - run: node scripts/release.mjs check-tag "$GITHUB_REF_NAME"
+      # Fails before anything is built when CHANGELOG.md has no section.
+      - run: node scripts/release-notes.mjs > /dev/null
+
+  checks:
+    needs: tag
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+
+  release:
+    needs: [tag, checks]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      NAME: ${{ needs.checks.outputs.tarball-name }}
+      SHA256: ${{ needs.checks.outputs.tarball-sha256 }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      - run: node scripts/release.mjs check-tag "$GITHUB_REF_NAME"
+      - uses: actions/download-artifact@v8
+        with:
+          name: package
+          path: release
+      - name: The tarball is the one `pack` built and tested
+        run: |
+          test "$NAME" = "$(node scripts/release.mjs asset)"
+          echo "$SHA256  release/$NAME" | sha256sum -c -
+          (cd release && sha256sum "$NAME" > SHA256SUMS && cat SHA256SUMS)
+      - name: Release notes from CHANGELOG.md
+        run: |
+          {
+            node scripts/release-notes.mjs
+            echo ""
+            echo "## Install"
+            echo ""
+            echo "Pin the release asset; the pnpm lockfile records its integrity:"
+            echo ""
+            echo '```jsonc'
+            echo "\"@rootxkit/uspace-ui\": \"$(node scripts/release.mjs url)\""
+            echo '```'
+            echo ""
+            echo "SHA-256 \`$SHA256\` (also in \`SHA256SUMS\`)."
+          } > "$RUNNER_TEMP/notes.md"
+          cat "$RUNNER_TEMP/notes.md"
+      - name: Create the GitHub Release
+        run: |
+          flags=()
+          if [ "$(node scripts/release.mjs prerelease)" = true ]; then
+            flags+=(--prerelease)
+          else
+            flags+=(--latest)
+          fi
+          gh release create "$GITHUB_REF_NAME" "release/$NAME" release/SHA256SUMS \
+            --verify-tag --title "$GITHUB_REF_NAME" \
+            --notes-file "$RUNNER_TEMP/notes.md" "${flags[@]}"
+      # Read the release back instead of trusting the log (E-02): the flag,
+      # the assets, and the bytes a consumer will download from the URL.
+      - name: Read the release back
+        run: |
+          gh release view "$GITHUB_REF_NAME" --json isPrerelease,assets \
+            --jq '"prerelease=\(.isPrerelease) assets=\([.assets[].name] | sort | join(","))"'
+          want_pre=$(node scripts/release.mjs prerelease)
+          got_pre=$(gh release view "$GITHUB_REF_NAME" --json isPrerelease --jq .isPrerelease)
+          test "$want_pre" = "$got_pre"
+          curl -sSfL -o "$RUNNER_TEMP/$NAME" "$(node scripts/release.mjs url)"
+          echo "$SHA256  $RUNNER_TEMP/$NAME" | sha256sum -c -

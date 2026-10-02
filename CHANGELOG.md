@@ -3,9 +3,54 @@
 All notable changes to `@rootxkit/uspace-ui`. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning
 follows docs/PLAN.md §12. One line per work package under Unreleased.
+Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
+Nothing yet.
+
+## 0.1.0-rc.1
+
+The first pre-release. It is a GitHub Release asset of this repository,
+not an npm version (PLAN D10 was superseded on 2026-10-02; see
+docs/RELEASING.md). Pin it exactly; the pnpm lockfile records its
+integrity:
+
+```jsonc
+"@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v0.1.0-rc.1/rootxkit-uspace-ui-0.1.0-rc.1.tgz"
+```
+
+An rc may still change an export; the next rc's section says what moved.
+
+### Entry points that ship
+
+`model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api` (with the
+`uspace-ui-gen-api` bin), `auth/server`, `auth/client`, `symbology`
+(zones, restrictions, tracks, identification, age, severity), `layers`
+(`ZoneLayer`, `RestrictionLayer`, `ZoneCard`, `TrackLayer`, `useLayer`),
+`legend` (`ZoneLegend`, `TrackLegend`, `IdentificationLegend`,
+`AgeLegend`, `SeverityLegend`), `live`, `status`, `table`, `form`,
+`eslint`, `test`, and `styles/tokens.css`, `styles/map.css`,
+`fonts/fonts.css` with the woff2 files.
+
+### Not yet
+
+- `alerts` is a stub that exports only `ENTRY` (WP-11).
+- `layers` has no `AlertLayer`, `MannedLayer`, `IntentLayer` or
+  `ReceiverLayer` yet (WP-11, WP-12).
+- There is no example app or `docs/CONSUMING.md` yet (WP-13).
+
+### Changes
+
+- WP-13a: the release path. `release.yml` checks that the tag equals
+  `version` and that this section exists, runs every CI job on the tag,
+  and attaches the tarball CI's `pack` job built and tested, with
+  `SHA256SUMS`, to a GitHub Release (a pre-release for an rc). CI's
+  `pack` job checks that the tarball holds exactly `files`, runs publint
+  and attw on it, and installs it by URL into a scratch consumer: the
+  lockfile pins its integrity, every subpath resolves, the entry points
+  type-check, the bin runs, and changed bytes are refused. `files` adds
+  `README.md` and `CHANGELOG.md`; `version` is `0.1.0-rc.1`.
 - WP-0: scaffold (pnpm, TypeScript strict `tsc` build to `dist/`, the
   `exports` map with stub entry points), the frozen view models and
   enumerations of `model` mirrored from `uspace-core` `v1.0.0`, the
