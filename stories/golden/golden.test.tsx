@@ -16,6 +16,7 @@ import * as form from "../form/Form.stories.js";
 import * as live from "../live/Status.stories.js";
 import * as typography from "../i18n/Typography.stories.js";
 import * as tracks from "../tracks/Tracks.stories.js";
+import * as table from "../table/Table.stories.js";
 import * as zones from "../zones/Zones.stories.js";
 import * as palettes from "./Palettes.stories.js";
 
@@ -174,6 +175,33 @@ const LIVE_GOLDEN = {
 } as const;
 
 for (const [name, story] of Object.entries(LIVE_GOLDEN)) {
+  it(name, async () => {
+    await expect(
+      await snapshotStable(story as typeof Georgian),
+    ).toMatchFileSnapshot(`./__snapshots__/${name}.html`);
+  });
+}
+
+// WP-9: one page of the registry table, and its empty and error states.
+const {
+  RegistryEnglishLight,
+  RegistryGeorgianDark,
+  EmptyEnglishLight,
+  EmptyGeorgianDark,
+  DeliveriesErrorEnglishLight,
+  DeliveriesErrorGeorgianDark,
+} = composeStories(table);
+
+const TABLE_GOLDEN = {
+  "table-page.en": RegistryEnglishLight,
+  "table-page.ka": RegistryGeorgianDark,
+  "table-empty.en": EmptyEnglishLight,
+  "table-empty.ka": EmptyGeorgianDark,
+  "table-error.en": DeliveriesErrorEnglishLight,
+  "table-error.ka": DeliveriesErrorGeorgianDark,
+} as const;
+
+for (const [name, story] of Object.entries(TABLE_GOLDEN)) {
   it(name, async () => {
     await expect(
       await snapshotStable(story as typeof Georgian),

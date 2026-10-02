@@ -108,6 +108,19 @@ follows docs/PLAN.md §12. One line per work package under Unreleased.
   `AgeChip`, `FrozenOverlay`). `layers` reads track age and capture-time
   order from `live` (`receivedAgeS` and `compareCapturedAt` stay as
   re-exports). No new dependency.
+- WP-9: `table` (`DataTable` on TanStack Table: a native `role="grid"`
+  table with a required caption, `aria-sort`, roving tabindex and the APG
+  keys, sorting with Shift for multi-sort and unknowns last both ways,
+  column filters, pagination, virtualisation above 200 rows, column
+  visibility and keyboard-resizable columns, sticky header, dense mode,
+  row and checkbox selection, and an empty, filtered-out, loading, error
+  with Retry-After and freshness state; `useTableUrlState` with the PII
+  deny-list kept out of the URL and malformed URL state counted; the
+  `columns` helpers `num`, `utc`, `age`, `severity`, `trust`, `ident`,
+  `enum`, `text`, `select`; `tableCounters`). No export button (01 A10).
+  @tanstack/react-table 8.21.3 (9.x exists and was not taken: its column
+  types and feature API changed, and the plan's signatures are v8's),
+  @tanstack/react-virtual 3.14.13.
 - WP-10: `form` (`Form` on react-hook-form with the zod resolver: API
   field errors from a returned `FieldError[]` or a thrown `ApiError` put
   on the field whose name matches the JSON path, the rest listed with
