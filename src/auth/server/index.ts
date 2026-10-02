@@ -14,6 +14,11 @@ export {
   type LoginResult,
 } from "../contract.js";
 export {
+  MFA_CHALLENGE_COOKIE,
+  MFA_CHALLENGE_PATH,
+  MIN_CHALLENGE_SECRET_BYTES,
+} from "./challenge.js";
+export {
   sessionClaimsUnverified,
   sessionDisplay,
   type UnverifiedSessionClaims,

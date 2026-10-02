@@ -10,8 +10,10 @@
 // password}` answers either a session `{token, expires_at, ...}` or an
 // MFA challenge `{mfa_token, expires_at, enrolment?}`, which `POST
 // <apiMfaPath>` `{mfa_token, code}` exchanges for the session. The
-// challenge never reaches the browser: the form sends `otp` with the
-// username and password, and the BFF runs both steps in one request.
+// browser sends `{username, password}` first and `{otp}` alone second.
+// Between the two, the challenge waits in the sealed, `HttpOnly`
+// `uspace_mfa` cookie (challenge.ts), so it never reaches page script
+// and the password crosses the network once.
 //
 // Nothing here logs. The login body holds a password.
 import { NextResponse, type NextRequest } from "next/server.js";
@@ -25,6 +27,14 @@ import {
   setSession,
   type SessionCookieOptions,
 } from "./cookies.js";
+import {
+  MFA_CHALLENGE_COOKIE,
+  MFA_CHALLENGE_PATH,
+  challengeKey,
+  checkChallengeSecret,
+  openChallenge,
+  sealChallenge,
+} from "./challenge.js";
 import { countAuth } from "./counters.js";
 import {
   callUpstream,
@@ -52,6 +62,12 @@ export interface BffOptions {
   apiLoginPath: string;
   /** The API's MFA step, e.g. `/v1/auth/mfa`; required when the API answers with a challenge. */
   apiMfaPath?: string;
+  /**
+   * The BFF's secret, at least 32 bytes, from the deployment's secret
+   * store (never the repository). It seals the MFA challenge cookie.
+   * Required with `apiMfaPath`.
+   */
+  mfaChallengeSecret?: string;
   /** The API's logout, e.g. `/v1/auth/logout`; when set, `logout` tells the API. */
   apiLogoutPath?: string;
   session: SessionCookieOptions;
@@ -91,15 +107,14 @@ function sameOrigin(req: NextRequest): boolean {
   }
 }
 
-interface Credentials {
-  username: string;
-  password: string;
-  otp: string | null;
-}
+/** The sign-in step a request carries: the password, or the code alone. */
+type LoginStep =
+  | { step: "password"; username: string; password: string }
+  | { step: "otp"; otp: string };
 
-async function readCredentials(
+async function readLoginStep(
   req: NextRequest,
-): Promise<Credentials | NextResponse> {
+): Promise<LoginStep | NextResponse> {
   const text = await req.text();
   if (new TextEncoder().encode(text).length > LOGIN_BODY_MAX_BYTES) {
     return problemResponse(413, "body_too_large", "Request body too large");
@@ -115,20 +130,31 @@ async function readCredentials(
       ? (body as Record<string, unknown>)
       : {};
   const errors: { field: string; reason: string }[] = [];
-  const field = (name: string, required: boolean): string | null => {
+  const refuse = (): NextResponse =>
+    problemResponse(400, "validation", "Invalid request", null, errors);
+  const present = (name: string): boolean =>
+    rec[name] !== undefined && rec[name] !== "";
+  const str = (name: string): string | null => {
     const v = rec[name];
     if (typeof v === "string" && v !== "") return v;
-    if (!required && (v === undefined || v === "")) return null;
-    errors.push({ field: name, reason: required ? "required" : "invalid" });
+    errors.push({
+      field: name,
+      reason: v === undefined || v === "" ? "required" : "invalid",
+    });
     return null;
   };
-  const username = field("username", true);
-  const password = field("password", true);
-  const otp = field("otp", false);
-  if (username === null || password === null || errors.length > 0) {
-    return problemResponse(400, "validation", "Invalid request", null, errors);
+  if (present("otp")) {
+    // The second step carries the code alone: the password went once.
+    for (const name of ["username", "password"]) {
+      if (present(name)) errors.push({ field: name, reason: "unexpected" });
+    }
+    const otp = str("otp");
+    return otp === null || errors.length > 0 ? refuse() : { step: "otp", otp };
   }
-  return { username, password, otp };
+  const username = str("username");
+  const password = str("password");
+  if (username === null || password === null) return refuse();
+  return { step: "password", username, password };
 }
 
 function noStoreJson(body: LoginResult): NextResponse {
@@ -167,6 +193,7 @@ function signedIn(
   answer: Record<string, unknown>,
   token: string,
   opts: BffOptions,
+  clearChallenge: boolean,
 ): NextResponse {
   const codes = answer["recovery_codes"];
   const result: LoginResult = { status: "signed_in" };
@@ -184,7 +211,23 @@ function signedIn(
   const session = { ...opts.session, maxAgeS };
   setSession(res, token, session);
   issueCsrf(res, session);
+  if (clearChallenge) setChallengeCookie(res, "", 0, opts);
   return res;
+}
+
+function setChallengeCookie(
+  res: NextResponse,
+  value: string,
+  maxAgeS: number,
+  opts: BffOptions,
+): void {
+  res.cookies.set(MFA_CHALLENGE_COOKIE, value, {
+    httpOnly: true,
+    secure: opts.session.secure,
+    sameSite: "strict",
+    path: MFA_CHALLENGE_PATH,
+    maxAge: maxAgeS,
+  });
 }
 
 function postJson(
@@ -202,6 +245,14 @@ function postJson(
 export function bffHandlers(opts: BffOptions): BffHandlers {
   const base = new URL(opts.apiBase);
   checkTrustedProxyHops(opts.trustedProxyHops);
+  if (opts.apiMfaPath !== undefined) {
+    checkChallengeSecret(opts.mfaChallengeSecret);
+  }
+  // Derived once; null when this API has no MFA step.
+  const key =
+    opts.apiMfaPath === undefined || opts.mfaChallengeSecret === undefined
+      ? null
+      : challengeKey(opts.mfaChallengeSecret);
 
   const login: RouteHandler = async (req) => {
     if (!sameOrigin(req)) {
@@ -212,14 +263,56 @@ export function bffHandlers(opts: BffOptions): BffHandlers {
         "Cross-origin sign-in refused",
       );
     }
-    const creds = await readCredentials(req);
-    if (creds instanceof NextResponse) return creds;
+    const step = await readLoginStep(req);
+    if (step instanceof NextResponse) return step;
+    const hadChallenge = req.cookies.get(MFA_CHALLENGE_COOKIE) !== undefined;
+
+    if (step.step === "otp") {
+      const sealed = req.cookies.get(MFA_CHALLENGE_COOKIE)?.value ?? "";
+      const challenge =
+        key === null || sealed === ""
+          ? null
+          : await openChallenge(await key, sealed, Date.now() / 1000);
+      if (challenge === null || opts.apiMfaPath === undefined) {
+        countAuth("mfa_challenge_invalid");
+        const res = problemResponse(
+          401,
+          "mfa_challenge_missing",
+          "Sign-in challenge missing or expired",
+          "the password step is missing or has expired; sign in again",
+        );
+        if (hadChallenge) setChallengeCookie(res, "", 0, opts);
+        return res;
+      }
+      const second = await callUpstream(
+        apiUrl(base, opts.apiMfaPath),
+        postJson(
+          req,
+          { mfa_token: challenge, code: step.otp },
+          opts.trustedProxyHops,
+        ),
+        opts.timeoutMs,
+        opts.fetch,
+      );
+      if (!second.ok) return second.response;
+      // A wrong code keeps the challenge: the API bounds the attempts.
+      if (!second.response.ok) return passThrough(second.response);
+      const session = await jsonOf(second.response);
+      const sessionToken = session?.["token"];
+      if (
+        session === null ||
+        typeof sessionToken !== "string" ||
+        sessionToken === ""
+      )
+        return invalidAnswer();
+      return signedIn(session, sessionToken, opts, true);
+    }
 
     const first = await callUpstream(
       apiUrl(base, opts.apiLoginPath),
       postJson(
         req,
-        { username: creds.username, password: creds.password },
+        { username: step.username, password: step.password },
         opts.trustedProxyHops,
       ),
       opts.timeoutMs,
@@ -230,47 +323,42 @@ export function bffHandlers(opts: BffOptions): BffHandlers {
     const answer = await jsonOf(first.response);
     if (answer === null) return invalidAnswer();
 
+    // Single step: an API that wants no code for this account answers
+    // the session directly.
     const token = answer["token"];
     if (typeof token === "string" && token !== "")
-      return signedIn(answer, token, opts);
+      return signedIn(answer, token, opts, hadChallenge);
 
     const challenge = answer["mfa_token"];
-    if (typeof challenge !== "string" || challenge === "")
-      return invalidAnswer();
-    if (creds.otp === null) {
-      const result: LoginResult = { status: "mfa_required" };
-      const enrolment = answer["enrolment"];
-      if (typeof enrolment === "object" && enrolment !== null) {
-        const { secret, otpauth_uri } = enrolment as Record<string, unknown>;
-        if (typeof secret === "string" && typeof otpauth_uri === "string") {
-          result.enrolment = { secret, otpauthUri: otpauth_uri };
-        }
-      }
-      return noStoreJson(result);
-    }
-    if (opts.apiMfaPath === undefined) return invalidAnswer();
-
-    const second = await callUpstream(
-      apiUrl(base, opts.apiMfaPath),
-      postJson(
-        req,
-        { mfa_token: challenge, code: creds.otp },
-        opts.trustedProxyHops,
-      ),
-      opts.timeoutMs,
-      opts.fetch,
-    );
-    if (!second.ok) return second.response;
-    if (!second.response.ok) return passThrough(second.response);
-    const session = await jsonOf(second.response);
-    const sessionToken = session?.["token"];
+    const expiresAt = answer["expires_at"];
     if (
-      session === null ||
-      typeof sessionToken !== "string" ||
-      sessionToken === ""
+      typeof challenge !== "string" ||
+      challenge === "" ||
+      typeof expiresAt !== "string" ||
+      key === null
     )
       return invalidAnswer();
-    return signedIn(session, sessionToken, opts);
+    // The cookie lives exactly as long as the API's challenge.
+    const expMs = Date.parse(expiresAt);
+    const leftS = Math.floor((expMs - Date.now()) / 1000);
+    if (!Number.isFinite(leftS) || leftS <= 0) return invalidAnswer();
+
+    const result: LoginResult = { status: "mfa_required" };
+    const enrolment = answer["enrolment"];
+    if (typeof enrolment === "object" && enrolment !== null) {
+      const { secret, otpauth_uri } = enrolment as Record<string, unknown>;
+      if (typeof secret === "string" && typeof otpauth_uri === "string") {
+        result.enrolment = { secret, otpauthUri: otpauth_uri };
+      }
+    }
+    const res = noStoreJson(result);
+    setChallengeCookie(
+      res,
+      await sealChallenge(await key, challenge, expMs / 1000),
+      leftS,
+      opts,
+    );
+    return res;
   };
 
   const logout: RouteHandler = async (req) => {

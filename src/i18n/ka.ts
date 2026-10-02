@@ -181,4 +181,5 @@ export const ka: Readonly<Record<Key, string>> = {
   "auth.recovery_codes":
     "აღდგენის კოდები: თითოეული მუშაობს ერთხელ, ერთჯერადი კოდის ნაცვლად. შეინახეთ ისინი ახლავე; ისინი აღარ გამოჩნდება.",
   "auth.continue": "გაგრძელება",
+  "auth.restart": "თავიდან დაწყება",
 };

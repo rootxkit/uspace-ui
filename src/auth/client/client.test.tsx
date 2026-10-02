@@ -230,7 +230,7 @@ describe("LoginForm", () => {
     );
   });
 
-  it("asks for the one-time code, keeps the password, then sends all three", async () => {
+  it("sends the password once: the code goes alone in a second request", async () => {
     const s = stub(
       answer(200, { status: "mfa_required" }),
       answer(200, { status: "signed_in" }),
@@ -239,17 +239,98 @@ describe("LoginForm", () => {
     fill(/username/i, USER);
     fill(/^password$/i, PASSWORD);
     await submit();
+    expect(JSON.parse(String(s.calls[0]?.init.body))).toEqual({
+      username: USER,
+      password: PASSWORD,
+    });
     expect(screen.getByRole("status").textContent).toMatch(/one-time code/);
-    expect(password().value).toBe(PASSWORD);
+    // The password field and its value are gone once the first step passed.
+    expect(screen.queryByLabelText(/^password$/i)).toBeNull();
     expect(screen.queryByTestId("enrolment")).toBeNull();
     fill(/one-time code/i, "000000");
     await submit();
     expect(JSON.parse(String(s.calls[1]?.init.body))).toEqual({
-      username: USER,
-      password: PASSWORD,
       otp: "000000",
     });
+    expect(String(s.calls[1]?.init.body)).not.toContain(PASSWORD);
     expect(onSuccess).toHaveBeenCalledTimes(1);
+  });
+
+  it("with the code typed up front, still sends the password and the code in separate requests", async () => {
+    const s = stub(
+      answer(200, { status: "mfa_required" }),
+      answer(200, { status: "signed_in" }),
+    );
+    const onSuccess = renderForm(s.fetch, vi.fn(), true);
+    fill(/username/i, USER);
+    fill(/^password$/i, PASSWORD);
+    fill(/one-time code/i, "000000");
+    await submit();
+    expect(s.calls.map((c) => JSON.parse(String(c.init.body)))).toEqual([
+      { username: USER, password: PASSWORD },
+      { otp: "000000" },
+    ]);
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+  });
+
+  it("an API without MFA signs in with one request (the single-step twin)", async () => {
+    const s = stub(answer(200, { status: "signed_in" }));
+    const onSuccess = renderForm(s.fetch, vi.fn(), true);
+    fill(/username/i, USER);
+    fill(/^password$/i, PASSWORD);
+    fill(/one-time code/i, "000000");
+    await submit();
+    expect(s.calls).toHaveLength(1);
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+  });
+
+  it("a refused code stays on the code step and clears the code", async () => {
+    const s = stub(
+      answer(200, { status: "mfa_required" }),
+      answer(401, refusal(401, "TEST: wrong code")),
+    );
+    renderForm(s.fetch);
+    fill(/username/i, USER);
+    fill(/^password$/i, PASSWORD);
+    await submit();
+    fill(/one-time code/i, "000000");
+    await submit();
+    expect(screen.getByRole("alert").textContent).toBe("TEST: wrong code");
+    expect(
+      (screen.getByLabelText(/one-time code/i) as HTMLInputElement).value,
+    ).toBe("");
+    expect(screen.queryByLabelText(/^password$/i)).toBeNull();
+  });
+
+  it("a missing or expired challenge goes back to the password step", async () => {
+    const s = stub(
+      answer(200, { status: "mfa_required" }),
+      answer(401, {
+        ...(refusal(401, "TEST: sign in again") as object),
+        type: "https://schemas.uspace.ge/problems/mfa_challenge_missing",
+      }),
+    );
+    renderForm(s.fetch);
+    fill(/username/i, USER);
+    fill(/^password$/i, PASSWORD);
+    await submit();
+    fill(/one-time code/i, "000000");
+    await submit();
+    expect(screen.getByRole("alert").textContent).toBe("TEST: sign in again");
+    expect(password().value).toBe("");
+    expect(screen.queryByLabelText(/one-time code/i)).toBeNull();
+  });
+
+  it("Start again returns to the password step", async () => {
+    const s = stub(answer(200, { status: "mfa_required" }));
+    renderForm(s.fetch);
+    fill(/username/i, USER);
+    fill(/^password$/i, PASSWORD);
+    await submit();
+    fireEvent.click(screen.getByRole("button", { name: /start again/i }));
+    expect(password().value).toBe("");
+    expect(screen.queryByLabelText(/one-time code/i)).toBeNull();
+    expect(screen.queryByRole("button", { name: /start again/i })).toBeNull();
   });
 
   it("shows the authenticator key while the account enrols", async () => {

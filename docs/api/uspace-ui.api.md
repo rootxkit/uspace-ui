@@ -246,6 +246,9 @@ declare namespace auth_server {
         SESSION_COOKIE,
         isUnsafeMethod,
         LoginResult,
+        MFA_CHALLENGE_COOKIE,
+        MFA_CHALLENGE_PATH,
+        MIN_CHALLENGE_SECRET_BYTES,
         sessionClaimsUnverified,
         sessionDisplay,
         UnverifiedSessionClaims,
@@ -296,7 +299,9 @@ type AuthCounter =
 /** A 2xx sign-in answer without a token or a challenge the BFF knows. */
 | "login_answer_invalid"
 /** No client address: the forwarded chain was shorter than the trusted hops, or not an IP. */
-| "client_address_unknown";
+| "client_address_unknown"
+/** A one-time code sent without a live sealed challenge (absent, altered, expired). */
+| "mfa_challenge_invalid";
 
 // @public
 function authCounters(): Readonly<Record<AuthCounter, number>>;
@@ -403,6 +408,7 @@ interface BffOptions {
     apiLogoutPath?: string;
     apiMfaPath?: string;
     fetch?: typeof fetch;
+    mfaChallengeSecret?: string;
     // (undocumented)
     session: SessionCookieOptions;
     timeoutMs: number;
@@ -1470,6 +1476,15 @@ interface MapViewProps {
     // (undocumented)
     scheme: MapScheme;
 }
+
+// @public
+const MFA_CHALLENGE_COOKIE = "uspace_mfa";
+
+// @public
+const MFA_CHALLENGE_PATH = "/_bff";
+
+// @public
+const MIN_CHALLENGE_SECRET_BYTES = 32;
 
 // @public
 function missingKeys(): number;

@@ -194,6 +194,7 @@ const catalogue = {
   "auth.recovery_codes":
     "Recovery codes: each works once, in place of a one-time code. Store them now; they are not shown again.",
   "auth.continue": "Continue",
+  "auth.restart": "Start again",
 } as const;
 
 /** A key of the kit's own catalogue. Apps add keys of their own. */

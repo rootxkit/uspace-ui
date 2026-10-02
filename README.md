@@ -119,6 +119,7 @@ export const bff = bffHandlers({
   apiBase: process.env.API_INTERNAL_URL!, // the API as the web container reaches it
   apiLoginPath: "/v1/auth/login",
   apiMfaPath: "/v1/auth/mfa", // the API's second sign-in step, when it has one
+  mfaChallengeSecret: process.env.BFF_SECRET!, // >= 32 bytes, from the secret store; seals the MFA challenge cookie
   apiLogoutPath: "/v1/auth/logout",
   session: { secure: true, maxAgeS: 12 * 3600 },
   allowPaths: [/^\/v1\/(zones|restrictions)(\/|$)/], // what the console may reach
@@ -155,11 +156,18 @@ const nonce = (await headers()).get(CSP_NONCE_HEADER) ?? undefined;
 // <CspNonceProvider nonce={nonce}><SessionProvider session={session}>...</SessionProvider></CspNonceProvider>
 ```
 
-Sign-in is `<LoginForm action="/_bff/login" onSuccess={...} />`. When
-the API answers the password with an MFA challenge, the BFF keeps the
-challenge to itself and the form asks for the one-time code; the next
-submit carries username, password and code, and the BFF runs both API
-steps. A refusal shows the API's `detail`, and a `429` counts its
+Sign-in is `<LoginForm action="/_bff/login" onSuccess={...} />`. The
+first request carries `{username, password}`. When the API answers with
+an MFA challenge, the BFF seals it with `mfaChallengeSecret`
+(AES-256-GCM, HKDF-derived key) into the `uspace_mfa` cookie: `HttpOnly;
+Secure; SameSite=Strict; Path=/_bff`, with `Max-Age` equal to the
+challenge's own expiry, which is checked again when the cookie is
+opened. The form drops the password from its state and asks for the
+code, and the second request carries `{otp}` alone. The password
+crosses the network once, and the challenge never reaches page script.
+An API that wants no code answers the session on the first request.
+A code sent without a live challenge gets `401 mfa_challenge_missing`
+and the form starts again. A refusal shows the API's `detail`, and a `429` counts its
 `Retry-After` down. `RequireRole` hides what a role does not use; it
 grants nothing.
 

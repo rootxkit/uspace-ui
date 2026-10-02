@@ -1,7 +1,8 @@
 // bffHandlers (WP-5): exactly three routes, sign-in against the API's own
-// two steps (the authority's /v1/auth/login and /v1/auth/mfa), cookies
-// set on success and never on a refusal (E-01 pairs), no credential in
-// any log line, logout and the proxy's path mapping.
+// two steps (the authority's /v1/auth/login and /v1/auth/mfa) with the
+// challenge sealed in a cookie between them and the password sent once,
+// cookies set on success and never on a refusal (E-01 pairs), no
+// credential in any log line, logout and the proxy's path mapping.
 import {
   afterEach,
   beforeEach,
@@ -12,6 +13,7 @@ import {
   vi,
 } from "vitest";
 
+import { challengeKey, openChallenge } from "./challenge.js";
 import { authCounters, resetAuthCountersForTests } from "./counters.js";
 import {
   bffHandlers,
@@ -34,6 +36,8 @@ import {
 const LOGIN = "/v1/auth/login";
 const MFA = "/v1/auth/mfa";
 const LOGOUT = "/v1/auth/logout";
+/** A fixture of the BFF secret: 32 bytes, never a real one. */
+const BFF_SECRET = "TEST".repeat(8);
 
 function handlers(
   f: typeof fetch,
@@ -44,6 +48,7 @@ function handlers(
     apiBase: API,
     apiLoginPath: LOGIN,
     apiMfaPath: MFA,
+    mfaChallengeSecret: BFF_SECRET,
     apiLogoutPath: LOGOUT,
     session: SESSION,
     allowPaths: [/^\/v1\/zones(\/|$)/],
@@ -62,18 +67,39 @@ const HOST = new URL(ORIGIN).host;
 function loginRequest(
   body: unknown,
   headers: Record<string, string> = { Origin: ORIGIN, Host: HOST },
+  cookies?: Record<string, string>,
 ) {
   return request("/_bff/login", {
     method: "POST",
     headers: { "Content-Type": "application/json", ...headers },
     body: JSON.stringify(body),
+    ...(cookies === undefined ? {} : { cookies }),
   });
 }
 
+/** The second step as the form sends it: the code alone, with the sealed challenge. */
+function otpRequest(sealed: string | null, otp: string = FIXTURE.otp) {
+  return loginRequest(
+    { otp },
+    { Origin: ORIGIN, Host: HOST },
+    sealed === null ? {} : { uspace_mfa: sealed },
+  );
+}
+
+/** Runs the password step and returns the sealed challenge it set. */
+async function passwordStep(h: BffHandlers): Promise<string> {
+  const res = await h.login(loginRequest(CREDENTIALS));
+  expect(await res.json()).toMatchObject({ status: "mfa_required" });
+  const sealed = setCookies(res).get("uspace_mfa")?.value;
+  expect(sealed).toBeTruthy();
+  return sealed ?? "";
+}
+
 const CREDENTIALS = { username: FIXTURE.username, password: FIXTURE.password };
+const CHALLENGE_TTL_S = 300;
 const CHALLENGE = {
   mfa_token: FIXTURE.mfaToken,
-  expires_at: "2099-01-01T00:00:00Z",
+  expires_at: new Date(Date.now() + CHALLENGE_TTL_S * 1000).toISOString(),
 };
 const FAR = new Date(Date.now() + 12 * 3600 * 1000).toISOString();
 const ISSUED = {
@@ -157,7 +183,7 @@ describe("login", () => {
     expect(res.headers.getSetCookie()).toEqual([]);
   });
 
-  it("asks for the one-time code without sending the challenge to the browser", async () => {
+  it("asks for the code, sealing the challenge in an HttpOnly cookie on /_bff for its lifetime", async () => {
     const stub = stubFetch(() =>
       json(200, {
         ...CHALLENGE,
@@ -178,8 +204,32 @@ describe("login", () => {
         otpauthUri: "otpauth://totp/TEST",
       },
     });
-    expect(res.headers.getSetCookie()).toEqual([]);
+    const jar = setCookies(res);
+    expect([...jar.keys()]).toEqual(["uspace_mfa"]);
+    const c = jar.get("uspace_mfa");
+    expect(c?.attrs["httponly"]).toBe(true);
+    expect(c?.attrs["secure"]).toBe(true);
+    expect(c?.attrs["samesite"]).toBe("strict");
+    expect(c?.attrs["path"]).toBe("/_bff");
+    const maxAge = Number(c?.attrs["max-age"]);
+    expect(maxAge).toBeGreaterThan(CHALLENGE_TTL_S - 5);
+    expect(maxAge).toBeLessThanOrEqual(CHALLENGE_TTL_S);
     expect(stub.calls).toHaveLength(1);
+  });
+
+  it("seals the challenge: the cookie value hides it, and only the BFF secret opens it", async () => {
+    const sealed = await passwordStep(
+      handlers(stubFetch(() => json(200, CHALLENGE)).fetch),
+    );
+    expect(sealed).not.toContain(FIXTURE.mfaToken);
+    expect(sealed).not.toContain(btoa(FIXTURE.mfaToken).slice(0, 12));
+    const now = Date.now() / 1000;
+    expect(
+      await openChallenge(await challengeKey(BFF_SECRET), sealed, now),
+    ).toBe(FIXTURE.mfaToken);
+    expect(
+      await openChallenge(await challengeKey("OTHER".repeat(8)), sealed, now),
+    ).toBeNull();
   });
 
   it("asks for the code without enrolment once the account has an authenticator", async () => {
@@ -188,40 +238,139 @@ describe("login", () => {
     expect(await res.json()).toEqual({ status: "mfa_required" });
   });
 
-  it("with otp runs both steps: the challenge and the code to the MFA path, then the cookies", async () => {
+  it("sends the password once: the second step carries only the code and the sealed challenge", async () => {
     const stub = stubFetch((url) =>
       url.endsWith(LOGIN)
         ? json(200, CHALLENGE)
         : json(200, { ...ISSUED, recovery_codes: ["TEST-RC-1", "TEST-RC-2"] }),
     );
-    const res = await handlers(stub.fetch).login(
-      loginRequest({ ...CREDENTIALS, otp: FIXTURE.otp }),
-    );
+    const h = handlers(stub.fetch);
+    const sealed = await passwordStep(h);
+    const res = await h.login(otpRequest(sealed));
     expect(stub.calls.map((c) => c.url)).toEqual([
       `${API}${LOGIN}`,
       `${API}${MFA}`,
     ]);
+    expect(JSON.parse(stub.calls[0]?.body ?? "")).toEqual(CREDENTIALS);
     expect(JSON.parse(stub.calls[1]?.body ?? "")).toEqual({
       mfa_token: FIXTURE.mfaToken,
       code: FIXTURE.otp,
     });
+    // The password reached the API in the first call and in no other.
+    const withPassword = stub.calls.filter((c) =>
+      (c.body ?? "").includes(FIXTURE.password),
+    );
+    expect(withPassword).toHaveLength(1);
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({
       status: "signed_in",
       recoveryCodes: ["TEST-RC-1", "TEST-RC-2"],
     });
-    expect(setCookies(res).get("uspace_session")?.value).toBe(FIXTURE.jwt);
+    const jar = setCookies(res);
+    expect(jar.get("uspace_session")?.value).toBe(FIXTURE.jwt);
+    // The used challenge is cleared.
+    expect(jar.get("uspace_mfa")?.attrs["max-age"]).toBe("0");
+    expect(jar.get("uspace_mfa")?.attrs["path"]).toBe("/_bff");
   });
 
-  it("on a refused code passes the problem through and sets no cookie", async () => {
-    const stub = stubFetch((url) =>
-      url.endsWith(LOGIN) ? json(200, CHALLENGE) : problem(401, "mfa_refused"),
-    );
+  it("refuses the password and the code together: the password goes in the first step only", async () => {
+    const stub = stubFetch(() => json(200, ISSUED));
     const res = await handlers(stub.fetch).login(
       loginRequest({ ...CREDENTIALS, otp: FIXTURE.otp }),
     );
+    expect(res.status).toBe(400);
+    expect(await res.json()).toMatchObject({
+      errors: [
+        { field: "username", reason: "unexpected" },
+        { field: "password", reason: "unexpected" },
+      ],
+    });
+    expect(stub.fn).not.toHaveBeenCalled();
+  });
+
+  it("keeps single-step sign-in when the API wants no code: no challenge cookie", async () => {
+    const stub = stubFetch(() => json(200, ISSUED));
+    const res = await handlers(stub.fetch).login(loginRequest(CREDENTIALS));
+    expect(await res.json()).toEqual({ status: "signed_in" });
+    const jar = setCookies(res);
+    expect(jar.get("uspace_session")?.value).toBe(FIXTURE.jwt);
+    expect(jar.has("uspace_mfa")).toBe(false);
+    expect(stub.calls).toHaveLength(1);
+  });
+
+  it("works without apiMfaPath and a secret for an API that has no MFA step", async () => {
+    const stub = stubFetch(() => json(200, ISSUED));
+    const h = handlers(stub.fetch, {}, ["apiMfaPath"]);
+    expect((await h.login(loginRequest(CREDENTIALS))).status).toBe(200);
+  });
+
+  it("refuses a code without a live challenge with 401, and never calls the API", async () => {
+    const stub = stubFetch((url) =>
+      url.endsWith(LOGIN) ? json(200, CHALLENGE) : json(200, ISSUED),
+    );
+    const h = handlers(stub.fetch);
+    const sealed = await passwordStep(h);
+    const tampered = `${sealed.slice(0, -2)}${sealed.endsWith("AA") ? "BB" : "AA"}`;
+    const foreign = await passwordStep(
+      handlers(stubFetch(() => json(200, CHALLENGE)).fetch, {
+        mfaChallengeSecret: "OTHER".repeat(8),
+      }),
+    );
+    const calls = stub.calls.length;
+    for (const cookie of [null, "", "garbage", "a.b.c", tampered, foreign]) {
+      const res = await h.login(otpRequest(cookie));
+      expect(res.status, String(cookie)).toBe(401);
+      expect(await res.json()).toMatchObject({
+        type: "https://schemas.uspace.ge/problems/mfa_challenge_missing",
+      });
+      expect(setCookies(res).has("uspace_session")).toBe(false);
+    }
+    expect(stub.calls).toHaveLength(calls);
+    expect(authCounters().mfa_challenge_invalid).toBe(6);
+  });
+
+  it("refuses a challenge past its expiry even if the browser still sends the cookie", async () => {
+    const stub = stubFetch((url) =>
+      url.endsWith(LOGIN) ? json(200, CHALLENGE) : json(200, ISSUED),
+    );
+    const h = handlers(stub.fetch);
+    const sealed = await passwordStep(h);
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(Date.now() + (CHALLENGE_TTL_S + 1) * 1000);
+    const late = await h.login(otpRequest(sealed));
+    expect(late.status).toBe(401);
+    expect(setCookies(late).get("uspace_mfa")?.attrs["max-age"]).toBe("0");
+    vi.useRealTimers();
+    // The twin: the same cookie inside its lifetime is accepted.
+    const inTime = await h.login(otpRequest(sealed));
+    expect(inTime.status).toBe(200);
+    expect(stub.calls.map((c) => c.url)).toEqual([
+      `${API}${LOGIN}`,
+      `${API}${MFA}`,
+    ]);
+  });
+
+  it("on a refused code passes the problem through, sets no session and keeps the challenge", async () => {
+    const stub = stubFetch((url) =>
+      url.endsWith(LOGIN) ? json(200, CHALLENGE) : problem(401, "mfa_refused"),
+    );
+    const h = handlers(stub.fetch);
+    const res = await h.login(otpRequest(await passwordStep(h)));
     expect(res.status).toBe(401);
     expect(res.headers.getSetCookie()).toEqual([]);
+  });
+
+  it("refuses to build with apiMfaPath but no secret, or a short one", () => {
+    const f = stubFetch(() => json(200, {})).fetch;
+    expect(() => handlers(f, {}, ["mfaChallengeSecret"] as never)).toThrow(
+      RangeError,
+    );
+    expect(() => handlers(f, { mfaChallengeSecret: "TEST".repeat(7) })).toThrow(
+      /at least 32 bytes/,
+    );
+    expect(() =>
+      handlers(f, { mfaChallengeSecret: "TEST".repeat(8) }),
+    ).not.toThrow();
   });
 
   it("keeps the cookie no longer than the session the API issued", async () => {
@@ -285,7 +434,7 @@ describe("login", () => {
       }),
     );
     expect(notJson.status).toBe(400);
-    const badOtp = await h.login(loginRequest({ ...CREDENTIALS, otp: 123456 }));
+    const badOtp = await h.login(loginRequest({ otp: 123456 }));
     expect(await badOtp.json()).toMatchObject({
       errors: [{ field: "otp", reason: "invalid" }],
     });
@@ -308,19 +457,29 @@ describe("login", () => {
       stubFetch(() => new Response("ok")).fetch,
     ).login(loginRequest(CREDENTIALS));
     expect(notJson.status).toBe(502);
+    // A challenge to an API configured without an MFA step.
     const noMfaPath = await handlers(
       stubFetch(() => json(200, CHALLENGE)).fetch,
       {},
       ["apiMfaPath"],
-    ).login(loginRequest({ ...CREDENTIALS, otp: FIXTURE.otp }));
+    ).login(loginRequest(CREDENTIALS));
     expect(noMfaPath.status).toBe(502);
-    const badSession = await handlers(
-      stubFetch((url) =>
-        url.endsWith(LOGIN) ? json(200, CHALLENGE) : json(200, {}),
-      ).fetch,
-    ).login(loginRequest({ ...CREDENTIALS, otp: FIXTURE.otp }));
+    // A challenge without, or past, its expiry.
+    for (const expires_at of [undefined, "soon", "2000-01-01T00:00:00Z"]) {
+      const res = await handlers(
+        stubFetch(() => json(200, { mfa_token: FIXTURE.mfaToken, expires_at }))
+          .fetch,
+      ).login(loginRequest(CREDENTIALS));
+      expect(res.status).toBe(502);
+      expect(res.headers.getSetCookie()).toEqual([]);
+    }
+    const badStub = stubFetch((url) =>
+      url.endsWith(LOGIN) ? json(200, CHALLENGE) : json(200, {}),
+    );
+    const bad = handlers(badStub.fetch);
+    const badSession = await bad.login(otpRequest(await passwordStep(bad)));
     expect(badSession.status).toBe(502);
-    expect(authCounters().login_answer_invalid).toBe(5);
+    expect(authCounters().login_answer_invalid).toBe(8);
   });
 
   it("answers 504 when the API does not answer, and sets no cookie", async () => {
@@ -339,9 +498,8 @@ describe("login", () => {
       String(u).endsWith(LOGIN)
         ? Promise.resolve(json(200, CHALLENGE))
         : hang(u, init)) as typeof fetch;
-    const res2 = await handlers(mfaHang, { timeoutMs: 20 }).login(
-      loginRequest({ ...CREDENTIALS, otp: FIXTURE.otp }),
-    );
+    const h2 = handlers(mfaHang, { timeoutMs: 20 });
+    const res2 = await h2.login(otpRequest(await passwordStep(h2)));
     expect(res2.status).toBe(504);
   });
 
@@ -379,9 +537,10 @@ describe("login", () => {
       () => Promise.reject(new TypeError("fetch failed")),
     ];
     for (const answer of answers) {
-      for (const body of [CREDENTIALS, { ...CREDENTIALS, otp: FIXTURE.otp }]) {
-        await handlers(stubFetch(answer).fetch).login(loginRequest(body));
-      }
+      const h = handlers(stubFetch(answer).fetch);
+      const first = await h.login(loginRequest(CREDENTIALS));
+      const sealed = setCookies(first).get("uspace_mfa")?.value ?? null;
+      await h.login(otpRequest(sealed));
     }
     const logged = JSON.stringify(spies.flatMap((s) => s.mock.calls));
     for (const secret of [
