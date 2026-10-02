@@ -159,11 +159,13 @@ const nonce = (await headers()).get(CSP_NONCE_HEADER) ?? undefined;
 Sign-in is `<LoginForm action="/_bff/login" onSuccess={...} />`. The
 first request carries `{username, password}`. When the API answers with
 an MFA challenge, the BFF seals it with `mfaChallengeSecret`
-(AES-256-GCM, HKDF-derived key) into the `uspace_mfa` cookie: `HttpOnly;
+(AES-256-GCM, HKDF-derived key), together with the username, into the
+`uspace_mfa` cookie: `HttpOnly;
 Secure; SameSite=Strict; Path=/_bff`, with `Max-Age` equal to the
 challenge's own expiry, which is checked again when the cookie is
 opened. The form drops the password from its state and asks for the
-code, and the second request carries `{otp}` alone. The password
+code, and the second request carries `{username, otp}`; a challenge
+opens only for the username it was issued to. The password
 crosses the network once, and the challenge never reaches page script.
 An API that wants no code answers the session on the first request.
 A code sent without a live challenge gets `401 mfa_challenge_missing`

@@ -37,7 +37,7 @@ export function isUnsafeMethod(method: string): boolean {
  * - `signed_in`: the cookies are set. `recoveryCodes` are present once,
  *   at the sign-in that confirms MFA enrolment, and must be shown then.
  * - `mfa_required`: the password was accepted and the API asks for a
- *   one-time code; send `{otp}` alone next. The BFF holds the API's
+ *   one-time code; send `{username, otp}` next, without the password. The BFF holds the API's
  *   challenge in the sealed `HttpOnly` `uspace_mfa` cookie (`Path=/_bff`)
  *   until then, so the password is sent once. `enrolment` is present
  *   while the account has no confirmed authenticator.

@@ -79,10 +79,14 @@ function loginRequest(
   });
 }
 
-/** The second step as the form sends it: the code alone, with the sealed challenge. */
-function otpRequest(sealed: string | null, otp: string = FIXTURE.otp) {
+/** The second step as the form sends it: username and code, with the sealed challenge. */
+function otpRequest(
+  sealed: string | null,
+  otp: string = FIXTURE.otp,
+  username: string = FIXTURE.username,
+) {
   return loginRequest(
-    { otp },
+    { username, otp },
     { Origin: ORIGIN, Host: HOST },
     sealed === null ? {} : { uspace_mfa: sealed },
   );
@@ -249,10 +253,20 @@ describe("login", () => {
     expect(sealed).not.toContain(btoa(FIXTURE.mfaToken).slice(0, 12));
     const now = Date.now() / 1000;
     expect(
-      await openChallenge(await challengeKey(BFF_SECRET), sealed, now),
+      await openChallenge(
+        await challengeKey(BFF_SECRET),
+        sealed,
+        FIXTURE.username,
+        now,
+      ),
     ).toBe(FIXTURE.mfaToken);
     expect(
-      await openChallenge(await challengeKey("OTHER".repeat(8)), sealed, now),
+      await openChallenge(
+        await challengeKey("OTHER".repeat(8)),
+        sealed,
+        FIXTURE.username,
+        now,
+      ),
     ).toBeNull();
   });
 
@@ -304,10 +318,7 @@ describe("login", () => {
     );
     expect(res.status).toBe(400);
     expect(await res.json()).toMatchObject({
-      errors: [
-        { field: "username", reason: "unexpected" },
-        { field: "password", reason: "unexpected" },
-      ],
+      errors: [{ field: "password", reason: "unexpected" }],
     });
     expect(stub.fn).not.toHaveBeenCalled();
   });
@@ -351,6 +362,39 @@ describe("login", () => {
     }
     expect(stub.calls).toHaveLength(calls);
     expect(authCounters().mfa_challenge_invalid).toBe(6);
+  });
+
+  it("binds the challenge to the username: another username cannot use it", async () => {
+    const stub = stubFetch((url) =>
+      url.endsWith(LOGIN) ? json(200, CHALLENGE) : json(200, ISSUED),
+    );
+    const h = handlers(stub.fetch);
+    const sealed = await passwordStep(h);
+    const other = await h.login(
+      otpRequest(sealed, FIXTURE.otp, "TEST-user-02"),
+    );
+    expect(other.status).toBe(401);
+    expect(await other.json()).toMatchObject({
+      type: "https://schemas.uspace.ge/problems/mfa_challenge_missing",
+    });
+    expect(stub.calls).toHaveLength(1);
+    const noUser = await h.login(
+      loginRequest({ otp: FIXTURE.otp }, undefined, { uspace_mfa: sealed }),
+    );
+    expect(noUser.status).toBe(400);
+    expect(await noUser.json()).toMatchObject({
+      errors: [{ field: "username", reason: "required" }],
+    });
+    // The twin: the username of the password step opens it.
+    const same = await h.login(otpRequest(sealed));
+    expect(same.status).toBe(200);
+    expect(stub.calls).toHaveLength(2);
+    const key = await challengeKey(BFF_SECRET);
+    const now = Date.now() / 1000;
+    expect(await openChallenge(key, sealed, "TEST-user-02", now)).toBeNull();
+    expect(await openChallenge(key, sealed, FIXTURE.username, now)).toBe(
+      FIXTURE.mfaToken,
+    );
   });
 
   it("refuses a challenge past its expiry even if the browser still sends the cookie", async () => {
@@ -524,7 +568,9 @@ describe("login", () => {
       }),
     );
     expect(notJson.status).toBe(400);
-    const badOtp = await h.login(loginRequest({ otp: 123456 }));
+    const badOtp = await h.login(
+      loginRequest({ username: FIXTURE.username, otp: 123456 }),
+    );
     expect(await badOtp.json()).toMatchObject({
       errors: [{ field: "otp", reason: "invalid" }],
     });

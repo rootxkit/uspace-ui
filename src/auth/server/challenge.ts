@@ -5,7 +5,8 @@
 // derived with HKDF-SHA-256). The second step then carries only the code,
 // so the password crosses the network once.
 //
-// The seal holds the challenge and its expiry. The expiry is the API's
+// The seal holds the challenge, the username it was issued to, and its
+// expiry; the second step must name the same username to open it. The expiry is the API's
 // `expires_at` and is checked on open as well as set as the cookie's
 // `Max-Age`, so a replayed cookie value dies with the challenge. The kit
 // sets no lifetime of its own. Web Crypto only, so it runs on Node.js and
@@ -66,15 +67,19 @@ function fromBase64url(s: string): Uint8Array<ArrayBuffer> | null {
   return Uint8Array.from(bin, (c) => c.charCodeAt(0));
 }
 
-/** Seals the challenge and its expiry (seconds since the epoch). */
+/**
+ * Seals the challenge, the username of the password step that earned it,
+ * and its expiry (seconds since the epoch).
+ */
 export async function sealChallenge(
   key: CryptoKey,
   token: string,
+  username: string,
   expS: number,
 ): Promise<string> {
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const plain = new TextEncoder().encode(
-    JSON.stringify({ t: token, exp: expS }),
+    JSON.stringify({ t: token, u: username, exp: expS }),
   );
   const sealed = await crypto.subtle.encrypt(
     { name: "AES-GCM", iv, additionalData: AAD },
@@ -86,11 +91,13 @@ export async function sealChallenge(
 
 /**
  * The challenge in a sealed value, or `null` when the value is malformed,
- * was sealed under another secret, was altered, or has expired at `nowS`.
+ * was sealed under another secret, was altered, was issued to another
+ * username than `username`, or has expired at `nowS`.
  */
 export async function openChallenge(
   key: CryptoKey,
   value: string,
+  username: string,
   nowS: number,
 ): Promise<string | null> {
   const [ivPart = "", ctPart = "", ...rest] = value.split(".");
@@ -111,7 +118,8 @@ export async function openChallenge(
     return null;
   }
   if (typeof payload !== "object" || payload === null) return null;
-  const { t, exp } = payload as { t?: unknown; exp?: unknown };
+  const { t, u, exp } = payload as { t?: unknown; u?: unknown; exp?: unknown };
   if (typeof t !== "string" || t === "" || typeof exp !== "number") return null;
+  if (typeof u !== "string" || u !== username) return null;
   return nowS < exp ? t : null;
 }

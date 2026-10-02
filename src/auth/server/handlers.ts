@@ -10,7 +10,7 @@
 // password}` answers either a session `{token, expires_at, ...}` or an
 // MFA challenge `{mfa_token, expires_at, enrolment?}`, which `POST
 // <apiMfaPath>` `{mfa_token, code}` exchanges for the session. The
-// browser sends `{username, password}` first and `{otp}` alone second.
+// browser sends `{username, password}` first and `{username, otp}` second.
 // Between the two, the challenge waits in the sealed, `HttpOnly`
 // `uspace_mfa` cookie (challenge.ts), so it never reaches page script
 // and the password crosses the network once.
@@ -201,7 +201,7 @@ export async function readBounded(
 /** The sign-in step a request carries: the password, or the code alone. */
 type LoginStep =
   | { step: "password"; username: string; password: string }
-  | { step: "otp"; otp: string };
+  | { step: "otp"; username: string; otp: string };
 
 async function readLoginStep(
   req: NextRequest,
@@ -235,12 +235,16 @@ async function readLoginStep(
     return null;
   };
   if (present("otp")) {
-    // The second step carries the code alone: the password went once.
-    for (const name of ["username", "password"]) {
-      if (present(name)) errors.push({ field: name, reason: "unexpected" });
+    // The second step carries the username the challenge is bound to and
+    // the code, never the password: the password went once.
+    if (present("password")) {
+      errors.push({ field: "password", reason: "unexpected" });
     }
+    const username = str("username");
     const otp = str("otp");
-    return otp === null || errors.length > 0 ? refuse() : { step: "otp", otp };
+    return username === null || otp === null || errors.length > 0
+      ? refuse()
+      : { step: "otp", username, otp };
   }
   const username = str("username");
   const password = str("password");
@@ -368,7 +372,12 @@ export function bffHandlers(opts: BffOptions): BffHandlers {
       const challenge =
         key === null || sealed === ""
           ? null
-          : await openChallenge(await key, sealed, Date.now() / 1000);
+          : await openChallenge(
+              await key,
+              sealed,
+              step.username,
+              Date.now() / 1000,
+            );
       if (challenge === null || opts.apiMfaPath === undefined) {
         countAuth("mfa_challenge_invalid");
         const res = problemResponse(
@@ -450,7 +459,7 @@ export function bffHandlers(opts: BffOptions): BffHandlers {
     const res = noStoreJson(result);
     setChallengeCookie(
       res,
-      await sealChallenge(await key, challenge, expMs / 1000),
+      await sealChallenge(await key, challenge, step.username, expMs / 1000),
       leftS,
       opts,
     );

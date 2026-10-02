@@ -8,7 +8,7 @@
 // button disabled until it reaches zero.
 //
 // Two steps when the API asks for a one-time code: the first request
-// carries `{username, password}`, the second `{otp}` alone. The BFF keeps
+// carries `{username, password}`, the second `{username, otp}`. The BFF keeps
 // the API's challenge in an `HttpOnly` cookie between them, and the form
 // drops the password from its state as soon as the first step succeeds.
 import {
@@ -161,13 +161,14 @@ export function LoginForm(props: LoginFormProps): ReactNode {
     setMessage(null);
     try {
       if (step === "otp") {
-        await send({ otp }, "otp");
+        await send({ username, otp }, "otp");
         return;
       }
       const outcome = await send({ username, password }, "password");
       // An MFA-only console may have the code typed already: send it
       // alone, as the second step.
-      if (outcome === "mfa_required" && otp !== "") await send({ otp }, "otp");
+      if (outcome === "mfa_required" && otp !== "")
+        await send({ username, otp }, "otp");
     } finally {
       setBusy(false);
     }

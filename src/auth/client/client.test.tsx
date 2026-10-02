@@ -230,7 +230,7 @@ describe("LoginForm", () => {
     );
   });
 
-  it("sends the password once: the code goes alone in a second request", async () => {
+  it("sends the password once: the second request carries the username and the code", async () => {
     const s = stub(
       answer(200, { status: "mfa_required" }),
       answer(200, { status: "signed_in" }),
@@ -250,6 +250,7 @@ describe("LoginForm", () => {
     fill(/one-time code/i, "000000");
     await submit();
     expect(JSON.parse(String(s.calls[1]?.init.body))).toEqual({
+      username: USER,
       otp: "000000",
     });
     expect(String(s.calls[1]?.init.body)).not.toContain(PASSWORD);
@@ -268,7 +269,7 @@ describe("LoginForm", () => {
     await submit();
     expect(s.calls.map((c) => JSON.parse(String(c.init.body)))).toEqual([
       { username: USER, password: PASSWORD },
-      { otp: "000000" },
+      { username: USER, otp: "000000" },
     ]);
     expect(onSuccess).toHaveBeenCalledTimes(1);
   });
