@@ -105,6 +105,14 @@ Each is one inserted line, re-applied by hand after step 3:
   which the kit's `exactOptionalPropertyTypes` refuses. If upstream fixes
   it, `tsc` reports the directive as unused and the line is dropped.
 
+- `scroll-area.tsx`, three lines (WP-5): `import { useCspNonce } from
+"./extra/CspNonce.js"`, `const nonce = useCspNonce()` at the top of
+  `ScrollArea`, and `{...(nonce === undefined ? {} : { nonce })}` on
+  `<ScrollAreaPrimitive.Viewport`. Radix's viewport injects a `<style>`
+  element and takes a `nonce` prop for it; this passes the request's CSP
+  nonce from `CspNonceProvider` (PLAN §7). Without a provider nothing
+  changes.
+
 Outside the files: `.prettierignore` leaves `src/ui/*.tsx` as the CLI
 formatted it, and `eslint.config.js` turns off
 `jsx-a11y/anchor-has-content` for `pagination.tsx` only (its link
@@ -133,7 +141,10 @@ content arrives through a props spread the rule cannot see).
 - `ScrollArea` (Radix) injects a `<style>` element to hide the native
   scrollbar. Under the PLAN §7 CSP (`style-src 'self'`, no
   `'unsafe-inline'`) the browser refuses it, and the native scrollbar
-  shows next to the custom one; the content still scrolls. The CSP story
+  shows next to the custom one; the content still scrolls. With the
+  request's nonce in `style-src` and a `CspNonceProvider` around the page
+  (the local patch above; `issueCspNonce` of `auth/server`), the style is
+  allowed. The CSP story
   (`stories/csp/`) checks which components render with no violation.
 - The open and close animations use the `tw-animate-css` classes
   (`animate-in`, `fade-in-0`, ...). The kit does not depend on it; an

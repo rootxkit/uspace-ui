@@ -44,3 +44,4 @@ export {
   type BffOptions,
   type RouteHandler,
 } from "./handlers.js";
+export { CSP_NONCE_HEADER, issueCspNonce } from "./nonce.js";

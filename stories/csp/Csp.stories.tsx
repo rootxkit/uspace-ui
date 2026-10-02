@@ -6,6 +6,7 @@ import { ThemeProvider, type Brand } from "../../src/theme/index.js";
 import {
   Badge,
   Button,
+  CspNonceProvider,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -29,10 +30,15 @@ import {
 // A CSP set by <meta> cannot be removed: in the Storybook UI, stories
 // opened after these in the same tab run under it until a reload. The
 // test runner gives each story file its own page.
+// A story fixture, not a secret: a real nonce is fresh per request.
+const STORY_NONCE = "VEVTVC1zdG9yeS1ub25jZQ==";
+
 const POLICY = [
   // 'report-sample' puts the first characters of a refused style into the
   // violation, so a story can tell whose style was refused.
-  "style-src 'self' 'report-sample'",
+  // The request's nonce (auth/server issueCspNonce); only the story that
+  // passes it through CspNonceProvider uses it.
+  `style-src 'self' 'nonce-${STORY_NONCE}' 'report-sample'`,
   "font-src 'self'",
   "img-src 'self' data:",
   "worker-src blob:",
@@ -103,6 +109,14 @@ function ScrollAreaUnderCsp() {
         ))}
       </ul>
     </ScrollArea>
+  );
+}
+
+function ScrollAreaWithNonce() {
+  return (
+    <CspNonceProvider nonce={STORY_NONCE}>
+      <ScrollAreaUnderCsp />
+    </CspNonceProvider>
   );
 }
 
@@ -200,5 +214,23 @@ export const ScrollAreaStyleIsRefused: Story = {
     const links = within(canvasElement).getAllByRole("link");
     await expect(links).toHaveLength(12);
     await expect(links[0]).toBeVisible();
+  },
+};
+
+/**
+ * The fix for the story above: with the request's nonce passed through
+ * CspNonceProvider, ScrollArea's <style> element is allowed and nothing is
+ * refused.
+ */
+export const ScrollAreaWithNonceRenders: Story = {
+  render: () => <ScrollAreaWithNonce />,
+  play: async ({ canvasElement }) => {
+    const style = canvasElement.querySelector("style");
+    await expect(style).not.toBeNull();
+    await expect(style?.nonce).toBe(STORY_NONCE);
+    await settle();
+    await expect(violations.map((v) => v.violatedDirective)).toEqual([]);
+    const links = within(canvasElement).getAllByRole("link");
+    await expect(links).toHaveLength(12);
   },
 };
