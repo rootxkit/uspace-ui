@@ -12,6 +12,7 @@ import {
   useT,
 } from "../../src/i18n/index.js";
 import * as login from "../auth/LoginForm.stories.js";
+import * as form from "../form/Form.stories.js";
 import * as live from "../live/Status.stories.js";
 import * as typography from "../i18n/Typography.stories.js";
 import * as tracks from "../tracks/Tracks.stories.js";
@@ -173,6 +174,30 @@ const LIVE_GOLDEN = {
 } as const;
 
 for (const [name, story] of Object.entries(LIVE_GOLDEN)) {
+  it(name, async () => {
+    await expect(
+      await snapshotStable(story as typeof Georgian),
+    ).toMatchFileSnapshot(`./__snapshots__/${name}.html`);
+  });
+}
+
+// WP-10: the zone form with the API's field errors replayed, and the
+// intent form with the ten Annex IV items.
+const {
+  ZoneFormEnglishLight,
+  ZoneFormGeorgianDark,
+  IntentFormEnglishLight,
+  IntentFormGeorgianDark,
+} = composeStories(form);
+
+const FORM_GOLDEN = {
+  "form-zone.en": ZoneFormEnglishLight,
+  "form-zone.ka": ZoneFormGeorgianDark,
+  "form-intent.en": IntentFormEnglishLight,
+  "form-intent.ka": IntentFormGeorgianDark,
+} as const;
+
+for (const [name, story] of Object.entries(FORM_GOLDEN)) {
   it(name, async () => {
     await expect(
       await snapshotStable(story as typeof Georgian),
