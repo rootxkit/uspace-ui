@@ -28,6 +28,7 @@ import {
 import { countAuth } from "./counters.js";
 import {
   callUpstream,
+  checkTrustedProxyHops,
   downstreamHeaders,
   forward,
   problemResponse,
@@ -56,6 +57,8 @@ export interface BffOptions {
   session: SessionCookieOptions;
   /** The API paths `proxy` may reach (see `forward`). */
   allowPaths: RegExp[];
+  /** See `ForwardOptions.trustedProxyHops`; the same for every call. */
+  trustedProxyHops?: number;
   /** The upstream timeout of every call the handlers make. Configuration. */
   timeoutMs: number;
   /** The fetch to use; the platform's by default. */
@@ -184,8 +187,12 @@ function signedIn(
   return res;
 }
 
-function postJson(req: NextRequest, body: unknown): RequestInit {
-  const headers = upstreamHeaders(req);
+function postJson(
+  req: NextRequest,
+  body: unknown,
+  hops: number | undefined,
+): RequestInit {
+  const headers = upstreamHeaders(req, hops);
   headers.set("Content-Type", "application/json");
   headers.set("Accept", "application/json, application/problem+json");
   return { method: "POST", headers, body: JSON.stringify(body) };
@@ -194,6 +201,7 @@ function postJson(req: NextRequest, body: unknown): RequestInit {
 /** The three route handlers of `/_bff/*`. */
 export function bffHandlers(opts: BffOptions): BffHandlers {
   const base = new URL(opts.apiBase);
+  checkTrustedProxyHops(opts.trustedProxyHops);
 
   const login: RouteHandler = async (req) => {
     if (!sameOrigin(req)) {
@@ -209,7 +217,11 @@ export function bffHandlers(opts: BffOptions): BffHandlers {
 
     const first = await callUpstream(
       apiUrl(base, opts.apiLoginPath),
-      postJson(req, { username: creds.username, password: creds.password }),
+      postJson(
+        req,
+        { username: creds.username, password: creds.password },
+        opts.trustedProxyHops,
+      ),
       opts.timeoutMs,
       opts.fetch,
     );
@@ -240,7 +252,11 @@ export function bffHandlers(opts: BffOptions): BffHandlers {
 
     const second = await callUpstream(
       apiUrl(base, opts.apiMfaPath),
-      postJson(req, { mfa_token: challenge, code: creds.otp }),
+      postJson(
+        req,
+        { mfa_token: challenge, code: creds.otp },
+        opts.trustedProxyHops,
+      ),
       opts.timeoutMs,
       opts.fetch,
     );
@@ -269,7 +285,7 @@ export function bffHandlers(opts: BffOptions): BffHandlers {
     }
     const token = readSessionToken(req, opts.session);
     if (opts.apiLogoutPath !== undefined && token !== null) {
-      const headers = upstreamHeaders(req);
+      const headers = upstreamHeaders(req, opts.trustedProxyHops);
       headers.set("Authorization", `Bearer ${token}`);
       // The cookies are cleared whatever the API answers: the browser's
       // sign-out does not wait on the API being up.
@@ -307,6 +323,9 @@ export function bffHandlers(opts: BffOptions): BffHandlers {
       allowPaths: opts.allowPaths,
       timeoutMs: opts.timeoutMs,
       ...(opts.fetch === undefined ? {} : { fetch: opts.fetch }),
+      ...(opts.trustedProxyHops === undefined
+        ? {}
+        : { trustedProxyHops: opts.trustedProxyHops }),
     });
   };
 

@@ -32,9 +32,19 @@ export interface ForwardOptions {
   timeoutMs: number;
   /** The fetch to use; the platform's by default. */
   fetch?: typeof fetch;
+  /**
+   * How many reverse proxies in front of Next.js append to
+   * `X-Forwarded-For` (1 for one Caddy). The BFF then sends the API the
+   * one address those proxies recorded for the client, never the header
+   * as the client wrote it. Absent: no `X-Forwarded-For` is sent.
+   */
+  trustedProxyHops?: number;
 }
 
-/** Request headers copied to the API; everything else is dropped. */
+/**
+ * Request headers copied to the API; everything else is dropped.
+ * `X-Forwarded-For` is not copied: the BFF writes its own (`clientAddress`).
+ */
 export const FORWARDED_REQUEST_HEADERS: readonly string[] = [
   "accept",
   "accept-language",
@@ -42,9 +52,6 @@ export const FORWARDED_REQUEST_HEADERS: readonly string[] = [
   "if-match",
   "if-none-match",
   "user-agent",
-  // The client address the reverse proxy recorded: the API's per-address
-  // sign-in limits (LESSONS S-15) read it when the BFF is a trusted proxy.
-  "x-forwarded-for",
 ];
 
 /**
@@ -94,13 +101,74 @@ export function problemResponse(
   );
 }
 
-/** The forwarded subset of the browser's headers. */
-export function upstreamHeaders(req: NextRequest): Headers {
+const IPV4 =
+  /^(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)$/;
+
+function isIpLiteral(v: string): boolean {
+  if (IPV4.test(v)) return true;
+  if (!v.includes(":") || /[^0-9A-Fa-f:.]/.test(v)) return false;
+  try {
+    new URL(`http://[${v}]/`);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Throws unless `hops` is absent or a whole number of at least 1. */
+export function checkTrustedProxyHops(hops: number | undefined): void {
+  if (hops !== undefined && !(Number.isInteger(hops) && hops >= 1)) {
+    throw new RangeError(
+      `trustedProxyHops must be an integer >= 1, got ${hops}`,
+    );
+  }
+}
+
+/**
+ * The client's address as the BFF's own trusted proxies recorded it.
+ * App Router handlers do not see the TCP peer, so the BFF reads the
+ * `X-Forwarded-For` chain from the right: each of the `hops` proxies in
+ * front of Next.js appended the address it received from, so the entry
+ * `hops` places from the end is the client. Anything to its left was
+ * written by the client and is ignored. `null` without `hops`, for a
+ * chain shorter than `hops`, or for an entry that is not an IP address
+ * (counted). Sound only when Next.js is reachable through those proxies
+ * alone.
+ */
+export function clientAddress(
+  req: NextRequest,
+  hops: number | undefined,
+): string | null {
+  if (hops === undefined) return null;
+  checkTrustedProxyHops(hops);
+  const chain = (req.headers.get("x-forwarded-for") ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s !== "");
+  const entry = chain.length >= hops ? chain[chain.length - hops] : undefined;
+  if (entry === undefined || !isIpLiteral(entry)) {
+    countAuth("client_address_unknown");
+    return null;
+  }
+  return entry;
+}
+
+/**
+ * The forwarded subset of the browser's headers, plus an
+ * `X-Forwarded-For` the BFF wrote itself: exactly the client address
+ * (`clientAddress`), or none. A client-supplied value never passes.
+ */
+export function upstreamHeaders(
+  req: NextRequest,
+  trustedProxyHops?: number,
+): Headers {
   const out = new Headers();
   for (const name of FORWARDED_REQUEST_HEADERS) {
     const v = req.headers.get(name);
     if (v !== null) out.set(name, v);
   }
+  const client = clientAddress(req, trustedProxyHops);
+  if (client !== null) out.set("X-Forwarded-For", client);
   return out;
 }
 
@@ -190,7 +258,7 @@ export async function forward(
       "send the uspace_csrf cookie's value as X-CSRF-Token",
     );
   }
-  const headers = upstreamHeaders(req);
+  const headers = upstreamHeaders(req, opts.trustedProxyHops);
   const token = readSessionToken(req, opts.session);
   if (token !== null) headers.set("Authorization", `Bearer ${token}`);
   const hasBody = isUnsafeMethod(req.method) && req.body !== null;

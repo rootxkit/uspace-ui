@@ -34,6 +34,7 @@ export {
 } from "./counters.js";
 export {
   DROPPED_RESPONSE_HEADERS,
+  clientAddress,
   FORWARDED_REQUEST_HEADERS,
   forward,
   type ForwardOptions,

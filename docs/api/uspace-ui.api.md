@@ -260,6 +260,7 @@ declare namespace auth_server {
         resetAuthCountersForTests,
         AuthCounter,
         DROPPED_RESPONSE_HEADERS,
+        clientAddress,
         FORWARDED_REQUEST_HEADERS,
         forward,
         ForwardOptions,
@@ -293,7 +294,9 @@ type AuthCounter =
 /** An upstream call that failed before an answer (connection, DNS). */
 | "upstream_unreachable"
 /** A 2xx sign-in answer without a token or a challenge the BFF knows. */
-| "login_answer_invalid";
+| "login_answer_invalid"
+/** No client address: the forwarded chain was shorter than the trusted hops, or not an IP. */
+| "client_address_unknown";
 
 // @public
 function authCounters(): Readonly<Record<AuthCounter, number>>;
@@ -403,6 +406,7 @@ interface BffOptions {
     // (undocumented)
     session: SessionCookieOptions;
     timeoutMs: number;
+    trustedProxyHops?: number;
 }
 
 // @public (undocumented)
@@ -505,6 +509,9 @@ function clearSession(res: NextResponse, opts: SessionCookieOptions): void;
 
 // @public
 type Client<Paths extends {}> = Client_2<Paths>;
+
+// @public
+function clientAddress(req: NextRequest, hops: number | undefined): string | null;
 
 // @public (undocumented)
 interface ClientOptions {
@@ -902,6 +909,7 @@ interface ForwardOptions {
     fetch?: typeof fetch;
     session: SessionCookieOptions;
     timeoutMs: number;
+    trustedProxyHops?: number;
 }
 
 // @public

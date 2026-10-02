@@ -68,7 +68,8 @@ describe("forward: headers", () => {
     expect(h?.get("accept-language")).toBe("ka");
     expect(h?.get("accept")).toBe("application/json");
     expect(h?.get("if-none-match")).toBe('"v1"');
-    expect(h?.get("x-forwarded-for")).toBe("192.0.2.10");
+    // No trusted hops configured: the client's header does not pass.
+    expect(h?.get("x-forwarded-for")).toBeNull();
   });
 
   it("sends no Authorization without a session cookie, not even the browser's", async () => {
@@ -97,6 +98,57 @@ describe("forward: headers", () => {
     expect(stub.calls[0]?.headers.get("content-type")).toBe("application/json");
     expect(stub.calls[0]?.body).toBe('{"name":"TEST zone"}');
     expect(await res.json()).toEqual({ id: "TEST-1" });
+  });
+});
+
+describe("forward: X-Forwarded-For", () => {
+  const xff = async (
+    chain: string | null,
+    hops: number | undefined,
+  ): Promise<string | null | undefined> => {
+    const stub = stubFetch(() => json(200, {}));
+    const req = request("/_bff/api/v1/zones", {
+      cookies: signedIn,
+      headers: chain === null ? {} : { "X-Forwarded-For": chain },
+    });
+    await forward(
+      req,
+      target("/v1/zones"),
+      opts(stub.fetch, hops === undefined ? {} : { trustedProxyHops: hops }),
+    );
+    return stub.calls[0]?.headers.get("x-forwarded-for");
+  };
+
+  it("never passes a client-supplied X-Forwarded-For without trusted hops", async () => {
+    expect(await xff("203.0.113.66", undefined)).toBeNull();
+    expect(await xff("203.0.113.66, 192.0.2.10", undefined)).toBeNull();
+  });
+
+  it("sends the address the trusted proxy recorded, and drops what the client wrote to its left", async () => {
+    // The client wrote 203.0.113.66; one Caddy appended the peer it saw.
+    expect(await xff("203.0.113.66, 192.0.2.10", 1)).toBe("192.0.2.10");
+    expect(await xff("192.0.2.10", 1)).toBe("192.0.2.10");
+  });
+
+  it("counts back as many hops as there are trusted proxies", async () => {
+    expect(await xff("203.0.113.66, 192.0.2.10, 10.0.0.5", 2)).toBe(
+      "192.0.2.10",
+    );
+    expect(await xff("2001:db8::7", 1)).toBe("2001:db8::7");
+  });
+
+  it("sends none, and counts it, when the chain is shorter than the hops or not an address", async () => {
+    expect(await xff("192.0.2.10", 2)).toBeNull();
+    expect(await xff(null, 1)).toBeNull();
+    expect(await xff("unknown", 1)).toBeNull();
+    expect(await xff("192.0.2.300", 1)).toBeNull();
+    expect(await xff("[::1]:443", 1)).toBeNull();
+    expect(authCounters().client_address_unknown).toBe(5);
+  });
+
+  it("refuses a hop count that is not a whole number of at least 1", async () => {
+    await expect(xff("192.0.2.10", 0)).rejects.toThrow(RangeError);
+    await expect(xff("192.0.2.10", 1.5)).rejects.toThrow(RangeError);
   });
 });
 

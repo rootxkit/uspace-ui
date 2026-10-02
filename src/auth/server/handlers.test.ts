@@ -345,6 +345,26 @@ describe("login", () => {
     expect(res2.status).toBe(504);
   });
 
+  it("sends the API the client address its trusted proxy recorded, not the client's header", async () => {
+    const chain = { "X-Forwarded-For": "203.0.113.66, 192.0.2.10" };
+    const trusted = stubFetch(() => json(200, ISSUED));
+    await handlers(trusted.fetch, { trustedProxyHops: 1 }).login(
+      loginRequest(CREDENTIALS, { Origin: ORIGIN, Host: HOST, ...chain }),
+    );
+    expect(trusted.calls[0]?.headers.get("x-forwarded-for")).toBe("192.0.2.10");
+    const untrusted = stubFetch(() => json(200, ISSUED));
+    await handlers(untrusted.fetch).login(
+      loginRequest(CREDENTIALS, { Origin: ORIGIN, Host: HOST, ...chain }),
+    );
+    expect(untrusted.calls[0]?.headers.get("x-forwarded-for")).toBeNull();
+  });
+
+  it("refuses an invalid trustedProxyHops when the handlers are built", () => {
+    const f = stubFetch(() => json(200, {})).fetch;
+    expect(() => handlers(f, { trustedProxyHops: 0 })).toThrow(RangeError);
+    expect(() => handlers(f, { trustedProxyHops: 1 })).not.toThrow();
+  });
+
   it("never writes the credentials, the challenge or the token to any log", async () => {
     const methods = ["log", "info", "warn", "error", "debug", "trace"] as const;
     const spies = methods.map((m) =>
@@ -448,6 +468,17 @@ describe("logout", () => {
 
 describe("proxy", () => {
   const cookies = { uspace_session: FIXTURE.jwt };
+
+  it("passes the trusted hops to forward", async () => {
+    const stub = stubFetch(() => json(200, []));
+    await handlers(stub.fetch, { trustedProxyHops: 1 }).proxy(
+      request("/_bff/api/v1/zones", {
+        cookies,
+        headers: { "X-Forwarded-For": "203.0.113.66, 192.0.2.10" },
+      }),
+    );
+    expect(stub.calls[0]?.headers.get("x-forwarded-for")).toBe("192.0.2.10");
+  });
 
   it("maps /_bff/api/<path>?<query> onto apiBase/<path>?<query>", async () => {
     const stub = stubFetch(() => json(200, []));

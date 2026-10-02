@@ -123,6 +123,7 @@ export const bff = bffHandlers({
   session: { secure: true, maxAgeS: 12 * 3600 },
   allowPaths: [/^\/v1\/(zones|restrictions)(\/|$)/], // what the console may reach
   timeoutMs: 10_000,
+  trustedProxyHops: 1, // one Caddy in front of Next.js appends to X-Forwarded-For
 });
 ```
 
@@ -161,6 +162,16 @@ submit carries username, password and code, and the BFF runs both API
 steps. A refusal shows the API's `detail`, and a `429` counts its
 `Retry-After` down. `RequireRole` hides what a role does not use; it
 grants nothing.
+
+**Client address.** The BFF never passes on an `X-Forwarded-For` the
+client wrote. Route handlers do not see the TCP peer, so with
+`trustedProxyHops: n` the BFF takes the entry `n` places from the end
+of the chain its own reverse proxies built, and sends the API exactly
+that address, or no header at all. This holds only when Next.js is
+reachable through those proxies alone. The API must list the BFF (the
+`web` container's address) as a trusted proxy, for example in the
+authority's `AUTHORITY_TRUSTED_PROXIES`. Otherwise it applies its
+per-address sign-in limits to the BFF instead of the client.
 
 **WebSockets: there is no ticket route.** The BFF cannot proxy a
 WebSocket, and a ticket in a query string ends up in access logs. The

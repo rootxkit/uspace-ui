@@ -22,7 +22,9 @@ export type AuthCounter =
   /** An upstream call that failed before an answer (connection, DNS). */
   | "upstream_unreachable"
   /** A 2xx sign-in answer without a token or a challenge the BFF knows. */
-  | "login_answer_invalid";
+  | "login_answer_invalid"
+  /** No client address: the forwarded chain was shorter than the trusted hops, or not an IP. */
+  | "client_address_unknown";
 
 const ZERO: Readonly<Record<AuthCounter, number>> = {
   claims_malformed: 0,
@@ -35,6 +37,7 @@ const ZERO: Readonly<Record<AuthCounter, number>> = {
   upstream_timeout: 0,
   upstream_unreachable: 0,
   login_answer_invalid: 0,
+  client_address_unknown: 0,
 };
 
 const counts: Record<AuthCounter, number> = { ...ZERO };
