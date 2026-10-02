@@ -1,0 +1,131 @@
+<div lang="en" class="bg-background p-4 text-foreground">
+<div data-testid="sources" style="max-width: 480px;">
+<section class="rounded-md border border-border bg-card p-3 text-sm text-card-foreground" aria-label="Sources" data-panel="sources">
+<h2 class="m-0 mb-2 text-sm font-semibold">Sources</h2>
+<section aria-label="direct_rid" data-source-type="direct_rid" class="mt-2">
+<h3 class="m-0 font-mono text-xs font-semibold">direct_rid</h3>
+<ul class="m-0 list-none p-0">
+<li class="flex flex-wrap items-start justify-between gap-2 border-t border-border py-2 first:border-t-0" data-source="direct_rid/*">
+<div class="grid min-w-0 gap-1">
+<span class="font-medium">All direct_rid</span>
+<span class="inline-flex flex-col gap-0.5 text-sm" data-source-state="healthy">
+<span class="inline-flex w-fit items-center rounded-full border-2 px-2 py-0.5 text-xs font-medium border-age-live" data-part="state">healthy</span>
+<span class="text-xs text-muted-foreground" data-part="detail">last heard 5 s ago</span>
+</span>
+<span class="text-xs text-muted-foreground" data-part="counters">182,344 accepted, 12 refused</span>
+</div>
+<button data-slot="button" data-variant="outline" data-size="sm" class="inline-flex shrink-0 items-center justify-center text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*='size-'])]:size-4 border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-8 gap-1.5 rounded-md px-3 has-[&gt;svg]:px-2.5" type="button" aria-label="Switch off All direct_rid">Switch off</button>
+</li>
+<li class="flex flex-wrap items-start justify-between gap-2 border-t border-border py-2 first:border-t-0" data-source="direct_rid/rx-test-01">
+<div class="grid min-w-0 gap-1">
+<span class="font-medium font-mono text-xs">rx-test-01</span>
+<span class="inline-flex flex-col gap-0.5 text-sm" data-source-state="healthy">
+<span class="inline-flex w-fit items-center rounded-full border-2 px-2 py-0.5 text-xs font-medium border-age-live" data-part="state">healthy</span>
+<span class="text-xs text-muted-foreground" data-part="detail">last heard 5 s ago</span>
+</span>
+<span class="text-xs text-muted-foreground" data-part="counters">182,344 accepted, 12 refused</span>
+</div>
+<button data-slot="button" data-variant="outline" data-size="sm" class="inline-flex shrink-0 items-center justify-center text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*='size-'])]:size-4 border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-8 gap-1.5 rounded-md px-3 has-[&gt;svg]:px-2.5" type="button" aria-label="Switch off rx-test-01">Switch off</button>
+</li>
+<li class="flex flex-wrap items-start justify-between gap-2 border-t border-border py-2 first:border-t-0" data-source="direct_rid/rx-test-02">
+<div class="grid min-w-0 gap-1">
+<span class="font-medium font-mono text-xs">rx-test-02</span>
+<span class="inline-flex flex-col gap-0.5 text-sm" data-source-state="lagging">
+<span class="inline-flex w-fit items-center rounded-full border-2 px-2 py-0.5 text-xs font-medium border-age-aging" data-part="state">lagging: behind, data still arriving</span>
+<span class="text-xs text-muted-foreground" data-part="detail">behind by 42 s</span>
+</span>
+<span class="text-xs text-muted-foreground" data-part="counters">182,344 accepted, 12 refused</span>
+</div>
+<button data-slot="button" data-variant="outline" data-size="sm" class="inline-flex shrink-0 items-center justify-center text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*='size-'])]:size-4 border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-8 gap-1.5 rounded-md px-3 has-[&gt;svg]:px-2.5" type="button" aria-label="Switch off rx-test-02">Switch off</button>
+</li>
+<li class="flex flex-wrap items-start justify-between gap-2 border-t border-border py-2 first:border-t-0" data-source="direct_rid/rx-test-03">
+<div class="grid min-w-0 gap-1">
+<span class="font-medium font-mono text-xs">rx-test-03</span>
+<span class="inline-flex flex-col gap-0.5 text-sm" data-source-state="stale">
+<span class="inline-flex w-fit items-center rounded-full border-2 px-2 py-0.5 text-xs font-medium border-age-stale" data-part="state">stale: not heard recently</span>
+<span class="text-xs text-muted-foreground" data-part="detail">silent since 2026-01-01 11:58:45 UTC</span>
+<span class="text-xs text-muted-foreground" data-part="detail">last heard 1 min ago</span>
+</span>
+<span class="text-xs text-muted-foreground" data-part="counters">182,344 accepted, 12 refused</span>
+</div>
+<button data-slot="button" data-variant="outline" data-size="sm" class="inline-flex shrink-0 items-center justify-center text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*='size-'])]:size-4 border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-8 gap-1.5 rounded-md px-3 has-[&gt;svg]:px-2.5" type="button" aria-label="Switch off rx-test-03">Switch off</button>
+</li>
+<li class="flex flex-wrap items-start justify-between gap-2 border-t border-border py-2 first:border-t-0" data-source="direct_rid/rx-test-04">
+<div class="grid min-w-0 gap-1">
+<span class="font-medium font-mono text-xs">rx-test-04</span>
+<span class="inline-flex flex-col gap-0.5 text-sm" data-source-state="unreachable">
+<span class="inline-flex w-fit items-center rounded-full border-2 px-2 py-0.5 text-xs font-medium border-severity-warning" data-part="state">unreachable: data buffered at the source</span>
+<span class="text-xs text-muted-foreground" data-part="detail">silent since 2026-01-01 11:54:48 UTC</span>
+<span class="text-xs text-muted-foreground" data-part="detail">last heard 5 min ago</span>
+</span>
+<span class="text-xs text-muted-foreground" data-part="counters">182,344 accepted, 12 refused</span>
+</div>
+<button data-slot="button" data-variant="outline" data-size="sm" class="inline-flex shrink-0 items-center justify-center text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*='size-'])]:size-4 border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-8 gap-1.5 rounded-md px-3 has-[&gt;svg]:px-2.5" type="button" aria-label="Switch off rx-test-04">Switch off</button>
+</li>
+<li class="flex flex-wrap items-start justify-between gap-2 border-t border-border py-2 first:border-t-0" data-source="direct_rid/rx-test-05">
+<div class="grid min-w-0 gap-1">
+<span class="font-medium font-mono text-xs">rx-test-05</span>
+<span class="inline-flex flex-col gap-0.5 text-sm" data-source-state="disabled">
+<span class="inline-flex w-fit items-center rounded-full border-2 px-2 py-0.5 text-xs font-medium border-severity-critical border-dashed" data-part="state">disabled</span>
+<span class="text-xs text-muted-foreground" data-part="detail">disabled by admin:test-1</span>
+<span class="text-xs text-muted-foreground" data-part="detail">disabled: this source is switched off</span>
+</span>
+<span class="text-xs text-muted-foreground" data-part="counters">5,521 accepted, 340 refused</span>
+</div>
+<button data-slot="button" data-variant="default" data-size="sm" class="inline-flex shrink-0 items-center justify-center text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground hover:bg-primary/90 h-8 gap-1.5 rounded-md px-3 has-[&gt;svg]:px-2.5" type="button" aria-label="Switch on rx-test-05">Switch on</button>
+</li>
+<li class="flex flex-wrap items-start justify-between gap-2 border-t border-border py-2 first:border-t-0" data-source="direct_rid/rx-test-06">
+<div class="grid min-w-0 gap-1">
+<span class="font-medium font-mono text-xs">rx-test-06</span>
+<span class="inline-flex flex-col gap-0.5 text-sm" data-source-state="never_heard">
+<span class="inline-flex w-fit items-center rounded-full border-2 px-2 py-0.5 text-xs font-medium border-border border-dotted" data-part="state">never heard</span>
+</span>
+<span class="text-xs text-muted-foreground" data-part="counters">0 accepted, 0 refused</span>
+</div>
+<button data-slot="button" data-variant="outline" data-size="sm" class="inline-flex shrink-0 items-center justify-center text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*='size-'])]:size-4 border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-8 gap-1.5 rounded-md px-3 has-[&gt;svg]:px-2.5" type="button" aria-label="Switch off rx-test-06">Switch off</button>
+</li>
+</ul>
+</section>
+<section aria-label="network_rid" data-source-type="network_rid" class="mt-2">
+<h3 class="m-0 font-mono text-xs font-semibold">network_rid</h3>
+<ul class="m-0 list-none p-0">
+<li class="flex flex-wrap items-start justify-between gap-2 border-t border-border py-2 first:border-t-0" data-source="network_rid/*">
+<div class="grid min-w-0 gap-1">
+<span class="font-medium">All network_rid</span>
+<span class="inline-flex flex-col gap-0.5 text-sm" data-source-state="disabled">
+<span class="inline-flex w-fit items-center rounded-full border-2 px-2 py-0.5 text-xs font-medium border-severity-critical border-dashed" data-part="state">disabled</span>
+<span class="text-xs text-muted-foreground" data-part="detail">disabled by supervisor:test-2</span>
+<span class="text-xs text-muted-foreground" data-part="detail">disabled: the whole source type is switched off</span>
+</span>
+<span class="text-xs text-muted-foreground" data-part="counters">182,344 accepted, 12 refused</span>
+</div>
+<button data-slot="button" data-variant="default" data-size="sm" class="inline-flex shrink-0 items-center justify-center text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground hover:bg-primary/90 h-8 gap-1.5 rounded-md px-3 has-[&gt;svg]:px-2.5" type="button" aria-label="Switch on All network_rid">Switch on</button>
+</li>
+<li class="flex flex-wrap items-start justify-between gap-2 border-t border-border py-2 first:border-t-0" data-source="network_rid/dp-test-01">
+<div class="grid min-w-0 gap-1">
+<span class="font-medium font-mono text-xs">dp-test-01</span>
+<span class="inline-flex flex-col gap-0.5 text-sm" data-source-state="disabled">
+<span class="inline-flex w-fit items-center rounded-full border-2 px-2 py-0.5 text-xs font-medium border-severity-critical border-dashed" data-part="state">disabled</span>
+<span class="text-xs text-muted-foreground" data-part="detail">disabled by supervisor:test-2</span>
+<span class="text-xs text-muted-foreground" data-part="detail">disabled: the whole source type is switched off</span>
+</span>
+<span class="text-xs text-muted-foreground" data-part="counters">182,344 accepted, 12 refused</span>
+</div>
+<span class="text-xs text-muted-foreground" data-part="at-type">Switched with its source type</span>
+</li>
+<li class="flex flex-wrap items-start justify-between gap-2 border-t border-border py-2 first:border-t-0" data-source="network_rid/dp-test-02">
+<div class="grid min-w-0 gap-1">
+<span class="font-medium font-mono text-xs">dp-test-02</span>
+<span class="inline-flex flex-col gap-0.5 text-sm" data-source-state="disabled">
+<span class="inline-flex w-fit items-center rounded-full border-2 px-2 py-0.5 text-xs font-medium border-severity-critical border-dashed" data-part="state">disabled</span>
+<span class="text-xs text-muted-foreground" data-part="detail">disabled: new sources are off until enabled</span>
+</span>
+<span class="text-xs text-muted-foreground" data-part="counters">0 accepted, 3 refused</span>
+</div>
+<button data-slot="button" data-variant="default" data-size="sm" class="inline-flex shrink-0 items-center justify-center text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground hover:bg-primary/90 h-8 gap-1.5 rounded-md px-3 has-[&gt;svg]:px-2.5" type="button" aria-label="Switch on dp-test-02">Switch on</button>
+</li>
+</ul>
+</section>
+</section>
+</div>
+</div>

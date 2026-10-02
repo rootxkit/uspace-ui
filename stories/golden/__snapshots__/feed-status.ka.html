@@ -1,0 +1,112 @@
+<div lang="ka" class="bg-background p-4 text-foreground">
+<div class="grid gap-2" data-testid="bars">
+<figure class="m-0 grid gap-1">
+<figcaption class="font-mono text-xs text-muted-foreground">connecting, first time</figcaption>
+<div role="status" class="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-border bg-card px-3 py-1.5 text-sm text-card-foreground" data-connection="connecting">
+<span data-part="connection" class="inline-flex items-center gap-2 font-semibold">
+<span aria-hidden="true" class="inline-block size-2.5 rounded-full bg-age-aging">
+</span>უკავშირდება</span>
+<span class="inline-flex items-center gap-3">
+<span aria-hidden="true" class="text-muted-foreground">·</span>
+<span data-part="last-frame">კადრი ჯერ არ მიღებულა</span>
+</span>
+<span class="inline-flex items-center gap-3">
+<span aria-hidden="true" class="text-muted-foreground">·</span>
+<span data-part="dropped" data-dropped="0">გამოტოვებულია 0 კადრი</span>
+</span>
+</div>
+</figure>
+<figure class="m-0 grid gap-1">
+<figcaption class="font-mono text-xs text-muted-foreground">live</figcaption>
+<div role="status" class="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-border bg-card px-3 py-1.5 text-sm text-card-foreground" data-connection="live">
+<span data-part="connection" class="inline-flex items-center gap-2 font-semibold">
+<span aria-hidden="true" class="inline-block size-2.5 rounded-full bg-age-live">
+</span>ცოცხალი</span>
+<span class="inline-flex items-center gap-3">
+<span aria-hidden="true" class="text-muted-foreground">·</span>
+<span data-part="last-frame">ბოლო კადრი 1 წმ წინ</span>
+</span>
+<span class="inline-flex items-center gap-3">
+<span aria-hidden="true" class="text-muted-foreground">·</span>
+<span data-part="dropped" data-dropped="0">გამოტოვებულია 0 კადრი</span>
+</span>
+</div>
+</figure>
+<figure class="m-0 grid gap-1">
+<figcaption class="font-mono text-xs text-muted-foreground">live and quiet for ten minutes</figcaption>
+<div role="status" class="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-border bg-card px-3 py-1.5 text-sm text-card-foreground" data-connection="live">
+<span data-part="connection" class="inline-flex items-center gap-2 font-semibold">
+<span aria-hidden="true" class="inline-block size-2.5 rounded-full bg-age-live">
+</span>ცოცხალი</span>
+<span class="inline-flex items-center gap-3">
+<span aria-hidden="true" class="text-muted-foreground">·</span>
+<span data-part="last-frame">ბოლო კადრი 10 წთ წინ</span>
+</span>
+<span class="inline-flex items-center gap-3">
+<span aria-hidden="true" class="text-muted-foreground">·</span>
+<span data-part="dropped" data-dropped="0">გამოტოვებულია 0 კადრი</span>
+</span>
+</div>
+</figure>
+<figure class="m-0 grid gap-1">
+<figcaption class="font-mono text-xs text-muted-foreground">live, frames dropped and ignored, degraded</figcaption>
+<div role="status" class="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-border bg-card px-3 py-1.5 text-sm text-card-foreground" data-connection="live">
+<span data-part="connection" class="inline-flex items-center gap-2 font-semibold">
+<span aria-hidden="true" class="inline-block size-2.5 rounded-full bg-age-live">
+</span>ცოცხალი</span>
+<span class="inline-flex items-center gap-3">
+<span aria-hidden="true" class="text-muted-foreground">·</span>
+<span data-part="last-frame">ბოლო კადრი 1 წმ წინ</span>
+</span>
+<span class="inline-flex items-center gap-3">
+<span aria-hidden="true" class="text-muted-foreground">·</span>
+<span data-part="dropped" data-dropped="17">გამოტოვებულია 17 კადრი</span>
+</span>
+<span class="inline-flex items-center gap-3">
+<span aria-hidden="true" class="text-muted-foreground">·</span>
+<span data-part="malformed">უგულებელყოფილია 2 დაზიანებული კადრი</span>
+</span>
+<span class="inline-flex items-center gap-3">
+<span aria-hidden="true" class="text-muted-foreground">·</span>
+<span data-part="degraded">შეზღუდულია: პილოტირებული საჰაერო მოძრაობის მონაცემები მიუწვდომელია; DSS მიუწვდომელია</span>
+</span>
+</div>
+</figure>
+<figure class="m-0 grid gap-1">
+<figcaption class="font-mono text-xs text-muted-foreground">down, retrying</figcaption>
+<div role="status" class="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-border bg-card px-3 py-1.5 text-sm text-card-foreground" data-connection="down">
+<span data-part="connection" class="inline-flex items-center gap-2 font-semibold">
+<span aria-hidden="true" class="inline-block size-2.5 rounded-full bg-severity-critical">
+</span>ნაკადი შეწყვეტილია, ხელახლა ვუკავშირდებით</span>
+<span class="inline-flex items-center gap-3">
+<span aria-hidden="true" class="text-muted-foreground">·</span>
+<span data-part="last-frame">ბოლო კადრი 1 წთ წინ</span>
+</span>
+<span class="inline-flex items-center gap-3">
+<span aria-hidden="true" class="text-muted-foreground">·</span>
+<span data-part="dropped" data-dropped="0">გამოტოვებულია 0 კადრი</span>
+</span>
+</div>
+</figure>
+<figure class="m-0 grid gap-1">
+<figcaption class="font-mono text-xs text-muted-foreground">session ended (4401), retrying</figcaption>
+<div role="status" class="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-border bg-card px-3 py-1.5 text-sm text-card-foreground" data-connection="down">
+<span data-part="connection" class="inline-flex items-center gap-2 font-semibold">
+<span aria-hidden="true" class="inline-block size-2.5 rounded-full bg-severity-critical">
+</span>ნაკადი შეწყვეტილია, ხელახლა ვუკავშირდებით</span>
+<span class="inline-flex items-center gap-3">
+<span aria-hidden="true" class="text-muted-foreground">·</span>
+<span data-part="last-frame">ბოლო კადრი 20 წმ წინ</span>
+</span>
+<span class="inline-flex items-center gap-3">
+<span aria-hidden="true" class="text-muted-foreground">·</span>
+<span data-part="dropped" data-dropped="0">გამოტოვებულია 0 კადრი</span>
+</span>
+<span class="inline-flex items-center gap-3">
+<span aria-hidden="true" class="text-muted-foreground">·</span>
+<span data-part="session">სესია დასრულდა: ხელახლა შედით სისტემაში</span>
+</span>
+</div>
+</figure>
+</div>
+</div>

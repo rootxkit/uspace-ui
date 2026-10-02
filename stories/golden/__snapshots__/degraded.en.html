@@ -1,0 +1,45 @@
+<div lang="en" class="bg-background p-4 text-foreground">
+<div class="grid max-w-lg gap-3" data-testid="degraded">
+<section class="rounded-md border-2 bg-card px-3 py-2 text-sm text-card-foreground border-severity-warning" aria-label="Degraded service" data-banner="degraded" data-degraded="true">
+<h2 class="m-0 text-sm font-semibold">Degraded service</h2>
+<ul class="m-0 mt-1 list-disc pl-5">
+<li data-degraded-key="manned">Manned traffic unavailable</li>
+<li data-degraded-key="dss">DSS unavailable</li>
+<li data-degraded-key="source_disabled">A source is switched off</li>
+<li data-degraded-key="nats_reconnecting">nats_reconnecting (as the server names it)</li>
+</ul>
+<ul class="m-0 list-none p-0 text-xs mt-2">
+<li data-age-of="cis" data-over="true">CIS data 5 min old: over the bound of 5 min</li>
+<li data-age-of="dataset:uspace_airspace">uspace_airspace, version uspace-test-2: 1 d old</li>
+<li data-age-of="dataset:zones">zones, version zones-test-7: 13 min old</li>
+<li data-age-of="projection">Registry projection 1 s old</li>
+</ul>
+</section>
+<section class="rounded-md border-2 bg-card px-3 py-2 text-sm text-card-foreground border-border" aria-label="Degraded service" data-banner="degraded" data-degraded="false">
+<ul class="m-0 list-none p-0 text-xs">
+<li data-age-of="cis">CIS data 14 s old</li>
+</ul>
+</section>
+<div class="flex flex-wrap gap-2">
+<span class="inline-flex items-center gap-1 rounded-full border-2 px-2 py-0.5 text-xs tabular-nums border-age-live" data-age="live" data-age-s="2">
+<span>2 s</span>
+<span>· Live</span>
+</span>
+<span class="inline-flex items-center gap-1 rounded-full border-2 px-2 py-0.5 text-xs tabular-nums border-age-aging" data-age="aging" data-age-s="15">
+<span>15 s</span>
+<span>· Ageing</span>
+</span>
+<span class="inline-flex items-center gap-1 rounded-full border-2 px-2 py-0.5 text-xs tabular-nums border-age-stale" data-age="stale" data-age-s="45">
+<span>45 s</span>
+<span>· Stale</span>
+</span>
+<span class="inline-flex items-center gap-1 rounded-full border-2 px-2 py-0.5 text-xs tabular-nums border-border" data-age="unknown" data-age-s="45">
+<span>45 s</span>
+</span>
+<span class="inline-flex items-center gap-1 rounded-full border-2 px-2 py-0.5 text-xs tabular-nums border-border" data-age="unknown" data-age-s="">
+<span>—</span>
+<span class="sr-only">Age not known</span>
+</span>
+</div>
+</div>
+</div>
