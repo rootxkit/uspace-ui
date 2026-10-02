@@ -24,6 +24,8 @@ import { Label as Label_2 } from 'radix-ui';
 import type { Linter } from 'eslint';
 import type { Map as Map_2 } from 'maplibre-gl';
 import { NextFontWithVariable } from 'next/dist/compiled/@next/font';
+import { NextRequest } from 'next/server.js';
+import type { NextResponse } from 'next/server.js';
 import { Popover as Popover_2 } from 'radix-ui';
 import { RadioGroup as RadioGroup_2 } from 'radix-ui';
 import * as React_2 from 'react';
@@ -97,7 +99,7 @@ type AlertKind = (typeof ALERT_KINDS)[number];
 
 declare namespace alerts {
     export {
-        ENTRY_5 as ENTRY
+        ENTRY_3 as ENTRY
     }
 }
 
@@ -216,15 +218,95 @@ interface ApiErrorInit {
 
 declare namespace auth_client {
     export {
-        ENTRY_2 as ENTRY
+        BFF_API_PREFIX,
+        BFF_LOGIN_PATH,
+        BFF_LOGOUT_PATH,
+        CSRF_COOKIE,
+        CSRF_HEADER,
+        LoginResult,
+        csrfToken,
+        LoginForm,
+        LoginFormProps,
+        RequireRole,
+        RequireRoleProps,
+        SessionProvider,
+        useSession,
+        SessionContextValue,
+        SessionProviderProps
     }
 }
 
 declare namespace auth_server {
     export {
-        ENTRY
+        BFF_API_PREFIX,
+        BFF_LOGIN_PATH,
+        BFF_LOGOUT_PATH,
+        CSRF_COOKIE,
+        CSRF_HEADER,
+        SESSION_COOKIE,
+        isUnsafeMethod,
+        LoginResult,
+        MFA_CHALLENGE_COOKIE,
+        MFA_CHALLENGE_PATH,
+        MIN_CHALLENGE_SECRET_BYTES,
+        sessionClaimsUnverified,
+        sessionDisplay,
+        UnverifiedSessionClaims,
+        checkCsrf,
+        clearSession,
+        issueCsrf,
+        readSessionToken,
+        setSession,
+        CookieReader,
+        SessionCookieOptions,
+        authCounters,
+        resetAuthCountersForTests,
+        AuthCounter,
+        DROPPED_RESPONSE_HEADERS,
+        clientAddress,
+        FORWARDED_REQUEST_HEADERS,
+        forward,
+        ForwardOptions,
+        bffHandlers,
+        BffHandlers,
+        BffOptions,
+        RouteHandler,
+        CSP_NONCE_HEADER,
+        issueCspNonce
     }
 }
+
+// @public (undocumented)
+type AuthCounter =
+/** A session token whose payload did not decode to a JSON object. */
+"claims_malformed"
+/** A `roles` claim that was present but not an array (the pre-M20 string). */
+| "roles_not_array"
+/** An entry of `roles` that was not a string; dropped. */
+| "role_not_string"
+/** A token without the `sub`, `exp` or `realm` a display needs. */
+| "claims_incomplete"
+/** A request the proxy refused: path outside the allow-list. */
+| "proxy_path_refused"
+/** An unsafe request refused for a missing or mismatched CSRF pair. */
+| "csrf_refused"
+/** A sign-in refused for a missing or foreign `Origin`. */
+| "origin_refused"
+/** An upstream call that did not answer within its timeout. */
+| "upstream_timeout"
+/** An upstream call that failed before an answer (connection, DNS). */
+| "upstream_unreachable"
+/** A 2xx sign-in answer without a token or a challenge the BFF knows. */
+| "login_answer_invalid"
+/** No client address: the forwarded chain was shorter than the trusted hops, or not an IP. */
+| "client_address_unknown"
+/** A one-time code sent without a live sealed challenge (absent, altered, expired). */
+| "mfa_challenge_invalid"
+/** An upstream 3xx other than 304: refused with a 502, never passed on. */
+| "upstream_redirect";
+
+// @public
+function authCounters(): Readonly<Record<AuthCounter, number>>;
 
 // @public
 function axeCheck(container: HTMLElement): Promise<void>;
@@ -296,6 +378,43 @@ interface BBoxSubscriptionOptions {
     // (undocumented)
     onChange(bbox: BBox): void;
     quantizeDeg: number;
+}
+
+// @public (undocumented)
+const BFF_API_PREFIX = "/_bff/api";
+
+// @public
+const BFF_LOGIN_PATH = "/_bff/login";
+
+// @public (undocumented)
+const BFF_LOGOUT_PATH = "/_bff/logout";
+
+// @public
+interface BffHandlers {
+    // (undocumented)
+    readonly login: RouteHandler;
+    // (undocumented)
+    readonly logout: RouteHandler;
+    // (undocumented)
+    readonly proxy: RouteHandler;
+}
+
+// @public
+function bffHandlers(opts: BffOptions): BffHandlers;
+
+// @public (undocumented)
+interface BffOptions {
+    allowPaths: RegExp[];
+    apiBase: string | URL;
+    apiLoginPath: string;
+    apiLogoutPath?: string;
+    apiMfaPath?: string;
+    fetch?: typeof fetch;
+    mfaChallengeSecret?: string;
+    // (undocumented)
+    session: SessionCookieOptions;
+    timeoutMs: number;
+    trustedProxyHops?: number;
 }
 
 // @public (undocumented)
@@ -384,6 +503,9 @@ type Catalogues = Partial<Record<Lang, Catalogue>>;
 // @public (undocumented)
 function Checkbox(input: React_2.ComponentProps<typeof Checkbox_2.Root>): React_2.JSX.Element;
 
+// @public
+function checkCsrf(req: NextRequest, opts?: Pick<SessionCookieOptions, "csrfName">): boolean;
+
 // @public (undocumented)
 const CLEAR_REASONS: readonly ["resolved", "stale", "source_disabled", "flight_ended", "acknowledged_timeout", "landed"];
 
@@ -391,7 +513,13 @@ const CLEAR_REASONS: readonly ["resolved", "stale", "source_disabled", "flight_e
 type ClearReason = (typeof CLEAR_REASONS)[number];
 
 // @public
+function clearSession(res: NextResponse, opts: SessionCookieOptions): void;
+
+// @public
 type Client<Paths extends {}> = Client_2<Paths>;
+
+// @public
+function clientAddress(req: NextRequest, hops: number | undefined): string | null;
 
 // @public (undocumented)
 interface ClientOptions {
@@ -457,6 +585,14 @@ function CommandShortcut(input: React_2.ComponentProps<"span">): React_2.JSX.Ele
 // @public (undocumented)
 const config: Linter.Config[];
 
+// @public
+interface CookieReader {
+    // (undocumented)
+    get(name: string): {
+        value: string;
+    } | undefined;
+}
+
 // @public (undocumented)
 function countLayer(counter: LayerCounter): void;
 
@@ -465,6 +601,24 @@ function createClient<Paths extends {}>(opts: ClientOptions): Client<Paths>;
 
 // @public
 function createTranslator(lang: Lang, catalogues?: Catalogues): Translate;
+
+// @public
+const CSP_NONCE_HEADER = "x-nonce";
+
+// @public (undocumented)
+function CspNonceProvider(props: {
+    nonce: string | undefined;
+    children?: ReactNode;
+}): ReactNode;
+
+// @public
+const CSRF_COOKIE = "uspace_csrf";
+
+// @public
+const CSRF_HEADER = "X-CSRF-Token";
+
+// @public
+function csrfToken(name?: string): string | null;
 
 // @public (undocumented)
 const DARK_QUERY = "(prefers-color-scheme: dark)";
@@ -577,6 +731,9 @@ function DropdownMenuSubTrigger(input: React_2.ComponentProps<typeof DropdownMen
 function DropdownMenuTrigger(input: React_2.ComponentProps<typeof DropdownMenu_2.Trigger>): React_2.JSX.Element;
 
 // @public
+const DROPPED_RESPONSE_HEADERS: readonly string[];
+
+// @public
 function EmptyState(props: EmptyStateProps): ReactNode;
 
 // @public (undocumented)
@@ -596,25 +753,19 @@ interface EmptyStateProps {
 const en: Readonly<Record<Key, string>>;
 
 // @public (undocumented)
-const ENTRY = "auth/server";
+const ENTRY = "live";
 
 // @public (undocumented)
-const ENTRY_2 = "auth/client";
+const ENTRY_2 = "status";
 
 // @public (undocumented)
-const ENTRY_3 = "live";
+const ENTRY_3 = "alerts";
 
 // @public (undocumented)
-const ENTRY_4 = "status";
+const ENTRY_4 = "table";
 
 // @public (undocumented)
-const ENTRY_5 = "alerts";
-
-// @public (undocumented)
-const ENTRY_6 = "table";
-
-// @public (undocumented)
-const ENTRY_7 = "form";
+const ENTRY_5 = "form";
 
 declare namespace eslint {
     export {
@@ -750,8 +901,23 @@ declare namespace fonts {
 
 declare namespace form {
     export {
-        ENTRY_7 as ENTRY
+        ENTRY_5 as ENTRY
     }
+}
+
+// @public
+function forward(req: NextRequest, target: URL, opts: ForwardOptions): Promise<Response>;
+
+// @public
+const FORWARDED_REQUEST_HEADERS: readonly string[];
+
+// @public (undocumented)
+interface ForwardOptions {
+    allowPaths: RegExp[];
+    fetch?: typeof fetch;
+    session: SessionCookieOptions;
+    timeoutMs: number;
+    trustedProxyHops?: number;
 }
 
 // @public
@@ -982,11 +1148,20 @@ const isSeverity: (x: unknown) => x is "info" | "warning" | "critical";
 // @public (undocumented)
 const isSourceState: (x: unknown) => x is "stale" | "disabled" | "healthy" | "lagging" | "unreachable" | "never_heard";
 
+// @public
+function issueCspNonce(): string;
+
+// @public
+function issueCsrf(res: NextResponse, opts: SessionCookieOptions): string;
+
 // @public (undocumented)
 const isTimeSource: (x: unknown) => x is "provider" | "broadcast" | "source_clock" | "receiver" | "system";
 
 // @public (undocumented)
 const isTrust: (x: unknown) => x is "authenticated" | "provider" | "surveillance" | "broadcast" | "sensor" | "simulated";
+
+// @public
+function isUnsafeMethod(method: string): boolean;
 
 // @public (undocumented)
 const isVerticalRef: (x: unknown) => x is "AGL" | "AMSL" | "WGS84";
@@ -1133,7 +1308,7 @@ declare namespace legend {
 
 declare namespace live {
     export {
-        ENTRY_3 as ENTRY
+        ENTRY
     }
 }
 
@@ -1142,6 +1317,29 @@ function loadBasemapInfo(cfg: BasemapConfig, signal: AbortSignal, timeoutMs?: nu
 
 // @public
 const LOCALES: Readonly<Record<Lang, string>>;
+
+// @public (undocumented)
+function LoginForm(props: LoginFormProps): ReactNode;
+
+// @public (undocumented)
+interface LoginFormProps {
+    action: string;
+    fetch?: typeof fetch;
+    mfa?: boolean;
+    onSuccess(): void;
+}
+
+// @public
+type LoginResult = {
+    status: "signed_in";
+    recoveryCodes?: string[];
+} | {
+    status: "mfa_required";
+    enrolment?: {
+        secret: string;
+        otpauthUri: string;
+    };
+};
 
 // @public (undocumented)
 interface MannedView {
@@ -1280,6 +1478,15 @@ interface MapViewProps {
     // (undocumented)
     scheme: MapScheme;
 }
+
+// @public
+const MFA_CHALLENGE_COOKIE = "uspace_mfa";
+
+// @public
+const MFA_CHALLENGE_PATH = "/_bff";
+
+// @public
+const MIN_CHALLENGE_SECRET_BYTES = 32;
 
 // @public
 function missingKeys(): number;
@@ -1481,6 +1688,9 @@ function RadioGroup(input: React_2.ComponentProps<typeof RadioGroup_2.Root>): Re
 function RadioGroupItem(input: React_2.ComponentProps<typeof RadioGroup_2.Item>): React_2.JSX.Element;
 
 // @public
+function readSessionToken(src: NextRequest | CookieReader, opts?: Pick<SessionCookieOptions, "name">): string | null;
+
+// @public
 function renderWithKit(ui: ReactNode, opts?: RenderWithKitOptions): RenderResult;
 
 // @public (undocumented)
@@ -1495,7 +1705,21 @@ interface RenderWithKitOptions {
 }
 
 // @public
+function RequireRole(props: RequireRoleProps): ReactNode;
+
+// @public (undocumented)
+interface RequireRoleProps {
+    anyOf: string[];
+    // (undocumented)
+    children?: ReactNode;
+    fallback?: ReactNode;
+}
+
+// @public
 function resetApiCountersForTests(): void;
+
+// @public
+function resetAuthCountersForTests(): void;
 
 // @public
 function resetI18nCounters(): void;
@@ -1590,6 +1814,9 @@ function retryAfterSOf(value: string | null, nowMs: number): number | null;
 // @public (undocumented)
 type Rgb = readonly [number, number, number];
 
+// @public
+type RouteHandler = (req: NextRequest) => Promise<Response>;
+
 // @public (undocumented)
 const rules: {
     noGeometryImports: Rule.RuleModule;
@@ -1648,6 +1875,28 @@ function SelectValue(input: React_2.ComponentProps<typeof Select_2.Value>): Reac
 // @public (undocumented)
 function Separator(input: React_2.ComponentProps<typeof Separator_2.Root>): React_2.JSX.Element;
 
+// @public
+const SESSION_COOKIE = "uspace_session";
+
+// @public
+function sessionClaimsUnverified(jwt: string): UnverifiedSessionClaims | null;
+
+// @public (undocumented)
+interface SessionContextValue {
+    session: SessionDisplay | null;
+    signOut(): Promise<void>;
+}
+
+// @public (undocumented)
+interface SessionCookieOptions {
+    csrfName?: string;
+    domain?: string;
+    maxAgeS: number;
+    name?: string;
+    path?: string;
+    secure: boolean;
+}
+
 // @public (undocumented)
 interface SessionDisplay {
     // (undocumented)
@@ -1659,6 +1908,25 @@ interface SessionDisplay {
     // (undocumented)
     sub: string;
 }
+
+// @public
+function sessionDisplay(jwt: string | null): SessionDisplay | null;
+
+// @public (undocumented)
+function SessionProvider(props: SessionProviderProps): ReactNode;
+
+// @public (undocumented)
+interface SessionProviderProps {
+    // (undocumented)
+    children?: ReactNode;
+    fetch?: typeof fetch;
+    logoutAction?: string;
+    // (undocumented)
+    session: SessionDisplay | null;
+}
+
+// @public
+function setSession(res: NextResponse, jwt: string, opts: SessionCookieOptions): void;
 
 // @public
 function setSourceData(sourceId: string): (map: Map_2, data: ZoneFeatureCollection) => void;
@@ -1748,7 +2016,7 @@ interface StatProps {
 
 declare namespace status_2 {
     export {
-        ENTRY_4 as ENTRY
+        ENTRY_2 as ENTRY
     }
 }
 
@@ -1817,7 +2085,7 @@ function Table(input: React_2.ComponentProps<"table">): React_2.JSX.Element;
 
 declare namespace table {
     export {
-        ENTRY_6 as ENTRY
+        ENTRY_4 as ENTRY
     }
 }
 
@@ -2173,6 +2441,8 @@ declare namespace ui {
         TooltipContent,
         TooltipProvider,
         TooltipTrigger,
+        CspNonceProvider,
+        useCspNonce,
         EmptyState,
         EmptyStateProps,
         InlineCode,
@@ -2187,7 +2457,20 @@ declare namespace ui {
 const UNRESOLVED_COLOUR = "#808080";
 
 // @public
+interface UnverifiedSessionClaims {
+    exp: number | null;
+    // (undocumented)
+    realm: string | null;
+    roles: string[];
+    // (undocumented)
+    sub: string | null;
+}
+
+// @public
 function useBBoxSubscription(opts: BBoxSubscriptionOptions): void;
+
+// @public
+function useCspNonce(): string | undefined;
 
 // @public
 function useFeaturePointer(map: Map_2 | null, layerId: string, onSelect: ((identifier: string) => void) | undefined): PointerHover | null;
@@ -2222,6 +2505,9 @@ function useOptionalI18n(): I18nContextValue | null;
 
 // @public
 function useOptionalTheme(): ThemeContextValue | null;
+
+// @public
+function useSession(): SessionContextValue;
 
 // @public
 function useStyleLoad(add: StyleLoadHandler): void;

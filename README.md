@@ -97,6 +97,128 @@ A non-2xx answer rejects with an `ApiError` (`status`, `problem`,
 `slug`, `retryAfterS`, `requestId`, `sunset`); the client never
 retries.
 
+### BFF session (`auth/server`, `auth/client`)
+
+The BFF is three routes and nothing else (the session contract every
+system shares): `/_bff/login`, `/_bff/logout` and `/_bff/api/*`. The
+session JWT the API issues lives in the `HttpOnly; Secure;
+SameSite=Strict` cookie `uspace_session`; the page never sees it. The
+readable `uspace_csrf` cookie goes back as `X-CSRF-Token` on every
+unsafe request (`createClient({ csrfToken })` does it); sign-in, which
+has no CSRF cookie yet, requires a same-origin `Origin`. The BFF never
+verifies a token: the API decides every request.
+
+Next.js ignores App Router folders whose name starts with `_`, so the
+URL `/_bff/...` lives in a folder named `%5Fbff`:
+
+```ts
+// web/src/lib/bff/handlers.ts
+import { bffHandlers } from "@rootxkit/uspace-ui/auth/server";
+
+export const bff = bffHandlers({
+  apiBase: process.env.API_INTERNAL_URL!, // the API as the web container reaches it
+  apiLoginPath: "/v1/auth/login",
+  apiMfaPath: "/v1/auth/mfa", // the API's second sign-in step, when it has one
+  mfaChallengeSecret: process.env.BFF_SECRET!, // >= 32 bytes, from the secret store; seals the MFA challenge cookie
+  apiLogoutPath: "/v1/auth/logout",
+  session: { secure: true, maxAgeS: 12 * 3600 },
+  allowPaths: [/^\/v1\/(zones|restrictions)(\/|$)/], // what the console may reach
+  timeoutMs: 10_000,
+  trustedProxyHops: 1, // one Caddy in front of Next.js appends to X-Forwarded-For
+});
+```
+
+```ts
+// web/src/app/%5Fbff/login/route.ts
+import { bff } from "@/lib/bff/handlers";
+export const POST = bff.login;
+
+// web/src/app/%5Fbff/logout/route.ts
+import { bff } from "@/lib/bff/handlers";
+export const POST = bff.logout;
+
+// web/src/app/%5Fbff/api/[...path]/route.ts
+import { bff } from "@/lib/bff/handlers";
+export const { GET, POST, PUT, PATCH, DELETE } = {
+  GET: bff.proxy, POST: bff.proxy, PUT: bff.proxy, PATCH: bff.proxy, DELETE: bff.proxy,
+};
+```
+
+```tsx
+// web/src/app/layout.tsx (server component)
+import { cookies, headers } from "next/headers";
+import { CSP_NONCE_HEADER, readSessionToken, sessionDisplay } from "@rootxkit/uspace-ui/auth/server";
+import { SessionProvider } from "@rootxkit/uspace-ui/auth/client";
+import { CspNonceProvider } from "@rootxkit/uspace-ui/ui";
+
+const session = sessionDisplay(readSessionToken(await cookies())); // display only, unverified
+const nonce = (await headers()).get(CSP_NONCE_HEADER) ?? undefined;
+// <CspNonceProvider nonce={nonce}><SessionProvider session={session}>...</SessionProvider></CspNonceProvider>
+```
+
+Sign-in is `<LoginForm action="/_bff/login" onSuccess={...} />`. The
+first request carries `{username, password}`. When the API answers with
+an MFA challenge, the BFF seals it with `mfaChallengeSecret`
+(AES-256-GCM, HKDF-derived key), together with the username, into the
+`uspace_mfa` cookie: `HttpOnly;
+Secure; SameSite=Strict; Path=/_bff`, with `Max-Age` equal to the
+challenge's own expiry, which is checked again when the cookie is
+opened. The form drops the password from its state and asks for the
+code, and the second request carries `{username, otp}`; a challenge
+opens only for the username it was issued to. The password
+crosses the network once, and the challenge never reaches page script.
+An API that wants no code answers the session on the first request.
+A code sent without a live challenge gets `401 mfa_challenge_missing`
+and the form starts again. A refusal shows the API's `detail`, and a `429` counts its
+`Retry-After` down. `RequireRole` hides what a role does not use; it
+grants nothing.
+
+**Client address.** The BFF never passes on an `X-Forwarded-For` the
+client wrote. Route handlers do not see the TCP peer, so with
+`trustedProxyHops: n` the BFF takes the entry `n` places from the end
+of the chain its own reverse proxies built, and sends the API exactly
+that address, or no header at all. This holds only when Next.js is
+reachable through those proxies alone. The API must list the BFF (the
+`web` container's address) as a trusted proxy, for example in the
+authority's `AUTHORITY_TRUSTED_PROXIES`. Otherwise it applies its
+per-address sign-in limits to the BFF instead of the client.
+
+**WebSockets: there is no ticket route.** The BFF cannot proxy a
+WebSocket, and a ticket in a query string ends up in access logs. The
+browser opens the system's WebSocket same-origin; the `uspace_session`
+cookie travels on the upgrade, where the WS process checks `Origin`
+against its allow-list and verifies the cookie. A close with `4401`
+means "sign in again". Do not add a ticket route to a `web/`;
+`bffHandlers` has no fourth handler to mount.
+
+**CSP nonce.** Radix ScrollArea injects a `<style>` element, which the
+console CSP (`style-src 'self'`, no `'unsafe-inline'`) refuses. The
+app's middleware calls `issueCspNonce()` per request, adds
+`'nonce-<value>'` to `style-src`, and passes the value in the
+`CSP_NONCE_HEADER` request header; the layout above hands it to
+`CspNonceProvider`.
+
+The middleware must overwrite `x-nonce` on every request and never read
+it. The browser can send its own `x-nonce`. A middleware that keeps an
+incoming value (`get(...) ?? issueCspNonce()`) lets the client choose
+the nonce, which defeats the policy. Always `set`, on a copy of the
+request headers:
+
+```ts
+// web/src/proxy.ts (Next.js middleware)
+import { NextResponse, type NextRequest } from "next/server";
+import { CSP_NONCE_HEADER, issueCspNonce } from "@rootxkit/uspace-ui/auth/server";
+
+export function proxy(req: NextRequest) {
+  const nonce = issueCspNonce(); // fresh per request, never taken from the request
+  const headers = new Headers(req.headers);
+  headers.set(CSP_NONCE_HEADER, nonce); // set, not append: replaces any client value
+  const res = NextResponse.next({ request: { headers } });
+  res.headers.set("Content-Security-Policy", `style-src 'self' 'nonce-${nonce}'; ...`);
+  return res;
+}
+```
+
 Entry points: `@rootxkit/uspace-ui/{model,theme,ui,i18n,fonts,map,api,
 auth/server,auth/client,symbology,layers,legend,live,status,alerts,
 table,form,eslint,test}`. The full step list for a `web/` app is in

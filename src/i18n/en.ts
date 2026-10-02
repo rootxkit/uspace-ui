@@ -173,6 +173,28 @@ const catalogue = {
   "restriction.state.ended": "Ended",
   "restriction.state.cancelled": "Cancelled",
   "restriction.state.unstated": "State not provided",
+
+  // WP-5: sign-in. Rate limits are the API's (LESSONS S-15): the form shows
+  // the API's refusal and its Retry-After, never a limit of its own.
+  "auth.title": "Sign in",
+  "auth.username": "Username",
+  "auth.password": "Password",
+  "auth.otp": "One-time code",
+  "auth.submit": "Sign in",
+  "auth.submitting": "Signing in",
+  "auth.failed": "Sign-in refused (status {status})",
+  "auth.unreachable": "The sign-in service could not be reached. Try again.",
+  "auth.retry_in_one": "Try again in {count} second",
+  "auth.retry_in_other": "Try again in {count} seconds",
+  "auth.mfa_required":
+    "Password accepted. Enter the one-time code from your authenticator app.",
+  "auth.enrol":
+    "Your account has no authenticator yet. Add this key to an authenticator app, then enter the code it shows.",
+  "auth.enrol_key": "Authenticator key",
+  "auth.recovery_codes":
+    "Recovery codes: each works once, in place of a one-time code. Store them now; they are not shown again.",
+  "auth.continue": "Continue",
+  "auth.restart": "Start again",
 } as const;
 
 /** A key of the kit's own catalogue. Apps add keys of their own. */

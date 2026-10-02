@@ -432,6 +432,7 @@ export function readSessionToken(req: NextRequest | ReadonlyRequestCookies, opts
 export function issueCsrf(res: NextResponse, opts): string; export function checkCsrf(req: NextRequest, opts): boolean   // double submit: cookie value equals X-CSRF-Token header on unsafe methods
 export function forward(req: NextRequest, target: URL, opts: { session: SessionCookieOptions; allowPaths: RegExp[]; timeoutMs: number }): Promise<Response>   // the one BFF proxy: adds Authorization: Bearer <session>, strips cookies, copies Accept-Language and Content-Type, passes status and problem bodies through; refuses a path not in allowPaths with 404; never follows redirects
 export function bffHandlers(opts): { login: RouteHandler; logout: RouteHandler; proxy: RouteHandler }   // the three routes every web/ mounts under /_bff/* (02 §3); login POSTs the credentials to the API's login endpoint over the server side and sets the cookie; the browser never sees the JWT. No WebSocket ticket route (M22): the BFF cannot proxy a WebSocket and a ticket in a query string is logged; the WS process accepts the session cookie on a same-origin upgrade with an `Origin` allow-list and verifies it with the shared verifier
+// WP-5 additions: sessionDisplay(jwt | null): SessionDisplay | null (the SessionProvider value; null without sub, exp or realm); issueCspNonce() and CSP_NONCE_HEADER (the per-request CSP nonce the app's middleware puts in style-src, read back by ui's CspNonceProvider for Radix ScrollArea); authCounters(); the contract names (SESSION_COOKIE, CSRF_COOKIE, CSRF_HEADER, BFF_*_PATH); LoginResult (the login route's 2xx body: signed_in with recoveryCodes?, or mfa_required with enrolment?). BffOptions: apiBase, apiLoginPath, apiMfaPath? (the API's second sign-in step, e.g. the authority's /v1/auth/mfa), mfaChallengeSecret? (required with apiMfaPath, >= 32 bytes: seals the MFA challenge in the BFF-internal cookie uspace_mfa, HttpOnly, Secure, SameSite=Strict, Path=/_bff, Max-Age = the challenge's expiry; no API or WS process reads it), apiLogoutPath?, session, allowPaths, trustedProxyHops? (X-Forwarded-For is written by the BFF from its trusted proxy chain, never passed through), timeoutMs. The login route takes {username, password}, then {username, otp}; the seal binds the challenge to that username
 export function sessionClaimsUnverified(jwt: string): { sub: string | null; roles: string[]; realm: string | null; exp: number | null } | null   // display only (which menu to show); authorisation is the API's; the name says so. Reads the reconciled session shape (M20): `sub`, `exp`, `roles: [string]`, `realm`; a `roles` claim that is absent or not an array gives `[]`, never a guess from `scope`
 ```
 
@@ -459,7 +460,7 @@ export const rules: { noGeometryImports; noServerClientsInWeb; noBusinessLogicIn
 named `geo`, `geodesy`, `cpa`, `conformance`. `noServerClientsInWeb`:
 `pg`, `postgres`, `nats`, `nats.ws`, `ioredis`, `redis`, `@prisma/*`,
 `drizzle-orm`, `kysely`, `knex`, `mongodb` anywhere under `web/`.
-`noBusinessLogicInRoutes`: under `app/api/**` and `app/_bff/**`, only
+`noBusinessLogicInRoutes`: under `app/api/**` and `app/_bff/**` (served from `app/%5Fbff/**`, WP-5), only
 imports from `@rootxkit/uspace-ui/auth/server`, `next/*` and the app's
 own `lib/bff/*` are allowed. `noHandWrittenApiTypes`: under
 `src/api/generated/**` only generated files (header check) may exist;
@@ -490,6 +491,7 @@ pinned exact in `package.json` and locked; peers carry ranges.
 | `pmtiles`, `@protomaps/basemaps` | `map` | D6: the self-hosted basemap protocol and the style layers the predecessor already used (P1-12). |
 | `tailwindcss` (peer `^4`) | styles | D4. The app runs Tailwind; the kit ships tokens and source classes. |
 | `radix-ui` (the unified package), `class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react`, `sonner`, `cmdk` | `ui` | What the vendored shadcn/ui components import. Accepted as the cost of shadcn/ui (D5). |
+| `server-only` (exact pin) | `auth/server` | The marker React and Next.js define for server-only modules: it resolves to an empty module under the `react-server` condition and throws everywhere else, so a client component that imports the BFF helpers fails to build (WP-5). No code beyond the throw. |
 | `openapi-fetch` | `api` | The typed fetch companion of `openapi-typescript` (`00 §6.2`): the generated `paths` type gives typed requests and responses with a 6 kB runtime. |
 | `openapi-typescript` (exact pin) | `bin/uspace-ui-gen-api` | The generator every `web/` runs through the kit's bin (§14 Q14), so it is a runtime dependency, not a dev one: the bin runs in the consumer's install and pins the generator version for all five apps (WP-4). Its peer `typescript` is the consumer's. |
 | `@tanstack/react-table` | `table` | Headless table with sorting, filtering, pagination and virtualisation hooks; the accessible markup is ours. |

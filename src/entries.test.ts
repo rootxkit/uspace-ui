@@ -51,7 +51,7 @@ const ADDED: Record<string, string> = {
     "WP-2: the @font-face rules and the font-sans stack for Storybook and non-Next consumers",
 };
 
-// Entries that are real (WP-0, WP-1, WP-2, WP-3, WP-4, WP-6); the rest are stubs
+// Entries that are real (WP-0 .. WP-6); the rest are stubs
 // until their WP.
 const REAL = new Set([
   "./model",
@@ -61,6 +61,8 @@ const REAL = new Set([
   "./fonts",
   "./map",
   "./api",
+  "./auth/server",
+  "./auth/client",
   "./symbology",
   "./layers",
   "./legend",
