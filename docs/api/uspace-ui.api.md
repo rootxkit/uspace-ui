@@ -10,6 +10,9 @@ import { ClassProp } from 'class-variance-authority/types';
 import { ClassValue } from 'clsx';
 import { Client as Client_2 } from 'openapi-fetch';
 import { Collapsible as Collapsible_2 } from 'radix-ui';
+import type { Column } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
+import type { ColumnFiltersState } from '@tanstack/react-table';
 import { Command as Command_2 } from 'cmdk';
 import type { ComponentProps } from 'react';
 import { Dialog as Dialog_2 } from 'radix-ui';
@@ -32,10 +35,12 @@ import * as React_2 from 'react';
 import { ReactNode } from 'react';
 import { ReactPortal } from 'react';
 import { RenderResult } from '@testing-library/react';
+import { RowSelectionState } from '@tanstack/react-table';
 import { Rule } from 'eslint';
 import { ScrollArea as ScrollArea_2 } from 'radix-ui';
 import { Select as Select_2 } from 'radix-ui';
 import { Separator as Separator_2 } from 'radix-ui';
+import type { SortingState } from '@tanstack/react-table';
 import type { StyleSpecification } from 'maplibre-gl';
 import { Switch as Switch_2 } from 'radix-ui';
 import { Tabs as Tabs_2 } from 'radix-ui';
@@ -43,6 +48,7 @@ import { toast } from 'sonner';
 import { ToasterProps } from 'sonner';
 import { Tooltip as Tooltip_2 } from 'radix-ui';
 import { VariantProps } from 'class-variance-authority';
+import type { VisibilityState } from '@tanstack/react-table';
 
 // @public
 const AGE_BUCKET_KEYS: Readonly<Record<AgeBucket, Key>>;
@@ -67,6 +73,12 @@ interface AgeChipProps {
     ageS: number | null;
     // (undocumented)
     className?: string;
+    staleAfterS: number | null;
+}
+
+// @public (undocumented)
+interface AgeColumnOptions<Row> extends ColumnOptions {
+    ageS(row: Row, nowMs: number): number | null;
     staleAfterS: number | null;
 }
 
@@ -655,6 +667,61 @@ const COLOR_SCHEMES: readonly ColorScheme[];
 // @public (undocumented)
 type ColorScheme = "light" | "dark" | "system";
 
+// @public
+type ColumnFilterKind = {
+    kind: "text";
+} | {
+    kind: "enum";
+    options: readonly FilterOption[];
+};
+
+// @public
+function columnLabel<Row>(column: Column<Row, unknown>, t: Translate): string;
+
+// @public (undocumented)
+interface ColumnOptions {
+    headerKey?: string;
+    id?: string;
+}
+
+// @public
+const columns: Readonly<{
+    num: typeof num;
+    utc: typeof utc;
+    age: typeof age;
+    severity: typeof severity;
+    trust: typeof trust;
+    ident: typeof ident;
+    enum: typeof enumColumn;
+    text: typeof text;
+    select: typeof select;
+}>;
+
+// @public
+function columnsFor<Row>(): {
+    num: (key: KeyOf<Row, number | null | undefined>, unitKey: string, digits: number, opts?: ColumnOptions) => TableColumn<Row>;
+    utc: (key: KeyOf<Row, string | null | undefined>, opts?: ColumnOptions) => TableColumn<Row>;
+    age: (nowMs: number, opts: AgeColumnOptions<Row>) => TableColumn<Row>;
+    severity: (opts?: ColumnOptions & {
+        key?: KeyOf<Row, Severity | null | undefined>;
+    }) => TableColumn<Row>;
+    trust: (opts?: ColumnOptions & {
+        key?: KeyOf<Row, Trust | null | undefined>;
+    }) => TableColumn<Row>;
+    ident: (opts?: ColumnOptions & {
+        key?: KeyOf<Row, Identification | null | undefined>;
+    }) => TableColumn<Row>;
+    enum: (key: KeyOf<Row, string | null | undefined>, i18nPrefix: string, opts?: ColumnOptions & {
+        values?: readonly string[];
+    }) => TableColumn<Row>;
+    text: (key: KeyOf<Row, string | null | undefined>, opts?: ColumnOptions & {
+        mono?: boolean;
+    }) => TableColumn<Row>;
+    select: (opts?: {
+        id?: string;
+    }) => TableColumn<Row>;
+};
+
 // @public (undocumented)
 function Command(input: React_2.ComponentProps<typeof Command_2>): React_2.JSX.Element;
 
@@ -785,6 +852,40 @@ interface DatasetAge {
 }
 
 // @public (undocumented)
+function DataTable<Row>(props: DataTableProps<Row>): JSX.Element;
+
+// @public (undocumented)
+interface DataTableProps<Row> {
+    caption: string;
+    captionHidden?: boolean;
+    // (undocumented)
+    className?: string;
+    // (undocumented)
+    columns: readonly TableColumn<Row>[];
+    // (undocumented)
+    dense?: boolean;
+    empty: ReactNode;
+    error?: Problem | null;
+    freshness?: Freshness | null;
+    getRowId(r: Row): string;
+    loading?: boolean;
+    // (undocumented)
+    onRowSelectionChange?(s: RowSelectionState): void;
+    onSelect?(r: Row): void;
+    // (undocumented)
+    onStateChange?(s: TableState): void;
+    retryAfterS?: number | null;
+    // (undocumented)
+    rows: readonly Row[];
+    rowSelection?: RowSelectionState;
+    selectedId?: string | null;
+    staleAfterS?: number | null;
+    state?: TableState;
+    toolbar?: boolean;
+    virtualize?: boolean;
+}
+
+// @public (undocumented)
 const DEFAULT_BACKOFF: Readonly<Backoff>;
 
 // @public (undocumented)
@@ -795,6 +896,9 @@ const DEFAULT_FRESHNESS_PICK: Readonly<Required<FreshnessPick>>;
 
 // @public
 const DEFAULT_LANG: Lang;
+
+// @public
+const DEFAULT_PAGE_SIZE = 25;
 
 // @public
 const DEFAULT_TIMEOUT_MS = 30000;
@@ -943,10 +1047,7 @@ const en: Readonly<Record<Key, string>>;
 const ENTRY = "alerts";
 
 // @public (undocumented)
-const ENTRY_2 = "table";
-
-// @public (undocumented)
-const ENTRY_3 = "form";
+const ENTRY_2 = "form";
 
 declare namespace eslint {
     export {
@@ -1067,6 +1168,14 @@ interface FieldError {
 // @public
 function fieldErrorsOf(err: unknown): FieldError[];
 
+// @public
+interface FilterOption {
+    // (undocumented)
+    labelKey: string;
+    // (undocumented)
+    value: string;
+}
+
 // @public (undocumented)
 interface Fixtures {
     // (undocumented)
@@ -1162,7 +1271,7 @@ declare namespace fonts {
 
 declare namespace form {
     export {
-        ENTRY_3 as ENTRY
+        ENTRY_2 as ENTRY
     }
 }
 
@@ -1219,6 +1328,31 @@ interface FrozenOverlayProps {
 
 // @public
 const GEORGIAN_UNICODE_RANGE = "U+10A0-10FF, U+1C90-1CBF, U+2D00-2D2F";
+
+// @public (undocumented)
+interface GridKey {
+    // (undocumented)
+    ctrlKey: boolean;
+    // (undocumented)
+    key: string;
+    // (undocumented)
+    metaKey: boolean;
+}
+
+// @public (undocumented)
+interface GridPos {
+    // (undocumented)
+    col: number;
+    // (undocumented)
+    row: number;
+}
+
+// @public (undocumented)
+interface GridSize {
+    // (undocumented)
+    cols: number;
+    rows: number;
+}
 
 // @public
 const HEIGHT_KEYS: Readonly<Record<HeightRef, Key>>;
@@ -1428,6 +1562,9 @@ function IdentSwatch(props: {
 // @public
 function identToken(s: IdentStatus | null): string;
 
+// @public (undocumented)
+function initialTableState(pageSize?: number): TableState;
+
 // @public
 function InlineCode(input: ComponentProps<"code">): ReactNode;
 
@@ -1481,6 +1618,9 @@ const isIdentReason: (x: unknown) => x is "matched" | "session_binding" | "uas_s
 // @public (undocumented)
 const isIdentStatus: (x: unknown) => x is "registered" | "suspended" | "unknown_operator" | "unidentified";
 
+// @public
+function isPiiColumn(id: string): boolean;
+
 // @public (undocumented)
 const isRestrictionState: (x: unknown) => x is "planned" | "active" | "ended" | "cancelled";
 
@@ -1525,6 +1665,11 @@ function Kbd(input: ComponentProps<"kbd">): ReactNode;
 // @public
 type Key = keyof typeof catalogue;
 
+// @public
+type KeyOf<Row, V> = {
+    [K in keyof Row]-?: Row[K] extends V ? K : never;
+}[keyof Row] & string;
+
 // @public (undocumented)
 const KIT_CATALOGUES: Readonly<Record<Lang, Catalogue>>;
 
@@ -1542,8 +1687,27 @@ interface KitBrand {
     shortName: string;
 }
 
+// @public
+interface KitColumnMeta {
+    align?: "start" | "end";
+    // (undocumented)
+    filter?: ColumnFilterKind;
+    headerKey: string;
+    select?: boolean;
+    unitKey?: string;
+    utc?: boolean;
+}
+
+// @public
+function kitColumnMeta(meta: KitColumnMeta): {
+    uspace: KitColumnMeta;
+};
+
 // @public (undocumented)
 type KitLang = "ka" | "en";
+
+// @public
+function kitMetaOf<Row>(column: Column<Row, unknown>): KitColumnMeta | undefined;
 
 // @public (undocumented)
 type KitScheme = "light" | "dark" | "system";
@@ -2036,6 +2200,9 @@ interface MapViewProps {
 }
 
 // @public
+const MAX_PAGE_SIZE = 1000;
+
+// @public
 const MFA_CHALLENGE_COOKIE = "uspace_mfa";
 
 // @public
@@ -2118,6 +2285,9 @@ function needsAttention(s: IdentStatus | null): boolean;
 // @public
 function negotiateLang(acceptLanguage: string | null, cookie: string | null): Lang;
 
+// @public
+function nextGridPos(k: GridKey, pos: GridPos, size: GridSize, pageStep?: number): GridPos | null;
+
 // @public (undocumented)
 const NO_EXTRAS: StatusExtras;
 
@@ -2126,6 +2296,12 @@ const notoSans: NextFontWithVariable;
 
 // @public
 const notoSansGeorgian: NextFontWithVariable;
+
+// @public
+const PAGE_SIZES: readonly number[];
+
+// @public
+const PAGE_STEP_ROWS = 10;
 
 // @public (undocumented)
 function Pagination(input: React_2.ComponentProps<"nav">): React_2.JSX.Element;
@@ -2194,6 +2370,9 @@ interface PatternImage {
     // (undocumented)
     width: number;
 }
+
+// @public
+const PII_FILTER_DENY_LIST: readonly string[];
 
 // @public
 const plugin: ESLint.Plugin;
@@ -2289,6 +2468,9 @@ function RadioGroupItem(input: React_2.ComponentProps<typeof RadioGroup_2.Item>)
 function readSessionToken(src: NextRequest | CookieReader, opts?: Pick<SessionCookieOptions, "name">): string | null;
 
 // @public
+function readTableState(params: URLSearchParams, key: string, base: TableState): TableState;
+
+// @public
 function receivedAgeS(t: TrackView, nowMs: number): number | null;
 
 // @public (undocumented)
@@ -2348,6 +2530,12 @@ function resetLayerCountersForTests(): void;
 
 // @public
 function resetLiveCountersForTests(): void;
+
+// @public
+function resetTableCountersForTests(): void;
+
+// @public
+const RESIZE_STEP_PX = 16;
 
 // @public
 function resolveColour(map: Map_2, token: string): string;
@@ -2999,7 +3187,44 @@ function Table(input: React_2.ComponentProps<"table">): React_2.JSX.Element;
 
 declare namespace table {
     export {
-        ENTRY_2 as ENTRY
+        UNIT_KEYS,
+        columnLabel,
+        columns,
+        columnsFor,
+        kitColumnMeta,
+        kitMetaOf,
+        tableColumn,
+        AgeColumnOptions,
+        ColumnFilterKind,
+        ColumnOptions,
+        FilterOption,
+        KeyOf,
+        KitColumnMeta,
+        TableColumn,
+        resetTableCountersForTests,
+        tableCounters,
+        TableCounter,
+        DataTable,
+        RESIZE_STEP_PX,
+        VIRTUAL_VIEWPORT_PX,
+        VIRTUALIZE_ABOVE_ROWS,
+        DataTableProps,
+        PAGE_STEP_ROWS,
+        nextGridPos,
+        GridKey,
+        GridPos,
+        GridSize,
+        DEFAULT_PAGE_SIZE,
+        MAX_PAGE_SIZE,
+        PAGE_SIZES,
+        PII_FILTER_DENY_LIST,
+        initialTableState,
+        isPiiColumn,
+        readTableState,
+        writeTableState,
+        TableState,
+        useTableUrlState,
+        TableUrlStateOptions
     }
 }
 
@@ -3012,6 +3237,26 @@ function TableCaption(input: React_2.ComponentProps<"caption">): React_2.JSX.Ele
 // @public (undocumented)
 function TableCell(input: React_2.ComponentProps<"td">): React_2.JSX.Element;
 
+// @public
+type TableColumn<Row> = ColumnDef<Row, unknown>;
+
+// @public
+function tableColumn<Row, V>(def: ColumnDef<Row, V>): TableColumn<Row>;
+
+// @public (undocumented)
+type TableCounter =
+/** A `<key>.*` search parameter that did not parse; it was ignored. */
+"url_state_malformed"
+/** A filter on a PII column found in a URL; dropped, never applied. */
+| "url_pii_refused"
+/** A filter on a PII column kept in memory instead of the URL. */
+| "pii_filter_in_memory"
+/** A sort, filter or visibility entry for a column the table lacks. */
+| "state_unknown_column";
+
+// @public
+function tableCounters(): Readonly<Record<TableCounter, number>>;
+
 // @public (undocumented)
 function TableFooter(input: React_2.ComponentProps<"tfoot">): React_2.JSX.Element;
 
@@ -3023,6 +3268,26 @@ function TableHeader(input: React_2.ComponentProps<"thead">): React_2.JSX.Elemen
 
 // @public (undocumented)
 function TableRow(input: React_2.ComponentProps<"tr">): React_2.JSX.Element;
+
+// @public (undocumented)
+interface TableState {
+    // (undocumented)
+    columnFilters: ColumnFiltersState;
+    // (undocumented)
+    columnVisibility: VisibilityState;
+    // (undocumented)
+    pagination: {
+        pageIndex: number;
+        pageSize: number;
+    };
+    // (undocumented)
+    sorting: SortingState;
+}
+
+// @public (undocumented)
+interface TableUrlStateOptions {
+    pageSize?: number;
+}
 
 // @public (undocumented)
 function Tabs(input: React_2.ComponentProps<typeof Tabs_2.Root>): React_2.JSX.Element;
@@ -3612,6 +3877,22 @@ declare namespace ui {
 }
 
 // @public
+const UNIT_KEYS: Readonly<{
+    readonly m: "unit.symbol.m";
+    readonly m_amsl: "unit.symbol.m_amsl";
+    readonly m_agl: "unit.symbol.m_agl";
+    readonly m_wgs84: "unit.symbol.m_wgs84";
+    readonly m_takeoff: "unit.symbol.m_takeoff";
+    readonly ms: "unit.symbol.ms";
+    readonly s: "unit.symbol.s";
+    readonly min: "unit.symbol.min";
+    readonly deg: "unit.symbol.deg";
+    readonly pct: "unit.symbol.pct";
+    readonly kg: "unit.symbol.kg";
+    readonly wh: "unit.symbol.wh";
+}>;
+
+// @public
 const UNRESOLVED_COLOUR = "#808080";
 
 // @public
@@ -3683,6 +3964,9 @@ function useStyleLoad(add: StyleLoadHandler): void;
 function useT(): Translate;
 
 // @public
+function useTableUrlState(key: string, opts?: TableUrlStateOptions): [TableState, (s: TableState) => void];
+
+// @public
 function useTFor(lang: Lang): Translate;
 
 // @public
@@ -3731,11 +4015,20 @@ const VIOLATION_KINDS: readonly ["height_120m", "zone_incursion", "unregistered"
 // @public (undocumented)
 type ViolationKind = (typeof VIOLATION_KINDS)[number];
 
+// @public
+const VIRTUAL_VIEWPORT_PX = 480;
+
+// @public
+const VIRTUALIZE_ABOVE_ROWS = 200;
+
 // @public (undocumented)
 const WCAG_22_AA_TAGS: readonly string[];
 
 // @public
 type WireSourceState = "live" | "stale" | "disabled" | "down" | "unknown";
+
+// @public
+function writeTableState(params: URLSearchParams, key: string, state: TableState, defaultPageSize?: number): URLSearchParams;
 
 // @public
 const ZONE_DIMMED_OPACITY = 0.35;
@@ -3941,6 +4234,18 @@ interface ZoneView {
     // (undocumented)
     version: string | null;
 }
+
+// Warnings were encountered during analysis:
+//
+// src/table/columns.tsx:567:21 - (ae-forgotten-export) The symbol "num" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:567:21 - (ae-forgotten-export) The symbol "utc" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:567:21 - (ae-forgotten-export) The symbol "age" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:567:21 - (ae-forgotten-export) The symbol "severity" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:567:21 - (ae-forgotten-export) The symbol "trust" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:567:21 - (ae-forgotten-export) The symbol "ident" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:567:21 - (ae-forgotten-export) The symbol "enumColumn" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:567:21 - (ae-forgotten-export) The symbol "text" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:567:21 - (ae-forgotten-export) The symbol "select" needs to be exported by the entry point entry.d.ts
 
 // (No @packageDocumentation comment for this package)
 
