@@ -15,7 +15,37 @@ export {
   resetFormCountersForTests,
   type FormCounter,
 } from "./counters.js";
+export {
+  DATUM_KEYS,
+  FORM_UNIT_KEYS,
+  Field,
+  fieldLabel,
+  type FieldLabelParts,
+  type FieldProps,
+} from "./Field.js";
 export { FieldErrors, type FieldErrorsProps } from "./FieldErrors.js";
+export {
+  BBoxField,
+  CheckboxField,
+  EnumField,
+  NumberField,
+  ReasonField,
+  SelectField,
+  TextField,
+  UTCDateTimeField,
+  type BBoxFieldProps,
+  type EnumFieldProps,
+  type FieldBaseProps,
+  type ReasonFieldProps,
+  type SelectFieldProps,
+  type SelectOption,
+  type TextFieldProps,
+  type UTCDateTimeFieldProps,
+} from "./fields.js";
 export { Form, type FormProps } from "./Form.js";
 export { kitErrorMap } from "./messages.js";
+export { formatLocaleNumber, parseLocaleNumber } from "./number.js";
 export { toFieldName, toJsonPath } from "./paths.js";
+export * as shapes from "./shapes.js";
+export type { BBoxValue } from "./shapes.js";
+export { inputToUtc, isRfc3339, isRfc3339Utc, utcToInput } from "./utc.js";
