@@ -301,7 +301,9 @@ type AuthCounter =
 /** No client address: the forwarded chain was shorter than the trusted hops, or not an IP. */
 | "client_address_unknown"
 /** A one-time code sent without a live sealed challenge (absent, altered, expired). */
-| "mfa_challenge_invalid";
+| "mfa_challenge_invalid"
+/** An upstream 3xx other than 304: refused with a 502, never passed on. */
+| "upstream_redirect";
 
 // @public
 function authCounters(): Readonly<Record<AuthCounter, number>>;
