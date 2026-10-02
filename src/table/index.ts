@@ -48,3 +48,7 @@ export {
   writeTableState,
   type TableState,
 } from "./state.js";
+export {
+  useTableUrlState,
+  type TableUrlStateOptions,
+} from "./useTableUrlState.js";
