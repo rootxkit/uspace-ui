@@ -54,6 +54,8 @@ export class MockMap {
   readonly layers = new Map<string, ML.LayerSpecification>();
   /** Images added with addImage (WP-6: zone fill patterns). */
   readonly images = new Map<string, unknown>();
+  /** The options each image was added with (WP-7: SDF track icons). */
+  readonly imageOptions = new Map<string, unknown>();
   readonly controls: { control: unknown; position: unknown }[] = [];
   center: { lng: number; lat: number };
   zoom: number;
@@ -132,6 +134,7 @@ export class MockMap {
     this.sources.clear();
     this.layers.clear();
     this.images.clear();
+    this.imageOptions.clear();
     this.setStyleCalls.push({ style, options });
     if (MockMap.autoLoad) queueMicrotask(() => this.fire("style.load"));
     return this;
@@ -179,11 +182,12 @@ export class MockMap {
     return this.images.has(id);
   }
 
-  addImage(id: string, image: unknown): this {
+  addImage(id: string, image: unknown, options?: unknown): this {
     if (this.images.has(id)) {
       throw new Error(`An image named "${id}" already exists.`);
     }
     this.images.set(id, image);
+    this.imageOptions.set(id, options);
     return this;
   }
 

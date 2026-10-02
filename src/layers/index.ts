@@ -18,6 +18,26 @@ export {
   type RestrictionLayerProps,
 } from "./RestrictionLayer.js";
 export {
+  TrackHold,
+  compareCapturedAt,
+  receivedAgeS,
+  trackFeatureCollection,
+  trackLabel,
+  type FeatureOptions,
+  type TrackFeature,
+  type TrackFeatureCollection,
+  type TrailFeature,
+} from "./trackFeatures.js";
+export {
+  TRACK_LAYER_ID,
+  TrackLayer,
+  putTrackIcons,
+  resolveTrackColours,
+  trackLayerIds,
+  type TrackLayerIds,
+  type TrackLayerProps,
+} from "./TrackLayer.js";
+export {
   UNRESOLVED_COLOUR,
   putImage,
   resolveColour,
