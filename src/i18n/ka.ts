@@ -292,4 +292,46 @@ export const ka: Readonly<Record<Key, string>> = {
     "აღდგენის კოდები: თითოეული მუშაობს ერთხელ, ერთჯერადი კოდის ნაცვლად. შეინახეთ ისინი ახლავე; ისინი აღარ გამოჩნდება.",
   "auth.continue": "გაგრძელება",
   "auth.restart": "თავიდან დაწყება",
+
+  // WP-8: the feed's status bar and frozen overlay
+  "feed.down_retrying": "ნაკადი შეწყვეტილია, ხელახლა ვუკავშირდებით",
+  "feed.last_frame": "ბოლო კადრი {age} წინ",
+  "feed.no_frame_yet": "კადრი ჯერ არ მიღებულა",
+  "feed.as_of":
+    "ნაჩვენებია მონაცემები {time}-ის მდგომარეობით, მიღებულია {age} წინ",
+  "feed.no_data_yet": "მონაცემები ჯერ არ მიღებულა",
+  "feed.malformed_one": "უგულებელყოფილია {count} დაზიანებული კადრი",
+  "feed.malformed_other": "უგულებელყოფილია {count} დაზიანებული კადრი",
+  "feed.degraded": "შეზღუდულია: {list}",
+  "feed.no_threshold":
+    "სერვერს მოძველების ზღვარი არ გამოუგზავნია: ასაკი ნაჩვენებია კატეგორიის გარეშე",
+
+  // WP-8: what is degraded, and the ages the status frame carries
+  "degraded.title": "შეზღუდული მომსახურება",
+  "degraded.manned": "პილოტირებული საჰაერო მოძრაობის მონაცემები მიუწვდომელია",
+  "degraded.dss": "DSS მიუწვდომელია",
+  "degraded.source_disabled": "ერთ-ერთი წყარო გათიშულია",
+  "degraded.publisher_stale": "გამომქვეყნებლის მონაცემები მოძველებულია",
+  "degraded.other": "{slug} (სერვერის დასახელებით)",
+  "degraded.cis_age": "CIS მონაცემების ასაკი: {age}",
+  "degraded.cis_age_over":
+    "CIS მონაცემების ასაკი: {age}, ზღვარი {bound} გადაჭარბებულია",
+  "degraded.dataset_age": "{dataset}, ვერსია {version}: ასაკი {age}",
+  "degraded.projection_age": "რეესტრის პროექციის ასაკი: {age}",
+
+  // WP-8: the sources panel and the switch
+  "source.panel.title": "წყაროები",
+  "source.panel.empty": "სერვერს წყაროები არ მოუწოდებია",
+  "source.all": "ყველა: {type}",
+  "source.last_heard": "ბოლოს მოისმა {age} წინ",
+  "source.counters": "მიღებულია {accepted}, უარყოფილია {refused}",
+  "source.switch.disable": "გათიშვა",
+  "source.switch.enable": "ჩართვა",
+  "source.switch.title_disable": "{name}: გათიშვა",
+  "source.switch.title_enable": "{name}: ჩართვა",
+  "source.switch.description":
+    "სერვერი ჩაწერს ცვლილებას თქვენი სახელით და მიზეზით.",
+  "source.switch.reason": "მიზეზი (სავალდებულო)",
+  "source.switch.reason_required": "გასაგრძელებლად მიუთითეთ მიზეზი",
+  "source.switch.at_type": "იმართება წყაროს ტიპთან ერთად",
 };
