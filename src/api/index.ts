@@ -21,4 +21,10 @@ export {
   retryAfterSOf,
   type ApiErrorInit,
 } from "./error.js";
+export {
+  DEFAULT_FRESHNESS_PICK,
+  freshnessOf,
+  type Freshness,
+  type FreshnessPick,
+} from "./freshness.js";
 export { parseProblem, PROBLEM_TYPE_PREFIX, problemSlug } from "./problem.js";
