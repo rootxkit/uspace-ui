@@ -22,6 +22,8 @@ export default defineConfig({
         "src/map/test/**",
         // The api fixtures, generated types and test helpers (WP-4).
         "src/api/test/**",
+        // The mock WebSocket server and its fixtures (WP-8).
+        "src/live/test/**",
       ],
       reporter: ["text", "text-summary", "json-summary"],
       thresholds: { statements: 90 },
