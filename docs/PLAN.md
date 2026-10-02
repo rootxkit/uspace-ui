@@ -126,7 +126,7 @@ model <- theme <- ui, map, symbology
 model <- i18n <- map, legend, status, alerts, table, form
 model <- api <- live, form
 map <- layers ;  symbology <- layers, legend, alerts
-live <- status, alerts
+live <- status, alerts, layers   (layers reads ageS and compareCapturedAt from live, WP-8)
 ui <- legend, status, alerts, table, form
 fonts, auth/server, auth/client: next (peer) only; nothing imports them
 eslint: nothing imports it
