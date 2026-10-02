@@ -88,7 +88,7 @@ name).
   Latin basic in `NotoSans-Regular.woff2`; total woff2 bytes ≤ the
   budget in `package.json`. Presence twin: a test that asks for a Hangul
   code point and sees the check fail.
-- Stories: a `Typography` story rendering the same paragraph in `ka`
+- Browser tests: a `Typography` page rendering the same paragraph in `ka`
   (including Mtavruli upper case via `text-transform: uppercase`) and
   `en`; golden DOM snapshot; `axe`.
 
@@ -96,12 +96,12 @@ name).
 
 - [ ] PLAN §3.4 and §3.5 implemented; API report updated.
 - [ ] Catalogue parity and wording tests green; `missingKeys()` is 0 for
-  the kit's own stories in both languages (a browser test asserts it).
+  the kit's own browser tests in both languages (the browser setup asserts it).
 - [ ] Font coverage test green; `fonts/SOURCES.md` names the Noto
   version, the subset command and the checksums; OFL text shipped.
-- [ ] A `web/`-style consumer (the Welcome story is enough until WP-13)
-  shows Georgian text in the Georgian face (visible in the Pages
-  Storybook; say that you looked, E-04).
+- [ ] A `web/`-style consumer (the Welcome test is enough until WP-13)
+  shows Georgian text in the Georgian face (measured by the browser
+  test; look at it in a headed run (`pnpm exec vitest --project browser --browser.headless=false <file>`) and say that you looked, E-04).
 - [ ] `pnpm check`, `pnpm test`, `pnpm test:browser` outputs in the PR.
 
 ## Safety notes

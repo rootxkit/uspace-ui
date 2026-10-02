@@ -29,7 +29,7 @@ ticket, reconciliation M22).
    (`__Host-` prefix consideration).
 5. This project's safety rules on credentials: the kit's login form is
    tested with fixture values only; no real credential ever appears in
-   a test, a story or a fixture.
+   a test or a fixture.
 
 ## What to build
 
@@ -102,7 +102,7 @@ in the URL, clears the password field on failure), `RequireRole`
   it reaches zero (fake timers); the password input is cleared on
   failure; `RequireRole` renders children when one of several `roles`
   matches, and the fallback when none does or `roles` is empty (pair).
-- Stories: `LoginForm` in both languages and schemes with `axe`;
+- Browser tests: `LoginForm` in both languages and schemes with `axe`;
   golden DOM snapshot.
 
 ## Done when

@@ -1,7 +1,7 @@
 // The `ui` entry point in jsdom: every vendored component renders through
 // the index with the role and state it promises, and the kit's additions
-// show what they say they show. The look and axe run in the stories
-// (stories/ui/); this file proves the exports are wired and the states
+// show what they say they show. The look and axe run in the browser
+// tests (browser/ui/); this file proves the exports are wired and the states
 // render (E-01: every "nothing" has its "something").
 import {
   act,

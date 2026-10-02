@@ -70,7 +70,7 @@ pinned by each `web/`; additive within a major.
 | D6 | The basemap is self-hosted: one PMTiles file served with HTTP range requests, Protomaps style layers, glyphs and sprites under one path the app configures. No third-party tile or font request from a console, ever. | Predecessor P1-12 and `06 §4`: state consoles must not leak viewport positions to a tile vendor, must work on an isolated network, and must show the extract's date. The bundle itself is built in the lab (§14 Q4). |
 | D7 | Fonts ship in the package (Noto Sans and Noto Sans Georgian, OFL, woff2 subsets) and are loaded with `next/font/local` through `/fonts`; a CI test reads each file's `cmap` and fails if any Georgian block (Mkhedruli U+10D0–U+10FF, Mtavruli U+1C90–U+1CBF, Nuskhuri U+2D00–U+2D2F, Asomtavruli U+10A0–U+10CF) is missing a glyph. | "A font that has full Georgian glyphs" is checked, not assumed (E-02). No Google Fonts request from a console (D6). |
 | D8 | The live feed client (`/live`) is a generic, reconnect-forever WebSocket store that understands the common envelope of `04 §2` and the console frame of §6.3, never a system's business messages. Message bodies are passed to app adapters typed by the app's generated types. | B-08 (reconnect forever, start degraded), C-08 (replay on connect is the server's duty; the client shows what it was given and its age), `05 §5` (`dropped_frames` visible), `05 §6` (freeze with age shown). |
-| D9 | Visual testing is Storybook 9 with stories run as tests in vitest browser mode (Playwright Chromium), `axe` on every story, DOM snapshots of a named golden set, and a static Storybook published to GitHub Pages from `main`. No hosted visual-diff service. | CI-cheap on a public repo: Pages and Actions are free; a paid snapshot service is a recurring cost and a secret. Map pixels are not snapshotted (WebGL in CI is noise); the style expressions the symbology produces are tested instead (§9). |
+| D9 | Visual testing is plain component tests in vitest browser mode (Playwright Chromium) under `browser/`: each test renders the component in the kit's providers in a chosen scheme and language, `axe` runs after every test, and a named golden set has DOM snapshots. No Storybook and no GitHub Pages site (the owner removed Storybook, and the Pages site planned for it, on 2026-10-02). No hosted visual-diff service. | CI-cheap: Actions is free on a public repo; a paid snapshot service is a recurring cost and a secret. Map pixels are not snapshotted (WebGL in CI is noise); the style expressions the symbology produces are tested instead (§9). |
 | D10 | Published to the public npm registry under the `@rootxkit` scope with provenance, from a tag workflow using OIDC trusted publishing (no long-lived token in secrets). npmjs is the only distribution channel: no GitHub Packages, no `github:` tag dependency, no tarball (reconciliation M32). The first publish is a pre-release, `0.1.0-rc.1`, as soon as WP-0..WP-5 merge (WP-13a), so the CISP's `web/` starts on an rc and bumps. | Consumers (`web/` CI, Docker builds, the owner's machines) install without a token; provenance ties each version to a commit and a workflow run (`06 §4` supply chain). A git-tag dependency would need a `prepare` build with the full devDependencies inside every system's Docker build. |
 | D11 | The kit ships its ESLint flat config (`/eslint`) with the rules the spec requires of every `web/`: no geometry or geodesy imports, no database or bus client imports, no business logic in route handlers, no hand-written API types in the generated directory. | `00 §6` ("a Next.js file importing geometry or geodesy libraries fails lint"), `07` KT-3 ("no-geometry-import and no-server-side-business-logic rules"). Writing the rule once here is how five apps get it the same. |
 | D12 | The first release `v0.1.0` is U-M1 (with C-M1; pre-releases `0.1.0-rc.N` precede it, D10); `v1.0.0` follows the first two consoles in production use of the track and alert components (the authority's A-M2 picture and the USSP's S-M2 console), when §3's API is declared stable. | Spec `07`. A kit's API is proven by its second consumer, not its first. |
@@ -103,7 +103,7 @@ pinned by each `web/`; additive within a major.
 ├── bin/              uspace-ui-gen-api (WP-4)
 ├── fonts/            woff2 files (WP-2)
 ├── styles/           tokens.css, map.css (WP-1, WP-3)
-├── stories/          Storybook stories per package (each WP)
+├── browser/          vitest browser-mode tests per package, golden snapshots, the test basemap (each WP)
 ├── examples/next-app/  a minimal consumer, built in CI (WP-13)
 ├── docs/             this plan, work packages, API report
 └── scripts/          font glyph check, exports check, api report
@@ -119,7 +119,7 @@ Entry points (`package.json` `exports`; every key is a contract, §12):
 ```
 
 Dependency DAG (edges point at what is imported). No cycles; `model` is
-the single root; `test` is imported by tests and stories only.
+the single root; `test` is imported by tests only.
 
 ```
 model <- theme <- ui, map, symbology
@@ -139,7 +139,7 @@ without a browser. `layers` never computes a position, a distance, a
 containment or an applicability; it reads the fields of a view model and
 emits MapLibre expressions. `auth/server` is marked `server-only` and
 `auth/client` never imports it. No entry point imports `next` except
-`fonts` and `auth/*`, so Storybook and vitest run without Next.js.
+`fonts` and `auth/*`, so vitest runs without Next.js.
 
 ---
 
@@ -487,7 +487,7 @@ pinned exact in `package.json` and locked; peers carry ranges.
 | Package | Entry point | Why it is allowed |
 |---|---|---|
 | `react`, `react-dom` (peer `^19`) | all but `symbology`, `eslint` | The UI framework (`00 §6`). |
-| `next` (peer `>=15`, optional; dev pin for the type check) | `fonts`, `auth/*` | `next/font/local`, `NextRequest`/`NextResponse`. Optional peer so Storybook and vitest run without it; the dev copy (exact pin, WP-2) gives `tsc` the `next/font/local` types. Verify the current major at WP-0 time, not from memory (§14 Q12). |
+| `next` (peer `>=15`, optional; dev pin for the type check) | `fonts`, `auth/*` | `next/font/local`, `NextRequest`/`NextResponse`. Optional peer so vitest runs without it; the dev copy (exact pin, WP-2) gives `tsc` the `next/font/local` types. Verify the current major at WP-0 time, not from memory (§14 Q12). |
 | `maplibre-gl` (peer `^5`) | `map`, `layers` | The map (`00 §6`). Peer, so the app controls one copy. |
 | `pmtiles`, `@protomaps/basemaps` | `map` | D6: the self-hosted basemap protocol and the style layers the predecessor already used (P1-12). |
 | `tailwindcss` (peer `^4`) | styles | D4. The app runs Tailwind; the kit ships tokens and source classes. |
@@ -499,10 +499,10 @@ pinned exact in `package.json` and locked; peers carry ranges.
 | `@tanstack/react-virtual` | `table` | Row virtualisation above 200 rows (§8). |
 | `react-hook-form`, `zod`, `@hookform/resolvers` | `form` | Form state and schema validation; `zod` schemas are the app's, the kit maps errors. |
 | `eslint`, `typescript-eslint`, `eslint-plugin-react-hooks`, `eslint-plugin-jsx-a11y` (peers of `/eslint`) | `eslint` | D11. |
-| dev: `typescript`, `vitest`, `@vitest/browser`, `playwright`, `@testing-library/react`, `@testing-library/user-event`, `jsdom`, `storybook`, `@storybook/react-vite`, `@storybook/addon-a11y`, `@storybook/addon-vitest`, `axe-core`, `prettier`, `publint`, `@arethetypeswrong/cli`, `@microsoft/api-extractor`, `fontkit` | tests, build, release | §9, §10, §12. `fontkit` reads the font `cmap` for D7. `api-extractor` writes the API report the semver gate diffs (§12). |
+| dev: `typescript`, `vitest`, `@vitest/browser`, `playwright`, `@testing-library/react`, `@testing-library/user-event`, `jsdom`, `axe-core`, `prettier`, `publint`, `@arethetypeswrong/cli`, `@microsoft/api-extractor`, `fontkit` | tests, build, release | §9, §10, §12. `fontkit` reads the font `cmap` for D7. `api-extractor` writes the API report the semver gate diffs (§12). |
 | `@types/geojson` (exact pin) | `model` | `ZoneView.geometry` and `IntentView.volumes` are GeoJSON types that appear in every consumer's declarations, so the types are a dependency, not a dev dependency. Types only, no runtime code (WP-0). |
-| dev: `@vitest/browser-playwright`, `@vitest/coverage-v8`, `vite`, `@storybook/addon-docs`, `@testing-library/dom`, `@types/react`, `@types/react-dom`, `@types/node` | tests, Storybook | The Vitest 4 Playwright provider and v8 coverage; the Vite that Storybook and the browser project run on; MDX docs pages in Storybook 9; the peer of `@testing-library/react`; type packages (WP-0). |
-| dev: `tailwindcss`, `@tailwindcss/vite` | Storybook, the browser and golden tests | Tailwind v4 compiled the way the apps compile it (D4), so the vendored shadcn/ui classes and the token utilities exist in the stories and in axe's contrast checks (WP-1). Build-time only; never in `dist/`. |
+| dev: `@vitest/browser-playwright`, `@vitest/coverage-v8`, `vite`, `@testing-library/dom`, `@types/react`, `@types/react-dom`, `@types/node` | tests | The Vitest 4 Playwright provider and v8 coverage; the Vite the browser project runs on; the peer of `@testing-library/react`; type packages (WP-0). |
+| dev: `tailwindcss`, `@tailwindcss/vite` | the browser tests and the golden set | Tailwind v4 compiled the way the apps compile it (D4), so the vendored shadcn/ui classes and the token utilities exist in the browser tests and in axe's contrast checks (WP-1). Build-time only; never in `dist/`. |
 | dev: `@maplibre/maplibre-gl-style-spec` (exact pin, the version `maplibre-gl` already resolves) | tests | MapLibre's own expression parser and style validator: the symbology's expressions are evaluated as MapLibre would and the layers a layer component builds are validated, without a WebGL context (§9 "tested as data"; WP-6). Never imported by `src/` outside tests. |
 
 Rejected: any geometry or geodesy library (the lint rule forbids it for
@@ -629,7 +629,7 @@ frames are not optional for a browser-facing WebSocket.
 | No PII in URLs (safety rules of this project; `06 §5`) | `useTableUrlState` and every link helper refuse keys named like identity fields (`name`, `email`, `phone`, `address`, `registration_number` secret part) — a test pins the list. |
 | No judgement in TypeScript (`06` T12) | the `/eslint` rules, applied to the kit itself in its own CI. |
 | Supply chain (`06 §4`) | exact pins, `pnpm install --frozen-lockfile`, Dependabot, `pnpm audit` as a non-gating report, provenance on publish (D10), `SECURITY.md` with a 90-day policy. |
-| Content Security Policy | the kit documents the CSP every `web/` sets (`connect-src 'self'` for API, WS and the basemap; `worker-src blob:` for MapLibre; `font-src 'self'`; no `unsafe-eval`) and `examples/next-app` ships it; a Storybook story loads under it. |
+| Content Security Policy | the kit documents the CSP every `web/` sets (`connect-src 'self'` for API, WS and the basemap; `worker-src blob:` for MapLibre; `font-src 'self'`; no `unsafe-eval`) and `examples/next-app` ships it; a browser test (`browser/csp/`) loads under it. |
 | Public repository | no hostname, no organisation name, no logo in the repo; `GEO-TEST-*` and `TEST*` fixtures only; a CI grep for `chikox.net` fails outside `examples/*/README.md`. |
 | Display is not authorisation | `RequireRole` hides, the API decides. Every component that triggers an audited act collects a reason and calls back; it never calls an API itself. |
 
@@ -652,11 +652,11 @@ is the proof.
 | GeoJSON source update | one `setData` (or `updateData` partial) per layer per frame; never per message | `TrackLayer` batches with `requestAnimationFrame`; at 1 000 tracks in view (over the throttle case) ≤ 8 ms per update |
 | Memory | track store ≤ 1 000 tracks × (1 view + 60 trail points) ≈ 10 MB; alert hold ≤ 500; eviction counted (E-10) | bounded stores with tests past the bound |
 | Initial JS | `map` + `layers` + `symbology` + `legend` ≤ 60 kB gzipped on top of `maplibre-gl` (≈ 250 kB gz); a public zone map page ≤ 400 kB gz total; `table` ≤ 40 kB; `form` ≤ 30 kB | `size-limit`-style check in CI with the numbers in `package.json` |
-| Basemap first paint | ≤ 2 s on a 10 Mbit link for a city view (PMTiles range requests, tiles cached by the browser) | Storybook story with the lab's bundle, measured by hand at WP-3 and noted |
+| Basemap first paint | ≤ 2 s on a 10 Mbit link for a city view (PMTiles range requests, tiles cached by the browser) | a map page with the lab's bundle, measured by hand at WP-3 and noted |
 | Table | 10 000 rows virtualised scroll at 60 fps; sort of 10 000 rows ≤ 50 ms | benchmark |
 | Fonts | ≤ 120 kB woff2 total for Latin + Georgian regular and bold subsets | CI test on file sizes |
 | Reconnect | first retry at 1 s, factor 2, cap 30 s, jitter; forever (B-08) | test with fake timers |
-| Accessibility | every story passes `axe` WCAG 2.2 AA; keyboard-only operation of map controls, table and alert list | CI |
+| Accessibility | every browser test passes `axe` WCAG 2.2 AA; keyboard-only operation of map controls, table and alert list | CI |
 
 ---
 
@@ -675,11 +675,11 @@ global state (timers, `matchMedia`, cookies) and pass shuffled.
 |---|---|---|
 | Unit (pure) | vitest, node | `symbology` (total functions; expression snapshots as data), `i18n` formatters and catalogue parity, `model` enumeration pins, `api` problem and freshness parsing, `live` stores with fake timers, `auth/server` cookie and CSRF logic with mocked `NextRequest`, the ESLint rules with `RuleTester` |
 | Component | vitest + Testing Library, jsdom | `status`, `alerts`, `table`, `form`, `legend`, `LoginForm`, `MapControls`: behaviour, keyboard, ARIA, wording per lesson, every enumeration value rendered at least once (presence) |
-| Browser | vitest browser mode (Playwright Chromium) via `@storybook/addon-vitest` | every story renders without error, `axe` passes, interaction tests in stories (`play`), DOM snapshots of the golden set (`stories/golden/*`): legends, status bar in each state, alert list, a table page, a form with field errors, the login form; MapLibre stories render with `--use-gl=angle --use-angle=swiftshader` for smoke only (no pixel snapshot, D9) |
+| Browser | vitest browser mode (Playwright Chromium), the `browser` project over `browser/**/*.test.tsx` | every component renders without error in both languages and both schemes, `axe` passes after every test, interaction tests drive the real browser (`vitest/browser` `userEvent`), DOM snapshots of the golden set (`browser/golden/`): legends, status bar in each state, alert list, a table page, a form with field errors, the login form; MapLibre renders with `--use-gl=angle --use-angle=swiftshader` for smoke only (no pixel snapshot, D9) |
 | Benchmarks | vitest `bench` in browser mode | the §8 rows; reported, not gated |
 | Fonts | vitest + `fontkit` | every Georgian block covered (D7); size budget |
 | Package | `publint`, `@arethetypeswrong/cli`, `api-extractor` | `exports` resolve for `node16`/`bundler`, types ship, no `any` in the public API, the API report is up to date |
-| Consumer | `examples/next-app` built with `next build` in CI (`output: standalone`), lint with `/eslint`, `openapi-typescript` run on a tiny fixture spec and `createClient<Paths>` type-checked | the integration a `web/` will do; also the CSP story |
+| Consumer | `examples/next-app` built with `next build` in CI (`output: standalone`), lint with `/eslint`, `openapi-typescript` run on a tiny fixture spec and `createClient<Paths>` type-checked | the integration a `web/` will do; also the CSP test |
 | Conformance hooks (lab) | `test/fixtures` from `uspace-lab/schemas/` examples (WP-14); `model` enums against `uspace-core/core` by a script that reads the Go source at a pinned tag (`scripts/check-enums.sh`, online, best-effort on PRs, required on `main`, like core's vector check) | `04 §4`: schema examples pass everywhere; a kit that cannot render a value the bus can carry fails here |
 
 "Integration with a real Postgres/NATS in CI" from the template does not
@@ -714,8 +714,7 @@ bitten by). Jobs on push to `main`, tags `v*` and pull requests;
    summary printed; profile uploaded.
 3. `browser`: Playwright Chromium from the cache (`~/.cache/ms-playwright`
    keyed on the Playwright version); `vitest run --project browser`
-   (stories as tests, `axe`, golden DOM snapshots); `storybook build` to
-   `storybook-static/` uploaded as an artifact on PRs.
+   (component tests, `axe`, golden DOM snapshots).
 4. `fonts`: the glyph coverage and size tests (fast; separate so a font
    change shows its own job).
 5. `example`: `examples/next-app` with `next build`, its lint, and the
@@ -724,11 +723,6 @@ bitten by). Jobs on push to `main`, tags `v*` and pull requests;
 6. `gitleaks` (`06 §4`).
 7. `enums` (`main` only, required; best-effort on PRs): `scripts/check-enums.sh`
    against `uspace-core` at the tag in `docs/CORE_VERSION`.
-
-`.github/workflows/pages.yml`: on push to `main`, path-filtered to
-`src/**`, `stories/**`, `styles/**`, `fonts/**`: `storybook build` and
-deploy to GitHub Pages (`actions/deploy-pages`). This is the living
-visual reference (D9).
 
 `.github/workflows/release.yml` (written by WP-13a, first run on
 `v0.1.0-rc.1`): on tag `v*`: the `check`, `test`, `browser` and `fonts`
@@ -807,8 +801,8 @@ Every `web/` also (M38, M22, M21):
   verify that cookie with the shared `core/auth.Verifier`.
 
 Upgrade policy for consumers: a `web/` pins an exact version and bumps
-it in its own PR, running its own lint, build and the kit's example
-stories against its adapters. Two majors of the kit are maintained for
+it in its own PR, running its own lint, build and tests against its
+adapters. Two majors of the kit are maintained for
 six months (§12), so a system is never forced to upgrade in step with
 another. Pre-releases (`0.1.0-rc.N`) are published under the npm dist-tag
 `next`; a consumer pins them exactly like a release and bumps to `0.1.0`
@@ -820,8 +814,7 @@ standalone`) into that system's image; the droplet never builds Next.js
 memory beyond its JS; the 3.8 GB droplet constraint is the systems'
 concern and the kit's bundle budget (§8) is its contribution.
 
-Storybook is served at `https://rootxkit.github.io/uspace-ui/` from
-`main` (D9), the only hosted artefact of this repo.
+This repo hosts nothing: the npm package is its only artefact (D9).
 
 ---
 
@@ -877,13 +870,13 @@ its own. Branch `feat/WP-<k>-<slug>`. Commit suffix `[WP-<k> U-M<n>]`.
 Done-when always includes: `pnpm check` (prettier, eslint with the kit's
 own rules, `tsc`, build, publint, attw, api report) clean; `pnpm test`
 and `pnpm test:browser` green with ≥ 90 % statement coverage of the owned
-entry points; every story passes `axe`; every user-facing string in both
+entry points; every browser test passes `axe`; every user-facing string in both
 catalogues; the API report updated; a CHANGELOG line; the PR pastes the
 outputs (E-04).
 
 | WP | Slug | Owns (exclusively) | Depends on | Milestone |
 |---|---|---|---|---|
-| WP-0 | `scaffold` | `package.json`, tooling, `src/model/`, `src/eslint/`, `src/test/` (helpers), CI, Storybook config, `CLAUDE.md`, `SECURITY.md`, `CHANGELOG.md` | — | U-M0 |
+| WP-0 | `scaffold` | `package.json`, tooling, `src/model/`, `src/eslint/`, `src/test/` (helpers), CI, the vitest browser config, `CLAUDE.md`, `SECURITY.md`, `CHANGELOG.md` | — | U-M0 |
 | WP-1 | `theme-ui` | `src/theme/`, `src/ui/`, `styles/tokens.css` | WP-0 | U-M1 |
 | WP-2 | `i18n-fonts` | `src/i18n/`, `src/fonts/`, `fonts/` | WP-0 | U-M1 |
 | WP-3 | `map-core` | `src/map/`, `styles/map.css` | WP-0 (types), WP-1 (tokens) for the control styling only; starts on WP-0 | U-M1 |
@@ -897,7 +890,7 @@ outputs (E-04).
 | WP-11 | `alerts` | `src/alerts/`, `src/layers/AlertLayer` | WP-7, WP-8 | U-M3 |
 | WP-12 | `traffic-layers` | `src/symbology/manned*`, `src/symbology/intent*`, `src/layers/{Manned,Intent,Receiver}Layer`, `src/status/TrackDetail` (the selected-track panel with the Remote ID block) | WP-6, WP-7, WP-8 | U-M3 |
 | WP-13a | `rc-publish` | `.github/workflows/release.yml`, the publish configuration (`publishConfig`, `files`, dist-tag rule), `CHANGELOG.md` `0.1.0-rc.N` sections, the npm trusted-publishing set-up with the owner | WP-0..WP-5 merged (the rc ships what is on `main`) | U-M1 (tags `v0.1.0-rc.N`; first publish) |
-| WP-13 | `release-0.1` | `examples/next-app/`, `README.md` consumer section, `docs/CONSUMING.md`, `pages.yml`, the `0.1.0` changelog and tag | WP-1..WP-6, WP-13a | U-M1 (tag `v0.1.0`) |
+| WP-13 | `release-0.1` | `examples/next-app/`, `README.md` consumer section, `docs/CONSUMING.md`, the `0.1.0` changelog and tag | WP-1..WP-6, WP-13a | U-M1 (tag `v0.1.0`) |
 | WP-14 | `v1-gate` | semver gate, `scripts/check-enums.sh`, lab schema fixtures, API report freeze, `v1.0.0` | WP-7..WP-13 | U-M4 (tag `v1.0.0`) |
 
 Waves (what can run in parallel):
@@ -924,8 +917,8 @@ files: `CHANGELOG.md` (one line per WP under Unreleased, in the WP's last
 commit), `docs/api/uspace-ui.api.md` (regenerated, so conflicts resolve
 by re-running the tool), the two catalogues `src/i18n/ka.ts` and
 `src/i18n/en.ts` (each WP adds a block under a comment with its WP id;
-the parity test catches a lost key in a merge), and `stories/golden/`
-(each WP adds its own files).
+the parity test catches a lost key in a merge), and `browser/golden/`
+(each WP adds its own entries and snapshots).
 
 Milestones: U-M0 scaffold merged; `v0.1.0-rc.1` published (WP-13a);
 **U-M1** = `v0.1.0` with C-M1 (`07`);
@@ -947,15 +940,15 @@ the default is a proposal, not the answer.
 | Q1 | Registry: "npm or GitHub Packages". GitHub Packages needs a token to *install* even a public package (every `web/` CI, every Docker build, every developer machine); npmjs needs the `@rootxkit` scope and supports OIDC trusted publishing with provenance, so no secret is stored anywhere. | D10: npmjs with trusted publishing, and nothing else (M32: no `github:` tag installs, no GitHub Packages fallback); `release.yml` is written for it (WP-13a). | **Open, owner-only**: the owner confirms access to the `@rootxkit` npm scope (an account matter) and that the package is public, and enables trusted publishing for this repository's `release.yml`. Default until then: npmjs under `@rootxkit`; WP-13a cannot publish without it and says so rather than switching registries. |
 | Q2 | The spec fixes no error body for the national APIs. The form kit needs a field-addressed error and `uspace-core` already names the field and reason (`core.FieldError`, `ed269.Problems` with a JSON path). | `model.Problem`: RFC 9457 `application/problem+json` with `type`, `title`, `status`, `detail`, `instance`, `errors: [{field, reason}]`, `truncated?`; `field` is the JSON path as core writes it; `type` = `https://schemas.uspace.ge/problems/<slug>`. The kit degrades to "request failed, status N" for anything else. | **Decided** (M28): adopted by all four systems; `problem/v1` lives in `uspace-lab/schemas/common/`. |
 | Q3 | Zone applicability on a console: the kit must dim a zone that does not apply now (`limitedApplicability`), but evaluating applicability is a judgement (`ed269.Applies`, T-09) and must not run in TypeScript. `02 F3` offers `GET /v1/{dataset}?at=` which returns only the applicable features. | `ZoneView.applies` is `boolean | null` and the kit dims only on `false`. The CISP read API and the authority's `GET /v1/zones/export` add `?applies_at=<RFC 3339>`, which annotates every feature with `extendedProperties.cis_applicability` ∈ `applies` / `not_applicable` / `unknown` without filtering (the filtering `?at=` stays). The app maps it onto `applies`; no double fetch. | **Decided** (M17): additive on both APIs. |
-| Q4 | Who builds and hosts the basemap bundle (PMTiles extract of Georgia, Protomaps glyphs *including Georgian ranges* for the fontstack, sprites), how big it is (the predecessor's was hundreds of MB) and how it is refreshed. The kit assumes the `/basemap/` layout of §6.3. | The lab builds it (lab WP-L3) from the predecessor's `infra/basemap/fetch_basemap.sh` as a release artefact with `SOURCE.json` and a size budget: a Georgia-wide extract with city-level zooms for Tbilisi, Kutaisi, Batumi and Poti and `z ≤ 12` elsewhere, under about 1 GB. The deployment repo (`uspace-deploy`) serves `/basemap/*` from one shared read-only volume on every host (Caddy `file_server`, range requests, long cache headers; one copy for five systems). The kit's `fonts.mapFontstack` names the glyph set. Storybook uses a tiny Tbilisi-only extract committed under `stories/basemap/` (a few MB) so stories render offline. | **Decided** (M38). The droplet's disk is part of the sizing question the reconciliation leaves to the owner (its §2.1, "droplet sizing"). |
+| Q4 | Who builds and hosts the basemap bundle (PMTiles extract of Georgia, Protomaps glyphs *including Georgian ranges* for the fontstack, sprites), how big it is (the predecessor's was hundreds of MB) and how it is refreshed. The kit assumes the `/basemap/` layout of §6.3. | The lab builds it (lab WP-L3) from the predecessor's `infra/basemap/fetch_basemap.sh` as a release artefact with `SOURCE.json` and a size budget: a Georgia-wide extract with city-level zooms for Tbilisi, Kutaisi, Batumi and Poti and `z ≤ 12` elsewhere, under about 1 GB. The deployment repo (`uspace-deploy`) serves `/basemap/*` from one shared read-only volume on every host (Caddy `file_server`, range requests, long cache headers; one copy for five systems). The kit's `fonts.mapFontstack` names the glyph set. The browser tests use a tiny Tbilisi-only extract committed under `browser/public/basemap/` (a few MB) so they render offline. | **Decided** (M38). The droplet's disk is part of the sizing question the reconciliation leaves to the owner (its §2.1, "droplet sizing"). |
 | Q5 | No browser-facing WS frame is specified; `02 §3` names the endpoints and `04 §2` the envelope. Four systems could invent four stream shapes. | §6.3's console frame (`console/status/v1`, `console/snapshot/v1`, `console/subscribe/v1`, plus the catalogued messages as bodies) on every browser-facing WebSocket of the four systems; the CISP's `resync` becomes a status frame with `resync_since`, the ANSP's `feed/status/v1` is retired for `console/status/v1`, the authority's `{viewport}` becomes `console/subscribe/v1`. Machine-facing streams carry the same envelope. The schemas are owned by `uspace-lab/schemas/common/`. | **Decided** (M29, M12, M14): adopted by all four systems. |
 | Q6 | Display thresholds (`stale_after_s`, `live_max_age_s`) are policy rows per system (`04 §3.3`); the kit refuses to default them (INV-03) and must get them from the API. | The status frame of §6.3 carries them (`policy_version`, `stale_after_s`, `live_max_age_s`) on connect and every 2 s. Until a system sends them, its console cannot colour age, and the age chip shows the raw seconds without a bucket (visible, not wrong). | **Decided** (M29): thresholds come in `console/status/v1`. |
-| Q7 | Visual regression without a hosted service (cost, secret) means no pixel diff of the map. | D9: stories as tests, `axe`, DOM snapshots of a golden set, Pages-hosted Storybook as the reviewed reference; symbology tested as expressions. If the owner wants pixel diffs later, Playwright `toHaveScreenshot` on the golden set with committed PNGs can be added without a service, accepting Linux-only rendering. | **Open, owner-only** (spending money on pixel snapshots is the owner's). Default until answered: accept D9. |
+| Q7 | Visual regression without a hosted service (cost, secret) means no pixel diff of the map. | D9: component tests in a real browser, `axe`, DOM snapshots of a golden set as the reviewed reference; symbology tested as expressions. If the owner wants pixel diffs later, Playwright `toHaveScreenshot` on the golden set with committed PNGs can be added without a service, accepting Linux-only rendering. | **Open, owner-only** (spending money on pixel snapshots is the owner's). Default until answered: accept D9. |
 | Q8 | Which font: Noto Sans Georgian alone has no Latin; a single family with both is Noto Sans (no Georgian) plus Noto Sans Georgian. Mtavruli (U+1C90) is required for upper-case Georgian since Unicode 11. | D7: both families bundled, `unicode-range` split, the glyph test covers all four Georgian blocks. Alternative families (BPG, Sylfaen) have licence or coverage problems for a public repo. | **Decided** (M38): Noto Sans + Noto Sans Georgian, OFL, bundled, loaded by every `web/` through `next/font/local`. |
 | Q9 | The console session JWT's claim names for display gating are not fixed by the spec (`00 §6.2` fixes `iss`, `aud`, `sub`, `scope`, `exp`, `jti`, `kid`). | One session shape in every system (§6.3 contract): `scope = "session"`, `roles: [string]`, `realm` (`console` / `police` / `portal`), `aud` = the system's own host, `jti` = session id, `exp` ≤ 12 h. `sessionClaimsUnverified` reads `sub`, `exp`, `roles[]`, `realm`; `RequireRole` intersects `roles`. The kit gates display only. | **Decided** (M20, M21): the authority's role model is the largest, so `roles` is always an array. |
 | Q10 | Branding config bundle shape (`06 §4` says it exists outside the repo; nothing names its keys). | §6.3's five `UI_BRAND_*` variables and a static `/brand/` directory for the logo; a missing name renders the role ("U-space authority"), never an organisation. | **Decided**: as proposed (branding is configuration, `06 §4`). |
 | Q11 | Accessibility obligations for Georgian public interfaces (`08` Q15) are unanswered. | WCAG 2.2 AA is the target and `axe` gates CI; the public map and the registry check page are the first to be audited by hand (WP-13). | **Open, owner-only** (the ministry answers spec Q15). Default until answered: WCAG 2.2 AA, `axe` gates CI, hand audit in WP-13. |
-| Q12 | Next.js and React majors at implementation time (this plan says `next >=15`, `react ^19` from the stack decisions); Storybook and vitest browser mode versions move quickly. | WP-0 pins what is current on its day, records the versions in `CHANGELOG.md`, and the peers stay ranges. Nothing in this plan depends on a feature newer than Next.js App Router, React 19 and Tailwind v4. | **Decided**: WP-0 verifies, does not assume. |
+| Q12 | Next.js and React majors at implementation time (this plan says `next >=15`, `react ^19` from the stack decisions); vitest browser mode versions move quickly. | WP-0 pins what is current on its day, records the versions in `CHANGELOG.md`, and the peers stay ranges. Nothing in this plan depends on a feature newer than Next.js App Router, React 19 and Tailwind v4. | **Decided**: WP-0 verifies, does not assume. |
 | Q13 | Tailwind v4 `@source` scanning of a compiled package versus a prebuilt stylesheet. | D4: `@source` (one theme, tree-shaken utilities); the example app proves it. A prebuilt `uspace-ui.css` can be added as an additive export for a non-Tailwind consumer (the lab dashboard?) without changing anything else. | **Decided**: `@source`; a prebuilt stylesheet only if a non-Tailwind consumer appears. |
 | Q14 | Should the kit ship the OpenAPI → TypeScript generation (`openapi-typescript`) as a CLI so all five `web/` generate identically, and check the output is committed and current? | WP-4 ships `uspace-ui-gen-api <openapi.yaml> <out.d.ts>` (a thin wrapper that pins the generator version and writes a header the `noHandWrittenApiTypes` rule recognises) and a CI snippet each `web/` copies. | **Decided**: every `web/` uses it. |
 | Q15 | Acknowledgement persistence: `02 F5` records acknowledgements at the USSP (`POST /v1/alerts/{id}/ack`); the authority's violations have review, not acks; the predecessor's console ack was per console and not recorded (P6-07). | The kit's `acknowledged` flag is per console and the `onAcknowledge` callback is the app's to persist; `AlertToaster` silences the tone on the local flag so an operator is never left with a tone they cannot stop while the API is down (B-10 thinking). | **Decided**: as proposed. |

@@ -1,5 +1,5 @@
 # CI of @rootxkit/uspace-ui (docs/PLAN.md §10 jobs 1-7). release.yml is
-# WP-13a and pages.yml is WP-13. Branch protection is the owner's.
+# WP-13a. Branch protection is the owner's.
 name: ci
 
 on:
@@ -94,16 +94,8 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
       - if: steps.pw-cache.outputs.cache-hit == 'true'
         run: pnpm exec playwright install-deps chromium
-      # stories as tests, axe on every story
+      # components in Chromium, axe after every test, golden snapshots
       - run: pnpm test:browser
-      - if: github.event_name == 'pull_request'
-        run: pnpm build-storybook
-      - if: github.event_name == 'pull_request'
-        uses: actions/upload-artifact@v7
-        with:
-          name: storybook-static
-          path: storybook-static/
-          retention-days: 7
 
   fonts:
     runs-on: ubuntu-latest
