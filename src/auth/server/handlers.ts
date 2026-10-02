@@ -92,16 +92,67 @@ function apiUrl(base: URL, path: string): URL {
 }
 
 /**
- * Login CSRF: there is no CSRF cookie before sign-in, so the sign-in
- * route requires the browser's `Origin` and that it names this host. A
- * cross-site form or fetch carries the attacker's origin.
+ * The entry a chain of `trustedProxyHops` proxies recorded in a
+ * forwarded header (`X-Forwarded-Proto`, `X-Forwarded-Host`): `hops`
+ * places from the end, as for the client address. `null` without trusted
+ * hops, without the header, or for a chain shorter than `hops`.
  */
-function sameOrigin(req: NextRequest): boolean {
-  const origin = req.headers.get("origin");
-  const host = req.headers.get("x-forwarded-host") ?? req.headers.get("host");
-  if (origin === null || host === null) return false;
+function forwardedEntry(
+  req: NextRequest,
+  name: string,
+  hops: number | undefined,
+): string | null {
+  if (hops === undefined) return null;
+  const chain = (req.headers.get(name) ?? "")
+    .split(",")
+    .map((v) => v.trim())
+    .filter((v) => v !== "");
+  return chain.length >= hops ? (chain[chain.length - hops] ?? null) : null;
+}
+
+/**
+ * This site's own origin as the browser addresses it: the scheme from
+ * `X-Forwarded-Proto` when the proxy hop is trusted, else from
+ * `session.secure`; the host and port from `X-Forwarded-Host` when the
+ * hop is trusted, else from `Host`. `null` when it cannot be formed.
+ */
+function ownOrigin(req: NextRequest, opts: BffOptions): string | null {
+  const hops = opts.trustedProxyHops;
+  const proto = forwardedEntry(req, "x-forwarded-proto", hops)?.toLowerCase();
+  const scheme =
+    proto === "https" || proto === "http"
+      ? proto
+      : opts.session.secure
+        ? "https"
+        : "http";
+  const host =
+    forwardedEntry(req, "x-forwarded-host", hops) ?? req.headers.get("host");
+  if (host === null || host === "") return null;
   try {
-    return new URL(origin).host === host.split(",")[0]?.trim();
+    const url = new URL(`${scheme}://${host}`);
+    // A host header that carries a path or credentials is not a host.
+    if (url.pathname !== "/" || url.username !== "" || url.search !== "") {
+      return null;
+    }
+    return url.origin;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Login CSRF: there is no CSRF cookie before sign-in, so the sign-in
+ * route requires the browser's `Origin` to be this site's own origin,
+ * scheme, host and port alike (URL serialisation drops default ports on
+ * both sides). A cross-site form or fetch carries the attacker's origin;
+ * a plain-HTTP page on the same host carries another scheme.
+ */
+function sameOrigin(req: NextRequest, opts: BffOptions): boolean {
+  const origin = req.headers.get("origin");
+  const own = ownOrigin(req, opts);
+  if (origin === null || own === null) return false;
+  try {
+    return new URL(origin).origin === own;
   } catch {
     return false;
   }
@@ -255,7 +306,7 @@ export function bffHandlers(opts: BffOptions): BffHandlers {
       : challengeKey(opts.mfaChallengeSecret);
 
   const login: RouteHandler = async (req) => {
-    if (!sameOrigin(req)) {
+    if (!sameOrigin(req, opts)) {
       countAuth("origin_refused");
       return problemResponse(
         403,

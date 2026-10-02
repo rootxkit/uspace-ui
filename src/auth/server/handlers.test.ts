@@ -406,7 +406,20 @@ describe("login", () => {
     expect(authCounters().origin_refused).toBe(2);
   });
 
-  it("accepts the origin the reverse proxy names in X-Forwarded-Host (the acceptance)", async () => {
+  it("accepts the origin the trusted reverse proxy names in X-Forwarded-Host and -Proto (the acceptance)", async () => {
+    const stub = stubFetch(() => json(200, ISSUED));
+    const res = await handlers(stub.fetch, { trustedProxyHops: 1 }).login(
+      loginRequest(CREDENTIALS, {
+        Origin: ORIGIN,
+        Host: "web:3000",
+        "X-Forwarded-Host": HOST,
+        "X-Forwarded-Proto": "https",
+      }),
+    );
+    expect(res.status).toBe(200);
+  });
+
+  it("ignores X-Forwarded-Host and -Proto without a trusted hop", async () => {
     const stub = stubFetch(() => json(200, ISSUED));
     const res = await handlers(stub.fetch).login(
       loginRequest(CREDENTIALS, {
@@ -415,7 +428,60 @@ describe("login", () => {
         "X-Forwarded-Host": HOST,
       }),
     );
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(403);
+    expect(stub.fn).not.toHaveBeenCalled();
+  });
+
+  it("compares the whole origin: another scheme or port on the same host is refused", async () => {
+    const stub = stubFetch(() => json(200, ISSUED));
+    const h = handlers(stub.fetch);
+    for (const origin of [
+      `http://${HOST}`,
+      `https://${HOST}:8443`,
+      `https://${HOST}.elsewhere.test`,
+      "null",
+    ]) {
+      const res = await h.login(
+        loginRequest(CREDENTIALS, { Origin: origin, Host: HOST }),
+      );
+      expect(res.status, origin).toBe(403);
+    }
+    // A forwarded http scheme from a trusted proxy refuses an https page.
+    const proxied = await handlers(stub.fetch, { trustedProxyHops: 1 }).login(
+      loginRequest(CREDENTIALS, {
+        Origin: ORIGIN,
+        Host: HOST,
+        "X-Forwarded-Proto": "http",
+      }),
+    );
+    expect(proxied.status).toBe(403);
+    expect(stub.fn).not.toHaveBeenCalled();
+  });
+
+  it("matches scheme and port exactly: a default port is the same origin, http with secure: false", async () => {
+    const stub = stubFetch(() => json(200, ISSUED));
+    const ok1 = await handlers(stub.fetch).login(
+      loginRequest(CREDENTIALS, { Origin: `https://${HOST}:443`, Host: HOST }),
+    );
+    expect(ok1.status).toBe(200);
+    const ok2 = await handlers(stub.fetch, {
+      session: { secure: false, maxAgeS: 3600 },
+    }).login(
+      loginRequest(CREDENTIALS, {
+        Origin: "http://localhost:3000",
+        Host: "localhost:3000",
+      }),
+    );
+    expect(ok2.status).toBe(200);
+    const badPort = await handlers(stub.fetch, {
+      session: { secure: false, maxAgeS: 3600 },
+    }).login(
+      loginRequest(CREDENTIALS, {
+        Origin: "http://localhost:3001",
+        Host: "localhost:3000",
+      }),
+    );
+    expect(badPort.status).toBe(403);
   });
 
   it("refuses a body without username or password with field errors, and never calls the API", async () => {
