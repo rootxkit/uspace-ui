@@ -156,6 +156,7 @@
     "maxWoff2Bytes": 122880
   },
   "dependencies": {
+    "@hookform/resolvers": "5.9.1",
     "@protomaps/basemaps": "5.7.2",
     "@tanstack/react-table": "8.21.3",
     "@tanstack/react-virtual": "3.14.13",
@@ -182,8 +183,10 @@
     "next": ">=15",
     "react": "^19",
     "react-dom": "^19",
+    "react-hook-form": "^7.55.0",
     "tailwindcss": "^4",
-    "typescript-eslint": "^8"
+    "typescript-eslint": "^8",
+    "zod": "^4"
   },
   "peerDependenciesMeta": {
     "@testing-library/react": {
@@ -204,10 +207,16 @@
     "next": {
       "optional": true
     },
+    "react-hook-form": {
+      "optional": true
+    },
     "tailwindcss": {
       "optional": true
     },
     "typescript-eslint": {
+      "optional": true
+    },
+    "zod": {
       "optional": true
     }
   },
@@ -237,10 +246,12 @@
     "publint": "0.3.25",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "react-hook-form": "7.89.0",
     "tailwindcss": "4.3.3",
     "typescript": "5.9.3",
     "typescript-eslint": "8.71.0",
     "vite": "7.3.6",
-    "vitest": "4.1.11"
+    "vitest": "4.1.11",
+    "zod": "4.6.5"
   }
 }

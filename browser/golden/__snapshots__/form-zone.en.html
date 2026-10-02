@@ -1,0 +1,95 @@
+<div lang="en" class="bg-background p-4 text-foreground">
+<div class="max-w-3xl" data-testid="zone-form">
+<form novalidate="" class="grid gap-4" data-form="">
+<div tabindex="-1" role="alert" aria-labelledby="id-0" class="grid gap-2 rounded-md border-2 border-severity-critical p-3 text-sm focus-visible:outline-2 focus-visible:outline-ring" data-part="summary" data-count="2">
+<p id="id-0" class="m-0 font-semibold">2 problems: correct them and send again</p>
+<p class="m-0" data-part="problem">The zone dataset was refused (status 422). 2 problems in the submitted features.</p>
+<ul class="m-0 grid gap-1 pl-5">
+<li data-error-for="features.0.properties.upper">
+<a href="#id-8" class="underline">Upper limit (m, AMSL)</a>: must be above the lower limit of the same feature</li>
+</ul>
+<div class="grid gap-1 text-sm" data-part="field-errors">
+<p class="m-0 font-medium">Problems the server named outside this form:</p>
+<ul class="m-0 grid gap-1 pl-5">
+<li data-path="features[0].geometry[0].horizontalProjection">
+<code class="font-mono text-xs">features[0].geometry[0].horizontalProjection</code>: polygon ring is not closed</li>
+</ul>
+</div>
+</div>
+<p class="m-0 text-xs text-muted-foreground">Fields marked * are required.</p>
+<div class="grid gap-3 sm:grid-cols-2">
+<div class="grid gap-1.5" data-field="features.0.properties.identifier">
+<label data-slot="label" class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50" for="id-1">Identifier<span aria-hidden="true" class="text-severity-critical"> *</span>
+</label>
+<input data-slot="input" class="h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40" id="id-1" aria-required="true" type="text" name="features.0.properties.identifier">
+</div>
+<div class="grid gap-1.5" data-field="features.0.properties.name">
+<label data-slot="label" class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50" for="id-2">Name<span aria-hidden="true" class="text-severity-critical"> *</span>
+</label>
+<input data-slot="input" class="h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40" id="id-2" aria-required="true" type="text" name="features.0.properties.name">
+</div>
+<div class="grid gap-1.5" data-field="features.0.properties.type">
+<label data-slot="label" class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50" for="id-3">Zone type<span aria-hidden="true" class="text-severity-critical"> *</span>
+</label>
+<select name="features.0.properties.type" id="id-3" aria-required="true" class="h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 text-base shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive md:text-sm">
+<option value="">Choose</option>
+<option value="PROHIBITED">Prohibited</option>
+<option value="REQ_AUTHORIZATION">Authorisation required</option>
+<option value="CONDITIONAL">Conditional</option>
+<option value="NO_RESTRICTION">No restriction</option>
+<option value="USPACE">U-space airspace</option>
+</select>
+</div>
+<div class="grid gap-1.5" data-field="features.0.properties.message">
+<label data-slot="label" class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50" for="id-4">Message to operators</label>
+<input data-slot="input" class="h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40" id="id-4" type="text" name="features.0.properties.message">
+</div>
+<div class="grid gap-1.5" data-field="features.0.properties.lowerRef">
+<label data-slot="label" class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50" for="id-5">Lower limit reference<span aria-hidden="true" class="text-severity-critical"> *</span>
+</label>
+<select name="features.0.properties.lowerRef" id="id-5" aria-required="true" class="h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 text-base shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive md:text-sm">
+<option value="">Choose</option>
+<option value="AGL">AGL</option>
+<option value="AMSL">AMSL</option>
+<option value="WGS84">above the WGS84 ellipsoid</option>
+</select>
+</div>
+<div class="grid gap-1.5" data-field="features.0.properties.lower">
+<label data-slot="label" class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50" for="id-6">Lower limit (m, AGL)<span aria-hidden="true" class="text-severity-critical"> *</span>
+</label>
+<input data-slot="input" class="h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40" id="id-6" aria-required="true" inputmode="decimal" autocomplete="off" type="text" value="0" name="features.0.properties.lower">
+</div>
+<div class="grid gap-1.5" data-field="features.0.properties.upperRef">
+<label data-slot="label" class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50" for="id-7">Upper limit reference<span aria-hidden="true" class="text-severity-critical"> *</span>
+</label>
+<select name="features.0.properties.upperRef" id="id-7" aria-required="true" class="h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 text-base shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive md:text-sm">
+<option value="">Choose</option>
+<option value="AGL">AGL</option>
+<option value="AMSL">AMSL</option>
+<option value="WGS84">above the WGS84 ellipsoid</option>
+</select>
+</div>
+<div class="grid gap-1.5" data-field="features.0.properties.upper" data-invalid="true">
+<label data-slot="label" class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50" for="id-8">Upper limit (m, AMSL)<span aria-hidden="true" class="text-severity-critical"> *</span>
+</label>
+<input data-slot="input" class="h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40" id="id-8" aria-required="true" inputmode="decimal" autocomplete="off" type="text" value="900" name="features.0.properties.upper" aria-describedby="id-9" aria-invalid="true">
+<p id="id-9" class="m-0 text-sm font-medium text-severity-critical" data-part="field-error">must be above the lower limit of the same feature</p>
+</div>
+<div class="grid gap-1.5" data-field="features.0.properties.start">
+<label data-slot="label" class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50" for="id-10">Applies from, UTC<span aria-hidden="true" class="text-severity-critical"> *</span>
+</label>
+<input data-slot="input" class="h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40" id="id-10" aria-describedby="id-11" aria-required="true" step="60" type="datetime-local" value="2026-03-29T00:30" name="features.0.properties.start">
+<p id="id-11" class="m-0 text-xs text-muted-foreground">Enter the time in UTC, not in your local time.</p>
+</div>
+<div class="grid gap-1.5" data-field="features.0.properties.end">
+<label data-slot="label" class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50" for="id-12">Applies until, UTC</label>
+<input data-slot="input" class="h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40" id="id-12" aria-describedby="id-13" step="60" type="datetime-local" value="" name="features.0.properties.end">
+<p id="id-13" class="m-0 text-xs text-muted-foreground">Enter the time in UTC, not in your local time.</p>
+</div>
+</div>
+<div class="flex flex-wrap items-center gap-3">
+<button data-slot="button" data-variant="default" data-size="default" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2 has-[&gt;svg]:px-3" type="submit" data-part="submit">Publish zone</button>
+</div>
+</form>
+</div>
+</div>

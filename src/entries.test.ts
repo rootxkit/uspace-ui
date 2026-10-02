@@ -51,7 +51,7 @@ const ADDED: Record<string, string> = {
     "WP-2: the @font-face rules and the font-sans stack for non-Next consumers and the browser tests",
 };
 
-// Entries that are real (WP-0 .. WP-9); the rest are stubs
+// Entries that are real (WP-0 .. WP-10); the rest are stubs
 // until their WP.
 const REAL = new Set([
   "./model",
@@ -69,6 +69,7 @@ const REAL = new Set([
   "./live",
   "./status",
   "./table",
+  "./form",
   "./eslint",
   "./test",
 ]);

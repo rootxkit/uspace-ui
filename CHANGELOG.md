@@ -121,6 +121,21 @@ follows docs/PLAN.md §12. One line per work package under Unreleased.
   @tanstack/react-table 8.21.3 (9.x exists and was not taken: its column
   types and feature API changed, and the plan's signatures are v8's),
   @tanstack/react-virtual 3.14.13.
+- WP-10: `form` (`Form` on react-hook-form with the zod resolver: API
+  field errors from a returned `FieldError[]` or a thrown `ApiError` put
+  on the field whose name matches the JSON path, the rest listed with
+  their path, the truncation note, an error summary that counts, links
+  and takes focus, submit disabled while busy and through a Retry-After
+  countdown, and a success that clears every error; `Field` with the
+  unit and datum in the label; `NumberField` (locale decimals, null when
+  empty), `TextField`, `SelectField`, `CheckboxField`, `EnumField`,
+  `UTCDateTimeField` (read as UTC by text, no drift across DST),
+  `BBoxField` in `[lng, lat]` order, `ReasonField`; `ConfirmDialog` with
+  a mandatory reason that never focuses a destructive confirm; `shapes`
+  for RFC 3339 UTC, bbox order and the reason; `kitErrorMap` so zod
+  issues read in `ka` and `en`). @hookform/resolvers 5.9.1;
+  react-hook-form (peer `^7.55`, dev 7.89.0) and zod (peer `^4`, dev
+  4.6.5) as optional peers.
 - Storybook removed (the owner's decision, 2026-10-02; PLAN D9): every
   story and the golden set are plain Vitest browser-mode tests under
   `browser/` that render the components in the kit's providers, with

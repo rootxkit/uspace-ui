@@ -15,6 +15,12 @@ import {
 } from "../../src/i18n/index.js";
 import { LoginForm } from "../../src/auth/client/index.js";
 import { LOGIN_PROPS } from "../auth/login.js";
+import {
+  IntentForm,
+  ZoneForm,
+  checkIntentForm,
+  checkZoneForm,
+} from "../form/views.js";
 import { checkEnglish, checkGeorgian } from "../i18n/checks.js";
 import { Typography } from "../i18n/Typography.js";
 import {
@@ -116,7 +122,9 @@ const table = (ui: ReactNode): ReactNode => (
 // card (WP-6), track legends (WP-7), the sign-in form (WP-5), the status
 // bar in each connection state, the sources panel with every source
 // state, the degraded banner and age chips (WP-8), and one page of the
-// registry table with its empty and error states (WP-9).
+// registry table with its empty and error states (WP-9), the zone form
+// with the API's field errors replayed and the intent form with the ten
+// Annex IV items (WP-10).
 const GOLDEN: Record<
   string,
   [ReactNode, Look, (canvas: HTMLElement) => void | Promise<void>]
@@ -185,6 +193,31 @@ const GOLDEN: Record<
     table(<Deliveries error />),
     KA_DARK,
     (c) => checkError(c, /30 წამის/),
+  ],
+  "form-zone.en": [
+    <ZoneForm />,
+    EN_LIGHT,
+    (c) => checkZoneForm(c, /^Upper limit \(m, AMSL\)/, /Publish zone/),
+  ],
+  "form-zone.ka": [
+    <ZoneForm />,
+    KA_DARK,
+    (c) =>
+      checkZoneForm(
+        c,
+        /^ზედა ზღვარი \(მ, ზღვის დონიდან\)/,
+        /ზონის გამოქვეყნება/,
+      ),
+  ],
+  "form-intent.en": [
+    <IntentForm />,
+    EN_LIGHT,
+    (c) => checkIntentForm(c, /^4D trajectory: start/),
+  ],
+  "form-intent.ka": [
+    <IntentForm />,
+    KA_DARK,
+    (c) => checkIntentForm(c, /^4D ტრაექტორია: დაწყება/),
   ],
 };
 
