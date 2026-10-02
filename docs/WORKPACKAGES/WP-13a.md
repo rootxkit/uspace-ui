@@ -1,4 +1,4 @@
-# WP-13a: rc publish (`release.yml`, npm trusted publishing, `0.1.0-rc.N`)
+# WP-13a: rc release (`release.yml`, GitHub Release tarballs, `0.1.0-rc.N`)
 
 Branch `feat/WP-13a-rc-publish`. Milestone U-M1 (the external leg of
 demo 1: the CISP's WP-9 `web/` scaffold starts on an rc of the kit and
@@ -9,6 +9,43 @@ configuration in `package.json` (`publishConfig`, `files`, `version`),
 `scripts/release-notes.mjs`, the `0.1.0-rc.N` sections of
 `CHANGELOG.md`, and `docs/RELEASING.md`. Depends on WP-0..WP-5 merged
 to `main` (the rc ships what is there). WP-13 depends on this.
+
+## Owner change of 2026-10-02: GitHub Release tarballs, not npmjs
+
+The owner changed this brief before it was implemented. **Distribution
+is GitHub Release tarballs, not npmjs.** Publishing to npm needs an npm
+account and the `@rootxkit` scope set up by the owner, and that is not
+available. PLAN D10 and reconciliation M32 are superseded (PLAN §1.2
+D10 has the old and new text and the reason; §14 Q1 is decided). Where
+the rest of this brief says otherwise, this section wins:
+
+- On a `v*` tag, `release.yml` checks tag = `version` and that the
+  CHANGELOG section exists, runs every CI job on the tag (`ci.yml`
+  through `workflow_call`), then attaches the tarball that CI's `pack`
+  job built (`pnpm pack`) and a `SHA256SUMS` file to a GitHub Release.
+  The `release` job alone has `permissions: contents: write` and uses
+  the run's `GITHUB_TOKEN`. A pre-release version (`v0.1.0-rc.1`) is
+  marked as a GitHub pre-release. There is no `pnpm publish`, no
+  `id-token: write`, no dist-tag; the dist-tag rule becomes the
+  pre-release rule (`scripts/release.mjs`, with its own test).
+- Consumers depend on the release asset URL,
+  `https://github.com/rootxkit/uspace-ui/releases/download/v<version>/rootxkit-uspace-ui-<version>.tgz`;
+  the pnpm lockfile pins its integrity. The "no tarball" rule of M32 is
+  lifted for release assets only; `github:` specs and branches stay
+  forbidden (a tarball of built output needs no `prepare` build, which
+  was M32's objection).
+- `publishConfig` and the trusted-publishing notes stay as a documented
+  "switch to npm later" path that is off by default
+  (`docs/RELEASING.md`).
+- The PR dry run is CI's `pack` job on every pull request: the same
+  pack step, a check that the tarball holds exactly `files`, publint
+  and attw on the tarball, and an install by URL into a scratch
+  consumer in which every entry point resolves and type-checks.
+- Not in the tarball's `files`: `LICENSE`, because the repository has
+  none yet (choosing a licence is the owner's). `bin/` is in `files`
+  because `uspace-ui-gen-api` ships (WP-4).
+- The owner's checklist is now: merge, then tag `v0.1.0-rc.1` from
+  `main`. No npm scope or trusted publisher is needed.
 
 ## Read first
 
@@ -102,18 +139,22 @@ to `main` (the rc ships what is there). WP-13 depends on this.
 
 ## Done when
 
-- [ ] `release.yml` merged; the dry-run job green on the PR with the
-  file list and the dist-tag line pasted.
-- [ ] The pack test runs in `check` and the publish job; `publint` and
-  `attw` clean on the packed tarball, not only on `dist/`.
+(As changed on 2026-10-02; the npm items are replaced.)
+
+- [ ] `release.yml` merged; CI's `pack` job green on the PR with the
+  file count, the SHA-256 and the "would release" line pasted.
+- [ ] The pack test runs in `check` and in `pack`; `publint` and `attw`
+  clean on the packed tarball, not only on `dist/`.
+- [ ] The consumer test green in `pack`: lockfile integrity for the URL,
+  every subpath resolves, entry points type-check, the bin runs,
+  changed bytes refused.
 - [ ] `docs/RELEASING.md` and the `0.1.0-rc.1` CHANGELOG section
-  committed; `README.md` "Consuming" says rc versions are under `next`.
-- [ ] The owner has confirmed the scope and the trusted publisher (PLAN
-  §14 Q1 stays open until then; this WP does not publish by any other
-  route, and says in the PR that it is waiting).
-- [ ] `0.1.0-rc.1` on npmjs with provenance, installable without a
-  token; the CISP planner told the exact version to pin (a comment on
-  `uspace-cisp` WP-9).
+  committed; `README.md` "Installing" gives the URL dependency line.
+- [ ] After the owner tags `v0.1.0-rc.1`: the run is green, the release
+  is a pre-release with the `.tgz` and `SHA256SUMS`, and `pnpm install`
+  of the URL in an empty directory works without a token (say you ran
+  it, paste the output; E-04); the CISP planner is told the exact URL to
+  pin (a comment on `uspace-cisp` WP-9).
 - [ ] `pnpm check`, `pnpm test` outputs in the PR.
 
 ## Safety notes
@@ -123,9 +164,12 @@ must be reproducible from a tag, signed by the workflow, and contain
 only built output. The one new risk an early rc adds is a consumer
 reading `latest` and getting an rc; the dist-tag rule and its test are
 the guard, and the post-publish check reads the dist-tags back rather
-than trusting the log. No token, ever: if trusted publishing cannot be
-set up, the WP stops and says so; it does not fall back to an
-`NPM_TOKEN` secret or to a `github:` dependency (M32).
+than trusting the log. No stored token, ever: the release uses the
+run's own `GITHUB_TOKEN`, and nothing falls back to an `NPM_TOKEN`
+secret or to a `github:` dependency. With release tarballs the guard
+against a consumer getting the wrong bytes is the lockfile's integrity
+(and `SHA256SUMS` for a reader), and the post-release step reads the
+release and the downloaded asset back rather than trusting the log.
 
 ## Commits
 
