@@ -490,6 +490,7 @@ pinned exact in `package.json` and locked; peers carry ranges.
 | `pmtiles`, `@protomaps/basemaps` | `map` | D6: the self-hosted basemap protocol and the style layers the predecessor already used (P1-12). |
 | `tailwindcss` (peer `^4`) | styles | D4. The app runs Tailwind; the kit ships tokens and source classes. |
 | `radix-ui` (the unified package), `class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react`, `sonner`, `cmdk` | `ui` | What the vendored shadcn/ui components import. Accepted as the cost of shadcn/ui (D5). |
+| `server-only` (exact pin) | `auth/server` | The marker React and Next.js define for server-only modules: it resolves to an empty module under the `react-server` condition and throws everywhere else, so a client component that imports the BFF helpers fails to build (WP-5). No code beyond the throw. |
 | `openapi-fetch` | `api` | The typed fetch companion of `openapi-typescript` (`00 §6.2`): the generated `paths` type gives typed requests and responses with a 6 kB runtime. |
 | `openapi-typescript` (exact pin) | `bin/uspace-ui-gen-api` | The generator every `web/` runs through the kit's bin (§14 Q14), so it is a runtime dependency, not a dev one: the bin runs in the consumer's install and pins the generator version for all five apps (WP-4). Its peer `typescript` is the consumer's. |
 | `@tanstack/react-table` | `table` | Headless table with sorting, filtering, pagination and virtualisation hooks; the accessible markup is ours. |
