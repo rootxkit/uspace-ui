@@ -161,6 +161,116 @@ export const ka: Readonly<Record<Key, string>> = {
   "restriction.state.cancelled": "გაუქმებული",
   "restriction.state.unstated": "მდგომარეობა მითითებული არ არის",
 
+  // WP-7: trust classes (04 §2)
+  "trust.authenticated": "ავთენტიფიცირებული",
+  "trust.provider": "პროვაიდერი (დაუდასტურებელი)",
+  "trust.surveillance": "მეთვალყურეობა",
+  "trust.broadcast": "სამაუწყებლო (დაუდასტურებელი)",
+  "trust.sensor": "სენსორი",
+  "trust.simulated": "სიმულირებული",
+  "trust.authenticated.meaning":
+    "გადმოცემულია ოპერატორის საკუთარი ავთენტიფიცირებული სესიით ამ აპარატისთვის.",
+  "trust.provider.meaning":
+    "პროვაიდერის მოწოდებული, დაუდასტურებელი: იმდენად სანდოა, რამდენადაც ეს სისტემა.",
+  "trust.surveillance.meaning":
+    "საჰაერო მოძრაობის მეთვალყურეობა, ANSP-ის მეშვეობით.",
+  "trust.broadcast.meaning":
+    "სამაუწყებლო და დაუდასტურებელი: ამ იდენტიფიკატორს და პოზიციას ნებისმიერს შეუძლია გადასცეს.",
+  "trust.sensor.meaning": "აღმოჩენილია სენსორით, იდენტიფიკატორის გარეშე.",
+  "trust.simulated.meaning": "სიმულირებული მოძრაობა, მხოლოდ ლაბორატორიიდან.",
+  "trust.fill.solid": "შევსებული",
+  "trust.fill.hollow": "ცარიელი",
+  "trust.fill.dashed": "წყვეტილი რგოლი",
+
+  // WP-7: tracks on the map and their legend
+  "track.provider": "პროვაიდერის მოწოდებული, დაუდასტურებელი",
+  "track.emergency": "საგანგებო მდგომარეობა",
+  "track.label.unidentified": "უიდენტიფიკაციო",
+  "track.legend.title": "ტრეკების სიმბოლოები",
+  "track.legend.count_one": "{count} ტრეკი",
+  "track.legend.count_other": "{count} ტრეკი",
+  "track.legend.shape":
+    "ფორმა: როგორ მივიდა პოზიცია სისტემამდე. ფერი და ნიშანი: იდენტიფიკაციის სტატუსი. ფერმკრთალი: ასაკი.",
+  "track.legend.arrow":
+    "ისარი: კურსი მიწის მიმართ, როგორც გადმოცემულია; ისარი არ არის, როცა კურსი არ არის გადმოცემული.",
+  "track.legend.emergency":
+    "გარე რგოლი: აპარატი აცხადებს საგანგებო მდგომარეობას.",
+  "track.legend.selected": "შიდა რგოლი: არჩეული ტრეკი.",
+
+  // WP-7: identification status (04 §3.2, G-01)
+  "ident.status.registered": "რეგისტრირებული",
+  "ident.status.suspended": "შეჩერებული",
+  "ident.status.unknown_operator": "უცნობი ოპერატორი",
+  "ident.status.unidentified": "უიდენტიფიკაციო",
+  "ident.status.none": "იდენტიფიკაცია არ არის",
+  "ident.hint.registered":
+    "სერიული ნომერი და ოპერატორი ემთხვევა მოქმედ რეგისტრაციას.",
+  "ident.hint.suspended":
+    "რეგისტრირებულია, მაგრამ საფრენი აპარატი ან მისი ოპერატორი შეჩერებული ან გაუქმებულია.",
+  "ident.hint.unknown_operator":
+    "სერიული ნომერი არ არის რეგისტრირებული, ან მითითებული ოპერატორი აკლია, უცნობია ან არ არის მფლობელი.",
+  "ident.hint.unidentified":
+    "გამოსადეგი სერიული ნომერი არ არის: ვერავინ იტყვის, რა აპარატია.",
+  "ident.hint.none": "ამ ტრეკისთვის იდენტიფიკაცია არ მიღებულა.",
+  "ident.reason.matched": "სერიული ნომერი და ოპერატორი ემთხვევა რეესტრს.",
+  "ident.reason.session_binding":
+    "მიბმულია ოპერატორის ავთენტიფიცირებული სესიით.",
+  "ident.reason.uas_suspended": "აპარატის რეგისტრაცია შეჩერებულია.",
+  "ident.reason.uas_revoked": "აპარატის რეგისტრაცია გაუქმებულია.",
+  "ident.reason.operator_suspended": "ოპერატორის რეგისტრაცია შეჩერებულია.",
+  "ident.reason.operator_revoked": "ოპერატორის რეგისტრაცია გაუქმებულია.",
+  "ident.reason.serial_unknown": "სერიული ნომერი რეესტრში არ არის.",
+  "ident.reason.not_a_serial":
+    "მითითებული იდენტიფიკატორი სერიული ნომერი არ არის, ამიტომ არ მოწმდება.",
+  "ident.reason.operator_absent": "ოპერატორის რეგისტრაცია არ არის მითითებული.",
+  "ident.reason.operator_mismatch":
+    "მითითებული ოპერატორი არ არის რეგისტრირებული მფლობელი.",
+  "ident.reason.owner_unknown":
+    "აპარატი ასახელებს მფლობელს, რომელიც რეესტრში არ არის.",
+  "ident.reason.not_in_registry": "აპარატი ცნობილია, მაგრამ რეესტრში არ არის.",
+  "ident.reason.serial_conflict":
+    "რეესტრის ჩანაწერები ერთმანეთს ეწინააღმდეგება სერიულ ნომერზე.",
+  "ident.reason.no_serial": "სერიული ნომერი არ არის მითითებული.",
+  "ident.reason.registry_unavailable": "რეესტრთან დაკავშირება ვერ მოხერხდა.",
+  "ident.caveat.as_broadcast":
+    "სერიული ნომერი და ოპერატორი, როგორც გადაცემულია, დაუდასტურებლად.",
+  "ident.caveat.provider":
+    "პროვაიდერის მოწოდებული, დაუდასტურებელი: სხვა სისტემის განცხადება.",
+  "ident.mismatch":
+    "ოპერატორი არ ემთხვევა: მითითებული ოპერატორი არ არის რეგისტრირებული მფლობელი.",
+  "ident.mismatch_short": "ოპერატორი არ ემთხვევა",
+  "ident.legend.title": "იდენტიფიკაცია",
+  "ident.legend.attention":
+    "რეგისტრირებულისა და შეჩერებულის შემდეგ ჩამოთვლილია ყურადღების საჭირო სტატუსები. განგაშს სერვერი აცხადებს.",
+  "ident.legend.mismatch":
+    "შეუსაბამობა ჩანს როგორც შეუსაბამობა და არასოდეს როგორც რეგისტრირებული.",
+  "ident.legend.mark": "ნიშანი სიმბოლოსთან: {mark}",
+  "ident.legend.no_mark": "სიმბოლოსთან ნიშანი არ არის",
+
+  // WP-7: age buckets
+  "age.bucket.live": "ცოცხალი",
+  "age.bucket.aging": "ძველდება",
+  "age.bucket.stale": "მოძველებული",
+  "age.bucket.unknown": "ასაკი უცნობია",
+  "age.legend.title": "ტრეკის ასაკი",
+  "age.legend.live": "{a}-ზე ნაკლები",
+  "age.legend.aging": "{a}-დან {b}-მდე",
+  "age.legend.stale": "{b} ან მეტი: ჩანს ფერმკრთლად, არასოდეს იშლება",
+  "age.legend.unknown": "ჩანს სრულად: უცნობი ასაკი ძველად არ არის ნაჩვენები",
+  "age.legend.basis":
+    "ასაკი ითვლება ამ კონსოლის მიერ პოზიციის მიღებიდან; მოძველების ზღვარი სერვერისაა ({b}).",
+  "age.legend.no_threshold":
+    "სერვერს მოძველების ზღვარი არ გამოუგზავნია: ასაკი ჯგუფებად არ იყოფა.",
+
+  // WP-7: severities
+  "severity.critical": "კრიტიკული",
+  "severity.warning": "გაფრთხილება",
+  "severity.info": "ინფორმაცია",
+  "severity.critical.hint": "საჭიროა მოქმედება ახლავე.",
+  "severity.warning.hint": "საჭიროა ყურადღება; ჯერ არ არის დარღვევა.",
+  "severity.info.hint": "საინფორმაციოდ; მოქმედება არ არის მოსალოდნელი.",
+  "severity.legend.title": "სიმძიმე",
+
   // WP-5: sign-in
   "auth.title": "შესვლა",
   "auth.username": "მომხმარებლის სახელი",

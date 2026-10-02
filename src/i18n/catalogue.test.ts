@@ -7,7 +7,20 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { DISABLED_BYS, SOURCE_STATES } from "../model/index.js";
+import { AGE_BUCKET_KEYS } from "../symbology/age.js";
+import {
+  IDENT_BASIS_KEYS,
+  IDENT_REASON_KEYS,
+  IDENT_STATUS_HINT_KEYS,
+  IDENT_STATUS_KEYS,
+} from "../symbology/ident.js";
 import { RESTRICTION_STATE_KEYS } from "../symbology/restriction.js";
+import { SEVERITY_HINT_KEYS, SEVERITY_KEYS } from "../symbology/severity.js";
+import {
+  TRUST_FILL_KEYS,
+  TRUST_KEYS,
+  TRUST_MEANING_KEYS,
+} from "../symbology/track.js";
 import { ZONE_PATTERN_KEYS, ZONE_TYPE_KEYS } from "../symbology/zone.js";
 import { en, type Key } from "./en.js";
 import { ALTITUDE_KEYS, HEIGHT_KEYS } from "./format.js";
@@ -113,6 +126,32 @@ const DYNAMIC_KEYS: Readonly<Record<string, readonly string[]>> = {
   "src/symbology/restriction.ts RESTRICTION_STATE_KEYS": Object.values(
     RESTRICTION_STATE_KEYS,
   ),
+  // TrackLegend: t(TRUST_KEYS[t]), t(TRUST_MEANING_KEYS[t]),
+  // t(TRUST_FILL_KEYS[fill])
+  "src/symbology/track.ts TRUST_KEYS": Object.values(TRUST_KEYS),
+  "src/symbology/track.ts TRUST_MEANING_KEYS":
+    Object.values(TRUST_MEANING_KEYS),
+  "src/symbology/track.ts TRUST_FILL_KEYS": Object.values(TRUST_FILL_KEYS),
+  // IdentificationLegend, trackLabel: t(IDENT_STATUS_KEYS[s]),
+  // t(IDENT_STATUS_HINT_KEYS[s]); identHintKey's keys (WP-12 renders them)
+  "src/symbology/ident.ts IDENT_STATUS_KEYS": Object.values(IDENT_STATUS_KEYS),
+  "src/symbology/ident.ts IDENT_STATUS_HINT_KEYS": Object.values(
+    IDENT_STATUS_HINT_KEYS,
+  ),
+  "src/symbology/ident.ts IDENT_REASON_KEYS": Object.values(IDENT_REASON_KEYS),
+  "src/symbology/ident.ts IDENT_BASIS_KEYS": Object.values(IDENT_BASIS_KEYS),
+  "src/symbology/ident.ts identHintKey caveats": [
+    "ident.registered_as_broadcast",
+    "ident.caveat.as_broadcast",
+    "ident.caveat.provider",
+    "ident.mismatch",
+  ],
+  // AgeLegend: t(AGE_BUCKET_KEYS[b])
+  "src/symbology/age.ts AGE_BUCKET_KEYS": Object.values(AGE_BUCKET_KEYS),
+  // SeverityLegend: t(SEVERITY_KEYS[s]), t(SEVERITY_HINT_KEYS[s])
+  "src/symbology/severity.ts SEVERITY_KEYS": Object.values(SEVERITY_KEYS),
+  "src/symbology/severity.ts SEVERITY_HINT_KEYS":
+    Object.values(SEVERITY_HINT_KEYS),
 };
 
 describe("keys used in src/", () => {
@@ -181,6 +220,14 @@ describe("R-05: broadcast and unverified", () => {
       "ident.basis.as_broadcast",
       "ident.basis.provider",
       "ident.registered_as_broadcast",
+      // WP-7: the trust names and meanings, the map label, the caveats
+      "trust.broadcast",
+      "trust.broadcast.meaning",
+      "trust.provider",
+      "trust.provider.meaning",
+      "track.provider",
+      "ident.caveat.as_broadcast",
+      "ident.caveat.provider",
     ];
     for (const k of broadcast) {
       expect(en[k], k).toMatch(UNVERIFIED.en);

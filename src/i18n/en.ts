@@ -174,6 +174,119 @@ const catalogue = {
   "restriction.state.cancelled": "Cancelled",
   "restriction.state.unstated": "State not provided",
 
+  // WP-7: trust classes (04 §2). A trust class is how the position reached
+  // the system, never how true it is (06 §1); the broadcast and provider
+  // meanings say unverified (R-05, PLAN §14 Q18).
+  "trust.authenticated": "Authenticated",
+  "trust.provider": "Provider (unverified)",
+  "trust.surveillance": "Surveillance",
+  "trust.broadcast": "Broadcast (unverified)",
+  "trust.sensor": "Sensor",
+  "trust.simulated": "Simulated",
+  "trust.authenticated.meaning":
+    "Sent over the operator's own authenticated session for this aircraft.",
+  "trust.provider.meaning":
+    "Reported by a provider, unverified: as trustworthy as that peer system.",
+  "trust.surveillance.meaning": "Air traffic surveillance, through the ANSP.",
+  "trust.broadcast.meaning":
+    "Broadcast and unverified: anyone can transmit this identity and position.",
+  "trust.sensor.meaning": "Detected by a sensor, without an identity.",
+  "trust.simulated.meaning": "Simulated traffic, from the lab only.",
+  "trust.fill.solid": "solid",
+  "trust.fill.hollow": "hollow",
+  "trust.fill.dashed": "dashed ring",
+
+  // WP-7: tracks on the map and their legend
+  "track.provider": "reported by a provider, unverified",
+  "track.emergency": "emergency",
+  "track.label.unidentified": "unidentified",
+  "track.legend.title": "Track symbols",
+  "track.legend.count_one": "{count} track",
+  "track.legend.count_other": "{count} tracks",
+  "track.legend.shape":
+    "Shape: how the position reached the system. Colour and mark: identification status. Faded: age.",
+  "track.legend.arrow":
+    "Arrow: course over ground as reported; no arrow when none is reported.",
+  "track.legend.emergency": "Outer ring: the aircraft reports an emergency.",
+  "track.legend.selected": "Inner ring: the selected track.",
+
+  // WP-7: identification status (04 §3.2, G-01). The status is the
+  // server's; these strings say what it means and on what basis.
+  "ident.status.registered": "registered",
+  "ident.status.suspended": "suspended",
+  "ident.status.unknown_operator": "unknown operator",
+  "ident.status.unidentified": "unidentified",
+  "ident.status.none": "no identification",
+  "ident.hint.registered":
+    "The serial and the operator match an active registration.",
+  "ident.hint.suspended":
+    "Registered, but the aircraft or its operator is suspended or revoked.",
+  "ident.hint.unknown_operator":
+    "The serial is not registered, or the operator given is missing, unknown or not the owner.",
+  "ident.hint.unidentified":
+    "No usable serial number: nobody can say what aircraft this is.",
+  "ident.hint.none": "No identification has been received for this track.",
+  "ident.reason.matched": "Serial and operator match the registry.",
+  "ident.reason.session_binding":
+    "Bound by the operator's authenticated session.",
+  "ident.reason.uas_suspended": "The aircraft's registration is suspended.",
+  "ident.reason.uas_revoked": "The aircraft's registration is revoked.",
+  "ident.reason.operator_suspended":
+    "The operator's registration is suspended.",
+  "ident.reason.operator_revoked": "The operator's registration is revoked.",
+  "ident.reason.serial_unknown": "The serial is not in the registry.",
+  "ident.reason.not_a_serial":
+    "The identity given is not a serial number, so it is not looked up.",
+  "ident.reason.operator_absent": "No operator registration was given.",
+  "ident.reason.operator_mismatch":
+    "The operator given is not the registered owner.",
+  "ident.reason.owner_unknown":
+    "The aircraft names an owner the registry does not hold.",
+  "ident.reason.not_in_registry":
+    "The aircraft is known but not in the registry.",
+  "ident.reason.serial_conflict": "Registry records conflict over the serial.",
+  "ident.reason.no_serial": "No serial was given.",
+  "ident.reason.registry_unavailable": "The registry could not be consulted.",
+  "ident.caveat.as_broadcast":
+    "Serial and operator as broadcast and unverified.",
+  "ident.caveat.provider":
+    "Reported by a provider, unverified: a peer system's claim.",
+  "ident.mismatch":
+    "Operator mismatch: the operator given is not the registered owner.",
+  "ident.mismatch_short": "operator mismatch",
+  "ident.legend.title": "Identification",
+  "ident.legend.attention":
+    "Listed after registered and suspended: the statuses that need attention. The server raises the alerts.",
+  "ident.legend.mismatch":
+    "A mismatch is shown as a mismatch, never as registered.",
+  "ident.legend.mark": "Mark beside the symbol: {mark}",
+  "ident.legend.no_mark": "No mark beside the symbol",
+
+  // WP-7: age buckets. The age counts from receipt by this console; the
+  // threshold is the server's (stale_after_s).
+  "age.bucket.live": "Live",
+  "age.bucket.aging": "Ageing",
+  "age.bucket.stale": "Stale",
+  "age.bucket.unknown": "Age not known",
+  "age.legend.title": "Track age",
+  "age.legend.live": "under {a}",
+  "age.legend.aging": "{a} to under {b}",
+  "age.legend.stale": "{b} or more: drawn faded, never removed",
+  "age.legend.unknown": "drawn in full: an unknown age is not shown as old",
+  "age.legend.basis":
+    "Age since this console received the position; the stale threshold is the server's ({b}).",
+  "age.legend.no_threshold":
+    "The server has not sent a stale threshold: ages are not bucketed.",
+
+  // WP-7: severities. The severity is the server's (Z-10).
+  "severity.critical": "Critical",
+  "severity.warning": "Warning",
+  "severity.info": "Information",
+  "severity.critical.hint": "Needs action now.",
+  "severity.warning.hint": "Needs attention; not yet a violation.",
+  "severity.info.hint": "For information; no action expected.",
+  "severity.legend.title": "Severity",
+
   // WP-5: sign-in. Rate limits are the API's (LESSONS S-15): the form shows
   // the API's refusal and its Retry-After, never a limit of its own.
   "auth.title": "Sign in",
