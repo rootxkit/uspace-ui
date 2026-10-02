@@ -172,6 +172,33 @@ export function upstreamHeaders(
   return out;
 }
 
+/**
+ * A redirect status: every 3xx but 304. A 304 Not Modified answers the
+ * `If-None-Match` the BFF forwards and is passed through; a redirect is not.
+ */
+export function isRedirect(status: number): boolean {
+  return status >= 300 && status < 400 && status !== 304;
+}
+
+/**
+ * An upstream redirect becomes a 502 problem with no `Location`. The
+ * browser must never be sent to wherever the API pointed: the target
+ * could be the API's internal address, or a place outside the allow-list.
+ * Counted.
+ */
+export async function redirectRefused(
+  upstream: Response,
+): Promise<NextResponse> {
+  await upstream.body?.cancel();
+  countAuth("upstream_redirect");
+  return problemResponse(
+    502,
+    "upstream_redirect",
+    "Upstream redirect refused",
+    `the API answered ${upstream.status}; the BFF does not follow or pass on redirects`,
+  );
+}
+
 /** The API's headers minus the dropped set. */
 export function downstreamHeaders(upstream: Response): Headers {
   const out = new Headers(upstream.headers);
@@ -274,6 +301,7 @@ export async function forward(
   );
   if (!result.ok) return result.response;
   const upstream = result.response;
+  if (isRedirect(upstream.status)) return redirectRefused(upstream);
   const res = new NextResponse(upstream.body, {
     status: upstream.status,
     statusText: upstream.statusText,

@@ -209,23 +209,46 @@ describe("forward: refusals before upstream", () => {
 });
 
 describe("forward: the API's answer", () => {
-  it("does not follow a 302: asks fetch for manual redirects and passes it through", async () => {
+  it("never passes a redirect on: a 3xx becomes a 502 problem without Location", async () => {
+    for (const status of [301, 302, 303, 307, 308]) {
+      const stub = stubFetch(
+        () =>
+          new Response(null, {
+            status,
+            headers: { Location: `${API}/elsewhere` },
+          }),
+      );
+      const res = await forward(
+        request("/_bff/api/v1/zones", { cookies: signedIn }),
+        target("/v1/zones"),
+        opts(stub.fetch),
+      );
+      expect(stub.calls[0]?.init.redirect).toBe("manual");
+      expect(stub.calls).toHaveLength(1);
+      expect(res.status, String(status)).toBe(502);
+      expect(res.headers.get("location")).toBeNull();
+      expect(await res.json()).toMatchObject({
+        type: "https://schemas.uspace.ge/problems/upstream_redirect",
+      });
+    }
+    expect(authCounters().upstream_redirect).toBe(5);
+  });
+
+  it("passes a 304 Not Modified through with its ETag (the twin: not a redirect)", async () => {
     const stub = stubFetch(
-      () =>
-        new Response(null, {
-          status: 302,
-          headers: { Location: `${API}/elsewhere` },
-        }),
+      () => new Response(null, { status: 304, headers: { ETag: '"v7"' } }),
     );
     const res = await forward(
-      request("/_bff/api/v1/zones", { cookies: signedIn }),
+      request("/_bff/api/v1/zones", {
+        cookies: signedIn,
+        headers: { "If-None-Match": '"v7"' },
+      }),
       target("/v1/zones"),
       opts(stub.fetch),
     );
-    expect(stub.calls[0]?.init.redirect).toBe("manual");
-    expect(stub.calls).toHaveLength(1);
-    expect(res.status).toBe(302);
-    expect(res.headers.get("location")).toBe(`${API}/elsewhere`);
+    expect(res.status).toBe(304);
+    expect(res.headers.get("etag")).toBe('"v7"');
+    expect(authCounters().upstream_redirect).toBe(0);
   });
 
   it("passes Retry-After, ETag, Sunset and a problem body through unchanged", async () => {

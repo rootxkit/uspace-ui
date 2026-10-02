@@ -41,7 +41,9 @@ import {
   checkTrustedProxyHops,
   downstreamHeaders,
   forward,
+  isRedirect,
   problemResponse,
+  redirectRefused,
   upstreamHeaders,
 } from "./forward.js";
 
@@ -215,8 +217,13 @@ function noStoreJson(body: LoginResult): NextResponse {
   });
 }
 
-/** The API's refusal as it came: status, problem body, `Retry-After`. No cookie is set. */
-function passThrough(upstream: Response): NextResponse {
+/**
+ * The API's refusal as it came: status, problem body, `Retry-After`. No
+ * cookie is set. A redirect is not a refusal to pass on: it becomes a
+ * 502 problem without `Location`.
+ */
+async function passThrough(upstream: Response): Promise<NextResponse> {
+  if (isRedirect(upstream.status)) return redirectRefused(upstream);
   return new NextResponse(upstream.body, {
     status: upstream.status,
     statusText: upstream.statusText,

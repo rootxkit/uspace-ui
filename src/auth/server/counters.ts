@@ -26,7 +26,9 @@ export type AuthCounter =
   /** No client address: the forwarded chain was shorter than the trusted hops, or not an IP. */
   | "client_address_unknown"
   /** A one-time code sent without a live sealed challenge (absent, altered, expired). */
-  | "mfa_challenge_invalid";
+  | "mfa_challenge_invalid"
+  /** An upstream 3xx other than 304: refused with a 502, never passed on. */
+  | "upstream_redirect";
 
 const ZERO: Readonly<Record<AuthCounter, number>> = {
   claims_malformed: 0,
@@ -41,6 +43,7 @@ const ZERO: Readonly<Record<AuthCounter, number>> = {
   login_answer_invalid: 0,
   client_address_unknown: 0,
   mfa_challenge_invalid: 0,
+  upstream_redirect: 0,
 };
 
 const counts: Record<AuthCounter, number> = { ...ZERO };

@@ -172,6 +172,28 @@ describe("login", () => {
     });
   });
 
+  it("turns a redirect from either sign-in step into a 502 without Location or cookies", async () => {
+    const redirect = () =>
+      new Response(null, {
+        status: 302,
+        headers: { Location: "http://api.test:8080/sso" },
+      });
+    const first = await handlers(stubFetch(redirect).fetch).login(
+      loginRequest(CREDENTIALS),
+    );
+    expect(first.status).toBe(502);
+    expect(first.headers.get("location")).toBeNull();
+    expect(first.headers.getSetCookie()).toEqual([]);
+    const stub = stubFetch((url) =>
+      url.endsWith(LOGIN) ? json(200, CHALLENGE) : redirect(),
+    );
+    const h = handlers(stub.fetch);
+    const second = await h.login(otpRequest(await passwordStep(h)));
+    expect(second.status).toBe(502);
+    expect(second.headers.get("location")).toBeNull();
+    expect(authCounters().upstream_redirect).toBe(2);
+  });
+
   it("on a 429 passes Retry-After and the problem through, and sets no cookie", async () => {
     const stub = stubFetch(() =>
       problem(429, "rate_limited", { "Retry-After": "30" }),
