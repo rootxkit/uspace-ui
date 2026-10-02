@@ -71,20 +71,20 @@ from `src/ui/index.ts`. `cn()` in `src/ui/cn.ts`. Every component keeps
   organisation string (a regex over the output for names is not
   possible, so the test asserts the exact fallback); `matchMedia` and
   `document.documentElement` restored after each test (E-11).
-- Stories: every `ui` component in both schemes; `axe` on each; a
-  `Palettes` story showing the four semantic sets with their variable
+- Browser tests (`browser/ui/`): every `ui` component in both schemes;
+  `axe` on each; a `Palettes` page showing the four semantic sets with their variable
   names (the golden set gets `palettes.light`/`palettes.dark` DOM
   snapshots).
-- A story under the CSP of PLAN §7 (`stories/csp/*`): a component using
-  inline styles must still render (no `style-src` violation in the
-  console; the story asserts the console is clean).
+- A browser test under the CSP of PLAN §7 (`browser/csp/*`): a
+  component using inline styles must still render (no `style-src`
+  violation in the console; the test asserts the console is clean).
 
 ## Done when
 
 - [ ] PLAN §3.2 signatures implemented; API report updated.
 - [ ] Contrast and colour-vision tests pass for both schemes; the
   thresholds and the transform are cited in the test file.
-- [ ] Every shadcn component listed renders in Storybook in both schemes
+- [ ] Every shadcn component listed renders in a browser test in both schemes
   with `axe` clean; `UPGRADING.md` written.
 - [ ] No string naming an organisation, a hostname or a logo path in
   `src/theme/` or `styles/` (the `chikox.net` grep plus a reviewer read).

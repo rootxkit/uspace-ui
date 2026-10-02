@@ -121,3 +121,10 @@ follows docs/PLAN.md §12. One line per work package under Unreleased.
   @tanstack/react-table 8.21.3 (9.x exists and was not taken: its column
   types and feature API changed, and the plan's signatures are v8's),
   @tanstack/react-virtual 3.14.13.
+- Storybook removed (the owner's decision, 2026-10-02; PLAN D9): every
+  story and the golden set are plain Vitest browser-mode tests under
+  `browser/` that render the components in the kit's providers, with
+  axe after every test and the same golden DOM snapshots; the test
+  basemap moved to `browser/public/basemap/`; the Storybook packages,
+  config, scripts and the CI build are gone, and no Pages site is
+  planned. No change to the package or its API.

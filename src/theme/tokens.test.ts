@@ -417,7 +417,7 @@ describe.each(Object.entries(SCHEMES))("%s scheme", (_scheme, s) => {
       MIN_CONTRAST_TEXT,
     );
     // shadcn's destructive Button and Badge hard-code white text on
-    // `bg-destructive` (`/60` in dark); the Button story's axe run checks
+    // `bg-destructive` (`/60` in dark); the Button browser test's axe run checks
     // that rendered pair. `--us-on-danger` is for the kit's own use.
     assertContrast(
       pick(s, { "on-danger": v("on-danger") }),

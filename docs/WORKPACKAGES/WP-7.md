@@ -96,7 +96,7 @@ consoles, the USSP operator portal.
   `IdentificationLegend` and absent from `SeverityLegend` (pair).
 - Benchmark: 400 upserts/s with 200 tracks in view, time to next frame
   (PLAN §8); reported.
-- Stories: a fixture sky over the Tbilisi extract with every trust and
+- Browser tests: a fixture sky over the Tbilisi extract with every trust and
   status combination at least once, ages spread across buckets, one
   emergency, one unidentified, one mismatch; both schemes and languages;
   golden DOM snapshots of the three legends.
@@ -105,13 +105,14 @@ consoles, the USSP operator portal.
 
 - [ ] PLAN §3.8 (track, ident, age, severity), §3.9 (`TrackLayer`),
   §3.10 (three legends) implemented; API report updated.
-- [ ] Every enumeration value renders somewhere in the stories (a
+- [ ] Every enumeration value renders somewhere in the browser tests (a
   browser test walks the fixture and the rendered legend DOM).
 - [ ] No position arithmetic in this WP (grep for `Math.`, `cos`,
   `sin`, `atan` in `src/layers/TrackLayer.tsx` and `src/symbology/`:
   only the icon generator may use them, for drawing shapes).
-- [ ] Stories on Pages; say you looked at a broadcast track and read
-  its caveat.
+- [ ] The track tests in a headed run (`pnpm exec vitest --project
+  browser --browser.headless=false <file>`); say you looked at a
+  broadcast track and read its caveat.
 - [ ] `pnpm check`, `pnpm test`, `pnpm test:browser` outputs in the PR.
 
 ## Safety notes

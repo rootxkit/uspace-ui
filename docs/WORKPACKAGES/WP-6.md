@@ -36,7 +36,7 @@ to `v0.1.0`.
    the kit draws GeoJSON as given, no circle construction), R-12, E-13
    (limits shown with reference and unit).
 4. `uspace-core/ed318` types (field names for the view-model adapter
-   example in the story), `uspace-core/core` `ZoneType`.
+   example in the browser tests), `uspace-core/core` `ZoneType`.
 5. Predecessor `utm/web-pilot/src/map/MapView.tsx` zone layers
    (`zones-fill`, `zones-line`, `zones-line-inactive`, labels) and
    `ZonesPanel.tsx`; its `zones.ts` *must not* be ported: it evaluated
@@ -94,7 +94,7 @@ to `v0.1.0`.
   still drawn (never removed silently; `02 §1` failure rule).
 - `ZoneLegend` (jsdom): five entries in the fixed order, counts when
   given, `axe` clean; both languages.
-- Stories: all five types over the Tbilisi extract; hover card in both
+- Browser tests: all five types over the Tbilisi extract; hover card in both
   languages; a `planned`/`active`/`ended` restriction trio; golden DOM
   snapshot of the legend and the hover card.
 
@@ -106,7 +106,9 @@ to `v0.1.0`.
   boolean about a zone (a reviewer greps for `Date`, `now`, `contains`,
   `inside`, `applies(` in `src/symbology/zone.ts` and `src/layers/Zone*`;
   the only `applies` is the field read).
-- [ ] Stories visible on Pages in both languages; say you looked.
+- [ ] The zone tests in both languages, in a headed run
+  (`pnpm exec vitest --project browser --browser.headless=false <file>`);
+  say you looked.
 - [ ] `pnpm check`, `pnpm test`, `pnpm test:browser` outputs in the PR.
 
 ## Safety notes

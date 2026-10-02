@@ -1,4 +1,4 @@
-// Synthetic rows for the table tests and stories (spec 06 §4: GEO-TEST-*
+// Synthetic rows for the table tests and browser tests (spec 06 §4: GEO-TEST-*
 // numbers, TEST* serials, no real data): a registry-shaped list, a
 // deliveries list with freshness, and the problem a refused read returns.
 import type { Freshness } from "../api/freshness.js";
