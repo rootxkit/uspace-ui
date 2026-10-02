@@ -22,6 +22,17 @@ ruleTester().run("no-business-logic-in-routes", noBusinessLogicInRoutes, {
       code: 'import { allowPaths } from "@/lib/bff/paths";',
     },
     { filename: "C:\\web\\app\\api\\x\\route.ts", code: 'import "next";' },
+    // The folder the /_bff/* URLs are really served from (WP-5): the
+    // permitted imports pass there too.
+    {
+      filename: "web/src/app/%5Fbff/login/route.ts",
+      code: 'import { bffHandlers } from "@rootxkit/uspace-ui/auth/server";\nimport { bff } from "@/lib/bff/handlers";',
+    },
+    // A folder that only looks like it stays outside the rule.
+    {
+      filename: "web/app/x%5Fbff/route.ts",
+      code: 'import { zones } from "../../lib/zones";',
+    },
     // Outside the route directories the rule says nothing.
     {
       filename: "web/app/zones/page.tsx",
@@ -46,6 +57,18 @@ ruleTester().run("no-business-logic-in-routes", noBusinessLogicInRoutes, {
     },
     {
       filename: "web/app/_bff/login/route.ts",
+      code: 'import { createClient } from "@rootxkit/uspace-ui/api";',
+      errors: [err("@rootxkit/uspace-ui/api")],
+    },
+    // The App Router serves /_bff/* from %5Fbff, in either case of the
+    // encoding (WP-5); a forbidden import there is reported.
+    {
+      filename: "web/src/app/%5Fbff/login/route.ts",
+      code: 'import { inZone } from "../../../lib/zones";',
+      errors: [err("../../../lib/zones")],
+    },
+    {
+      filename: "C:\\web\\app\\%5fbff\\api\\[...path]\\route.ts",
       code: 'import { createClient } from "@rootxkit/uspace-ui/api";',
       errors: [err("@rootxkit/uspace-ui/api")],
     },

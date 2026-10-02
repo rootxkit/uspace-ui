@@ -460,7 +460,7 @@ export const rules: { noGeometryImports; noServerClientsInWeb; noBusinessLogicIn
 named `geo`, `geodesy`, `cpa`, `conformance`. `noServerClientsInWeb`:
 `pg`, `postgres`, `nats`, `nats.ws`, `ioredis`, `redis`, `@prisma/*`,
 `drizzle-orm`, `kysely`, `knex`, `mongodb` anywhere under `web/`.
-`noBusinessLogicInRoutes`: under `app/api/**` and `app/_bff/**`, only
+`noBusinessLogicInRoutes`: under `app/api/**` and `app/_bff/**` (served from `app/%5Fbff/**`, WP-5), only
 imports from `@rootxkit/uspace-ui/auth/server`, `next/*` and the app's
 own `lib/bff/*` are allowed. `noHandWrittenApiTypes`: under
 `src/api/generated/**` only generated files (header check) may exist;
