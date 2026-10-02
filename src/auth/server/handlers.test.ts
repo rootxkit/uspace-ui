@@ -13,6 +13,8 @@ import {
   vi,
 } from "vitest";
 
+import { NextRequest } from "next/server.js";
+
 import { challengeKey, openChallenge } from "./challenge.js";
 import { authCounters, resetAuthCountersForTests } from "./counters.js";
 import {
@@ -531,6 +533,92 @@ describe("login", () => {
     );
     expect(big.status).toBe(413);
     expect(stub.fn).not.toHaveBeenCalled();
+  });
+
+  it("refuses a body Content-Length announces over 8 KiB before reading a byte", async () => {
+    const stub = stubFetch(() => json(200, ISSUED));
+    const req = loginRequest(CREDENTIALS, {
+      Origin: ORIGIN,
+      Host: HOST,
+      "Content-Length": "100000",
+    });
+    const res = await handlers(stub.fetch).login(req);
+    expect(res.status).toBe(413);
+    expect(req.bodyUsed).toBe(false);
+    expect(stub.fn).not.toHaveBeenCalled();
+  });
+
+  it("stops reading an endless body at the bound and cancels the stream", async () => {
+    let pulled = 0;
+    let cancelled = false;
+    const endless = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        pulled += 1;
+        controller.enqueue(new Uint8Array(1024).fill(0x20));
+      },
+      cancel() {
+        cancelled = true;
+      },
+    });
+    const req = new NextRequest(new URL("/_bff/login", ORIGIN), {
+      method: "POST",
+      headers: {
+        Origin: ORIGIN,
+        Host: HOST,
+        "Content-Type": "application/json",
+      },
+      body: endless,
+      duplex: "half",
+    } as unknown as ConstructorParameters<typeof NextRequest>[1]);
+    const stub = stubFetch(() => json(200, ISSUED));
+    const res = await handlers(stub.fetch).login(req);
+    expect(res.status).toBe(413);
+    expect(cancelled).toBe(true);
+    // 8 KiB in 1 KiB chunks: the ninth passes the bound and ends the read.
+    expect(pulled).toBeLessThanOrEqual(11);
+    expect(stub.fn).not.toHaveBeenCalled();
+  });
+
+  it("reads a body of exactly 8 KiB (the bound is inclusive)", async () => {
+    const base = JSON.stringify({ ...CREDENTIALS, pad: "" });
+    const body = JSON.stringify({
+      ...CREDENTIALS,
+      pad: "x".repeat(8192 - base.length),
+    });
+    expect(new TextEncoder().encode(body).length).toBe(8192);
+    const stub = stubFetch(() => json(200, ISSUED));
+    const res = await handlers(stub.fetch).login(
+      request("/_bff/login", {
+        method: "POST",
+        headers: {
+          Origin: ORIGIN,
+          Host: HOST,
+          "Content-Length": "8192",
+        },
+        body,
+      }),
+    );
+    expect(res.status).toBe(200);
+    const over = await handlers(stub.fetch).login(
+      request("/_bff/login", {
+        method: "POST",
+        headers: { Origin: ORIGIN, Host: HOST },
+        body: `${body} `,
+      }),
+    );
+    expect(over.status).toBe(413);
+  });
+
+  it("refuses a Content-Length that is not a number", async () => {
+    const stub = stubFetch(() => json(200, ISSUED));
+    const res = await handlers(stub.fetch).login(
+      loginRequest(CREDENTIALS, {
+        Origin: ORIGIN,
+        Host: HOST,
+        "Content-Length": "1e3",
+      }),
+    );
+    expect(res.status).toBe(413);
   });
 
   it("answers 502 for a 2xx without a token or a challenge, and sets no cookie", async () => {

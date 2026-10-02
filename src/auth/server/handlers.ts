@@ -160,6 +160,44 @@ function sameOrigin(req: NextRequest, opts: BffOptions): boolean {
   }
 }
 
+/**
+ * The request body as text, read no further than `maxBytes`. `null` when
+ * `Content-Length` announces more, before any byte is read, or when the
+ * stream passes the bound, at which point the read stops and the stream
+ * is cancelled. Nothing beyond the bound is buffered.
+ */
+export async function readBounded(
+  req: Request,
+  maxBytes: number,
+): Promise<string | null> {
+  const declared = req.headers.get("content-length");
+  if (declared !== null) {
+    const n = Number(declared);
+    if (!/^\d+$/.test(declared.trim()) || n > maxBytes) return null;
+  }
+  if (req.body === null) return "";
+  const reader = req.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > maxBytes) {
+      await reader.cancel();
+      return null;
+    }
+    chunks.push(value);
+  }
+  const all = new Uint8Array(total);
+  let at = 0;
+  for (const c of chunks) {
+    all.set(c, at);
+    at += c.byteLength;
+  }
+  return new TextDecoder().decode(all);
+}
+
 /** The sign-in step a request carries: the password, or the code alone. */
 type LoginStep =
   | { step: "password"; username: string; password: string }
@@ -168,8 +206,8 @@ type LoginStep =
 async function readLoginStep(
   req: NextRequest,
 ): Promise<LoginStep | NextResponse> {
-  const text = await req.text();
-  if (new TextEncoder().encode(text).length > LOGIN_BODY_MAX_BYTES) {
+  const text = await readBounded(req, LOGIN_BODY_MAX_BYTES);
+  if (text === null) {
     return problemResponse(413, "body_too_large", "Request body too large");
   }
   let body: unknown;
