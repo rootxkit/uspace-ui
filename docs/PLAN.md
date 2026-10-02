@@ -96,7 +96,7 @@ pinned by each `web/`; additive within a major.
 │   ├── live/         reconnecting feed, track/alert/source stores (WP-8)   deps: model, api
 │   ├── status/       source state, degraded banner, age chip, freeze overlay (WP-8)  deps: live, i18n, ui
 │   ├── alerts/       alert list, toast, acknowledgement, tone (WP-11)      deps: live, i18n, ui, symbology
-│   ├── table/        accessible data table kit (WP-9)                      deps: ui, i18n
+│   ├── table/        accessible data table kit (WP-9)                      deps: ui, i18n, status, symbology
 │   ├── form/         form kit with field errors and units (WP-10)          deps: ui, i18n, api
 │   ├── eslint/       the flat config every web/ extends (WP-0)             deps: eslint (peer)
 │   └── test/         render helpers, fixtures from the lab's schema examples (WP-0, WP-14)
@@ -125,8 +125,9 @@ the single root; `test` is imported by tests and stories only.
 model <- theme <- ui, map, symbology
 model <- i18n <- map, legend, status, alerts, table, form
 model <- api <- live, form
-map <- layers ;  symbology <- layers, legend, alerts
+map <- layers ;  symbology <- layers, legend, alerts, table
 live <- status, alerts, layers   (layers reads ageS and compareCapturedAt from live, WP-8)
+status <- table   (columns.age renders the AgeChip, WP-9; table imports the api Freshness type only)
 ui <- legend, status, alerts, table, form
 fonts, auth/server, auth/client: next (peer) only; nothing imports them
 eslint: nothing imports it

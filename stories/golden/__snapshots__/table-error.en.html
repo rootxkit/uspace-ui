@@ -1,0 +1,184 @@
+<div lang="en" class="bg-background p-4 text-foreground">
+<div data-testid="deliveries">
+<div class="grid gap-2 text-sm" data-table="" data-virtual="false" data-state-kind="error">
+<div class="flex flex-wrap items-end justify-between gap-3">
+<div role="group" aria-label="Filters" class="flex flex-wrap items-end gap-3" data-part="filters">
+<div class="grid gap-1">
+<label data-slot="label" class="flex items-center gap-2 font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 text-xs" for="id-0">Filter: Subscriber</label>
+<input data-slot="input" class="min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 h-9 w-44" id="id-0" data-filter="subscriber" type="search" value="">
+</div>
+<div class="grid gap-1">
+<label data-slot="label" class="flex items-center gap-2 font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 text-xs" for="id-1">Filter: Dataset</label>
+<input data-slot="input" class="min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 h-9 w-44" id="id-1" data-filter="dataset" type="search" value="">
+</div>
+<div class="grid gap-1">
+<label data-slot="label" class="flex items-center gap-2 font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 text-xs" for="id-2">Filter: Version</label>
+<input data-slot="input" class="min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 h-9 w-44" id="id-2" data-filter="version" type="search" value="">
+</div>
+<div class="grid gap-1">
+<label data-slot="label" class="flex items-center gap-2 font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 text-xs" for="id-3">Filter: State</label>
+<select id="id-3" data-filter="state" class="h-9 rounded-md border border-input bg-background px-2 text-sm focus-visible:outline-2 focus-visible:outline-ring">
+<option value="">All</option>
+<option value="delivered">Delivered</option>
+<option value="pending">Pending</option>
+<option value="failed">Failed</option>
+</select>
+</div>
+</div>
+<details class="relative text-sm" data-part="columns">
+<summary class="cursor-pointer rounded-md border border-input px-3 py-1.5 focus-visible:outline-2 focus-visible:outline-ring">Columns</summary>
+<fieldset class="absolute z-20 mt-1 grid min-w-48 gap-1 rounded-md border border-border bg-popover p-2 text-popover-foreground shadow-md">
+<legend class="sr-only">Columns to show</legend>
+<label class="flex items-center gap-2">
+<input data-column-toggle="subscriber" type="checkbox" checked="">Subscriber</label>
+<label class="flex items-center gap-2">
+<input data-column-toggle="dataset" type="checkbox" checked="">Dataset</label>
+<label class="flex items-center gap-2">
+<input data-column-toggle="version" type="checkbox" checked="">Version</label>
+<label class="flex items-center gap-2">
+<input data-column-toggle="deliveredAt" type="checkbox" checked="">Delivered (UTC)</label>
+<label class="flex items-center gap-2">
+<input data-column-toggle="latencyS" type="checkbox" checked="">Latency (s)</label>
+<label class="flex items-center gap-2">
+<input data-column-toggle="state" type="checkbox" checked="">State</label>
+</fieldset>
+</details>
+</div>
+<div class="relative w-full overflow-auto rounded-md border border-border" data-part="scroll">
+<p id="id-4" class="sr-only">Arrow keys move between cells. Home and End go to the first and last cell of a row, with Control to the first and last row. Page Up and Page Down move ten rows. Enter selects a row or sorts by a column, with Shift adding to the sort. Space toggles a checkbox. Alt with Left or Right resizes a column.</p>
+<table role="grid" aria-rowcount="1" aria-colcount="6" aria-describedby="id-4" tabindex="-1" class="w-full caption-top border-collapse" style="min-width: 900px;">
+<caption class="px-2 py-2 text-left text-sm font-semibold text-foreground">Deliveries of the zone dataset</caption>
+<thead>
+<tr aria-rowindex="1">
+<th scope="col" colspan="1" aria-sort="none" data-column="subscriber" class="sticky top-0 z-10 border-b border-border bg-background px-2 text-left align-middle font-medium whitespace-nowrap text-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring h-8" style="width: 150px;">
+<button type="button" data-grid-cell="0:0" tabindex="0" class="inline-flex items-center gap-1 rounded-sm font-medium focus-visible:outline-2 focus-visible:outline-ring">
+<span>Subscriber</span>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-down size-3.5 shrink-0 opacity-50" aria-hidden="true">
+<path d="m21 16-4 4-4-4">
+</path>
+<path d="M17 20V4">
+</path>
+<path d="m3 8 4-4 4 4">
+</path>
+<path d="M7 4v16">
+</path>
+</svg>
+</button>
+<span aria-hidden="true" data-part="resize" class="absolute top-0 right-0 h-full w-1.5 cursor-col-resize touch-none select-none hover:bg-border">
+</span>
+</th>
+<th scope="col" colspan="1" aria-sort="none" data-column="dataset" class="sticky top-0 z-10 border-b border-border bg-background px-2 text-left align-middle font-medium whitespace-nowrap text-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring h-8" style="width: 150px;">
+<button type="button" data-grid-cell="0:1" tabindex="-1" class="inline-flex items-center gap-1 rounded-sm font-medium focus-visible:outline-2 focus-visible:outline-ring">
+<span>Dataset</span>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-down size-3.5 shrink-0 opacity-50" aria-hidden="true">
+<path d="m21 16-4 4-4-4">
+</path>
+<path d="M17 20V4">
+</path>
+<path d="m3 8 4-4 4 4">
+</path>
+<path d="M7 4v16">
+</path>
+</svg>
+</button>
+<span aria-hidden="true" data-part="resize" class="absolute top-0 right-0 h-full w-1.5 cursor-col-resize touch-none select-none hover:bg-border">
+</span>
+</th>
+<th scope="col" colspan="1" aria-sort="none" data-column="version" class="sticky top-0 z-10 border-b border-border bg-background px-2 text-left align-middle font-medium whitespace-nowrap text-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring h-8" style="width: 150px;">
+<button type="button" data-grid-cell="0:2" tabindex="-1" class="inline-flex items-center gap-1 rounded-sm font-medium focus-visible:outline-2 focus-visible:outline-ring">
+<span>Version</span>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-down size-3.5 shrink-0 opacity-50" aria-hidden="true">
+<path d="m21 16-4 4-4-4">
+</path>
+<path d="M17 20V4">
+</path>
+<path d="m3 8 4-4 4 4">
+</path>
+<path d="M7 4v16">
+</path>
+</svg>
+</button>
+<span aria-hidden="true" data-part="resize" class="absolute top-0 right-0 h-full w-1.5 cursor-col-resize touch-none select-none hover:bg-border">
+</span>
+</th>
+<th scope="col" colspan="1" aria-sort="none" data-column="deliveredAt" class="sticky top-0 z-10 border-b border-border bg-background px-2 text-left align-middle font-medium whitespace-nowrap text-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring h-8" style="width: 150px;">
+<button type="button" data-grid-cell="0:3" tabindex="-1" class="inline-flex items-center gap-1 rounded-sm font-medium focus-visible:outline-2 focus-visible:outline-ring">
+<span>Delivered (UTC)</span>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-down size-3.5 shrink-0 opacity-50" aria-hidden="true">
+<path d="m21 16-4 4-4-4">
+</path>
+<path d="M17 20V4">
+</path>
+<path d="m3 8 4-4 4 4">
+</path>
+<path d="M7 4v16">
+</path>
+</svg>
+</button>
+<span aria-hidden="true" data-part="resize" class="absolute top-0 right-0 h-full w-1.5 cursor-col-resize touch-none select-none hover:bg-border">
+</span>
+</th>
+<th scope="col" colspan="1" aria-sort="none" data-column="latencyS" class="sticky top-0 z-10 border-b border-border bg-background px-2 align-middle font-medium whitespace-nowrap text-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring h-8 text-right" style="width: 150px;">
+<button type="button" data-grid-cell="0:4" tabindex="-1" class="inline-flex items-center gap-1 rounded-sm font-medium focus-visible:outline-2 focus-visible:outline-ring flex-row-reverse">
+<span>Latency (s)</span>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-down size-3.5 shrink-0 opacity-50" aria-hidden="true">
+<path d="m21 16-4 4-4-4">
+</path>
+<path d="M17 20V4">
+</path>
+<path d="m3 8 4-4 4 4">
+</path>
+<path d="M7 4v16">
+</path>
+</svg>
+</button>
+<span aria-hidden="true" data-part="resize" class="absolute top-0 right-0 h-full w-1.5 cursor-col-resize touch-none select-none hover:bg-border">
+</span>
+</th>
+<th scope="col" colspan="1" aria-sort="none" data-column="state" class="sticky top-0 z-10 border-b border-border bg-background px-2 text-left align-middle font-medium whitespace-nowrap text-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring h-8" style="width: 150px;">
+<button type="button" data-grid-cell="0:5" tabindex="-1" class="inline-flex items-center gap-1 rounded-sm font-medium focus-visible:outline-2 focus-visible:outline-ring">
+<span>State</span>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-down size-3.5 shrink-0 opacity-50" aria-hidden="true">
+<path d="m21 16-4 4-4-4">
+</path>
+<path d="M17 20V4">
+</path>
+<path d="m3 8 4-4 4 4">
+</path>
+<path d="M7 4v16">
+</path>
+</svg>
+</button>
+<span aria-hidden="true" data-part="resize" class="absolute top-0 right-0 h-full w-1.5 cursor-col-resize touch-none select-none hover:bg-border">
+</span>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr data-part="notice">
+<td colspan="6" class="p-3">
+<div role="alert" class="grid gap-1 rounded-md border-2 border-severity-critical p-3 text-sm" data-part="error">
+<p class="m-0 font-medium">CIS data out of date (status 503)</p>
+<p class="m-0">The dataset has not been refreshed within its bound.</p>
+<p class="m-0 text-muted-foreground" data-part="retry-after">The server asks to wait 30 seconds before trying again</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+<div class="flex flex-wrap items-center gap-2">
+<div class="flex flex-wrap items-center gap-2 text-xs text-muted-foreground" data-part="freshness" data-stale="false">
+<span class="inline-flex items-center gap-1 rounded-full border-2 px-2 py-0.5 text-xs tabular-nums border-age-live" data-age="live" data-age-s="66">
+<span>1 min</span>
+<span>· Live</span>
+</span>
+<span data-part="version">As of version 42</span>
+<span>updated 2026-10-02 09:14 UTC</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
