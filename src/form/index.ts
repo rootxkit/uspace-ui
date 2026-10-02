@@ -4,6 +4,11 @@
 // each refusal on its field. Units and datums are in the labels, times
 // are UTC, and every audited act goes through a dialog with a reason.
 export {
+  ConfirmDialog,
+  type ConfirmDialogProps,
+  type ConfirmReason,
+} from "./ConfirmDialog.js";
+export {
   errorText,
   useFieldControl,
   type FieldControl,
