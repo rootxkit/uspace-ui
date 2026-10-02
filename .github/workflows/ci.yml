@@ -38,6 +38,13 @@ concurrency:
 permissions:
   contents: read
 
+defaults:
+  run:
+    # Explicit bash runs steps with -eo pipefail. The runner's default,
+    # bash -e without pipefail, lets a failing command on the left of a
+    # pipe (tar -tzf | wc -l in the pack job) pass the step.
+    shell: bash
+
 jobs:
   check:
     runs-on: ubuntu-latest
