@@ -11,6 +11,7 @@ export default [
       "storybook-static/",
       ".cache/",
       "node_modules/",
+      "src/api/test/generated/",
       "**/*.d.ts",
       "**/*.d.mts",
     ],

@@ -1,0 +1,5 @@
+{
+  "extends": "../../../tsconfig.json",
+  "include": ["./*.ts", "./generated/*.d.ts", "../../eslint/vendor.d.ts"],
+  "exclude": []
+}
