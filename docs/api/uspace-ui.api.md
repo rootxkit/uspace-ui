@@ -8,6 +8,7 @@ import { AlertDialog as AlertDialog_2 } from 'radix-ui';
 import { Checkbox as Checkbox_2 } from 'radix-ui';
 import { ClassProp } from 'class-variance-authority/types';
 import { ClassValue } from 'clsx';
+import { Client as Client_2 } from 'openapi-fetch';
 import { Collapsible as Collapsible_2 } from 'radix-ui';
 import { Command as Command_2 } from 'cmdk';
 import type { ComponentProps } from 'react';
@@ -96,7 +97,7 @@ type AlertKind = (typeof ALERT_KINDS)[number];
 
 declare namespace alerts {
     export {
-        ENTRY_6 as ENTRY
+        ENTRY_5 as ENTRY
     }
 }
 
@@ -144,19 +145,84 @@ type AltSource = (typeof ALT_SOURCES)[number];
 
 declare namespace api {
     export {
-        ENTRY
+        createClient,
+        DEFAULT_TIMEOUT_MS,
+        Client,
+        ClientOptions,
+        apiCounters,
+        resetApiCountersForTests,
+        SUNSET_NOTICE_LIMIT,
+        sunsetNotices,
+        ApiCounter,
+        SunsetNotice,
+        ApiError,
+        fieldErrorsOf,
+        retryAfterSOf,
+        ApiErrorInit,
+        DEFAULT_FRESHNESS_PICK,
+        freshnessOf,
+        Freshness,
+        FreshnessPick,
+        parseProblem,
+        PROBLEM_TYPE_PREFIX,
+        problemSlug
     }
+}
+
+// @public (undocumented)
+type ApiCounter =
+/** A response that carried a `Sunset` header: its API major is deprecated. */
+"sunset_seen"
+/** A distinct `Sunset` value past the notice bound: counted, not kept. */
+| "sunset_notice_dropped"
+/** An `application/problem+json` body that was not a problem (RFC 9457). */
+| "problem_malformed"
+/** An entry of a problem's `errors` that was not `{field, reason}`. */
+| "field_error_malformed"
+/** A `Retry-After` that was neither delay-seconds nor an HTTP-date. */
+| "retry_after_malformed"
+/** A `401` answer; `onUnauthorized` is called on the first of a run. */
+| "unauthorized";
+
+// @public
+function apiCounters(): Readonly<Record<ApiCounter, number>>;
+
+// @public
+class ApiError extends Error {
+    constructor(init: ApiErrorInit);
+    // (undocumented)
+    readonly name = "ApiError";
+    readonly problem: Problem | null;
+    readonly requestId: string | null;
+    readonly retryAfterS: number | null;
+    readonly slug: string | null;
+    readonly status: number;
+    readonly sunset: string | null;
+}
+
+// @public (undocumented)
+interface ApiErrorInit {
+    // (undocumented)
+    problem: Problem | null;
+    // (undocumented)
+    requestId: string | null;
+    // (undocumented)
+    retryAfterS: number | null;
+    // (undocumented)
+    status: number;
+    // (undocumented)
+    sunset: string | null;
 }
 
 declare namespace auth_client {
     export {
-        ENTRY_3 as ENTRY
+        ENTRY_2 as ENTRY
     }
 }
 
 declare namespace auth_server {
     export {
-        ENTRY_2 as ENTRY
+        ENTRY
     }
 }
 
@@ -170,7 +236,7 @@ function Badge(input: React_2.ComponentProps<"span"> & VariantProps<typeof badge
 
 // @public (undocumented)
 const badgeVariants: (props?: ({
-    variant?: "link" | "default" | "destructive" | "outline" | "secondary" | "ghost" | null | undefined;
+    variant?: "default" | "link" | "destructive" | "outline" | "secondary" | "ghost" | null | undefined;
 } & ClassProp) | undefined) => string;
 
 // @public
@@ -284,7 +350,7 @@ function Button(input: React_2.ComponentProps<"button"> & VariantProps<typeof bu
 
 // @public (undocumented)
 const buttonVariants: (props?: ({
-    variant?: "link" | "default" | "destructive" | "outline" | "secondary" | "ghost" | null | undefined;
+    variant?: "default" | "link" | "destructive" | "outline" | "secondary" | "ghost" | null | undefined;
     size?: "default" | "xs" | "sm" | "lg" | "icon" | "icon-xs" | "icon-sm" | "icon-lg" | null | undefined;
 } & ClassProp) | undefined) => string;
 
@@ -323,6 +389,20 @@ const CLEAR_REASONS: readonly ["resolved", "stale", "source_disabled", "flight_e
 
 // @public (undocumented)
 type ClearReason = (typeof CLEAR_REASONS)[number];
+
+// @public
+type Client<Paths extends {}> = Client_2<Paths>;
+
+// @public (undocumented)
+interface ClientOptions {
+    baseUrl: string;
+    csrfToken?: () => string | null;
+    fetch?: typeof fetch;
+    lang?: () => Lang;
+    now?: () => number;
+    onUnauthorized?(): void;
+    timeoutMs?: number;
+}
 
 // @public (undocumented)
 function cn(...inputs: ClassValue[]): string;
@@ -381,6 +461,9 @@ const config: Linter.Config[];
 function countLayer(counter: LayerCounter): void;
 
 // @public
+function createClient<Paths extends {}>(opts: ClientOptions): Client<Paths>;
+
+// @public
 function createTranslator(lang: Lang, catalogues?: Catalogues): Translate;
 
 // @public (undocumented)
@@ -390,7 +473,13 @@ const DARK_QUERY = "(prefers-color-scheme: dark)";
 const DASH = "\u2014";
 
 // @public
+const DEFAULT_FRESHNESS_PICK: Readonly<Required<FreshnessPick>>;
+
+// @public
 const DEFAULT_LANG: Lang;
+
+// @public
+const DEFAULT_TIMEOUT_MS = 30000;
 
 // @public (undocumented)
 function Dialog(input: React_2.ComponentProps<typeof Dialog_2.Root>): React_2.JSX.Element;
@@ -507,28 +596,25 @@ interface EmptyStateProps {
 const en: Readonly<Record<Key, string>>;
 
 // @public (undocumented)
-const ENTRY = "api";
+const ENTRY = "auth/server";
 
 // @public (undocumented)
-const ENTRY_2 = "auth/server";
+const ENTRY_2 = "auth/client";
 
 // @public (undocumented)
-const ENTRY_3 = "auth/client";
+const ENTRY_3 = "live";
 
 // @public (undocumented)
-const ENTRY_4 = "live";
+const ENTRY_4 = "status";
 
 // @public (undocumented)
-const ENTRY_5 = "status";
+const ENTRY_5 = "alerts";
 
 // @public (undocumented)
-const ENTRY_6 = "alerts";
+const ENTRY_6 = "table";
 
 // @public (undocumented)
-const ENTRY_7 = "table";
-
-// @public (undocumented)
-const ENTRY_8 = "form";
+const ENTRY_7 = "form";
 
 declare namespace eslint {
     export {
@@ -565,6 +651,9 @@ interface FieldError {
     // (undocumented)
     reason: string;
 }
+
+// @public
+function fieldErrorsOf(err: unknown): FieldError[];
 
 // @public (undocumented)
 interface Fixtures {
@@ -661,8 +750,32 @@ declare namespace fonts {
 
 declare namespace form {
     export {
-        ENTRY_8 as ENTRY
+        ENTRY_7 as ENTRY
     }
+}
+
+// @public
+interface Freshness {
+    ageS: number | null;
+    etag: string | null;
+    stale: boolean;
+    updatedAt: string | null;
+    version: string | null;
+}
+
+// @public
+function freshnessOf(res: Response, body: unknown, pick?: FreshnessPick): Freshness;
+
+// @public
+interface FreshnessPick {
+    // (undocumented)
+    ageS?: string;
+    // (undocumented)
+    stale?: string;
+    // (undocumented)
+    updatedAt?: string;
+    // (undocumented)
+    version?: string;
 }
 
 // @public
@@ -843,7 +956,7 @@ const isAlertKind: (x: unknown) => x is "proximity" | "nonconformance" | "noncon
 const isAlertState: (x: unknown) => x is "raised" | "updated" | "cleared";
 
 // @public (undocumented)
-const isAltSource: (x: unknown) => x is "none" | "geodetic" | "pressure" | "network";
+const isAltSource: (x: unknown) => x is "geodetic" | "pressure" | "network" | "none";
 
 // @public (undocumented)
 const isClearReason: (x: unknown) => x is "resolved" | "stale" | "source_disabled" | "flight_ended" | "acknowledged_timeout" | "landed";
@@ -867,7 +980,7 @@ const isRestrictionState: (x: unknown) => x is "planned" | "active" | "ended" | 
 const isSeverity: (x: unknown) => x is "info" | "warning" | "critical";
 
 // @public (undocumented)
-const isSourceState: (x: unknown) => x is "healthy" | "disabled" | "stale" | "lagging" | "unreachable" | "never_heard";
+const isSourceState: (x: unknown) => x is "stale" | "disabled" | "healthy" | "lagging" | "unreachable" | "never_heard";
 
 // @public (undocumented)
 const isTimeSource: (x: unknown) => x is "provider" | "broadcast" | "source_clock" | "receiver" | "system";
@@ -1020,7 +1133,7 @@ declare namespace legend {
 
 declare namespace live {
     export {
-        ENTRY_4 as ENTRY
+        ENTRY_3 as ENTRY
     }
 }
 
@@ -1274,6 +1387,9 @@ function parseHexColour(s: string): Rgb | null;
 // @public (undocumented)
 function parseLang(v: string | null | undefined): Lang | null;
 
+// @public
+function parseProblem(res: Response): Promise<Problem | null>;
+
 // @public (undocumented)
 function parseScheme(v: string | null | undefined): ColorScheme | null;
 
@@ -1347,6 +1463,12 @@ interface Problem {
 }
 
 // @public
+const PROBLEM_TYPE_PREFIX = "https://schemas.uspace.ge/problems/";
+
+// @public
+function problemSlug(type: string): string | null;
+
+// @public
 function putImage(map: Map_2, name: string, image: PatternImage): void;
 
 // @public
@@ -1371,6 +1493,9 @@ interface RenderWithKitOptions {
     // (undocumented)
     scheme?: KitScheme;
 }
+
+// @public
+function resetApiCountersForTests(): void;
 
 // @public
 function resetI18nCounters(): void;
@@ -1458,6 +1583,9 @@ interface RestrictionView extends ZoneView {
     // (undocumented)
     startsAt?: string | null;
 }
+
+// @public
+function retryAfterSOf(value: string | null, nowMs: number): number | null;
 
 // @public (undocumented)
 type Rgb = readonly [number, number, number];
@@ -1620,7 +1748,7 @@ interface StatProps {
 
 declare namespace status_2 {
     export {
-        ENTRY_5 as ENTRY
+        ENTRY_4 as ENTRY
     }
 }
 
@@ -1629,6 +1757,18 @@ type StyleLoadHandler = (map: Map_2) => void;
 
 // @public
 function subscriptionBBox(b: BBox, marginFraction: number, quantizeDeg: number): BBox;
+
+// @public (undocumented)
+const SUNSET_NOTICE_LIMIT = 16;
+
+// @public
+interface SunsetNotice {
+    schemaPath: string;
+    sunset: string;
+}
+
+// @public
+function sunsetNotices(): readonly SunsetNotice[];
 
 // @public (undocumented)
 function Switch(input: React_2.ComponentProps<typeof Switch_2.Root> & {
@@ -1677,7 +1817,7 @@ function Table(input: React_2.ComponentProps<"table">): React_2.JSX.Element;
 
 declare namespace table {
     export {
-        ENTRY_7 as ENTRY
+        ENTRY_6 as ENTRY
     }
 }
 
