@@ -75,6 +75,12 @@ function kitMiddleware(opts: ClientOptions): Middleware {
   // One call per run of 401s: a page of ten requests that all find the
   // session gone asks for one re-login, not ten.
   let unauthorizedArmed = true;
+  // What ends a request's timeout once its answer, or its failure, is in.
+  const settle = new WeakMap<Request, () => void>();
+  const settled = (request: Request): void => {
+    settle.get(request)?.();
+    settle.delete(request);
+  };
 
   return {
     onRequest({ request }) {
@@ -84,14 +90,34 @@ function kitMiddleware(opts: ClientOptions): Middleware {
         const token = opts.csrfToken();
         if (token !== null) request.headers.set("X-CSRF-Token", token);
       }
-      const signal = AbortSignal.any([
-        request.signal,
-        AbortSignal.timeout(timeoutMs),
-      ]);
-      return new Request(request, { signal });
+      // One controller per request, held by its timer and by the caller's
+      // signal until the answer comes. Not AbortSignal.timeout or
+      // AbortSignal.any: the platform holds those weakly, so an unreferenced
+      // one can be collected and its timeout never fires.
+      const controller = new AbortController();
+      const abort = (): void => controller.abort(request.signal.reason);
+      if (request.signal.aborted) abort();
+      else request.signal.addEventListener("abort", abort, { once: true });
+      const timer = setTimeout(() => {
+        controller.abort(
+          new DOMException(`no answer within ${timeoutMs} ms`, "TimeoutError"),
+        );
+      }, timeoutMs);
+      const timed = new Request(request, { signal: controller.signal });
+      settle.set(timed, () => {
+        clearTimeout(timer);
+        request.signal.removeEventListener("abort", abort);
+      });
+      return timed;
+    },
+
+    onError({ request }) {
+      settled(request);
+      return undefined;
     },
 
     async onResponse({ request, response, schemaPath }) {
+      settled(request);
       const sunset = response.headers.get("Sunset");
       if (sunset !== null && noteSunset(sunset, schemaPath)) {
         console.warn(

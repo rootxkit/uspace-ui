@@ -1,6 +1,8 @@
 // createClient against an in-process fetch stub (no network), typed by the
 // `paths` generated from fixture.yaml (types.test.ts generates them and
 // type-checks this file). Every refusal has its acceptance (LESSONS E-01).
+import { setFlagsFromString } from "node:v8";
+import { runInNewContext } from "node:vm";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { createClient, type ClientOptions } from "../client.js";
@@ -398,10 +400,71 @@ describe("createClient: timeout", () => {
     expect((err as DOMException).name).toBe("AbortError");
   });
 
-  it("answers a request that comes back within timeoutMs", async () => {
-    const s = stub(() => json(ZONES));
-    const { data } = await client(s, { timeoutMs: 20 }).GET("/v1/zones");
-    expect(data?.cis_version).toBe(42);
+  it("still times out after a garbage collection (CI found a signal collected)", async () => {
+    // AbortSignal.timeout and AbortSignal.any are held weakly by Node: with
+    // nothing else referencing them, a collection drops the timeout and the
+    // request hangs. The client's own controller must survive one.
+    setFlagsFromString("--expose-gc");
+    const gc = runInNewContext("gc") as () => void;
+    const pending = client(hanging(), { timeoutMs: 50 })
+      .GET("/v1/zones")
+      .then(
+        () => null,
+        (e: unknown) => e,
+      );
+    await new Promise((r) => setTimeout(r, 10));
+    gc();
+    const err = await pending;
+    expect((err as DOMException).name).toBe("TimeoutError");
+  });
+
+  it("answers a request that comes back within timeoutMs, and clears its timer", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    try {
+      const s = stub(() => json(ZONES));
+      const { data } = await client(s, { timeoutMs: 20 }).GET("/v1/zones");
+      expect(data?.cis_version).toBe(42);
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("clears the timer of a request whose fetch fails, and passes the failure on", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    try {
+      const s = stub(() => Promise.reject(new TypeError("network down")));
+      const err = await client(s, { timeoutMs: 20 })
+        .GET("/v1/zones")
+        .then(
+          () => null,
+          (e: unknown) => e,
+        );
+      expect(err).toBeInstanceOf(TypeError);
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("keeps the timer running while no answer has come", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    try {
+      const pending = client(hanging(), { timeoutMs: 20 })
+        .GET("/v1/zones")
+        .then(
+          () => null,
+          (e: unknown) => e,
+        );
+      // setImmediate is not faked: it lets the request reach the stub.
+      await new Promise((r) => setImmediate(r));
+      expect(vi.getTimerCount()).toBe(1);
+      vi.advanceTimersByTime(20);
+      expect(((await pending) as DOMException).name).toBe("TimeoutError");
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 
