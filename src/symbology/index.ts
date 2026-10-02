@@ -1,6 +1,22 @@
 // `@rootxkit/uspace-ui/symbology` (docs/PLAN.md §3.8): pure functions from
 // enumerations to visual values and MapLibre expressions. No React, no map.
 // WP-6 adds the zone and restriction part; WP-7 adds the track part.
+export { AGE_BUCKET_KEYS, ageBucket, ageOpacity, ageToken } from "./age.js";
+export {
+  IDENT_BASIS_KEYS,
+  IDENT_ORDER,
+  IDENT_REASON_KEYS,
+  IDENT_STATUS_HINT_KEYS,
+  IDENT_STATUS_KEYS,
+  identDrawn,
+  identHintKey,
+  identMark,
+  identOrder,
+  identToken,
+  needsAttention,
+  type IdentHint,
+  type IdentKey,
+} from "./ident.js";
 export {
   RESTRICTION_LINE_KEYS,
   RESTRICTION_STATE_KEYS,
@@ -37,3 +53,41 @@ export {
   type ZonePattern,
   type ZoneStyle,
 } from "./zone.js";
+export {
+  SEVERITY_HINT_KEYS,
+  SEVERITY_KEYS,
+  SEVERITY_ORDER,
+  severityGlyph,
+  severityOrder,
+  severityToken,
+  type SeverityGlyph,
+} from "./severity.js";
+export {
+  TRACK_COLOUR_TOKENS,
+  TRACK_ICON_IDS,
+  TRUST_KEYS,
+  TRUST_MEANING_KEYS,
+  TRUST_ORDER,
+  ageOpacityExpression,
+  trackIconId,
+  trackStyle,
+  trustOrder,
+  trustToken,
+  type TrackColours,
+  type TrackFeatureProperties,
+  type TrackStyle,
+  type TrailFeatureProperties,
+} from "./track.js";
+export {
+  TRACK_ICON_PIXEL_RATIO,
+  TRACK_ICON_PX,
+  trackIconDistance,
+  trackIconParts,
+  trackIconSdf,
+  trackIconSvg,
+  trustFill,
+  trustShape,
+  type IconPart,
+  type Shape,
+  type ShapeFill,
+} from "./trackIcon.js";

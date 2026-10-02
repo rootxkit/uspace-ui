@@ -13,6 +13,7 @@ import {
 } from "../../src/i18n/index.js";
 import * as login from "../auth/LoginForm.stories.js";
 import * as typography from "../i18n/Typography.stories.js";
+import * as tracks from "../tracks/Tracks.stories.js";
 import * as zones from "../zones/Zones.stories.js";
 import * as palettes from "./Palettes.stories.js";
 
@@ -26,6 +27,7 @@ const {
 } = composeStories(zones);
 
 const { LoginEnglishLight, LoginGeorgianDark } = composeStories(login);
+const { LegendsEnglishLight, LegendsGeorgianDark } = composeStories(tracks);
 
 // One element per line, so a reviewed diff reads line by line.
 const pretty = (html: string): string => `${html.replace(/></g, ">\n<")}\n`;
@@ -123,6 +125,18 @@ it("zone-card.en", async () => {
 it("zone-card.ka", async () => {
   await expect(await snapshotStable(HoverCardGeorgian)).toMatchFileSnapshot(
     "./__snapshots__/zone-card.ka.html",
+  );
+});
+
+it("track-legends.en", async () => {
+  await expect(await snapshotStable(LegendsEnglishLight)).toMatchFileSnapshot(
+    "./__snapshots__/track-legends.en.html",
+  );
+});
+
+it("track-legends.ka", async () => {
+  await expect(await snapshotStable(LegendsGeorgianDark)).toMatchFileSnapshot(
+    "./__snapshots__/track-legends.ka.html",
   );
 });
 

@@ -6,11 +6,26 @@ export type LayerCounter =
   /** Data handed to a layer that a newer value replaced in the same frame. */
   | "update_superseded"
   /** A colour token that did not resolve to `#rrggbb` on the map's element. */
-  | "token_unresolved";
+  | "token_unresolved"
+  /**
+   * A track update whose `times.capturedAt` is older than the one held
+   * for the same id (LESSONS T-13): ignored, never reordered.
+   */
+  | "track_out_of_order"
+  /**
+   * A track update whose `capturedAt` or the held one's is not RFC 3339
+   * UTC (02 §1), so the two cannot be ordered: applied, never hidden.
+   */
+  | "track_time_unordered"
+  /** A trail point pushed out of its track's bounded ring (E-10). */
+  | "trail_point_evicted";
 
 const counts: Record<LayerCounter, number> = {
   update_superseded: 0,
   token_unresolved: 0,
+  track_out_of_order: 0,
+  track_time_unordered: 0,
+  trail_point_evicted: 0,
 };
 
 export function countLayer(counter: LayerCounter): void {

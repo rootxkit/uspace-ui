@@ -45,10 +45,42 @@ import { Tooltip as Tooltip_2 } from 'radix-ui';
 import { VariantProps } from 'class-variance-authority';
 
 // @public
+const AGE_BUCKET_KEYS: Readonly<Record<AgeBucket, Key>>;
+
+// @public
 const AGE_BUCKETS: readonly ["live", "aging", "stale", "unknown"];
 
 // @public (undocumented)
 type AgeBucket = (typeof AGE_BUCKETS)[number];
+
+// @public
+function ageBucket(ageS: number | null, staleAfterS: number): AgeBucket;
+
+// @public (undocumented)
+function AgeLegend(props: AgeLegendProps): JSX.Element;
+
+// @public (undocumented)
+interface AgeLegendProps {
+    // (undocumented)
+    className?: string;
+    // (undocumented)
+    defaultCollapsed?: boolean;
+    staleAfterS: number;
+}
+
+// @public
+function ageOpacity(b: AgeBucket): number;
+
+// @public
+function ageOpacityExpression(): ExpressionSpecification;
+
+// @public
+function AgeSwatch(props: {
+    bucket: AgeBucket;
+}): JSX.Element;
+
+// @public
+function ageToken(b: AgeBucket): string;
 
 // @public (undocumented)
 const ALERT_KINDS: readonly ["proximity", "nonconformance", "nonconformance_nearby", "height_exceedance", "zone_incursion", "lost_link", "restriction_activated", "emergency_nearby"];
@@ -582,6 +614,9 @@ function CommandSeparator(input: React_2.ComponentProps<typeof Command_2.Separat
 // @public (undocumented)
 function CommandShortcut(input: React_2.ComponentProps<"span">): React_2.JSX.Element;
 
+// @public
+function compareCapturedAt(a: string, b: string): number | null;
+
 // @public (undocumented)
 const config: Linter.Config[];
 
@@ -773,6 +808,18 @@ declare namespace eslint {
         plugin,
         config as default
     }
+}
+
+// @public (undocumented)
+interface FeatureOptions {
+    // (undocumented)
+    nowMs: number;
+    // (undocumented)
+    selectedId: string | null;
+    // (undocumented)
+    staleAfterS: number;
+    // (undocumented)
+    t: Translate;
 }
 
 // @public (undocumented)
@@ -1050,17 +1097,57 @@ interface I18nProviderProps {
     onLangChange?(l: Lang): void;
 }
 
+// @public
+interface IconPart {
+    // (undocumented)
+    d: string;
+    dash: string | null;
+    // (undocumented)
+    fill: boolean;
+    // (undocumented)
+    strokeWidth: number;
+}
+
 // @public (undocumented)
 const IDENT_BASES: readonly ["authenticated", "as_broadcast", "provider"];
 
+// @public
+const IDENT_BASIS_KEYS: Readonly<Record<IdentBasis, Key>>;
+
+// @public
+const IDENT_ORDER: readonly IdentKey[];
+
+// @public
+const IDENT_REASON_KEYS: Readonly<Record<IdentReason, Key>>;
+
 // @public (undocumented)
 const IDENT_REASONS: readonly ["matched", "session_binding", "uas_suspended", "uas_revoked", "operator_suspended", "operator_revoked", "serial_unknown", "not_a_serial", "operator_absent", "operator_mismatch", "owner_unknown", "not_in_registry", "serial_conflict", "no_serial", "registry_unavailable"];
+
+// @public
+const IDENT_STATUS_HINT_KEYS: Readonly<Record<IdentKey, Key>>;
+
+// @public
+const IDENT_STATUS_KEYS: Readonly<Record<IdentKey, Key>>;
 
 // @public (undocumented)
 const IDENT_STATUSES: readonly ["registered", "suspended", "unknown_operator", "unidentified"];
 
 // @public (undocumented)
 type IdentBasis = (typeof IDENT_BASES)[number];
+
+// @public
+function identDrawn(ident: Identification | null): IdentKey;
+
+// @public
+interface IdentHint {
+    caveat: Key | null;
+    mismatch: Key | null;
+    reason: Key;
+    status: Key;
+}
+
+// @public
+function identHintKey(status: IdentStatus, reason: IdentReason, basis: IdentBasis, mismatch?: boolean): IdentHint;
 
 // @public (undocumented)
 interface Identification {
@@ -1081,10 +1168,39 @@ interface Identification {
 }
 
 // @public (undocumented)
+function IdentificationLegend(props: IdentificationLegendProps): JSX.Element;
+
+// @public (undocumented)
+interface IdentificationLegendProps {
+    // (undocumented)
+    className?: string;
+    counts?: Partial<Record<IdentKey, number>>;
+    // (undocumented)
+    defaultCollapsed?: boolean;
+}
+
+// @public
+type IdentKey = IdentStatus | "none";
+
+// @public
+function identMark(s: IdentKey): string;
+
+// @public (undocumented)
+function identOrder(): readonly IdentKey[];
+
+// @public (undocumented)
 type IdentReason = (typeof IDENT_REASONS)[number];
 
 // @public (undocumented)
 type IdentStatus = (typeof IDENT_STATUSES)[number];
+
+// @public
+function IdentSwatch(props: {
+    status: IdentKey;
+}): JSX.Element;
+
+// @public
+function identToken(s: IdentStatus | null): string;
 
 // @public
 function InlineCode(input: ComponentProps<"code">): ReactNode;
@@ -1232,7 +1348,19 @@ type LayerCounter =
 /** Data handed to a layer that a newer value replaced in the same frame. */
 "update_superseded"
 /** A colour token that did not resolve to `#rrggbb` on the map's element. */
-| "token_unresolved";
+| "token_unresolved"
+/**
+* A track update whose `times.capturedAt` is older than the one held
+* for the same id (LESSONS T-13): ignored, never reordered.
+*/
+| "track_out_of_order"
+/**
+* A track update whose `capturedAt` or the held one's is not RFC 3339
+* UTC (02 §1), so the two cannot be ordered: applied, never hidden.
+*/
+| "track_time_unordered"
+/** A trail point pushed out of its track's bounded ring (E-10). */
+| "trail_point_evicted";
 
 // @public
 function layerCounters(): Readonly<Record<LayerCounter, number>>;
@@ -1261,6 +1389,22 @@ declare namespace layers {
         restrictionLayerIds,
         RestrictionLayerIds,
         RestrictionLayerProps,
+        TrackHold,
+        compareCapturedAt,
+        receivedAgeS,
+        trackFeatureCollection,
+        trackLabel,
+        FeatureOptions,
+        TrackFeature,
+        TrackFeatureCollection,
+        TrailFeature,
+        TRACK_LAYER_ID,
+        TrackLayer,
+        putTrackIcons,
+        resolveTrackColours,
+        trackLayerIds,
+        TrackLayerIds,
+        TrackLayerProps,
         UNRESOLVED_COLOUR,
         putImage,
         resolveColour,
@@ -1300,10 +1444,54 @@ interface LayerToggle {
 
 declare namespace legend {
     export {
+        AgeLegend,
+        AgeSwatch,
+        AgeLegendProps,
+        IdentificationLegend,
+        IdentSwatch,
+        IdentificationLegendProps,
+        LegendCount,
+        LegendNote,
+        LegendSection,
+        LegendSectionProps,
+        SeverityLegend,
+        SeveritySwatch,
+        SeverityLegendProps,
+        TrackLegend,
+        TrackSwatch,
+        TrackLegendProps,
         ZoneLegend,
         ZoneSwatch,
         ZoneLegendProps
     }
+}
+
+// @public
+function LegendCount(props: {
+    counts: Readonly<Record<string, number | undefined>> | undefined;
+    row: string;
+    format(count: number): string;
+}): JSX.Element | null;
+
+// @public
+function LegendNote(props: {
+    note: string;
+    children: ReactNode;
+}): JSX.Element;
+
+// @public (undocumented)
+function LegendSection(props: LegendSectionProps): JSX.Element;
+
+// @public (undocumented)
+interface LegendSectionProps {
+    // (undocumented)
+    children: ReactNode;
+    // (undocumented)
+    className?: string | undefined;
+    // (undocumented)
+    defaultCollapsed?: boolean | undefined;
+    kind: string;
+    title: string;
 }
 
 declare namespace live {
@@ -1557,6 +1745,9 @@ declare namespace model {
 }
 
 // @public
+function needsAttention(s: IdentStatus | null): boolean;
+
+// @public
 function negotiateLang(acceptLanguage: string | null, cookie: string | null): Lang;
 
 // @public
@@ -1679,6 +1870,9 @@ function problemSlug(type: string): string | null;
 function putImage(map: Map_2, name: string, image: PatternImage): void;
 
 // @public
+function putTrackIcons(map: Map_2): void;
+
+// @public
 function putZonePatterns(map: Map_2, colours: ZoneColours): void;
 
 // @public (undocumented)
@@ -1689,6 +1883,9 @@ function RadioGroupItem(input: React_2.ComponentProps<typeof RadioGroup_2.Item>)
 
 // @public
 function readSessionToken(src: NextRequest | CookieReader, opts?: Pick<SessionCookieOptions, "name">): string | null;
+
+// @public
+function receivedAgeS(t: TrackView, nowMs: number): number | null;
 
 // @public
 function renderWithKit(ui: ReactNode, opts?: RenderWithKitOptions): RenderResult;
@@ -1732,6 +1929,9 @@ function resolveColour(map: Map_2, token: string): string;
 
 // @public (undocumented)
 type ResolvedScheme = "light" | "dark";
+
+// @public
+function resolveTrackColours(map: Map_2): TrackColours;
 
 // @public
 function resolveZoneColours(map: Map_2): ZoneColours;
@@ -1937,6 +2137,49 @@ const SEVERITIES: readonly ["info", "warning", "critical"];
 // @public (undocumented)
 type Severity = (typeof SEVERITIES)[number];
 
+// @public
+const SEVERITY_HINT_KEYS: Readonly<Record<Severity, Key>>;
+
+// @public
+const SEVERITY_KEYS: Readonly<Record<Severity, Key>>;
+
+// @public
+const SEVERITY_ORDER: readonly Severity[];
+
+// @public
+type SeverityGlyph = "octagon" | "triangle" | "circle";
+
+// @public (undocumented)
+function severityGlyph(s: Severity): SeverityGlyph;
+
+// @public (undocumented)
+function SeverityLegend(props?: SeverityLegendProps): JSX.Element;
+
+// @public (undocumented)
+interface SeverityLegendProps {
+    // (undocumented)
+    className?: string;
+    // (undocumented)
+    defaultCollapsed?: boolean;
+}
+
+// @public (undocumented)
+function severityOrder(): readonly Severity[];
+
+// @public
+function SeveritySwatch(props: {
+    severity: Severity;
+}): JSX.Element;
+
+// @public
+function severityToken(s: Severity): string;
+
+// @public
+type Shape = "triangle" | "diamond" | "square" | "circle" | "hexagon" | "cross";
+
+// @public
+type ShapeFill = "solid" | "hollow" | "dashed";
+
 // @public (undocumented)
 function Sheet(input: React_2.ComponentProps<typeof Dialog_2.Root>): React_2.JSX.Element;
 
@@ -2045,6 +2288,23 @@ function Switch(input: React_2.ComponentProps<typeof Switch_2.Root> & {
 
 declare namespace symbology {
     export {
+        AGE_BUCKET_KEYS,
+        ageBucket,
+        ageOpacity,
+        ageToken,
+        IDENT_BASIS_KEYS,
+        IDENT_ORDER,
+        IDENT_REASON_KEYS,
+        IDENT_STATUS_HINT_KEYS,
+        IDENT_STATUS_KEYS,
+        identDrawn,
+        identHintKey,
+        identMark,
+        identOrder,
+        identToken,
+        needsAttention,
+        IdentHint,
+        IdentKey,
         RESTRICTION_LINE_KEYS,
         RESTRICTION_STATE_KEYS,
         restrictionLine,
@@ -2076,7 +2336,39 @@ declare namespace symbology {
         ZoneColours,
         ZoneFeatureProperties,
         ZonePattern,
-        ZoneStyle
+        ZoneStyle,
+        SEVERITY_HINT_KEYS,
+        SEVERITY_KEYS,
+        SEVERITY_ORDER,
+        severityGlyph,
+        severityOrder,
+        severityToken,
+        SeverityGlyph,
+        TRACK_COLOUR_TOKENS,
+        TRACK_ICON_IDS,
+        TRUST_KEYS,
+        TRUST_MEANING_KEYS,
+        TRUST_ORDER,
+        ageOpacityExpression,
+        trackIconId,
+        trackStyle,
+        trustOrder,
+        trustToken,
+        TrackColours,
+        TrackFeatureProperties,
+        TrackStyle,
+        TrailFeatureProperties,
+        TRACK_ICON_PIXEL_RATIO,
+        TRACK_ICON_PX,
+        trackIconDistance,
+        trackIconParts,
+        trackIconSdf,
+        trackIconSvg,
+        trustFill,
+        trustShape,
+        IconPart,
+        Shape,
+        ShapeFill
     }
 }
 
@@ -2251,6 +2543,187 @@ function TooltipProvider(input: React_2.ComponentProps<typeof Tooltip_2.Provider
 // @public (undocumented)
 function TooltipTrigger(input: React_2.ComponentProps<typeof Tooltip_2.Trigger>): React_2.JSX.Element;
 
+// @public
+const TRACK_COLOUR_TOKENS: Readonly<{
+    emergency: string;
+    selected: "--us-text";
+    halo: "--us-surface";
+}>;
+
+// @public
+const TRACK_ICON_IDS: readonly {
+    id: string;
+    trust: Trust;
+    directional: boolean;
+}[];
+
+// @public
+const TRACK_ICON_PIXEL_RATIO = 2;
+
+// @public
+const TRACK_ICON_PX = 56;
+
+// @public
+const TRACK_LAYER_ID = "us-tracks";
+
+// @public
+interface TrackColours {
+    emergency: string;
+    halo: string;
+    // (undocumented)
+    ident: Readonly<Record<IdentKey, string>>;
+    selected: string;
+}
+
+// @public (undocumented)
+type TrackFeature = GeoJSON_2.Feature<GeoJSON_2.Point, TrackFeatureProperties>;
+
+// @public (undocumented)
+type TrackFeatureCollection = GeoJSON_2.FeatureCollection<GeoJSON_2.Point | GeoJSON_2.LineString, TrackFeatureProperties | TrailFeatureProperties>;
+
+// @public
+function trackFeatureCollection(hold: TrackHold, opts: FeatureOptions): TrackFeatureCollection;
+
+// @public
+interface TrackFeatureProperties {
+    // (undocumented)
+    age: AgeBucket;
+    // (undocumented)
+    emergency: boolean;
+    ident: IdentKey;
+    identifier: string;
+    // (undocumented)
+    kind: "track";
+    label: string;
+    mark: string;
+    // (undocumented)
+    selected: boolean;
+    trackDeg: number | null;
+    // (undocumented)
+    trust: Trust;
+}
+
+// @public
+class TrackHold {
+    apply(tracks: readonly TrackView[], trailPoints: number): number;
+    // Warning: (ae-forgotten-export) The symbol "Held" needs to be exported by the entry point entry.d.ts
+    entries(): IterableIterator<[string, Readonly<Held>]>;
+}
+
+// Warning: (ae-forgotten-export) The symbol "Pt" needs to be exported by the entry point entry.d.ts
+//
+// @public
+function trackIconDistance(t: Trust, directional: boolean, p: Pt): number;
+
+// @public
+function trackIconId(t: Trust, directional: boolean): string;
+
+// @public
+function trackIconParts(t: Trust, directional: boolean): IconPart[];
+
+// @public
+function trackIconSdf(t: Trust, directional: boolean): PatternImage;
+
+// @public
+function trackIconSvg(t: Trust, directional: boolean, colour?: string): string;
+
+// @public
+function trackLabel(t: TrackView, drawn: IdentKey, tr: Translate): string;
+
+// @public (undocumented)
+function TrackLayer(props: TrackLayerProps): null;
+
+// @public (undocumented)
+interface TrackLayerIds {
+    // (undocumented)
+    emergency: string;
+    // (undocumented)
+    icon: string;
+    // (undocumented)
+    label: string;
+    // (undocumented)
+    mark: string;
+    // (undocumented)
+    selected: string;
+    // (undocumented)
+    source: string;
+    // (undocumented)
+    trail: string;
+}
+
+// @public (undocumented)
+function trackLayerIds(id: string): TrackLayerIds;
+
+// @public (undocumented)
+interface TrackLayerProps {
+    id?: string;
+    labels?: boolean;
+    nowMs: number;
+    onSelect?(id: string): void;
+    // (undocumented)
+    selectedId?: string | null;
+    staleAfterS: number;
+    tracks: Iterable<TrackView>;
+    trails?: {
+        points: number;
+    } | false;
+    visible?: boolean;
+}
+
+// @public (undocumented)
+function TrackLegend(props: TrackLegendProps): JSX.Element;
+
+// @public (undocumented)
+interface TrackLegendProps {
+    // (undocumented)
+    className?: string;
+    counts?: Partial<Record<Trust, number>>;
+    // (undocumented)
+    defaultCollapsed?: boolean;
+}
+
+// @public (undocumented)
+interface TrackStyle {
+    // (undocumented)
+    emergencyFilter: FilterSpecification;
+    emergencyRadius: ExpressionSpecification;
+    // (undocumented)
+    iconColor: ExpressionSpecification;
+    // (undocumented)
+    iconImage: ExpressionSpecification;
+    // (undocumented)
+    iconOpacity: ExpressionSpecification;
+    // (undocumented)
+    iconRotate: ExpressionSpecification;
+    // (undocumented)
+    iconSize: ExpressionSpecification;
+    markFilter: FilterSpecification;
+    // (undocumented)
+    pointFilter: FilterSpecification;
+    // (undocumented)
+    ringRadius: ExpressionSpecification;
+    // (undocumented)
+    selectedFilter: FilterSpecification;
+    // (undocumented)
+    textSize: ExpressionSpecification;
+    // (undocumented)
+    trailColor: ExpressionSpecification;
+    // (undocumented)
+    trailFilter: FilterSpecification;
+    // (undocumented)
+    trailOpacity: ExpressionSpecification;
+}
+
+// @public
+function trackStyle(colours: TrackColours): TrackStyle;
+
+// @public
+function TrackSwatch(props: {
+    trust: Trust;
+    directional?: boolean;
+    size?: number;
+}): JSX.Element;
+
 // @public (undocumented)
 interface TrackView {
     // (undocumented)
@@ -2298,6 +2771,21 @@ interface TrackView {
 }
 
 // @public (undocumented)
+type TrailFeature = GeoJSON_2.Feature<GeoJSON_2.LineString, TrailFeatureProperties>;
+
+// @public
+interface TrailFeatureProperties {
+    // (undocumented)
+    age: AgeBucket;
+    // (undocumented)
+    ident: IdentKey;
+    // (undocumented)
+    identifier: string;
+    // (undocumented)
+    kind: "trail";
+}
+
+// @public (undocumented)
 type Translate = (key: string, vars?: Vars) => string;
 
 // @public
@@ -2306,8 +2794,29 @@ type Translate_2 = (key: string) => string;
 // @public (undocumented)
 type Trust = (typeof TRUSTS)[number];
 
+// @public
+const TRUST_KEYS: Readonly<Record<Trust, Key>>;
+
+// @public
+const TRUST_MEANING_KEYS: Readonly<Record<Trust, Key>>;
+
+// @public
+const TRUST_ORDER: readonly Trust[];
+
+// @public (undocumented)
+function trustFill(t: Trust): ShapeFill;
+
+// @public (undocumented)
+function trustOrder(): readonly Trust[];
+
 // @public (undocumented)
 const TRUSTS: readonly ["authenticated", "provider", "surveillance", "broadcast", "sensor", "simulated"];
+
+// @public
+function trustShape(t: Trust): Shape;
+
+// @public
+function trustToken(t: Trust): string;
 
 declare namespace ui {
     export {

@@ -1,0 +1,243 @@
+<div lang="en" class="bg-background p-4 text-foreground">
+<div style="max-width: 360px;">
+<div class="grid gap-3" data-testid="legends">
+<section class="us-legend rounded-md border border-border bg-card p-3 text-sm text-card-foreground" aria-label="Track symbols" data-legend="track">
+<h2 class="m-0 text-sm font-semibold">
+<button type="button" class="w-full rounded-sm text-left font-semibold focus-visible:outline-2 focus-visible:outline-ring" aria-expanded="true" aria-controls="id-0">Track symbols</button>
+</h2>
+<div id="id-0">
+<ul class="mt-2 grid list-none gap-2 p-0">
+<li data-trust="authenticated" class="flex items-start gap-2">
+<svg aria-hidden="true" class="shrink-0" data-shape="triangle" data-fill="solid" width="24" height="24" viewBox="0 0 56 56">
+<path d="M28 13.6 L40.47 35.2 L15.53 35.2 Z" fill="currentColor">
+</path>
+</svg>
+<span class="min-w-0">Authenticated<span class="text-muted-foreground"> · solid</span>
+<span class="block text-xs text-muted-foreground">Sent over the operator's own authenticated session for this aircraft.</span>
+</span>
+<span class="ml-auto whitespace-nowrap tabular-nums" data-count="5">5 tracks</span>
+</li>
+<li data-trust="provider" class="flex items-start gap-2">
+<svg aria-hidden="true" class="shrink-0" data-shape="diamond" data-fill="solid" width="24" height="24" viewBox="0 0 56 56">
+<path d="M28 13.6 L42.4 28 L28 42.4 L13.6 28 Z" fill="currentColor">
+</path>
+</svg>
+<span class="min-w-0">Provider (unverified)<span class="text-muted-foreground"> · solid</span>
+<span class="block text-xs text-muted-foreground">Reported by a provider, unverified: as trustworthy as that peer system.</span>
+</span>
+<span class="ml-auto whitespace-nowrap tabular-nums" data-count="5">5 tracks</span>
+</li>
+<li data-trust="surveillance" class="flex items-start gap-2">
+<svg aria-hidden="true" class="shrink-0" data-shape="square" data-fill="solid" width="24" height="24" viewBox="0 0 56 56">
+<path d="M38.18 17.82 L38.18 38.18 L17.82 38.18 L17.82 17.82 Z" fill="currentColor">
+</path>
+</svg>
+<span class="min-w-0">Surveillance<span class="text-muted-foreground"> · solid</span>
+<span class="block text-xs text-muted-foreground">Air traffic surveillance, through the ANSP.</span>
+</span>
+<span class="ml-auto whitespace-nowrap tabular-nums" data-count="5">5 tracks</span>
+</li>
+<li data-trust="broadcast" class="flex items-start gap-2">
+<svg aria-hidden="true" class="shrink-0" data-shape="hexagon" data-fill="hollow" width="24" height="24" viewBox="0 0 56 56">
+<path d="M28 14.8 L39.43 21.4 L39.43 34.6 L28 41.2 L16.57 34.6 L16.57 21.4 Z" fill="none" stroke="currentColor" stroke-width="4">
+</path>
+</svg>
+<span class="min-w-0">Broadcast (unverified)<span class="text-muted-foreground"> · hollow</span>
+<span class="block text-xs text-muted-foreground">Broadcast and unverified: anyone can transmit this identity and position.</span>
+</span>
+<span class="ml-auto whitespace-nowrap tabular-nums" data-count="5">5 tracks</span>
+</li>
+<li data-trust="sensor" class="flex items-start gap-2">
+<svg aria-hidden="true" class="shrink-0" data-shape="cross" data-fill="solid" width="24" height="24" viewBox="0 0 56 56">
+<path d="M23.44 14.2 L32.56 14.2 L32.56 23.44 L41.8 23.44 L41.8 32.56 L32.56 32.56 L32.56 41.8 L23.44 41.8 L23.44 32.56 L14.2 32.56 L14.2 23.44 L23.44 23.44 Z" fill="currentColor">
+</path>
+</svg>
+<span class="min-w-0">Sensor<span class="text-muted-foreground"> · solid</span>
+<span class="block text-xs text-muted-foreground">Detected by a sensor, without an identity.</span>
+</span>
+<span class="ml-auto whitespace-nowrap tabular-nums" data-count="5">5 tracks</span>
+</li>
+<li data-trust="simulated" class="flex items-start gap-2">
+<svg aria-hidden="true" class="shrink-0" data-shape="circle" data-fill="dashed" width="24" height="24" viewBox="0 0 56 56">
+<path d="M22 28 A6 6 0 1 0 34 28 A6 6 0 1 0 22 28 Z" fill="currentColor">
+</path>
+<path d="M16 28 A12 12 0 1 0 40 28 A12 12 0 1 0 16 28 Z" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="4.71 4.71">
+</path>
+</svg>
+<span class="min-w-0">Simulated<span class="text-muted-foreground"> · dashed ring</span>
+<span class="block text-xs text-muted-foreground">Simulated traffic, from the lab only.</span>
+</span>
+<span class="ml-auto whitespace-nowrap tabular-nums" data-count="5">5 tracks</span>
+</li>
+</ul>
+<p class="mt-2 mb-0 text-xs text-muted-foreground" data-note="shape">Shape: how the position reached the system. Colour and mark: identification status. Faded: age.</p>
+<p class="mt-2 mb-0 text-xs text-muted-foreground" data-note="arrow">
+<span class="inline-flex items-center gap-1 align-middle">
+<svg aria-hidden="true" class="shrink-0" data-shape="triangle" data-fill="solid" width="18" height="18" viewBox="0 0 56 56">
+<path d="M28 13.6 L40.47 35.2 L15.53 35.2 Z" fill="currentColor">
+</path>
+<path d="M28 6 L33 15 L23 15 Z" fill="currentColor">
+</path>
+</svg>
+</span> Arrow: course over ground as reported; no arrow when none is reported.</p>
+<p class="mt-2 mb-0 text-xs text-muted-foreground" data-note="emergency">Outer ring: the aircraft reports an emergency.</p>
+<p class="mt-2 mb-0 text-xs text-muted-foreground" data-note="selected">Inner ring: the selected track.</p>
+</div>
+</section>
+<section class="us-legend rounded-md border border-border bg-card p-3 text-sm text-card-foreground" aria-label="Identification" data-legend="identification">
+<h2 class="m-0 text-sm font-semibold">
+<button type="button" class="w-full rounded-sm text-left font-semibold focus-visible:outline-2 focus-visible:outline-ring" aria-expanded="true" aria-controls="id-1">Identification</button>
+</h2>
+<div id="id-1">
+<ul class="mt-2 grid list-none gap-2 p-0">
+<li data-ident="registered" data-attention="false" class="flex items-start gap-2">
+<span class="inline-flex shrink-0 items-center gap-0.5" aria-hidden="true">
+<svg width="18" height="18" viewBox="0 0 18 18" data-token="--us-ident-registered">
+<circle cx="9" cy="9" r="7" fill="var(--us-ident-registered)" stroke="var(--us-surface)" stroke-width="1">
+</circle>
+</svg>
+<span class="w-3 text-center font-semibold" data-mark="">
+</span>
+</span>
+<span class="min-w-0">registered<span class="block text-xs text-muted-foreground">The serial and the operator match an active registration.</span>
+<span class="sr-only">No mark beside the symbol</span>
+</span>
+<span class="ml-auto whitespace-nowrap tabular-nums" data-count="6">6 tracks</span>
+</li>
+<li data-ident="suspended" data-attention="false" class="flex items-start gap-2">
+<span class="inline-flex shrink-0 items-center gap-0.5" aria-hidden="true">
+<svg width="18" height="18" viewBox="0 0 18 18" data-token="--us-ident-suspended">
+<circle cx="9" cy="9" r="7" fill="var(--us-ident-suspended)" stroke="var(--us-surface)" stroke-width="1">
+</circle>
+</svg>
+<span class="w-3 text-center font-semibold" data-mark="!">!</span>
+</span>
+<span class="min-w-0">suspended<span class="block text-xs text-muted-foreground">Registered, but the aircraft or its operator is suspended or revoked.</span>
+<span class="sr-only">Mark beside the symbol: !</span>
+</span>
+<span class="ml-auto whitespace-nowrap tabular-nums" data-count="6">6 tracks</span>
+</li>
+<li data-ident="unknown_operator" data-attention="true" class="flex items-start gap-2">
+<span class="inline-flex shrink-0 items-center gap-0.5" aria-hidden="true">
+<svg width="18" height="18" viewBox="0 0 18 18" data-token="--us-ident-unknown_operator">
+<circle cx="9" cy="9" r="7" fill="var(--us-ident-unknown_operator)" stroke="var(--us-surface)" stroke-width="1">
+</circle>
+</svg>
+<span class="w-3 text-center font-semibold" data-mark="?">?</span>
+</span>
+<span class="min-w-0">unknown operator<span class="block text-xs text-muted-foreground">The serial is not registered, or the operator given is missing, unknown or not the owner.</span>
+<span class="sr-only">Mark beside the symbol: ?</span>
+</span>
+<span class="ml-auto whitespace-nowrap tabular-nums" data-count="6">6 tracks</span>
+</li>
+<li data-ident="unidentified" data-attention="true" class="flex items-start gap-2">
+<span class="inline-flex shrink-0 items-center gap-0.5" aria-hidden="true">
+<svg width="18" height="18" viewBox="0 0 18 18" data-token="--us-ident-unidentified">
+<circle cx="9" cy="9" r="7" fill="var(--us-ident-unidentified)" stroke="var(--us-surface)" stroke-width="1">
+</circle>
+</svg>
+<span class="w-3 text-center font-semibold" data-mark="×">×</span>
+</span>
+<span class="min-w-0">unidentified<span class="block text-xs text-muted-foreground">No usable serial number: nobody can say what aircraft this is.</span>
+<span class="sr-only">Mark beside the symbol: ×</span>
+</span>
+<span class="ml-auto whitespace-nowrap tabular-nums" data-count="6">6 tracks</span>
+</li>
+<li data-ident="none" data-attention="false" class="flex items-start gap-2">
+<span class="inline-flex shrink-0 items-center gap-0.5" aria-hidden="true">
+<svg width="18" height="18" viewBox="0 0 18 18" data-token="--us-ident-none">
+<circle cx="9" cy="9" r="7" fill="var(--us-ident-none)" stroke="var(--us-surface)" stroke-width="1">
+</circle>
+</svg>
+<span class="w-3 text-center font-semibold" data-mark="–">–</span>
+</span>
+<span class="min-w-0">no identification<span class="block text-xs text-muted-foreground">No identification has been received for this track.</span>
+<span class="sr-only">Mark beside the symbol: –</span>
+</span>
+<span class="ml-auto whitespace-nowrap tabular-nums" data-count="6">6 tracks</span>
+</li>
+</ul>
+<p class="mt-2 mb-0 text-xs text-muted-foreground" data-note="attention">Listed after registered and suspended: the statuses that need attention. The server raises the alerts.</p>
+<p class="mt-2 mb-0 text-xs text-muted-foreground" data-note="broadcast">Broadcast and unverified: anyone can transmit this identity and position.</p>
+<p class="mt-2 mb-0 text-xs text-muted-foreground" data-note="provider">Reported by a provider, unverified: a peer system's claim.</p>
+<p class="mt-2 mb-0 text-xs text-muted-foreground" data-note="mismatch">A mismatch is shown as a mismatch, never as registered.</p>
+</div>
+</section>
+<section class="us-legend rounded-md border border-border bg-card p-3 text-sm text-card-foreground" aria-label="Track age" data-legend="age">
+<h2 class="m-0 text-sm font-semibold">
+<button type="button" class="w-full rounded-sm text-left font-semibold focus-visible:outline-2 focus-visible:outline-ring" aria-expanded="true" aria-controls="id-2">Track age</button>
+</h2>
+<div id="id-2">
+<ul class="mt-2 grid list-none gap-2 p-0">
+<li data-age="live" class="flex items-start gap-2">
+<svg aria-hidden="true" class="shrink-0" width="18" height="18" viewBox="0 0 18 18" data-opacity="1">
+<circle cx="9" cy="9" r="7" fill="currentColor" fill-opacity="1">
+</circle>
+</svg>
+<span class="min-w-0">Live<span class="block text-xs text-muted-foreground">under 10 s</span>
+</span>
+</li>
+<li data-age="aging" class="flex items-start gap-2">
+<svg aria-hidden="true" class="shrink-0" width="18" height="18" viewBox="0 0 18 18" data-opacity="0.7">
+<circle cx="9" cy="9" r="7" fill="currentColor" fill-opacity="0.7">
+</circle>
+</svg>
+<span class="min-w-0">Ageing<span class="block text-xs text-muted-foreground">10 s to under 30 s</span>
+</span>
+</li>
+<li data-age="stale" class="flex items-start gap-2">
+<svg aria-hidden="true" class="shrink-0" width="18" height="18" viewBox="0 0 18 18" data-opacity="0.35">
+<circle cx="9" cy="9" r="7" fill="currentColor" fill-opacity="0.35">
+</circle>
+</svg>
+<span class="min-w-0">Stale<span class="block text-xs text-muted-foreground">30 s or more: drawn faded, never removed</span>
+</span>
+</li>
+<li data-age="unknown" class="flex items-start gap-2">
+<svg aria-hidden="true" class="shrink-0" width="18" height="18" viewBox="0 0 18 18" data-opacity="1">
+<circle cx="9" cy="9" r="7" fill="currentColor" fill-opacity="1">
+</circle>
+</svg>
+<span class="min-w-0">Age not known<span class="block text-xs text-muted-foreground">drawn in full: an unknown age is not shown as old</span>
+</span>
+</li>
+</ul>
+<p class="mt-2 mb-0 text-xs text-muted-foreground" data-note="basis">Age since this console received the position; the stale threshold is the server's (30 s).</p>
+</div>
+</section>
+<section class="us-legend rounded-md border border-border bg-card p-3 text-sm text-card-foreground" aria-label="Severity" data-legend="severity">
+<h2 class="m-0 text-sm font-semibold">
+<button type="button" class="w-full rounded-sm text-left font-semibold focus-visible:outline-2 focus-visible:outline-ring" aria-expanded="true" aria-controls="id-3">Severity</button>
+</h2>
+<div id="id-3">
+<ul class="mt-2 grid list-none gap-2 p-0">
+<li data-severity="critical" class="flex items-start gap-2">
+<svg aria-hidden="true" class="shrink-0" width="18" height="18" viewBox="0 0 18 18" data-glyph="octagon">
+<polygon points="6,1 12,1 17,6 17,12 12,17 6,17 1,12 1,6" fill="var(--us-severity-critical)">
+</polygon>
+</svg>
+<span class="min-w-0">Critical<span class="block text-xs text-muted-foreground">Needs action now.</span>
+</span>
+</li>
+<li data-severity="warning" class="flex items-start gap-2">
+<svg aria-hidden="true" class="shrink-0" width="18" height="18" viewBox="0 0 18 18" data-glyph="triangle">
+<polygon points="9,1 17,16 1,16" fill="var(--us-severity-warning)">
+</polygon>
+</svg>
+<span class="min-w-0">Warning<span class="block text-xs text-muted-foreground">Needs attention; not yet a violation.</span>
+</span>
+</li>
+<li data-severity="info" class="flex items-start gap-2">
+<svg aria-hidden="true" class="shrink-0" width="18" height="18" viewBox="0 0 18 18" data-glyph="circle">
+<circle cx="9" cy="9" r="8" fill="var(--us-severity-info)">
+</circle>
+</svg>
+<span class="min-w-0">Information<span class="block text-xs text-muted-foreground">For information; no action expected.</span>
+</span>
+</li>
+</ul>
+</div>
+</section>
+</div>
+</div>
+</div>
