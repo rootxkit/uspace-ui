@@ -3,7 +3,7 @@
 Branch `feat/WP-0-scaffold`. Milestone U-M0 (the first merge after the
 plan). Owns `package.json`, `pnpm-lock.yaml`, `tsconfig*.json`,
 `.nvmrc`, `.npmrc`, `.prettierrc`, `eslint.config.js`, `vitest.config.ts`,
-`.storybook/`, `src/model/`, `src/eslint/`, `src/test/` (helpers only),
+`src/model/`, `src/eslint/`, `src/test/` (helpers only),
 `scripts/`, `.github/workflows/ci.yml`, `SECURITY.md`, `CHANGELOG.md`,
 `.gitattributes`, `.gitignore`. Depends on nothing. Every other WP
 depends on it, so it is small and reviewed first.
@@ -50,12 +50,14 @@ dependency pins, peers as ranges, `publishConfig: { access: "public",
 provenance: true }` (npmjs is the only registry, PLAN D10; no
 `.npmrc` registry override, no GitHub Packages line). Prettier. Vitest
 with three projects: `node`
-(pure), `jsdom` (components), `browser` (Playwright Chromium, stories).
-Storybook 9 with `react-vite`, `addon-a11y`, `addon-vitest`; one story
-(`stories/Welcome.mdx`) so the browser job has something to run.
+(pure), `jsdom` (components), `browser` (Playwright Chromium,
+component tests under `browser/`, `axe` after every test); one browser
+test (`browser/welcome.test.tsx`) so the browser job has something to
+run. (Storybook was part of this package until the owner removed it on
+2026-10-02, PLAN D9.)
 Scripts: `check` (prettier, eslint, tsc, build, publint, attw,
 api-extractor, size, the `chikox.net` grep), `test`, `test:browser`,
-`storybook`, `build-storybook`, `api-report`.
+`api-report`.
 
 **`src/model/`.** The types and enumerations of PLAN §3.1, verbatim.
 `enums.ts` exports each enumeration as a `readonly` array *and* the
@@ -84,7 +86,7 @@ them with the arrays. Online, best-effort on PRs, required on `main`
 (PLAN §10 job 7). `size-check.mjs` reading budgets from `package.json`.
 
 **CI.** `.github/workflows/ci.yml` exactly as PLAN §10 jobs 1–7
-(`release.yml` is WP-13a, `pages.yml` is WP-13). `concurrency` with
+(`release.yml` is WP-13a). `concurrency` with
 cancel-in-progress, `timeout-minutes`, path filters, caches for pnpm and
 Playwright. Branch protection is the owner's.
 
@@ -113,7 +115,7 @@ Playwright. Branch protection is the owner's.
 - `test/fixtures.test.ts`: every enumeration value appears at least once
   across the fixtures (presence); fixture numbers use `GEO-TEST-*` and
   `TEST*` (a regex over the JSON).
-- The browser project runs the one story and `axe` on it.
+- The browser project runs the one browser test and `axe` on it.
 
 ## Done when
 

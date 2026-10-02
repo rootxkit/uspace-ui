@@ -1,6 +1,6 @@
-// Synthetic schemas, defaults and problem bodies for the form tests and
-// stories (spec 06 §4: GEO-TEST-* and TEST* only). The problem bodies are
-// in the one shape every national API answers with (RFC 9457 with
+// Synthetic schemas, defaults and problem bodies for the form unit and
+// browser tests (spec 06 §4: GEO-TEST-* and TEST* only). The problem
+// bodies are in the one shape every national API answers with (RFC 9457 with
 // `errors[{field, reason}]`, PLAN §3.7, M28), as uspace-core writes the
 // paths (`features[0].properties.name`).
 import { z } from "zod";
@@ -120,7 +120,7 @@ export const ALL_DEFAULTS: AllFields = {
   reason: "",
 };
 
-/** The app's catalogue for the test and story labels, in both languages. */
+/** The app's catalogue for the test labels, in both languages. */
 export const FORM_CATALOGUES = {
   en: {
     "zone.form.identifier": "Identifier",

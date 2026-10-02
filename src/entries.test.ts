@@ -48,7 +48,7 @@ const PENDING: Record<string, string> = {};
 // the reason, in the map's order after the plan's.
 const ADDED: Record<string, string> = {
   "./fonts/fonts.css":
-    "WP-2: the @font-face rules and the font-sans stack for Storybook and non-Next consumers",
+    "WP-2: the @font-face rules and the font-sans stack for non-Next consumers and the browser tests",
 };
 
 // Entries that are real (WP-0 .. WP-10); the rest are stubs

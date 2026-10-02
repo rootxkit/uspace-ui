@@ -1,11 +1,10 @@
-import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
 
-// Four projects (PLAN §9): `node` for pure code, `jsdom` for components,
-// `browser` for the stories (Playwright Chromium, axe on every story),
-// `golden` for the DOM snapshots of the golden set.
+// Three projects (PLAN §9): `node` for pure code, `jsdom` for components,
+// `browser` for components in a real browser (Playwright Chromium, axe
+// after every test) and the DOM snapshots of the golden set.
 export default defineConfig({
   test: {
     restoreMocks: true,
@@ -47,15 +46,20 @@ export default defineConfig({
       },
       {
         extends: true,
-        plugins: [storybookTest({ configDir: ".storybook" })],
+        plugins: [tailwindcss()],
+        // The committed Tbilisi basemap extract (WP-3) is served at
+        // /basemap/, the way a deployment serves it (PLAN §6.3), so the map
+        // tests make no third-party request.
+        publicDir: "browser/public",
         test: {
           name: "browser",
-          // A map story waits for tiles and glyphs on SwiftShader.
+          include: ["browser/**/*.test.tsx"],
+          // A map test waits for tiles and glyphs on SwiftShader.
           testTimeout: 30000,
           browser: {
             enabled: true,
             headless: true,
-            // MapLibre stories render on SwiftShader for smoke only (D9).
+            // MapLibre renders on SwiftShader for smoke only (D9).
             provider: playwright({
               launchOptions: {
                 args: ["--use-gl=angle", "--use-angle=swiftshader"],
@@ -63,25 +67,7 @@ export default defineConfig({
             }),
             instances: [{ browser: "chromium" }],
           },
-          setupFiles: [".storybook/vitest.setup.ts"],
-        },
-      },
-      {
-        // The golden DOM snapshots (PLAN §9): plain tests that render
-        // composed stories, in a project of their own because the
-        // Storybook plugin replaces a project's `include` with the stories.
-        extends: true,
-        plugins: [tailwindcss()],
-        test: {
-          name: "golden",
-          include: ["stories/golden/**/*.test.tsx"],
-          browser: {
-            enabled: true,
-            headless: true,
-            provider: playwright(),
-            instances: [{ browser: "chromium" }],
-          },
-          setupFiles: [".storybook/vitest.setup.ts"],
+          setupFiles: ["browser/setup.ts"],
         },
       },
     ],

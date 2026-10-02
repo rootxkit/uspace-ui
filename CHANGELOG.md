@@ -136,3 +136,10 @@ follows docs/PLAN.md §12. One line per work package under Unreleased.
   issues read in `ka` and `en`). @hookform/resolvers 5.9.1;
   react-hook-form (peer `^7.55`, dev 7.89.0) and zod (peer `^4`, dev
   4.6.5) as optional peers.
+- Storybook removed (the owner's decision, 2026-10-02; PLAN D9): every
+  story and the golden set are plain Vitest browser-mode tests under
+  `browser/` that render the components in the kit's providers, with
+  axe after every test and the same golden DOM snapshots; the test
+  basemap moved to `browser/public/basemap/`; the Storybook packages,
+  config, scripts and the CI build are gone, and no Pages site is
+  planned. No change to the package or its API.

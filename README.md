@@ -44,7 +44,6 @@ consumer installs with pnpm and an exact pin.
 - Rules for contributors and agents: [`CLAUDE.md`](CLAUDE.md)
 - Spec: `uspace-lab/docs/spec/` (`00 §6.3` names this package; `07`
   U-M1 is its first milestone)
-- Storybook: published to GitHub Pages from `main` once WP-13 lands
 
 ## Consuming (from `0.1.0-rc.1`)
 
@@ -229,6 +228,5 @@ table,form,eslint,test}`. The full step list for a `web/` app is in
 ```
 pnpm install --frozen-lockfile   # Node 22, pnpm via corepack
 pnpm check                       # prettier, eslint, tsc, build, publint, attw, api report
-pnpm test && pnpm test:browser   # vitest; stories as tests with axe
-pnpm storybook
+pnpm test && pnpm test:browser   # vitest; components in Chromium with axe
 ```

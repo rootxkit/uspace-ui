@@ -8,7 +8,6 @@ export default [
     ignores: [
       "dist/",
       "coverage/",
-      "storybook-static/",
       ".cache/",
       "node_modules/",
       "src/api/test/generated/",

@@ -116,7 +116,7 @@ console.
   `docs/LAB_VERSION` exists (visible skip otherwise, counted in CI).
 - Benchmark: 400 frames/s dispatched for 10 s, CPU time reported
   (PLAN §8).
-- Stories: the status bar in each connection state; the sources panel
+- Browser tests: the status bar in each connection state; the sources panel
   with every state; the degraded banner; the frozen overlay over a map;
   golden DOM snapshots.
 

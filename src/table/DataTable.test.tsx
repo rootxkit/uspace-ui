@@ -661,7 +661,7 @@ describe("virtualisation", () => {
     key("End", { ctrlKey: true });
     // The virtualiser scrolls; the row renders, then takes focus.
     // jsdom has no scrolling, so the scroll the virtualiser asked for is
-    // played here; the browser story runs the real one.
+    // played here; the browser test runs the real one.
     const scroller = container.querySelector<HTMLElement>(
       '[data-part="scroll"]',
     );

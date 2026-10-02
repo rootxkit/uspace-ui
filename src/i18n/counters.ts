@@ -1,6 +1,6 @@
 // What the i18n layer had to work around is counted as well as handled
 // (CLAUDE.md rule 9): WP-8's status components read these, and the
-// browser tests assert `missingKeys()` is 0 for the kit's own stories.
+// browser tests assert `missingKeys()` is 0 for the kit's own components.
 
 export type I18nCounter =
   /** A `ka` lookup that found nothing in `ka` and showed the `en` text. */

@@ -1,7 +1,7 @@
 // The bundled faces as data (docs/PLAN.md D7, §3.5): which file covers
 // which code points, the CSS variables the loaders set and the MapLibre
-// fontstack. No `next` import, so the map layers, Storybook and the tests
-// read these without Next.js. `index.ts` repeats the ranges as literals
+// fontstack. No `next` import, so the map layers and the tests read
+// these without Next.js. `index.ts` repeats the ranges as literals
 // (next/font requires literal options); the font test compares them.
 
 /**
@@ -28,7 +28,7 @@ export const FONT_VARIABLES = {
 /**
  * The family stack: the Georgian face first (its unicode-range admits only
  * Georgian), then Latin, then the platform. Without the loaders' classes
- * (Storybook, a non-Next app) the variables fall back to the families
+ * (the browser tests, a non-Next app) the variables fall back to the families
  * `fonts/fonts.css` declares over the same files.
  */
 export const fontFamily = `var(${FONT_VARIABLES.georgian}, "Noto Sans Georgian"), var(${FONT_VARIABLES.latin}, "Noto Sans"), ui-sans-serif, system-ui, sans-serif`;

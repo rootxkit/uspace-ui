@@ -80,7 +80,7 @@ to `main` (the rc ships what is there). WP-13 depends on this.
 - Pack test (`scripts/pack-test.mjs`, run in `check` and in the
   publish job): `pnpm pack` output contains `dist/`, `styles/`,
   `fonts/`, `README.md`, `LICENSE`, `CHANGELOG.md` and nothing from
-  `stories/`, `examples/`, `src/`, `.github/`, `docs/` (presence and
+  `browser/`, `examples/`, `src/`, `.github/`, `docs/` (presence and
   absence, E-01); every `exports` key of PLAN §2 resolves inside the
   packed tarball (unpack into a temp dir and `require.resolve` /
   import each, `node16` and `bundler` conditions).

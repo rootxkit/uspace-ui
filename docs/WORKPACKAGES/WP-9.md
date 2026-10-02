@@ -68,7 +68,7 @@ table primitives), WP-2 (formatters, i18n). Consumers: every console.
 - Virtualisation: 10 000 rows render ≤ 60 DOM rows; scrolling to the
   end renders the last row; sort of 10 000 rows timed and reported
   (benchmark).
-- Stories: a registry-shaped fixture (with `GEO-TEST-*` numbers), a
+- Browser tests: a registry-shaped fixture (with `GEO-TEST-*` numbers), a
   sources table with every `SourceState`, a deliveries table with
   freshness and an error state; both languages; golden DOM snapshots of
   one page and the empty/error states.

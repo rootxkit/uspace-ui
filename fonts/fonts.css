@@ -4,7 +4,7 @@
    (next/font, `fontClassName` on <html>) and imports this file only for
    the stack below: its variables then name next/font's families, and the
    @font-face rules here are never used, so nothing is fetched twice.
-   Storybook and an app without Next.js import this file alone: the
+   The browser tests and an app without Next.js import this file alone: the
    variables are unset and the stack falls back to the families declared
    here, over the same files.
 

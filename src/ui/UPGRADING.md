@@ -83,7 +83,7 @@ and installs packages. Run it in a scratch directory and diff.
    dependency; a new one needs a row in PLAN §4 and a reason in the
    commit body, and the pins in this repo's `package.json` move with it.
 5. Run `pnpm check`, `pnpm test` and `pnpm test:browser` (every `ui`
-   story runs axe in both schemes), regenerate the API report, and say
+   browser test runs axe in both schemes), regenerate the API report, and say
    in the PR which upstream changes came in.
 
 ## Import paths
@@ -136,7 +136,7 @@ content arrives through a props spread the rule cannot see).
   | `PaginationEllipsis`                   | "More pages"                                                          | a `<span>` with your own text; the text is not a prop                                     | `ui.more_pages`                                              |
   | `CommandDialog`                        | title "Command Palette", description "Search for a command to run..." | `title` and `description` props                                                           | `ui.command_title`, `ui.command_description`                 |
 
-  The `ui` stories do this in both languages (`stories/ui/texts.ts`).
+  The `ui` browser tests do this in both languages (`browser/ui/texts.ts`).
 
 - `ScrollArea` (Radix) injects a `<style>` element to hide the native
   scrollbar. Under the PLAN §7 CSP (`style-src 'self'`, no
@@ -144,8 +144,8 @@ content arrives through a props spread the rule cannot see).
   shows next to the custom one; the content still scrolls. With the
   request's nonce in `style-src` and a `CspNonceProvider` around the page
   (the local patch above; `issueCspNonce` of `auth/server`), the style is
-  allowed. The CSP story
-  (`stories/csp/`) checks which components render with no violation.
+  allowed. The CSP browser test
+  (`browser/csp/`) checks which components render with no violation.
 - The open and close animations use the `tw-animate-css` classes
   (`animate-in`, `fade-in-0`, ...). The kit does not depend on it; an
   app that wants the animations imports `tw-animate-css` after

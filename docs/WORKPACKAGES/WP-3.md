@@ -1,7 +1,7 @@
 # WP-3: `map` (MapView, self-hosted basemap, viewport and bbox hooks)
 
 Branch `feat/WP-3-map-core`. Milestone U-M1. Owns `src/map/`,
-`styles/map.css`, `stories/basemap/` exclusively. Depends on WP-0; uses
+`styles/map.css`, `browser/public/basemap/` exclusively. Depends on WP-0; uses
 WP-1 tokens for control styling (start on WP-0, rebase when WP-1
 merges). Consumers: WP-6, WP-7, WP-11, WP-12 layers; every console and
 the CISP public map. On the critical path.
@@ -44,11 +44,11 @@ the CISP public map. On the critical path.
   quantise to `quantizeDeg`, debounce, fire only on change; first fire
   on load), `MapControls` (zoom, compass, scale, scheme toggle, layer
   toggles as a sheet via `LayerPanel`), `styles/map.css`.
-- A tiny committed PMTiles extract for stories (`stories/basemap/`,
+- A tiny committed PMTiles extract for the browser tests (`browser/public/basemap/`,
   Tbilisi centre, a few MB at most; its `SOURCE.json` with the date and
-  bounds; the build command recorded in `stories/basemap/README.md`),
+  bounds; the build command recorded in `browser/public/basemap/README.md`),
   plus the glyph PBFs for the fontstack's Latin and Georgian ranges
-  needed by the story labels only.
+  needed by the test labels only.
 
 ## Tests
 
@@ -66,8 +66,8 @@ the CISP public map. On the critical path.
   with `name:ka`; `en` leaves them; road `ref` untouched; dark flavour
   selected by scheme; attribution contains the date when known and the
   no-basemap text when not.
-- Browser (stories, smoke only): `MapView` with the committed extract
-  renders a canvas and fires `onLoad`; the `ka` story shows a Georgian
+- Browser (smoke only): `MapView` with the committed extract
+  renders a canvas and fires `onLoad`; the `ka` test shows a Georgian
   label (assert via the map's `queryRenderedFeatures` on a known label
   layer, not pixels); `axe` on the controls.
 - Benchmark: 400 `setData` calls per second on a GeoJSON source with 200
@@ -76,11 +76,12 @@ the CISP public map. On the critical path.
 ## Done when
 
 - [ ] PLAN §3.6 implemented; API report updated.
-- [ ] The Pages Storybook shows the Tbilisi extract with Georgian labels
-  in `ka` and Latin in `en`, light and dark; say you looked (E-04).
+- [ ] The map test page shows the Tbilisi extract with Georgian labels
+  in `ka` and Latin in `en`, light and dark; look at it in a headed run (`pnpm exec vitest --project browser --browser.headless=false <file>`) and say you
+  looked (E-04).
 - [ ] No request leaves the page except to the configured basemap paths
   (a browser test records `performance.getEntriesByType("resource")`
-  and asserts every URL starts with the story's origin).
+  and asserts every URL starts with the test page's origin).
 - [ ] The no-basemap and no-WebGL notices exist and are tested (E-02).
 - [ ] `pnpm check`, `pnpm test`, `pnpm test:browser` outputs in the PR.
 

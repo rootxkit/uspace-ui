@@ -109,17 +109,22 @@ and the lab consumes it at build time, pinned by an exact version. Read
   Enumerations come from `uspace-core/core`; message fields from spec
   `04`; the standard fields from `uspace-core/f3411`, `f3548`, `ed318`.
   Read, cite, pin.
-- **E-04 Never report an inference as an observation.** "Stories pass"
-  means `pnpm test:browser` ran and you read the summary; "looks right
-  on Pages" means you opened it. A skipped test is reported as skipped.
+- **E-04 Never report an inference as an observation.** "Browser tests
+  pass" means `pnpm test:browser` ran and you read the summary; "looks
+  right" means you watched it render in a headed run. A skipped test is
+  reported as skipped.
   A tool error is not evidence about the thing being checked.
 - **E-10** every bounded structure has a test that exceeds its bound.
 - **E-11** tests restore timers, `matchMedia`, cookies, the DOM and the
   map mock; the suite passes with `--sequence.shuffle`.
-- Every story passes `axe` (WCAG 2.2 AA); every user-facing component
-  has a story in both languages and both schemes; the golden set under
-  `stories/golden/` has DOM snapshots that change only with a reviewed
-  reason.
+- Every user-facing component has a browser test under `browser/` in
+  both languages and both schemes (light in English, dark in Georgian at
+  least), rendered with `renderKit` (`browser/kit.tsx`), which mounts it
+  in the kit's providers; `browser/setup.ts` runs `axe` (WCAG 2.2 AA)
+  after every test and fails a test that showed a missing key. The
+  golden set (`browser/golden/golden.test.tsx`) has DOM snapshots under
+  `browser/golden/__snapshots__/` that change only with a reviewed
+  reason. There is no Storybook (PLAN D9).
 - Coverage: a work package is done at >= 90 % statement coverage of its
   entry points, with every branch that produces a distinct wording or
   visual state covered by a named test.
@@ -156,9 +161,8 @@ The scripts are defined in `package.json` (WP-0).
 pnpm install --frozen-lockfile   # Node 22 (.nvmrc), pnpm via corepack (packageManager)
 pnpm check          # prettier, build, eslint (the kit's own rules, from dist/), tsc, publint, attw, api report, size, hostname grep
 pnpm test           # vitest: node and jsdom projects, with coverage
-pnpm test:browser   # vitest browser mode: stories as tests, axe (needs `pnpm exec playwright install chromium` once)
-pnpm storybook      # local Storybook
-pnpm build-storybook   # static Storybook in storybook-static/
+pnpm test:browser   # vitest browser mode: components in Chromium, axe, golden snapshots (needs `pnpm exec playwright install chromium` once)
+pnpm exec vitest --project browser --browser.headless=false <file>   # watch a browser test render
 pnpm build          # tsc to dist/
 pnpm api-report     # regenerate docs/api/uspace-ui.api.md (commit the result)
 scripts/check-enums.sh   # compare src/model enumerations with uspace-core at docs/CORE_VERSION (online)
@@ -175,8 +179,8 @@ pnpm test:browser
 pnpm api-report && git diff --stat docs/api
 ```
 
-Then check the brief's done-when list item by item. Open the Pages
-Storybook (or the local one) and look at every story you added in both
+Then check the brief's done-when list item by item. Run every browser
+test you added headed (the command above) and look at it in both
 languages; say that you did. If a component cannot be built without a
 field, a threshold or a frame the API does not provide, stop and write
 it down in the PR as a spec gap (`docs/PLAN.md §14`); do not invent a

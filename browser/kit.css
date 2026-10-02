@@ -1,0 +1,10 @@
+/* What a consuming app's global stylesheet does (PLAN D4): Tailwind, then
+   the kit's tokens and font stack, then the kit's sources in the scan.
+   The browser tests scan src/ directly; an app scans the compiled dist/ of
+   the package. */
+@import "tailwindcss";
+@import "../styles/tokens.css";
+@import "../fonts/fonts.css";
+
+@source "../src";
+@source "../browser";

@@ -1,4 +1,4 @@
-// Deterministic, synthetic view models for tests and stories (PLAN §3.18).
+// Deterministic, synthetic view models for unit and browser tests (PLAN §3.18).
 //
 // Generated from the `model` arrays: each enumeration is cycled through the
 // records, so a value added to `model` appears in the fixtures without an
