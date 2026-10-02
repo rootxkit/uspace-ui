@@ -123,10 +123,8 @@
     "api-report": "node scripts/api-report.mjs --local",
     "format": "prettier --write .",
     "test": "vitest run --coverage --project node --project jsdom",
-    "test:browser": "vitest run --project browser --project golden",
-    "bench:map": "vitest run --project browser --silent=false --reporter=verbose -t \"Set Data 200 Features\"",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build -o storybook-static"
+    "test:browser": "vitest run --project browser",
+    "bench:map": "vitest run --project browser --silent=false --reporter=verbose -t \"setData 200 features\""
   },
   "sizeBudgets": {
     "map+layers+symbology+legend": {
