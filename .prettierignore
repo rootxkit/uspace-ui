@@ -1,6 +1,5 @@
 dist/
 coverage/
-storybook-static/
 .cache/
 pnpm-lock.yaml
 # Plan documents are reviewed prose, not formatted code.
