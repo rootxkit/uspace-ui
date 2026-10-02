@@ -14,6 +14,12 @@ import {
   IDENT_STATUS_HINT_KEYS,
   IDENT_STATUS_KEYS,
 } from "../symbology/ident.js";
+import {
+  CONNECTION_KEYS,
+  DEGRADED_KEYS,
+  DISABLED_BY_KEYS,
+  SOURCE_STATE_KEYS,
+} from "../status/words.js";
 import { RESTRICTION_STATE_KEYS } from "../symbology/restriction.js";
 import { SEVERITY_HINT_KEYS, SEVERITY_KEYS } from "../symbology/severity.js";
 import {
@@ -152,6 +158,13 @@ const DYNAMIC_KEYS: Readonly<Record<string, readonly string[]>> = {
   "src/symbology/severity.ts SEVERITY_KEYS": Object.values(SEVERITY_KEYS),
   "src/symbology/severity.ts SEVERITY_HINT_KEYS":
     Object.values(SEVERITY_HINT_KEYS),
+  // WP-8 status: t(SOURCE_STATE_KEYS[s]), t(DISABLED_BY_KEYS[d]),
+  // t(DEGRADED_KEYS[slug]) (degradedLabel), t(CONNECTION_KEYS[c]);
+  // FeedStatusBar's plurals t("feed.dropped"|"feed.malformed", {count})
+  "src/status/words.ts SOURCE_STATE_KEYS": Object.values(SOURCE_STATE_KEYS),
+  "src/status/words.ts DISABLED_BY_KEYS": Object.values(DISABLED_BY_KEYS),
+  "src/status/words.ts DEGRADED_KEYS": Object.values(DEGRADED_KEYS),
+  "src/status/words.ts CONNECTION_KEYS": Object.values(CONNECTION_KEYS),
 };
 
 describe("keys used in src/", () => {

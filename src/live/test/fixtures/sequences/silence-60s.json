@@ -1,0 +1,26 @@
+{
+  "name": "silence-60s",
+  "recorded_from": "synthetic, from uspace-lab schemas/common examples at LAB_COMMIT; no system serves the console frame yet (README.md: replace with a recording)",
+  "description": "A healthy connection that goes quiet: status and snapshot on connect, then sixty seconds with no frame of any kind, then one status frame. The socket stays open throughout.",
+  "steps": [
+    {
+      "op": "open"
+    },
+    {
+      "op": "frame",
+      "lab": "console/status/v1/examples/authority-picture.json"
+    },
+    {
+      "op": "frame",
+      "lab": "console/snapshot/v1/examples/authority-picture.json"
+    },
+    {
+      "op": "wait",
+      "ms": 60000
+    },
+    {
+      "op": "frame",
+      "lab": "console/status/v1/examples/authority-picture.json"
+    }
+  ]
+}

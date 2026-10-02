@@ -12,6 +12,7 @@ import {
   useT,
 } from "../../src/i18n/index.js";
 import * as login from "../auth/LoginForm.stories.js";
+import * as live from "../live/Status.stories.js";
 import * as typography from "../i18n/Typography.stories.js";
 import * as tracks from "../tracks/Tracks.stories.js";
 import * as zones from "../zones/Zones.stories.js";
@@ -28,6 +29,14 @@ const {
 
 const { LoginEnglishLight, LoginGeorgianDark } = composeStories(login);
 const { LegendsEnglishLight, LegendsGeorgianDark } = composeStories(tracks);
+const {
+  StatusBarEnglishLight,
+  StatusBarGeorgianDark,
+  SourcesEnglishLight,
+  SourcesGeorgianDark,
+  DegradedEnglishLight,
+  DegradedGeorgianDark,
+} = composeStories(live);
 
 // One element per line, so a reviewed diff reads line by line.
 const pretty = (html: string): string => `${html.replace(/></g, ">\n<")}\n`;
@@ -151,6 +160,25 @@ it("login-form.ka", async () => {
     "./__snapshots__/login-form.ka.html",
   );
 });
+
+// WP-8: the status bar in each connection state, the sources panel with
+// every source state, the degraded banner and age chips.
+const LIVE_GOLDEN = {
+  "feed-status.en": StatusBarEnglishLight,
+  "feed-status.ka": StatusBarGeorgianDark,
+  "sources-panel.en": SourcesEnglishLight,
+  "sources-panel.ka": SourcesGeorgianDark,
+  "degraded.en": DegradedEnglishLight,
+  "degraded.ka": DegradedGeorgianDark,
+} as const;
+
+for (const [name, story] of Object.entries(LIVE_GOLDEN)) {
+  it(name, async () => {
+    await expect(
+      await snapshotStable(story as typeof Georgian),
+    ).toMatchFileSnapshot(`./__snapshots__/${name}.html`);
+  });
+}
 
 // The presence twin of the setup's missingKeys() check: a key that `ka`
 // lacks is counted in the browser too. Reset after, so the setup's own

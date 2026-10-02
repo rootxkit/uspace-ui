@@ -22,28 +22,13 @@ import type {
   TrackFeatureProperties,
   TrailFeatureProperties,
 } from "../symbology/track.js";
+import { ageS, compareCapturedAt } from "../live/time.js";
 import { countLayer } from "./counters.js";
 
-// RFC 3339 UTC with `Z` (spec 02 §1), any number of fraction digits.
-const UTC = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d{1,9}))?Z$/;
-
-/**
- * Orders two `capturedAt` values as written, without a clock or a `Date`:
- * the seconds part compares as text, the fraction padded to nanoseconds.
- * Negative when `a` is older, 0 when equal, positive when newer; null when
- * either is not RFC 3339 UTC, so the two cannot be ordered.
- */
-export function compareCapturedAt(a: string, b: string): number | null {
-  const ma = UTC.exec(a);
-  const mb = UTC.exec(b);
-  if (ma === null || mb === null) return null;
-  const sa = ma[1] ?? "";
-  const sb = mb[1] ?? "";
-  if (sa !== sb) return sa < sb ? -1 : 1;
-  const fa = (ma[2] ?? "").padEnd(9, "0");
-  const fb = (mb[2] ?? "").padEnd(9, "0");
-  return fa === fb ? 0 : fa < fb ? -1 : 1;
-}
+// The ordering of two capture times and the display age live in `live`
+// (WP-8), the one place the kit reads ages; the layer uses them and
+// re-exports `compareCapturedAt` so WP-7's imports keep working.
+export { compareCapturedAt };
 
 interface Held {
   /** The newest live sample; null while only backlog has arrived. */
@@ -166,14 +151,14 @@ export type TrackFeatureCollection = GeoJSON.FeatureCollection<
 >;
 
 /**
- * Seconds since this console received the sample: two readings of the
- * browser clock (`receivedAtMs`, stamped by the live store, and the app's
- * `nowMs` tick), never the server's times (04 §2: an age counts from
- * receipt or from capture, never a mix).
+ * Seconds since this console received the sample: `live`'s `ageS` on the
+ * `"received"` basis (two readings of the browser clock: `receivedAtMs`,
+ * stamped by the live track store, and the app's `nowMs` tick), never the
+ * server's times (04 §2: an age counts from receipt or from capture, never
+ * a mix). Kept for WP-7's callers; new code calls `ageS` from `/live`.
  */
 export function receivedAgeS(t: TrackView, nowMs: number): number | null {
-  const age = (nowMs - t.receivedAtMs) / 1000;
-  return Number.isFinite(age) ? age : null;
+  return ageS(t, nowMs, "received");
 }
 
 /**
@@ -234,7 +219,7 @@ export function trackFeatureCollection(
     const age: AgeBucket =
       h.view === null
         ? "stale"
-        : ageBucket(receivedAgeS(h.view, opts.nowMs), opts.staleAfterS);
+        : ageBucket(ageS(h.view, opts.nowMs, "received"), opts.staleAfterS);
     if (h.trail.length >= 2) {
       trails.push({
         type: "Feature",

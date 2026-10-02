@@ -50,11 +50,25 @@ const AGE_BUCKET_KEYS: Readonly<Record<AgeBucket, Key>>;
 // @public
 const AGE_BUCKETS: readonly ["live", "aging", "stale", "unknown"];
 
+// @public
+type AgeBasis = "received" | "captured";
+
 // @public (undocumented)
 type AgeBucket = (typeof AGE_BUCKETS)[number];
 
 // @public
 function ageBucket(ageS: number | null, staleAfterS: number): AgeBucket;
+
+// @public (undocumented)
+function AgeChip(props: AgeChipProps): JSX.Element;
+
+// @public (undocumented)
+interface AgeChipProps {
+    ageS: number | null;
+    // (undocumented)
+    className?: string;
+    staleAfterS: number | null;
+}
 
 // @public (undocumented)
 function AgeLegend(props: AgeLegendProps): JSX.Element;
@@ -75,6 +89,13 @@ function ageOpacity(b: AgeBucket): number;
 function ageOpacityExpression(): ExpressionSpecification;
 
 // @public
+function ageS(t: {
+    receivedAtMs: number;
+} | {
+    times: Times;
+}, nowMs: number, by?: AgeBasis, clockOffsetMs?: number | null): number | null;
+
+// @public
 function AgeSwatch(props: {
     bucket: AgeBucket;
 }): JSX.Element;
@@ -87,6 +108,9 @@ const ALERT_KINDS: readonly ["proximity", "nonconformance", "nonconformance_near
 
 // @public (undocumented)
 const ALERT_STATES: readonly ["raised", "updated", "cleared"];
+
+// @public (undocumented)
+const ALERT_STORE_LIMIT = 500;
 
 // @public (undocumented)
 function AlertDialog(input: React_2.ComponentProps<typeof AlertDialog_2.Root>): React_2.JSX.Element;
@@ -126,17 +150,53 @@ function AlertDialogTitle(input: React_2.ComponentProps<typeof AlertDialog_2.Tit
 // @public (undocumented)
 function AlertDialogTrigger(input: React_2.ComponentProps<typeof AlertDialog_2.Trigger>): React_2.JSX.Element;
 
+// @public
+type AlertInput = Omit<AlertView, "receivedAtMs" | "acknowledged">;
+
 // @public (undocumented)
 type AlertKind = (typeof ALERT_KINDS)[number];
 
 declare namespace alerts {
     export {
-        ENTRY_3 as ENTRY
+        ENTRY
     }
 }
 
 // @public (undocumented)
 type AlertState = (typeof ALERT_STATES)[number];
+
+// @public (undocumented)
+interface AlertStore {
+    acknowledge(id: string): void;
+    apply(a: AlertInput): void;
+    // (undocumented)
+    counters(): Readonly<Record<AlertStoreCounter, number>>;
+    dispose(): void;
+    // (undocumented)
+    get(id: string): AlertView | undefined;
+    replace(alerts: readonly AlertInput[]): void;
+    snapshot(): ReadonlyMap<string, AlertView>;
+    // (undocumented)
+    subscribe(fn: () => void): () => void;
+}
+
+// @public (undocumented)
+type AlertStoreCounter =
+/** An alert pushed out by `maxAlerts`, cleared ones first (E-10). */
+"alert_evicted"
+/** A cleared alert dropped at the end of its hold. */
+| "cleared_dropped"
+/** An active alert absent from a snapshot: the server no longer has it. */
+| "alert_absent_from_snapshot"
+/** An acknowledgement for an id the store did not hold. */
+| "acknowledge_unknown";
+
+// @public (undocumented)
+interface AlertStoreOptions {
+    clearedHoldMs?: number;
+    maxAlerts?: number;
+    now?: () => number;
+}
 
 // @public (undocumented)
 interface AlertView {
@@ -344,6 +404,13 @@ function authCounters(): Readonly<Record<AuthCounter, number>>;
 function axeCheck(container: HTMLElement): Promise<void>;
 
 // @public (undocumented)
+interface Backoff {
+    factor: number;
+    initialMs: number;
+    maxMs: number;
+}
+
+// @public (undocumented)
 function Badge(input: React_2.ComponentProps<"span"> & VariantProps<typeof badgeVariants> & {
     asChild?: boolean;
 }): React_2.JSX.Element;
@@ -402,6 +469,9 @@ interface BBox {
     // (undocumented)
     minLng: number;
 }
+
+// @public
+type BBox_2 = readonly [number, number, number, number];
 
 // @public (undocumented)
 interface BBoxSubscriptionOptions {
@@ -564,6 +634,9 @@ interface ClientOptions {
     timeoutMs?: number;
 }
 
+// @public
+const CLOSE_UNAUTHORIZED = 4401;
+
 // @public (undocumented)
 function cn(...inputs: ClassValue[]): string;
 
@@ -620,6 +693,31 @@ function compareCapturedAt(a: string, b: string): number | null;
 // @public (undocumented)
 const config: Linter.Config[];
 
+// @public (undocumented)
+const CONNECTION_KEYS: Readonly<Record<FeedStatus["connection"], Key>>;
+
+// @public
+interface ConsoleFrame {
+    // (undocumented)
+    backlog: boolean;
+    // (undocumented)
+    body: unknown;
+    // (undocumented)
+    capturedAt: string | null;
+    // (undocumented)
+    msgId: string;
+    // (undocumented)
+    producer: string;
+    // (undocumented)
+    rxTs: string;
+    // (undocumented)
+    schema: string;
+    // (undocumented)
+    timeSource: TimeSource;
+    // (undocumented)
+    ts: string | null;
+}
+
 // @public
 interface CookieReader {
     // (undocumented)
@@ -631,8 +729,25 @@ interface CookieReader {
 // @public (undocumented)
 function countLayer(counter: LayerCounter): void;
 
+// @public (undocumented)
+function countLive(counter: LiveCounter, by?: number): void;
+
+// @public (undocumented)
+function createAlertStore(opts?: AlertStoreOptions): AlertStore;
+
 // @public
 function createClient<Paths extends {}>(opts: ClientOptions): Client<Paths>;
+
+// @public
+function createMannedStore(opts: TrackStoreOptions): MannedStore;
+
+// @public (undocumented)
+function createSourceStore(opts?: {
+    maxSources?: number;
+}): SourceStore;
+
+// @public
+function createTrackStore(opts: TrackStoreOptions): TrackStore;
 
 // @public
 function createTranslator(lang: Lang, catalogues?: Catalogues): Translate;
@@ -662,6 +777,20 @@ const DARK_QUERY = "(prefers-color-scheme: dark)";
 const DASH = "\u2014";
 
 // @public
+interface DatasetAge {
+    // (undocumented)
+    ageS: number;
+    // (undocumented)
+    version: string;
+}
+
+// @public (undocumented)
+const DEFAULT_BACKOFF: Readonly<Backoff>;
+
+// @public (undocumented)
+const DEFAULT_CLEARED_HOLD_MS = 30000;
+
+// @public
 const DEFAULT_FRESHNESS_PICK: Readonly<Required<FreshnessPick>>;
 
 // @public
@@ -669,6 +798,26 @@ const DEFAULT_LANG: Lang;
 
 // @public
 const DEFAULT_TIMEOUT_MS = 30000;
+
+// @public
+const DEGRADED_KEYS: Readonly<Record<string, Key>>;
+
+// @public (undocumented)
+function DegradedBanner(props: DegradedBannerProps): JSX.Element | null;
+
+// @public (undocumented)
+interface DegradedBannerProps {
+    cisAgeS?: number | null;
+    cisStaleBoundS?: number | null;
+    // (undocumented)
+    className?: string;
+    datasets?: Readonly<Record<string, DatasetAge>> | null;
+    degraded: readonly string[];
+    projectionAgeS?: number | null;
+}
+
+// @public
+function degradedLabel(slug: string, t: Translate): string;
 
 // @public (undocumented)
 function Dialog(input: React_2.ComponentProps<typeof Dialog_2.Root>): React_2.JSX.Element;
@@ -706,6 +855,9 @@ function DialogTrigger(input: React_2.ComponentProps<typeof Dialog_2.Trigger>): 
 
 // @public
 const DIMMED_RESTRICTION_STATES: readonly RestrictionState[];
+
+// @public (undocumented)
+const DISABLED_BY_KEYS: Readonly<Record<DisabledBy, Key>>;
 
 // @public (undocumented)
 const DISABLED_BYS: readonly ["type", "instance", "default_deny"];
@@ -788,19 +940,13 @@ interface EmptyStateProps {
 const en: Readonly<Record<Key, string>>;
 
 // @public (undocumented)
-const ENTRY = "live";
+const ENTRY = "alerts";
 
 // @public (undocumented)
-const ENTRY_2 = "status";
+const ENTRY_2 = "table";
 
 // @public (undocumented)
-const ENTRY_3 = "alerts";
-
-// @public (undocumented)
-const ENTRY_4 = "table";
-
-// @public (undocumented)
-const ENTRY_5 = "form";
+const ENTRY_3 = "form";
 
 declare namespace eslint {
     export {
@@ -808,6 +954,14 @@ declare namespace eslint {
         plugin,
         config as default
     }
+}
+
+// @public
+interface ExternalStore<T> {
+    // (undocumented)
+    snapshot(): T;
+    // (undocumented)
+    subscribe(fn: () => void): () => void;
 }
 
 // @public (undocumented)
@@ -820,6 +974,35 @@ interface FeatureOptions {
     staleAfterS: number;
     // (undocumented)
     t: Translate;
+}
+
+// @public
+class FeedClient {
+    constructor(opts: FeedOptions);
+    // (undocumented)
+    getStatus: () => LiveStatus;
+    send: (frame: SubscribeFrame) => void;
+    setOptions(opts: FeedOptions): void;
+    // (undocumented)
+    start(): void;
+    // (undocumented)
+    stop(): void;
+    // (undocumented)
+    subscribe: (fn: () => void) => (() => void);
+}
+
+// @public (undocumented)
+interface FeedOptions {
+    // (undocumented)
+    backoff?: Backoff;
+    now?: () => number;
+    onFrame(frame: ConsoleFrame): void;
+    onUnauthorized?(): void;
+    // (undocumented)
+    protocols?: string[];
+    random?: () => number;
+    stores?: FeedStores;
+    url: string | (() => Promise<string>);
 }
 
 // @public (undocumented)
@@ -840,6 +1023,37 @@ interface FeedStatus {
     sinceMs: number;
     // (undocumented)
     staleAfterS: number | null;
+}
+
+// @public (undocumented)
+function FeedStatusBar(props: FeedStatusBarProps): JSX.Element;
+
+// @public (undocumented)
+interface FeedStatusBarProps {
+    // (undocumented)
+    className?: string;
+    nowMs: number;
+    // (undocumented)
+    status: FeedStatusInput;
+}
+
+// @public
+type FeedStatusInput = FeedStatus & {
+    lastFrameAtMs?: number | null;
+    framesMalformed?: number;
+    unauthorized?: boolean;
+};
+
+// @public
+interface FeedStores {
+    alerts?: SnapshotTarget<AlertInput>;
+    manned?: SnapshotTarget<Omit<MannedView, "receivedAtMs">> & {
+        store: MannedStore;
+    };
+    sources?: SourceStore;
+    tracks?: SnapshotTarget<Omit<TrackView, "receivedAtMs">> & {
+        store: TrackStore;
+    };
 }
 
 // @public (undocumented)
@@ -948,7 +1162,7 @@ declare namespace fonts {
 
 declare namespace form {
     export {
-        ENTRY_5 as ENTRY
+        ENTRY_3 as ENTRY
     }
 }
 
@@ -989,6 +1203,18 @@ interface FreshnessPick {
     updatedAt?: string;
     // (undocumented)
     version?: string;
+}
+
+// @public (undocumented)
+function FrozenOverlay(props: FrozenOverlayProps): JSX.Element | null;
+
+// @public (undocumented)
+interface FrozenOverlayProps {
+    // (undocumented)
+    className?: string;
+    nowMs: number;
+    // (undocumented)
+    status: FeedStatusInput;
 }
 
 // @public
@@ -1496,8 +1722,147 @@ interface LegendSectionProps {
 
 declare namespace live {
     export {
-        ENTRY
+        ALERT_STORE_LIMIT,
+        DEFAULT_CLEARED_HOLD_MS,
+        createAlertStore,
+        AlertInput,
+        AlertStore,
+        AlertStoreCounter,
+        AlertStoreOptions,
+        DEFAULT_BACKOFF,
+        STABLE_AFTER_MS,
+        reconnectDelayMs,
+        Backoff,
+        CLOSE_UNAUTHORIZED,
+        FeedClient,
+        resolveFeedUrl,
+        FeedOptions,
+        FeedStores,
+        LiveStatus,
+        SnapshotTarget,
+        countLive,
+        liveCounters,
+        resetLiveCountersForTests,
+        LiveCounter,
+        NO_EXTRAS,
+        SNAPSHOT_SCHEMA,
+        STATUS_SCHEMA,
+        SUBSCRIBE_SCHEMA,
+        parseFrame,
+        parseFrameText,
+        parseSnapshotBody,
+        parseStatusBody,
+        subscribeFrame,
+        BBox_2 as BBox,
+        ConsoleFrame,
+        DatasetAge,
+        SnapshotBody,
+        StatusBody,
+        StatusExtras,
+        StatusSource,
+        SubscribeFrame,
+        SubscribeLayer,
+        WireSourceState,
+        useFeed,
+        useNowMs,
+        useStore,
+        ExternalStore,
+        LiveFeed,
+        SOURCE_STORE_LIMIT,
+        createSourceStore,
+        sourceAgeS,
+        sourceStateOf,
+        LiveSourceView,
+        SourceStore,
+        SourceStoreCounter,
+        ageS,
+        compareCapturedAt,
+        utcMs,
+        AgeBasis,
+        RECENTLY_REMOVED_LIMIT,
+        createMannedStore,
+        createTrackStore,
+        MannedStore,
+        PositionStore,
+        RemovedReason,
+        RemovedTrack,
+        TrackStore,
+        TrackStoreCounter,
+        TrackStoreOptions
     }
+}
+
+// @public (undocumented)
+type LiveCounter =
+/** A message that arrived on a feed socket, whatever it held. */
+"frames_received"
+/**
+* A message that was not a console frame: not text, not JSON, or an
+* envelope field missing or of the wrong type (04 §2). Dropped.
+*/
+| "frames_malformed"
+/** A well-formed frame the kit has no store for: passed to `onFrame`. */
+| "frames_unhandled"
+/** A `console/status/v1` whose body broke the schema: not applied. */
+| "status_malformed"
+/** A `console/snapshot/v1` whose body broke the schema: not applied. */
+| "snapshot_malformed"
+/** One item of a snapshot that was not a frame: skipped. */
+| "snapshot_item_malformed"
+/** One item of a snapshot the app's adapter returned null for. */
+| "snapshot_item_unadapted"
+/** A snapshot collection with no store given in the options. */
+| "snapshot_collection_unstored"
+/** A socket the client tried to open. */
+| "connect_attempts"
+/**
+* A connect that could not start: the `url` function rejected or the
+* `WebSocket` constructor threw. Retried like a close.
+*/
+| "connect_failed"
+/**
+* A feed URL refused before connecting: it carried credentials, a
+* token-like query parameter, or another origin (M22: the cookie on a
+* same-origin upgrade is the only credential). Retried like a close.
+*/
+| "url_refused"
+/** A socket that closed while the client was running. */
+| "closed"
+/** A close with code 4401: the session is gone (PLAN §6.3, M22). */
+| "unauthorized"
+/** A subscribe frame replaced by a newer one before it could be sent. */
+| "subscribe_superseded";
+
+// @public
+function liveCounters(): Readonly<Record<LiveCounter, number>>;
+
+// @public
+interface LiveFeed extends LiveStatus {
+    send(frame: SubscribeFrame): void;
+}
+
+// @public
+interface LiveSourceView extends SourceView {
+    ageAtMs: number;
+    ageS: number | null;
+    // (undocumented)
+    counters: Readonly<Record<string, number>>;
+    since: string | null;
+}
+
+// @public
+interface LiveStatus extends FeedStatus {
+    attempt: number;
+    clockOffsetMs: number | null;
+    connectionId: string | null;
+    extras: StatusExtras;
+    framesMalformed: number;
+    framesUnhandled: number;
+    lastFrameAtMs: number | null;
+    lastStatusAtMs: number | null;
+    nextRetryAtMs: number | null;
+    unauthorized: boolean;
+    zonesVersion: string | null;
 }
 
 // @public
@@ -1528,6 +1893,9 @@ type LoginResult = {
         otpauthUri: string;
     };
 };
+
+// @public (undocumented)
+type MannedStore = PositionStore<MannedView>;
 
 // @public (undocumented)
 interface MannedView {
@@ -1750,6 +2118,9 @@ function needsAttention(s: IdentStatus | null): boolean;
 // @public
 function negotiateLang(acceptLanguage: string | null, cookie: string | null): Lang;
 
+// @public (undocumented)
+const NO_EXTRAS: StatusExtras;
+
 // @public
 const notoSans: NextFontWithVariable;
 
@@ -1780,6 +2151,12 @@ function PaginationNext(input: React_2.ComponentProps<typeof PaginationLink>): R
 function PaginationPrevious(input: React_2.ComponentProps<typeof PaginationLink>): React_2.JSX.Element;
 
 // @public
+function parseFrame(raw: unknown): ConsoleFrame | null;
+
+// @public
+function parseFrameText(data: unknown): ConsoleFrame | null;
+
+// @public
 function parseHexColour(s: string): Rgb | null;
 
 // @public (undocumented)
@@ -1792,7 +2169,16 @@ function parseProblem(res: Response): Promise<Problem | null>;
 function parseScheme(v: string | null | undefined): ColorScheme | null;
 
 // @public
+function parseSnapshotBody(raw: unknown): {
+    body: SnapshotBody;
+    malformedItems: number;
+} | null;
+
+// @public
 function parseSourceInfo(body: unknown): BasemapInfo | null;
+
+// @public
+function parseStatusBody(raw: unknown): StatusBody | null;
 
 // @public
 const PATTERN_TILE_PX = 8;
@@ -1842,6 +2228,24 @@ function PopoverTitle(input: React_2.ComponentProps<"h2">): React_2.JSX.Element;
 // @public (undocumented)
 function PopoverTrigger(input: React_2.ComponentProps<typeof Popover_2.Trigger>): React_2.JSX.Element;
 
+// Warning: (ae-forgotten-export) The symbol "Positioned" needs to be exported by the entry point entry.d.ts
+//
+// @public
+interface PositionStore<V extends Positioned> {
+    // (undocumented)
+    counters(): Readonly<Record<TrackStoreCounter, number>>;
+    // (undocumented)
+    get(id: string): V | undefined;
+    recentlyRemoved(): readonly RemovedTrack[];
+    remove(id: string, reason: ClearReason | "source_disabled"): void;
+    replace(tracks: readonly Omit<V, "receivedAtMs">[]): void;
+    snapshot(): ReadonlyMap<string, V>;
+    // (undocumented)
+    subscribe(fn: () => void): () => void;
+    trail(id: string): readonly (readonly [number, number])[];
+    upsert(t: Omit<V, "receivedAtMs">): void;
+}
+
 // @public (undocumented)
 interface Problem {
     // (undocumented)
@@ -1887,6 +2291,24 @@ function readSessionToken(src: NextRequest | CookieReader, opts?: Pick<SessionCo
 // @public
 function receivedAgeS(t: TrackView, nowMs: number): number | null;
 
+// @public (undocumented)
+const RECENTLY_REMOVED_LIMIT = 50;
+
+// @public
+function reconnectDelayMs(attempt: number, backoff: Backoff, random: number): number;
+
+// @public
+type RemovedReason = ClearReason | "evicted";
+
+// @public
+interface RemovedTrack {
+    atMs: number;
+    // (undocumented)
+    reason: RemovedReason;
+    // (undocumented)
+    trackId: string;
+}
+
 // @public
 function renderWithKit(ui: ReactNode, opts?: RenderWithKitOptions): RenderResult;
 
@@ -1925,10 +2347,20 @@ function resetI18nCounters(): void;
 function resetLayerCountersForTests(): void;
 
 // @public
+function resetLiveCountersForTests(): void;
+
+// @public
 function resolveColour(map: Map_2, token: string): string;
 
 // @public (undocumented)
 type ResolvedScheme = "light" | "dark";
+
+// @public
+function resolveFeedUrl(url: string, page: string | undefined): {
+    url: string;
+} | {
+    refused: string;
+};
 
 // @public
 function resolveTrackColours(map: Map_2): TrackColours;
@@ -2210,14 +2642,104 @@ function SheetTrigger(input: React_2.ComponentProps<typeof Dialog_2.Trigger>): R
 // @public (undocumented)
 function Skeleton(input: React.ComponentProps<"div">): JSX.Element;
 
+// @public (undocumented)
+const SNAPSHOT_SCHEMA = "console/snapshot/v1";
+
+// @public
+interface SnapshotBody {
+    // (undocumented)
+    alerts: ConsoleFrame[];
+    // (undocumented)
+    manned: ConsoleFrame[];
+    // (undocumented)
+    tracks: ConsoleFrame[];
+    // (undocumented)
+    zonesVersion: string | null;
+}
+
+// @public
+interface SnapshotTarget<I> {
+    adapt(frame: ConsoleFrame): I | null;
+    // (undocumented)
+    store: {
+        replace(items: readonly I[]): void;
+    };
+}
+
 // @public
 const SOURCE_INFO_TIMEOUT_MS = 5000;
+
+// @public (undocumented)
+const SOURCE_STATE_KEYS: Readonly<Record<SourceState, Key>>;
 
 // @public (undocumented)
 const SOURCE_STATES: readonly ["disabled", "healthy", "stale", "lagging", "unreachable", "never_heard"];
 
 // @public (undocumented)
+const SOURCE_STORE_LIMIT = 1000;
+
+// @public
+function sourceAgeS(s: Pick<LiveSourceView, "ageS" | "ageAtMs">, nowMs: number): number | null;
+
+// @public
+function sourceDisplayAgeS(s: SourceInput, nowMs: number): number | null;
+
+// @public
+type SourceInput = SourceView & {
+    ageS?: number | null;
+    ageAtMs?: number;
+};
+
+// @public (undocumented)
+function SourcesPanel(props: SourcesPanelProps): JSX.Element;
+
+// @public (undocumented)
+interface SourcesPanelProps {
+    canSwitch: boolean;
+    // (undocumented)
+    className?: string;
+    nowMs: number;
+    onSwitch?(s: SourceView, enabled: boolean, reason: string): void;
+    // (undocumented)
+    sources: readonly SourceInput[];
+}
+
+// @public (undocumented)
 type SourceState = (typeof SOURCE_STATES)[number];
+
+// @public (undocumented)
+function SourceStateBadge(props: SourceStateBadgeProps): JSX.Element;
+
+// @public (undocumented)
+interface SourceStateBadgeProps {
+    // (undocumented)
+    className?: string;
+    nowMs: number;
+    // (undocumented)
+    source: SourceInput;
+}
+
+// @public
+function sourceStateOf(s: StatusSource): SourceState;
+
+// @public (undocumented)
+interface SourceStore {
+    applyStatus(sources: readonly StatusSource[], serverTs: string, receivedAtMs: number): void;
+    // (undocumented)
+    counters(): Readonly<Record<SourceStoreCounter, number>>;
+    snapshot(): readonly LiveSourceView[];
+    // (undocumented)
+    subscribe(fn: () => void): () => void;
+}
+
+// @public (undocumented)
+type SourceStoreCounter =
+/** A source past `SOURCE_STORE_LIMIT` in one status frame (E-10). */
+"source_dropped_over_limit"
+/** A source in the previous status frame and not in this one. */
+| "source_left_status"
+/** A source in the wire state `unknown` (B-09), shown as stale. */
+| "source_state_unknown";
 
 // @public (undocumented)
 interface SourceView {
@@ -2242,6 +2764,9 @@ interface SourceView {
 }
 
 // @public
+const STABLE_AFTER_MS = 10000;
+
+// @public
 function Stat(props: StatProps): ReactNode;
 
 // @public
@@ -2259,12 +2784,109 @@ interface StatProps {
 
 declare namespace status_2 {
     export {
-        ENTRY_2 as ENTRY
+        AgeChip,
+        AgeChipProps,
+        DegradedBanner,
+        DegradedBannerProps,
+        FeedStatusBar,
+        FeedStatusBarProps,
+        FeedStatusInput,
+        FrozenOverlay,
+        FrozenOverlayProps,
+        SourceStateBadge,
+        sourceDisplayAgeS,
+        SourceInput,
+        SourceStateBadgeProps,
+        SourcesPanel,
+        SourcesPanelProps,
+        CONNECTION_KEYS,
+        DEGRADED_KEYS,
+        DISABLED_BY_KEYS,
+        SOURCE_STATE_KEYS,
+        degradedLabel
     }
 }
 
 // @public
+const STATUS_SCHEMA = "console/status/v1";
+
+// @public
+interface StatusBody extends StatusExtras {
+    // (undocumented)
+    connectionId: string;
+    // (undocumented)
+    degraded: string[];
+    // (undocumented)
+    droppedFrames: number;
+    // (undocumented)
+    liveMaxAgeS: number;
+    // (undocumented)
+    policyVersion: string;
+    // (undocumented)
+    serverTs: string;
+    // (undocumented)
+    sources: StatusSource[];
+    // (undocumented)
+    staleAfterS: number;
+}
+
+// @public
+interface StatusExtras {
+    // (undocumented)
+    cisAgeS: number | null;
+    // (undocumented)
+    cisVersion: string | null;
+    // (undocumented)
+    datasets: Readonly<Record<string, DatasetAge>> | null;
+    // (undocumented)
+    dpState: string | null;
+    // (undocumented)
+    nats: string | null;
+    // (undocumented)
+    projectionAgeS: number | null;
+    // (undocumented)
+    resyncSince: string | null;
+}
+
+// @public
+interface StatusSource {
+    ageS: number | null;
+    counters: Readonly<Record<string, number>>;
+    // (undocumented)
+    disabledBy: DisabledBy | null;
+    // (undocumented)
+    disabledByWho: string | null;
+    lagS: number | null;
+    since: string;
+    // (undocumented)
+    source: string;
+    sourceInstance: string | null;
+    // (undocumented)
+    state: WireSourceState;
+}
+
+// @public
 type StyleLoadHandler = (map: Map_2) => void;
+
+// @public (undocumented)
+const SUBSCRIBE_SCHEMA = "console/subscribe/v1";
+
+// @public
+interface SubscribeFrame {
+    // (undocumented)
+    body: {
+        bbox: BBox_2;
+        layers: readonly SubscribeLayer[];
+    };
+    // (undocumented)
+    schema: typeof SUBSCRIBE_SCHEMA;
+}
+
+// @public
+function subscribeFrame(bbox: BBox_2, layers: readonly SubscribeLayer[]): SubscribeFrame;
+
+// @public
+type SubscribeLayer = "tracks" | "manned" | "alerts" | "zones";
 
 // @public
 function subscriptionBBox(b: BBox, marginFraction: number, quantizeDeg: number): BBox;
@@ -2377,7 +2999,7 @@ function Table(input: React_2.ComponentProps<"table">): React_2.JSX.Element;
 
 declare namespace table {
     export {
-        ENTRY_4 as ENTRY
+        ENTRY_2 as ENTRY
     }
 }
 
@@ -2683,6 +3305,33 @@ interface TrackLegendProps {
 }
 
 // @public (undocumented)
+type TrackStore = PositionStore<TrackView>;
+
+// @public (undocumented)
+type TrackStoreCounter =
+/** A track pushed out by `maxTracks`, oldest update first (E-10). */
+"track_evicted"
+/** A trail point pushed out of its track's ring (E-10). */
+| "trail_point_evicted"
+/** A removal pushed out of the recently removed ring. */
+| "removed_ring_evicted"
+/** A sample older than the one held for its id (T-13): ignored. */
+| "track_out_of_order"
+/** A sample whose time cannot be ordered against the held one: applied. */
+| "track_time_unordered"
+/** A `backlog` sample for a track with a live view: trail only (T-04). */
+| "backlog_to_trail"
+/** A removal for an id the store did not hold. */
+| "remove_unknown";
+
+// @public (undocumented)
+interface TrackStoreOptions {
+    maxTracks: number;
+    now?: () => number;
+    trailPoints: number;
+}
+
+// @public (undocumented)
 interface TrackStyle {
     // (undocumented)
     emergencyFilter: FilterSpecification;
@@ -2984,6 +3633,9 @@ function useCspNonce(): string | undefined;
 // @public
 function useFeaturePointer(map: Map_2 | null, layerId: string, onSelect: ((identifier: string) => void) | undefined): PointerHover | null;
 
+// @public
+function useFeed(opts: FeedOptions): LiveFeed;
+
 // @public (undocumented)
 function useLang(): {
     lang: Lang;
@@ -3010,6 +3662,9 @@ function useMap(): Map_2 | null;
 function useMapContext(): MapContextValue;
 
 // @public
+function useNowMs(periodMs: number, now?: () => number): number;
+
+// @public
 function useOptionalI18n(): I18nContextValue | null;
 
 // @public
@@ -3017,6 +3672,9 @@ function useOptionalTheme(): ThemeContextValue | null;
 
 // @public
 function useSession(): SessionContextValue;
+
+// @public
+function useStore<T>(store: ExternalStore<T>): T;
 
 // @public
 function useStyleLoad(add: StyleLoadHandler): void;
@@ -3032,6 +3690,9 @@ function useTheme(): ThemeContextValue;
 
 // @public
 function useViewport(): ViewportState;
+
+// @public
+function utcMs(iso: string | null | undefined): number | null;
 
 // @public (undocumented)
 type Vars = Readonly<Record<string, string | number>>;
@@ -3072,6 +3733,9 @@ type ViolationKind = (typeof VIOLATION_KINDS)[number];
 
 // @public (undocumented)
 const WCAG_22_AA_TAGS: readonly string[];
+
+// @public
+type WireSourceState = "live" | "stale" | "disabled" | "down" | "unknown";
 
 // @public
 const ZONE_DIMMED_OPACITY = 0.35;

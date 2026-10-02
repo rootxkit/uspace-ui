@@ -1,0 +1,50 @@
+{
+  "name": "session-expiry-4401",
+  "recorded_from": "synthetic, from uspace-lab schemas/common examples at LAB_COMMIT; no system serves the console frame yet (README.md: replace with a recording)",
+  "description": "A live feed whose session ends: the server closes with 4401, the next upgrade is refused with 4401 again (the cookie is still the old one), then the app re-logs in and the upgrade after that succeeds and sends a status frame.",
+  "steps": [
+    {
+      "op": "open"
+    },
+    {
+      "op": "frame",
+      "lab": "console/status/v1/examples/authority-picture.json"
+    },
+    {
+      "op": "frame",
+      "lab": "console/snapshot/v1/examples/authority-picture.json"
+    },
+    {
+      "op": "wait",
+      "ms": 2000
+    },
+    {
+      "op": "frame",
+      "lab": "console/status/v1/examples/authority-picture.json"
+    },
+    {
+      "op": "close",
+      "code": 4401,
+      "reason": "session expired"
+    },
+    {
+      "op": "open"
+    },
+    {
+      "op": "close",
+      "code": 4401,
+      "reason": "session expired"
+    },
+    {
+      "op": "open"
+    },
+    {
+      "op": "frame",
+      "lab": "console/status/v1/examples/authority-picture.json"
+    },
+    {
+      "op": "frame",
+      "lab": "console/snapshot/v1/examples/authority-picture.json"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+<div lang="ka" class="bg-background p-4 text-foreground">
+<div class="grid max-w-lg gap-3" data-testid="degraded">
+<section class="rounded-md border-2 bg-card px-3 py-2 text-sm text-card-foreground border-severity-warning" aria-label="შეზღუდული მომსახურება" data-banner="degraded" data-degraded="true">
+<h2 class="m-0 text-sm font-semibold">შეზღუდული მომსახურება</h2>
+<ul class="m-0 mt-1 list-disc pl-5">
+<li data-degraded-key="manned">პილოტირებული საჰაერო მოძრაობის მონაცემები მიუწვდომელია</li>
+<li data-degraded-key="dss">DSS მიუწვდომელია</li>
+<li data-degraded-key="source_disabled">ერთ-ერთი წყარო გათიშულია</li>
+<li data-degraded-key="nats_reconnecting">nats_reconnecting (სერვერის დასახელებით)</li>
+</ul>
+<ul class="m-0 list-none p-0 text-xs mt-2">
+<li data-age-of="cis" data-over="true">CIS მონაცემების ასაკი: 5 წთ, ზღვარი 5 წთ გადაჭარბებულია</li>
+<li data-age-of="dataset:uspace_airspace">uspace_airspace, ვერსია uspace-test-2: ასაკი 1 დღე</li>
+<li data-age-of="dataset:zones">zones, ვერსია zones-test-7: ასაკი 13 წთ</li>
+<li data-age-of="projection">რეესტრის პროექციის ასაკი: 1 წმ</li>
+</ul>
+</section>
+<section class="rounded-md border-2 bg-card px-3 py-2 text-sm text-card-foreground border-border" aria-label="შეზღუდული მომსახურება" data-banner="degraded" data-degraded="false">
+<ul class="m-0 list-none p-0 text-xs">
+<li data-age-of="cis">CIS მონაცემების ასაკი: 14 წმ</li>
+</ul>
+</section>
+<div class="flex flex-wrap gap-2">
+<span class="inline-flex items-center gap-1 rounded-full border-2 px-2 py-0.5 text-xs tabular-nums border-age-live" data-age="live" data-age-s="2">
+<span>2 წმ</span>
+<span>· ცოცხალი</span>
+</span>
+<span class="inline-flex items-center gap-1 rounded-full border-2 px-2 py-0.5 text-xs tabular-nums border-age-aging" data-age="aging" data-age-s="15">
+<span>15 წმ</span>
+<span>· ძველდება</span>
+</span>
+<span class="inline-flex items-center gap-1 rounded-full border-2 px-2 py-0.5 text-xs tabular-nums border-age-stale" data-age="stale" data-age-s="45">
+<span>45 წმ</span>
+<span>· მოძველებული</span>
+</span>
+<span class="inline-flex items-center gap-1 rounded-full border-2 px-2 py-0.5 text-xs tabular-nums border-border" data-age="unknown" data-age-s="45">
+<span>45 წმ</span>
+</span>
+<span class="inline-flex items-center gap-1 rounded-full border-2 px-2 py-0.5 text-xs tabular-nums border-border" data-age="unknown" data-age-s="">
+<span>—</span>
+<span class="sr-only">ასაკი უცნობია</span>
+</span>
+</div>
+</div>
+</div>

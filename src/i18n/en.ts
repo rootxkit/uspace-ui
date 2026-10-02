@@ -308,6 +308,49 @@ const catalogue = {
     "Recovery codes: each works once, in place of a one-time code. Store them now; they are not shown again.",
   "auth.continue": "Continue",
   "auth.restart": "Start again",
+
+  // WP-8: the feed's status bar and frozen overlay (C-12: down is "feed
+  // down, retrying" with the age of the last frame, never "data lost").
+  "feed.down_retrying": "Feed down, retrying",
+  "feed.last_frame": "last frame {age} ago",
+  "feed.no_frame_yet": "no frame received yet",
+  "feed.as_of": "Showing data as of {time}, received {age} ago",
+  "feed.no_data_yet": "No data received yet",
+  "feed.malformed_one": "{count} malformed frame ignored",
+  "feed.malformed_other": "{count} malformed frames ignored",
+  "feed.degraded": "Degraded: {list}",
+  "feed.no_threshold":
+    "The server has sent no stale threshold: ages are shown without a bucket",
+
+  // WP-8: what is degraded, by the server's key (02 F5), and the ages the
+  // status frame carries (CIS cache, datasets, registry projection).
+  "degraded.title": "Degraded service",
+  "degraded.manned": "Manned traffic unavailable",
+  "degraded.dss": "DSS unavailable",
+  "degraded.source_disabled": "A source is switched off",
+  "degraded.publisher_stale": "Publisher data out of date",
+  "degraded.other": "{slug} (as the server names it)",
+  "degraded.cis_age": "CIS data {age} old",
+  "degraded.cis_age_over": "CIS data {age} old: over the bound of {bound}",
+  "degraded.dataset_age": "{dataset}, version {version}: {age} old",
+  "degraded.projection_age": "Registry projection {age} old",
+
+  // WP-8: the sources panel and the switch (B-09, B-11: a switch needs a
+  // reason; disabled by a person never reads like silent).
+  "source.panel.title": "Sources",
+  "source.panel.empty": "The server reported no sources",
+  "source.all": "All {type}",
+  "source.last_heard": "last heard {age} ago",
+  "source.counters": "{accepted} accepted, {refused} refused",
+  "source.switch.disable": "Switch off",
+  "source.switch.enable": "Switch on",
+  "source.switch.title_disable": "Switch off {name}",
+  "source.switch.title_enable": "Switch on {name}",
+  "source.switch.description":
+    "The server records the change with your name and the reason.",
+  "source.switch.reason": "Reason (required)",
+  "source.switch.reason_required": "Give a reason to continue",
+  "source.switch.at_type": "Switched with its source type",
 } as const;
 
 /** A key of the kit's own catalogue. Apps add keys of their own. */
