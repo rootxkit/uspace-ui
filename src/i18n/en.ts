@@ -351,6 +351,52 @@ const catalogue = {
   "source.switch.reason": "Reason (required)",
   "source.switch.reason_required": "Give a reason to continue",
   "source.switch.at_type": "Switched with its source type",
+
+  // WP-9: the table kit. A unit and a datum are in the column header
+  // (E-13), a time column says UTC (S-16), and an empty table says why
+  // (E-02). No export: an export is an audited act at the API (01 A10).
+  "table.header_unit": "{label} ({unit})",
+  "table.header_utc": "{label} (UTC)",
+  "table.column.age": "Age",
+  "table.column.severity": "Severity",
+  "table.column.trust": "Trust",
+  "table.column.ident": "Identification",
+  "table.column.select": "Select",
+  "table.select_row": "Select row {id}",
+  "table.select_page": "Select every row on this page",
+  "table.filters": "Filters",
+  "table.filter_label": "Filter: {label}",
+  "table.filter_all": "All",
+  "table.columns": "Columns",
+  "table.columns_legend": "Columns to show",
+  "table.keyboard_hint":
+    "Arrow keys move between cells. Home and End go to the first and last cell of a row, with Control to the first and last row. Page Up and Page Down move ten rows. Enter selects a row or sorts by a column, with Shift adding to the sort. Space toggles a checkbox. Alt with Left or Right resizes a column.",
+  "table.empty_filtered": "No rows match the filters",
+  "table.clear_filters": "Clear filters",
+  "table.error_title": "{title} (status {status})",
+  "table.retry_after_one":
+    "The server asks to wait {count} second before trying again",
+  "table.retry_after_other":
+    "The server asks to wait {count} seconds before trying again",
+  "table.as_of_version": "As of version {version}",
+  "table.updated_at": "updated {time}",
+  "table.stale": "Stale, as the server reports",
+  "table.refreshing": "Refreshing",
+  "table.range": "Rows {from} to {to} of {total}",
+  "table.page_size": "Rows per page",
+  "table.page_of": "Page {page} of {pages}",
+  "unit.symbol.m": "m",
+  "unit.symbol.m_amsl": "m AMSL",
+  "unit.symbol.m_agl": "m AGL",
+  "unit.symbol.m_wgs84": "m above the WGS84 ellipsoid",
+  "unit.symbol.m_takeoff": "m above take-off",
+  "unit.symbol.ms": "m/s",
+  "unit.symbol.s": "s",
+  "unit.symbol.min": "min",
+  "unit.symbol.deg": "°",
+  "unit.symbol.pct": "%",
+  "unit.symbol.kg": "kg",
+  "unit.symbol.wh": "Wh",
 } as const;
 
 /** A key of the kit's own catalogue. Apps add keys of their own. */
