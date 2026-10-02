@@ -4,6 +4,7 @@
 
 ```ts
 
+import type { $ZodErrorMap } from 'zod/v4/core';
 import { AlertDialog as AlertDialog_2 } from 'radix-ui';
 import { Checkbox as Checkbox_2 } from 'radix-ui';
 import { ClassProp } from 'class-variance-authority/types';
@@ -43,6 +44,7 @@ import { toast } from 'sonner';
 import { ToasterProps } from 'sonner';
 import { Tooltip as Tooltip_2 } from 'radix-ui';
 import { VariantProps } from 'class-variance-authority';
+import { z } from 'zod';
 
 // @public
 const AGE_BUCKET_KEYS: Readonly<Record<AgeBucket, Key>>;
@@ -471,7 +473,28 @@ interface BBox {
 }
 
 // @public
+function bbox(): z.ZodTuple<[z.ZodNumber, z.ZodNumber, z.ZodNumber, z.ZodNumber], null>;
+
+// @public
 type BBox_2 = readonly [number, number, number, number];
+
+// @public
+function BBoxField(props: BBoxFieldProps): JSX.Element;
+
+// @public (undocumented)
+interface BBoxFieldProps {
+    // (undocumented)
+    className?: string;
+    // (undocumented)
+    disabled?: boolean;
+    // (undocumented)
+    hintKey?: string;
+    // (undocumented)
+    labelKey: string;
+    name: string;
+    // (undocumented)
+    required?: boolean;
+}
 
 // @public (undocumented)
 interface BBoxSubscriptionOptions {
@@ -481,6 +504,9 @@ interface BBoxSubscriptionOptions {
     onChange(bbox: BBox): void;
     quantizeDeg: number;
 }
+
+// @public
+type BBoxValue = [number, number, number, number];
 
 // @public (undocumented)
 const BFF_API_PREFIX = "/_bff/api";
@@ -606,6 +632,9 @@ type Catalogues = Partial<Record<Lang, Catalogue>>;
 function Checkbox(input: React_2.ComponentProps<typeof Checkbox_2.Root>): React_2.JSX.Element;
 
 // @public
+function CheckboxField(props: FieldBaseProps): JSX.Element;
+
+// @public
 function checkCsrf(req: NextRequest, opts?: Pick<SessionCookieOptions, "csrfName">): boolean;
 
 // @public (undocumented)
@@ -692,6 +721,37 @@ function compareCapturedAt(a: string, b: string): number | null;
 
 // @public (undocumented)
 const config: Linter.Config[];
+
+// @public (undocumented)
+function ConfirmDialog(props: ConfirmDialogProps): JSX.Element;
+
+// @public (undocumented)
+interface ConfirmDialogProps {
+    // (undocumented)
+    bodyKey: string;
+    // (undocumented)
+    cancelLabelKey?: string;
+    // (undocumented)
+    confirmLabelKey?: string;
+    destructive?: boolean;
+    onCancel?(): void;
+    onConfirm(reason?: string): void;
+    // (undocumented)
+    onOpenChange?(open: boolean): void;
+    open?: boolean;
+    reason?: ConfirmReason;
+    // (undocumented)
+    titleKey: string;
+    trigger?: ReactNode;
+    vars?: Vars;
+}
+
+// @public (undocumented)
+interface ConfirmReason {
+    minLength: number;
+    // (undocumented)
+    required: true;
+}
 
 // @public (undocumented)
 const CONNECTION_KEYS: Readonly<Record<FeedStatus["connection"], Key>>;
@@ -783,6 +843,9 @@ interface DatasetAge {
     // (undocumented)
     version: string;
 }
+
+// @public
+const DATUM_KEYS: Readonly<Record<VerticalRef, Key>>;
 
 // @public (undocumented)
 const DEFAULT_BACKOFF: Readonly<Backoff>;
@@ -945,8 +1008,17 @@ const ENTRY = "alerts";
 // @public (undocumented)
 const ENTRY_2 = "table";
 
+// @public
+function EnumField<E extends string>(props: EnumFieldProps<E>): JSX.Element;
+
 // @public (undocumented)
-const ENTRY_3 = "form";
+interface EnumFieldProps<E extends string> extends FieldBaseProps {
+    i18nPrefix: string;
+    values: readonly E[];
+}
+
+// @public
+function errorText(err: HeldError, t: Translate, hasKey: (k: string) => boolean): string;
 
 declare namespace eslint {
     export {
@@ -1057,6 +1129,28 @@ interface FeedStores {
 }
 
 // @public (undocumented)
+function Field(props: FieldProps): JSX.Element;
+
+// @public (undocumented)
+type FieldBaseProps = Omit<FieldProps, "children" | "inline" | "utc">;
+
+// @public (undocumented)
+interface FieldControl {
+    // (undocumented)
+    describedBy: string | undefined;
+    // (undocumented)
+    disabled: boolean;
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    invalid: boolean;
+    // (undocumented)
+    name: string;
+    // (undocumented)
+    required: boolean;
+}
+
+// @public (undocumented)
 interface FieldError {
     // (undocumented)
     field: string;
@@ -1064,8 +1158,48 @@ interface FieldError {
     reason: string;
 }
 
+// @public (undocumented)
+function FieldErrors(props: FieldErrorsProps): JSX.Element | null;
+
 // @public
 function fieldErrorsOf(err: unknown): FieldError[];
+
+// @public (undocumented)
+interface FieldErrorsProps {
+    // (undocumented)
+    className?: string;
+    // (undocumented)
+    errors: readonly FieldError[];
+    truncated?: boolean;
+}
+
+// @public
+function fieldLabel(t: Translate, p: FieldLabelParts): string;
+
+// @public (undocumented)
+interface FieldLabelParts {
+    datum?: VerticalRef | null | undefined;
+    // (undocumented)
+    labelKey: string;
+    unit?: string | undefined;
+    utc?: boolean | undefined;
+}
+
+// @public (undocumented)
+interface FieldProps extends FieldLabelParts {
+    // (undocumented)
+    children: ReactNode;
+    // (undocumented)
+    className?: string;
+    // (undocumented)
+    disabled?: boolean;
+    // (undocumented)
+    hintKey?: string;
+    inline?: boolean;
+    name: string;
+    // (undocumented)
+    required?: boolean;
+}
 
 // @public (undocumented)
 interface Fixtures {
@@ -1160,10 +1294,104 @@ declare namespace fonts {
     }
 }
 
+// @public (undocumented)
+function Form<Schema extends z.ZodType>(props: FormProps<Schema>): JSX.Element;
+
 declare namespace form {
     export {
-        ENTRY_3 as ENTRY
+        ConfirmDialog,
+        ConfirmDialogProps,
+        ConfirmReason,
+        errorText,
+        useFieldControl,
+        FieldControl,
+        HeldError,
+        RegisteredField,
+        formCounters,
+        resetFormCountersForTests,
+        FormCounter,
+        DATUM_KEYS,
+        FORM_UNIT_KEYS,
+        Field,
+        fieldLabel,
+        FieldLabelParts,
+        FieldProps,
+        FieldErrors,
+        FieldErrorsProps,
+        BBoxField,
+        CheckboxField,
+        EnumField,
+        NumberField,
+        ReasonField,
+        SelectField,
+        TextField,
+        UTCDateTimeField,
+        BBoxFieldProps,
+        EnumFieldProps,
+        FieldBaseProps,
+        ReasonFieldProps,
+        SelectFieldProps,
+        SelectOption,
+        TextFieldProps,
+        UTCDateTimeFieldProps,
+        Form,
+        FormProps,
+        kitErrorMap,
+        formatLocaleNumber,
+        parseLocaleNumber,
+        toFieldName,
+        toJsonPath,
+        shapes,
+        BBoxValue,
+        inputToUtc,
+        isRfc3339,
+        isRfc3339Utc,
+        utcToInput
     }
+}
+
+// @public
+const FORM_UNIT_KEYS: Readonly<{
+    readonly m: "form.unit.m";
+    readonly ft: "form.unit.ft";
+    readonly ms: "form.unit.ms";
+    readonly s: "form.unit.s";
+    readonly min: "form.unit.min";
+    readonly deg: "form.unit.deg";
+    readonly kg: "form.unit.kg";
+    readonly pct: "form.unit.pct";
+}>;
+
+// @public
+function formatLocaleNumber(v: number | null, lang: Lang): string;
+
+// @public (undocumented)
+type FormCounter =
+/** An API field error whose path matched no registered field. */
+"field_error_unmapped"
+/** A submission the API refused (an `ApiError` or returned errors). */
+| "submit_refused"
+/** A submission that threw something other than an `ApiError`. */
+| "submit_failed";
+
+// @public
+function formCounters(): Readonly<Record<FormCounter, number>>;
+
+// @public (undocumented)
+interface FormProps<Schema extends z.ZodType> {
+    // (undocumented)
+    busyLabelKey?: string;
+    // (undocumented)
+    children: ReactNode;
+    // (undocumented)
+    className?: string;
+    // (undocumented)
+    defaults: z.input<Schema>;
+    onSubmit(values: z.output<Schema>): Promise<void | FieldError[]>;
+    schema: Schema;
+    // (undocumented)
+    submitLabelKey: string;
+    successKey?: string;
 }
 
 // @public
@@ -1225,6 +1453,14 @@ const HEIGHT_KEYS: Readonly<Record<HeightRef, Key>>;
 
 // @public (undocumented)
 type HeightRef = "TakeoffLocation" | "GroundLevel";
+
+// @public
+interface HeldError {
+    // (undocumented)
+    message?: string;
+    // (undocumented)
+    type?: string | number;
+}
 
 // @public
 const HOVER_OFFSET_PX = 12;
@@ -1434,6 +1670,9 @@ function InlineCode(input: ComponentProps<"code">): ReactNode;
 // @public (undocumented)
 function Input(input: React_2.ComponentProps<"input">): React_2.JSX.Element;
 
+// @public
+function inputToUtc(local: string): string | null;
+
 // @public (undocumented)
 interface IntentView {
     // (undocumented)
@@ -1483,6 +1722,12 @@ const isIdentStatus: (x: unknown) => x is "registered" | "suspended" | "unknown_
 
 // @public (undocumented)
 const isRestrictionState: (x: unknown) => x is "planned" | "active" | "ended" | "cancelled";
+
+// @public
+function isRfc3339(v: string): boolean;
+
+// @public
+function isRfc3339Utc(v: string): boolean;
 
 // @public (undocumented)
 const isSeverity: (x: unknown) => x is "info" | "warning" | "critical";
@@ -1541,6 +1786,9 @@ interface KitBrand {
     // (undocumented)
     shortName: string;
 }
+
+// @public
+const kitErrorMap: $ZodErrorMap;
 
 // @public (undocumented)
 type KitLang = "ka" | "en";
@@ -2127,6 +2375,9 @@ const notoSans: NextFontWithVariable;
 // @public
 const notoSansGeorgian: NextFontWithVariable;
 
+// @public
+function NumberField(props: FieldBaseProps): JSX.Element;
+
 // @public (undocumented)
 function Pagination(input: React_2.ComponentProps<"nav">): React_2.JSX.Element;
 
@@ -2161,6 +2412,9 @@ function parseHexColour(s: string): Rgb | null;
 
 // @public (undocumented)
 function parseLang(v: string | null | undefined): Lang | null;
+
+// @public
+function parseLocaleNumber(text: string, lang: Lang): number | null;
 
 // @public
 function parseProblem(res: Response): Promise<Problem | null>;
@@ -2289,6 +2543,25 @@ function RadioGroupItem(input: React_2.ComponentProps<typeof RadioGroup_2.Item>)
 function readSessionToken(src: NextRequest | CookieReader, opts?: Pick<SessionCookieOptions, "name">): string | null;
 
 // @public
+function reason(minLength: number): z.ZodString;
+
+// @public
+function ReasonField(props: ReasonFieldProps): JSX.Element;
+
+// @public (undocumented)
+interface ReasonFieldProps {
+    // (undocumented)
+    className?: string;
+    // (undocumented)
+    hintKey?: string;
+    // (undocumented)
+    labelKey?: string;
+    minLength: number;
+    // (undocumented)
+    name: string;
+}
+
+// @public
 function receivedAgeS(t: TrackView, nowMs: number): number | null;
 
 // @public (undocumented)
@@ -2296,6 +2569,16 @@ const RECENTLY_REMOVED_LIMIT = 50;
 
 // @public
 function reconnectDelayMs(attempt: number, backoff: Backoff, random: number): number;
+
+// @public (undocumented)
+interface RegisteredField {
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    label: string;
+    // (undocumented)
+    required: boolean;
+}
 
 // @public
 type RemovedReason = ClearReason | "evicted";
@@ -2339,6 +2622,9 @@ function resetApiCountersForTests(): void;
 
 // @public
 function resetAuthCountersForTests(): void;
+
+// @public
+function resetFormCountersForTests(): void;
 
 // @public
 function resetI18nCounters(): void;
@@ -2478,6 +2764,15 @@ function SelectContent(input: React_2.ComponentProps<typeof Select_2.Content>): 
 // @public
 const SELECTED_EXTRA_WIDTH_PX = 2;
 
+// @public
+function SelectField(props: SelectFieldProps): JSX.Element;
+
+// @public (undocumented)
+interface SelectFieldProps extends FieldBaseProps {
+    // (undocumented)
+    options: readonly SelectOption[];
+}
+
 // @public (undocumented)
 function SelectGroup(input: React_2.ComponentProps<typeof Select_2.Group>): React_2.JSX.Element;
 
@@ -2486,6 +2781,14 @@ function SelectItem(input: React_2.ComponentProps<typeof Select_2.Item>): React_
 
 // @public (undocumented)
 function SelectLabel(input: React_2.ComponentProps<typeof Select_2.Label>): React_2.JSX.Element;
+
+// @public (undocumented)
+interface SelectOption {
+    // (undocumented)
+    labelKey: string;
+    // (undocumented)
+    value: string;
+}
 
 // @public (undocumented)
 function SelectScrollDownButton(input: React_2.ComponentProps<typeof Select_2.ScrollDownButton>): React_2.JSX.Element;
@@ -2611,6 +2914,15 @@ type Shape = "triangle" | "diamond" | "square" | "circle" | "hexagon" | "cross";
 
 // @public
 type ShapeFill = "solid" | "hollow" | "dashed";
+
+declare namespace shapes {
+    export {
+        utcTime,
+        bbox,
+        reason,
+        BBoxValue
+    }
+}
 
 // @public (undocumented)
 function Sheet(input: React_2.ComponentProps<typeof Dialog_2.Root>): React_2.JSX.Element;
@@ -3062,6 +3374,17 @@ const TEST_BRAND: KitBrand;
 // @public (undocumented)
 function Textarea(input: React_2.ComponentProps<"textarea">): React_2.JSX.Element;
 
+// @public
+function TextField(props: TextFieldProps): JSX.Element;
+
+// @public (undocumented)
+interface TextFieldProps extends FieldBaseProps {
+    // (undocumented)
+    autoComplete?: string;
+    // (undocumented)
+    type?: "text" | "email" | "tel" | "url";
+}
+
 declare namespace theme {
     export {
         BRAND_ENV_PREFIX,
@@ -3134,6 +3457,12 @@ type TimeSource = (typeof TIME_SOURCES)[number];
 
 // @public (undocumented)
 const Toaster: (input: ToasterProps) => JSX.Element;
+
+// @public
+function toFieldName(path: string): string;
+
+// @public
+function toJsonPath(name: string): string;
 
 // @public (undocumented)
 interface Tokens {
@@ -3636,6 +3965,15 @@ function useFeaturePointer(map: Map_2 | null, layerId: string, onSelect: ((ident
 // @public
 function useFeed(opts: FeedOptions): LiveFeed;
 
+// @public
+function useFieldControl(): {
+    id: string;
+    "aria-describedby": string | undefined;
+    "aria-invalid": true | undefined;
+    "aria-required": true | undefined;
+    disabled: boolean | undefined;
+};
+
 // @public (undocumented)
 function useLang(): {
     lang: Lang;
@@ -3692,7 +4030,21 @@ function useTheme(): ThemeContextValue;
 function useViewport(): ViewportState;
 
 // @public
+function UTCDateTimeField(props: UTCDateTimeFieldProps): JSX.Element;
+
+// @public (undocumented)
+interface UTCDateTimeFieldProps extends FieldBaseProps {
+    seconds?: boolean;
+}
+
+// @public
 function utcMs(iso: string | null | undefined): number | null;
+
+// @public
+function utcTime(): z.ZodString;
+
+// @public
+function utcToInput(iso: string | null): string;
 
 // @public (undocumented)
 type Vars = Readonly<Record<string, string | number>>;
