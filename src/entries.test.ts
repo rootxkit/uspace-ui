@@ -24,6 +24,7 @@ const PLAN_KEYS = [
   "./map",
   "./api",
   "./auth/server",
+  "./auth/client",
   "./symbology",
   "./layers",
   "./legend",

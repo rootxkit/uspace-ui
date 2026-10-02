@@ -11,6 +11,7 @@ import {
   resetI18nCounters,
   useT,
 } from "../../src/i18n/index.js";
+import * as login from "../auth/LoginForm.stories.js";
 import * as typography from "../i18n/Typography.stories.js";
 import * as zones from "../zones/Zones.stories.js";
 import * as palettes from "./Palettes.stories.js";
@@ -23,6 +24,8 @@ const {
   HoverCardEnglish,
   HoverCardGeorgian,
 } = composeStories(zones);
+
+const { LoginEnglishLight, LoginGeorgianDark } = composeStories(login);
 
 // One element per line, so a reviewed diff reads line by line.
 const pretty = (html: string): string => `${html.replace(/></g, ">\n<")}\n`;
@@ -120,6 +123,18 @@ it("zone-card.en", async () => {
 it("zone-card.ka", async () => {
   await expect(await snapshotStable(HoverCardGeorgian)).toMatchFileSnapshot(
     "./__snapshots__/zone-card.ka.html",
+  );
+});
+
+it("login-form.en", async () => {
+  await expect(await snapshotStable(LoginEnglishLight)).toMatchFileSnapshot(
+    "./__snapshots__/login-form.en.html",
+  );
+});
+
+it("login-form.ka", async () => {
+  await expect(await snapshotStable(LoginGeorgianDark)).toMatchFileSnapshot(
+    "./__snapshots__/login-form.ka.html",
   );
 });
 
