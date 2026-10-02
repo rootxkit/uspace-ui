@@ -19,3 +19,6 @@ stories/golden/__snapshots__/
 # and what the tests generate from them (WP-4).
 src/api/test/systems/
 src/api/test/generated/
+# The lab's schema examples, copied unchanged at the commit in
+# src/live/test/fixtures/lab/LAB_COMMIT (WP-8; WP-14 re-pins them).
+src/live/test/fixtures/lab/
