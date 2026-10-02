@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import { extractSection } from "./release-notes.mjs";
@@ -43,5 +44,17 @@ describe("extractSection", () => {
 
   it("returns null for an empty section", () => {
     expect(extractSection("## 1.0.0\n\n## 0.9.0\n- x\n", "1.0.0")).toBeNull();
+  });
+
+  it("finds the section of the package version in the real CHANGELOG", () => {
+    const pkg = JSON.parse(readFileSync("package.json", "utf8")) as {
+      version: string;
+    };
+    const body = extractSection(
+      readFileSync("CHANGELOG.md", "utf8"),
+      pkg.version,
+    );
+    expect(body).not.toBeNull();
+    expect(body).not.toMatch(/^## /m);
   });
 });
