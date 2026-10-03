@@ -4,6 +4,24 @@
 // unmount. A layer reads the fields of a view model and emits expressions;
 // it never computes a position, a containment or an applicability.
 export {
+  ALERT_DASH,
+  ALERT_LAYER_ID,
+  ALERT_RING_RADIUS_PX,
+  ALERT_WIDTH_PX,
+  AlertLayer,
+  alertLayerIds,
+  resolveSeverityColours,
+  type AlertLayerIds,
+  type AlertLayerProps,
+} from "./AlertLayer.js";
+export {
+  AlertGaps,
+  alertFeatureCollection,
+  type AlertFeature,
+  type AlertFeatureCollection,
+  type AlertFeatureProperties,
+} from "./alertFeatures.js";
+export {
   countLayer,
   layerCounters,
   resetLayerCountersForTests,

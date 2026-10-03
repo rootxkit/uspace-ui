@@ -18,7 +18,19 @@ export type LayerCounter =
    */
   | "track_time_unordered"
   /** A trail point pushed out of its track's bounded ring (E-10). */
-  | "trail_point_evicted";
+  | "trail_point_evicted"
+  /**
+   * A proximity alert whose peer is not in the track map (WP-11): a ring
+   * is drawn on the party that is, never a line to a guessed position.
+   * Counted once per alert while the peer stays missing.
+   */
+  | "alert_peer_missing"
+  /**
+   * An alert none of whose aircraft is in the track map (WP-11): nothing
+   * can be drawn for it on the map; the list still shows it. Counted once
+   * per alert while it stays so.
+   */
+  | "alert_aircraft_missing";
 
 const counts: Record<LayerCounter, number> = {
   update_superseded: 0,
@@ -26,6 +38,8 @@ const counts: Record<LayerCounter, number> = {
   track_out_of_order: 0,
   track_time_unordered: 0,
   trail_point_evicted: 0,
+  alert_peer_missing: 0,
+  alert_aircraft_missing: 0,
 };
 
 export function countLayer(counter: LayerCounter): void {
