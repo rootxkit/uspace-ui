@@ -148,21 +148,32 @@ jobs:
       - name: pnpm pack, and check the tarball holds exactly `files`
         id: pack
         run: node scripts/pack-test.mjs --out "$RUNNER_TEMP/pack"
+      # Step outputs derive from package.json, which a pull request can
+      # change: they reach the shell through env, never through an expression
+      # interpolated into the script (retro-audit N5).
       - name: publint and attw on the packed tarball
+        env:
+          TARBALL: ${{ steps.pack.outputs.tarball }}
         run: |
-          pnpm exec publint run --strict "${{ steps.pack.outputs.tarball }}"
-          pnpm exec attw "${{ steps.pack.outputs.tarball }}" --profile esm-only --format table-flipped --exclude-entrypoints ./styles/tokens.css ./styles/map.css ./fonts/fonts.css ./package.json
+          pnpm exec publint run --strict "$TARBALL"
+          pnpm exec attw "$TARBALL" --profile esm-only --format table-flipped --exclude-entrypoints ./styles/tokens.css ./styles/map.css ./fonts/fonts.css ./package.json
       - name: Install by URL into a scratch consumer
-        run: node scripts/consumer-test.mjs "${{ steps.pack.outputs.tarball }}"
+        env:
+          TARBALL: ${{ steps.pack.outputs.tarball }}
+        run: node scripts/consumer-test.mjs "$TARBALL"
       - name: What a tag would release
+        env:
+          TARBALL: ${{ steps.pack.outputs.tarball }}
+          NAME: ${{ steps.pack.outputs.name }}
+          SHA256: ${{ steps.pack.outputs.sha256 }}
         run: |
-          files=$(tar -tzf "${{ steps.pack.outputs.tarball }}" | wc -l)
+          files=$(tar -tzf "$TARBALL" | wc -l)
           kind=release
           if [ "$(node scripts/release.mjs prerelease)" = true ]; then kind=pre-release; fi
           {
-            echo "Would release ${{ steps.pack.outputs.name }} ($files files) as a GitHub $kind on tag v$(node -p 'require("./package.json").version')"
+            echo "Would release $NAME ($files files) as a GitHub $kind on tag v$(node -p 'require("./package.json").version')"
             echo ""
-            echo "- sha256: \`${{ steps.pack.outputs.sha256 }}\`"
+            echo "- sha256: \`$SHA256\`"
             echo "- consumer dependency: \`\"@rootxkit/uspace-ui\": \"$(node scripts/release.mjs url)\"\`"
           } | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
