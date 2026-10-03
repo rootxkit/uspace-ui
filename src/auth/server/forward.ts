@@ -10,6 +10,7 @@
 // Nothing here logs: a request or answer body may hold a credential.
 import { NextResponse, type NextRequest } from "next/server.js";
 
+import { guardResponse } from "../../api/body.js";
 import { PROBLEM_TYPE_PREFIX } from "../../api/problem.js";
 import { isUnsafeMethod } from "../contract.js";
 import {
@@ -28,7 +29,10 @@ export interface ForwardOptions {
    * normalised pathname. Anchor them (`/^\/v1\/zones(\/|$)/`).
    */
   allowPaths: RegExp[];
-  /** How long the BFF waits for the API's answer headers. Configuration. */
+  /**
+   * How long the BFF waits for the API's answer headers, and then for each
+   * chunk of its body while one is being read. Configuration.
+   */
   timeoutMs: number;
   /** The fetch to use; the platform's by default. */
   fetch?: typeof fetch;
@@ -212,7 +216,10 @@ export type UpstreamResult =
 /**
  * One call to the API under the BFF's own timeout and controller, with
  * redirects not followed. A timeout is a 504 problem and a failure before
- * an answer a 502 problem, both counted.
+ * an answer a 502 problem, both counted. The answer's body stays under the
+ * same controller: a read that waits `timeoutMs` for its next chunk aborts
+ * the call, errors the body and is counted as a timeout, so a body that
+ * stalls after the headers never holds the route open (retro-audit S4).
  */
 export async function callUpstream(
   url: URL,
@@ -232,7 +239,20 @@ export async function callUpstream(
       redirect: "manual",
       signal: controller.signal,
     });
-    return { ok: true, response };
+    const guarded = guardResponse(response, {
+      signal: controller.signal,
+      idleMs: timeoutMs,
+      onIdle: () => {
+        countAuth("upstream_timeout");
+        const reason = new DOMException(
+          `no body chunk within ${timeoutMs} ms`,
+          "TimeoutError",
+        );
+        controller.abort(reason);
+        return reason;
+      },
+    });
+    return { ok: true, response: guarded ?? response };
   } catch {
     if (timedOut) {
       countAuth("upstream_timeout");

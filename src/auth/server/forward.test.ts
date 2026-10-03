@@ -395,3 +395,75 @@ describe("forward: upstream failures", () => {
     }
   });
 });
+
+describe("forward: a body that stalls after the headers (retro-audit S4)", () => {
+  // The API answers its headers and one chunk, then nothing; the body does
+  // not watch the signal, so only the BFF's own bound can end it.
+  function stalled(): { fetch: typeof fetch; signal: () => AbortSignal } {
+    let seen: AbortSignal | undefined;
+    const f = vi.fn((_url: RequestInfo | URL, init?: RequestInit) => {
+      seen = init?.signal ?? undefined;
+      return Promise.resolve(
+        new Response(
+          new ReadableStream<Uint8Array>({
+            start(ctrl) {
+              ctrl.enqueue(new TextEncoder().encode('{"features":['));
+            },
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        ),
+      );
+    });
+    return {
+      fetch: f as unknown as typeof fetch,
+      signal: () => {
+        if (seen === undefined) throw new Error("fetch was not called");
+        return seen;
+      },
+    };
+  }
+
+  it("errors the body after timeoutMs of silence, aborts upstream and counts it", async () => {
+    const up = stalled();
+    const res = await forward(
+      request("/_bff/api/v1/zones", { cookies: signedIn }),
+      target("/v1/zones"),
+      opts(up.fetch, { timeoutMs: 30 }),
+    );
+    expect(res.status).toBe(200);
+    const read = await res.text().then(
+      () => "read",
+      () => "errored",
+    );
+    expect(read).toBe("errored");
+    expect(up.signal().aborted).toBe(true);
+    expect(authCounters().upstream_timeout).toBe(1);
+  });
+
+  it("streams a slow body whose chunks each come within timeoutMs (the twin)", async () => {
+    const parts = ['{"a":', "1,", '"b":', "2}"];
+    const slow = stubFetch(
+      () =>
+        new Response(
+          new ReadableStream<Uint8Array>({
+            async start(ctrl) {
+              for (const p of parts) {
+                await new Promise((r) => setTimeout(r, 15));
+                ctrl.enqueue(new TextEncoder().encode(p));
+              }
+              ctrl.close();
+            },
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        ),
+    );
+    // 60 ms in all, more than timeoutMs, but never 40 ms of silence.
+    const res = await forward(
+      request("/_bff/api/v1/zones", { cookies: signedIn }),
+      target("/v1/zones"),
+      opts(slow.fetch, { timeoutMs: 40 }),
+    );
+    expect(await res.json()).toEqual({ a: 1, b: 2 });
+    expect(authCounters().upstream_timeout).toBe(0);
+  });
+});

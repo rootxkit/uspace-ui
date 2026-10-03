@@ -725,6 +725,26 @@ describe("login", () => {
     expect(res2.status).toBe(504);
   });
 
+  it("gives up on a sign-in answer whose body stalls after the headers (retro-audit S4)", async () => {
+    const stall = (() =>
+      Promise.resolve(
+        new Response(
+          new ReadableStream<Uint8Array>({
+            start(ctrl) {
+              ctrl.enqueue(new TextEncoder().encode('{"token":'));
+            },
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        ),
+      )) as typeof fetch;
+    const res = await handlers(stall, { timeoutMs: 30 }).login(
+      loginRequest(CREDENTIALS),
+    );
+    expect(res.status).toBe(502);
+    expect(res.headers.getSetCookie()).toEqual([]);
+    expect(authCounters().upstream_timeout).toBe(1);
+  });
+
   it("sends the API the client address its trusted proxy recorded, not the client's header", async () => {
     const chain = { "X-Forwarded-For": "203.0.113.66, 192.0.2.10" };
     const trusted = stubFetch(() => json(200, ISSUED));

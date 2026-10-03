@@ -15,6 +15,7 @@ import createFetchClient, {
 
 import type { Lang } from "../i18n/lang.js";
 
+import { guardResponse } from "./body.js";
 import { countApi, noteSunset } from "./counters.js";
 import { ApiError, retryAfterSOf } from "./error.js";
 import { parseProblem } from "./problem.js";
@@ -75,11 +76,31 @@ function kitMiddleware(opts: ClientOptions): Middleware {
   // One call per run of 401s: a page of ten requests that all find the
   // session gone asks for one re-login, not ten.
   let unauthorizedArmed = true;
-  // What ends a request's timeout once its answer, or its failure, is in.
-  const settle = new WeakMap<Request, () => void>();
+  // What ends a request's timeout once its answer, body included, or its
+  // failure is in, and the signal that timeout aborts. The deadline covers
+  // the body: fetch resolves on the headers, and a body that stalls after
+  // them must still fail (retro-audit S4).
+  const settle = new WeakMap<
+    Request,
+    { done: () => void; signal: AbortSignal }
+  >();
   const settled = (request: Request): void => {
-    settle.get(request)?.();
+    settle.get(request)?.done();
     settle.delete(request);
+  };
+  // `response` with its body under the request's deadline, settling it when
+  // the body ends; `null` (and settled now) when there is no body.
+  const guarded = (request: Request, response: Response): Response | null => {
+    const entry = settle.get(request);
+    const res =
+      entry === undefined
+        ? null
+        : guardResponse(response, {
+            signal: entry.signal,
+            onEnd: () => settled(request),
+          });
+    if (res === null) settled(request);
+    return res;
   };
 
   return {
@@ -104,9 +125,12 @@ function kitMiddleware(opts: ClientOptions): Middleware {
         );
       }, timeoutMs);
       const timed = new Request(request, { signal: controller.signal });
-      settle.set(timed, () => {
-        clearTimeout(timer);
-        request.signal.removeEventListener("abort", abort);
+      settle.set(timed, {
+        done: () => {
+          clearTimeout(timer);
+          request.signal.removeEventListener("abort", abort);
+        },
+        signal: controller.signal,
       });
       return timed;
     },
@@ -117,7 +141,8 @@ function kitMiddleware(opts: ClientOptions): Middleware {
     },
 
     async onResponse({ request, response, schemaPath }) {
-      settled(request);
+      const signal = settle.get(request)?.signal;
+      const body = guarded(request, response);
       const sunset = response.headers.get("Sunset");
       if (sunset !== null && noteSunset(sunset, schemaPath)) {
         console.warn(
@@ -126,7 +151,7 @@ function kitMiddleware(opts: ClientOptions): Middleware {
       }
       if (response.ok) {
         unauthorizedArmed = true;
-        return undefined;
+        return body ?? undefined;
       }
       if (response.status === 401) {
         countApi("unauthorized");
@@ -135,9 +160,14 @@ function kitMiddleware(opts: ClientOptions): Middleware {
           opts.onUnauthorized?.();
         }
       }
+      const problem = body === null ? null : await parseProblem(body);
+      // A problem body that stalled is the timeout, not a malformed problem.
+      if (signal?.aborted === true) throw signal.reason;
+      settled(request);
+      await body?.body?.cancel().catch(() => undefined);
       throw new ApiError({
         status: response.status,
-        problem: await parseProblem(response.clone()),
+        problem,
         retryAfterS: retryAfterSOf(response.headers.get("Retry-After"), now()),
         requestId: response.headers.get("X-Request-Id"),
         sunset,
