@@ -29,6 +29,20 @@ export {
 } from "./counters.js";
 export { HoverPortal } from "./HoverPortal.js";
 export {
+  INTENT_LABEL_SIZE_PX,
+  INTENT_LAYER_ID,
+  IntentCard,
+  IntentLayer,
+  intentFeatureCollection,
+  intentLabel,
+  intentLayerIds,
+  type IntentCardProps,
+  type IntentFeatureCollection,
+  type IntentInput,
+  type IntentLayerIds,
+  type IntentLayerProps,
+} from "./IntentLayer.js";
+export {
   MANNED_LAYER_ID,
   MannedLayer,
   mannedAge,
