@@ -134,6 +134,9 @@ const TOKENISH =
  * cannot be resolved, one with user info, a query parameter named like a
  * credential, a fragment, or another origin than the page's (M22: the
  * cookie on a same-origin upgrade is the only credential the kit sends).
+ * Without `page` there is no origin to compare with, so even an absolute
+ * URL is refused (`no_page`) rather than accepted unchecked (retro-audit
+ * N8).
  */
 export function resolveFeedUrl(
   url: string,
@@ -157,11 +160,10 @@ export function resolveFeedUrl(
     if (TOKENISH.test(key)) return { refused: "token_in_query" };
   }
   if (resolved.hash !== "") return { refused: "fragment" };
-  if (pageUrl !== null) {
-    const pageWs = pageUrl.protocol === "https:" ? "wss:" : "ws:";
-    if (resolved.host !== pageUrl.host || resolved.protocol !== pageWs)
-      return { refused: "cross_origin" };
-  }
+  if (pageUrl === null) return { refused: "no_page" };
+  const pageWs = pageUrl.protocol === "https:" ? "wss:" : "ws:";
+  if (resolved.host !== pageUrl.host || resolved.protocol !== pageWs)
+    return { refused: "cross_origin" };
   return { url: resolved.toString() };
 }
 
