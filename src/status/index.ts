@@ -13,6 +13,7 @@ export {
 export { FrozenOverlay, type FrozenOverlayProps } from "./FrozenOverlay.js";
 export {
   SourceStateBadge,
+  sourceDetailLines,
   sourceDisplayAgeS,
   type SourceInput,
   type SourceStateBadgeProps,
