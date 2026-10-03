@@ -60,8 +60,12 @@ export const FORWARDED_REQUEST_HEADERS: readonly string[] = [
 
 /**
  * Response headers never passed back: the hop-by-hop set (RFC 9110
- * §7.6.1), cookies (the BFF owns the browser's cookie jar), and the
- * encoding and length the platform's fetch has already undone.
+ * §7.6.1), cookies (the BFF owns the browser's cookie jar), the encoding
+ * and length the platform's fetch has already undone, and the headers
+ * that describe the API's own server rather than the answer (retro-audit
+ * S5). Every `Access-Control-*` header is dropped too (`downstreamHeaders`):
+ * one the API wrote for its own origin must not be replayed on the
+ * console's.
  */
 export const DROPPED_RESPONSE_HEADERS: readonly string[] = [
   "connection",
@@ -76,6 +80,9 @@ export const DROPPED_RESPONSE_HEADERS: readonly string[] = [
   "set-cookie",
   "content-encoding",
   "content-length",
+  "server",
+  "via",
+  "x-powered-by",
 ];
 
 /** An `application/problem+json` answer of the BFF itself (M28 shape). */
@@ -203,10 +210,30 @@ export async function redirectRefused(
   );
 }
 
-/** The API's headers minus the dropped set. */
+/**
+ * An absolute or scheme-relative URL reference (`http://api:8080/...`,
+ * `//api:8080/...`): it names a host, which is the API's internal one.
+ */
+function namesAHost(ref: string): boolean {
+  return /^[A-Za-z][A-Za-z0-9+.-]*:/.test(ref) || /^[\\/]{2}/.test(ref);
+}
+
+/**
+ * The API's headers minus the dropped set and every `Access-Control-*`
+ * header. A `Location` (a 201's, a 202's) passes only as a relative
+ * reference: an absolute one would hand the browser the API's internal
+ * address (retro-audit S5).
+ */
 export function downstreamHeaders(upstream: Response): Headers {
   const out = new Headers(upstream.headers);
   for (const name of DROPPED_RESPONSE_HEADERS) out.delete(name);
+  for (const name of [...out.keys()]) {
+    if (name.startsWith("access-control-")) out.delete(name);
+  }
+  const location = out.get("location");
+  if (location !== null && namesAHost(location.trim())) {
+    out.delete("location");
+  }
   return out;
 }
 

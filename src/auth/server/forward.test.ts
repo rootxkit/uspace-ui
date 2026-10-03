@@ -308,6 +308,76 @@ describe("forward: the API's answer", () => {
     expect(res.headers.get("x-request-id")).toBe("TEST-req-1");
   });
 
+  it("drops the API's absolute Location and server-identifying headers (retro-audit S5)", async () => {
+    for (const location of [
+      "http://api:8080/v1/zones/123",
+      "//api:8080/v1/zones/123",
+      "HTTPS://api.internal/v1/zones/123",
+      // Browsers read a backslash as a slash in a special URL.
+      "\\\\api:8080/v1/zones/123",
+      "/\\api:8080/v1/zones/123",
+    ]) {
+      const stub = stubFetch(
+        () =>
+          new Response("{}", {
+            status: 201,
+            headers: {
+              Location: location,
+              Server: "TEST-server/1.0",
+              Via: "1.1 TEST-proxy",
+              "X-Powered-By": "TEST-framework",
+              "Access-Control-Allow-Origin": "http://api:8080",
+              "Access-Control-Allow-Credentials": "true",
+              "Access-Control-Expose-Headers": "ETag",
+              ETag: '"v1"',
+            },
+          }),
+      );
+      const res = await forward(
+        request("/_bff/api/v1/zones", {
+          method: "POST",
+          cookies: signedIn,
+          headers: { "X-CSRF-Token": FIXTURE.csrf },
+        }),
+        target("/v1/zones"),
+        opts(stub.fetch),
+      );
+      expect(res.status).toBe(201);
+      for (const h of [
+        "location",
+        "server",
+        "via",
+        "x-powered-by",
+        "access-control-allow-origin",
+        "access-control-allow-credentials",
+        "access-control-expose-headers",
+      ]) {
+        expect(res.headers.get(h), `${location} ${h}`).toBeNull();
+      }
+      expect(res.headers.get("etag")).toBe('"v1"');
+    }
+  });
+
+  it("passes a relative Location on a 201 through (the twin)", async () => {
+    const stub = stubFetch(
+      () =>
+        new Response("{}", {
+          status: 201,
+          headers: { Location: "/v1/zones/123" },
+        }),
+    );
+    const res = await forward(
+      request("/_bff/api/v1/zones", {
+        method: "POST",
+        cookies: signedIn,
+        headers: { "X-CSRF-Token": FIXTURE.csrf },
+      }),
+      target("/v1/zones"),
+      opts(stub.fetch),
+    );
+    expect(res.headers.get("location")).toBe("/v1/zones/123");
+  });
+
   it("clears both cookies on a 401: the session is gone", async () => {
     const stub = stubFetch(() => problem(401, "unauthenticated"));
     const res = await forward(
