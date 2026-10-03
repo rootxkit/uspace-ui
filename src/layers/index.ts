@@ -27,6 +27,21 @@ export {
   resetLayerCountersForTests,
   type LayerCounter,
 } from "./counters.js";
+export { HoverPortal } from "./HoverPortal.js";
+export {
+  MANNED_LAYER_ID,
+  MannedLayer,
+  mannedAge,
+  mannedFeatureCollection,
+  mannedLabel,
+  mannedLayerIds,
+  putMannedIcons,
+  resolveMannedColours,
+  type MannedFeatureCollection,
+  type MannedFeatureOptions,
+  type MannedLayerIds,
+  type MannedLayerProps,
+} from "./MannedLayer.js";
 export {
   RESTRICTION_FILL_OPACITY,
   RESTRICTION_LAYER_ID,
