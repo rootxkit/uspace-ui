@@ -8,7 +8,8 @@
 //
 // This is the one file of `symbology` that uses `Math`: it draws shapes in
 // icon pixels. It never touches a position, a distance on the ground or a
-// bearing of an aircraft (WP-7 done-when).
+// bearing of an aircraft (WP-7 done-when). WP-12's manned icons are drawn
+// with its exported helpers, so `manned.ts` needs no `Math` of its own.
 import type { Trust } from "../model/index.js";
 import type { PatternImage } from "./zone.js";
 
@@ -82,7 +83,9 @@ const ARROW_HALF = 5;
 const SDF_RADIUS = 8;
 const SDF_CUTOFF = 0.25;
 
-type Pt = readonly [number, number];
+/** A point in icon pixels, origin at the icon's centre, y down. */
+export type IconPoint = readonly [number, number];
+type Pt = IconPoint;
 
 type Outline =
   { kind: "polygon"; points: readonly Pt[] } | { kind: "circle"; r: number };
@@ -151,13 +154,15 @@ export interface IconPart {
 
 const n2 = (v: number): string => String(Math.round(v * 100) / 100);
 
-function polygonPath(points: readonly Pt[]): string {
+/** An SVG path of a closed polygon in icon pixels (centre origin). */
+export function polygonPath(points: readonly Pt[]): string {
   return `${points
     .map(([x, y], i) => `${i === 0 ? "M" : "L"}${n2(C + x)} ${n2(C + y)}`)
     .join(" ")} Z`;
 }
 
-function circlePath(r: number): string {
+/** An SVG path of a circle of radius `r` icon pixels, centred. */
+export function circlePath(r: number): string {
   return `M${n2(C - r)} ${n2(C)} A${n2(r)} ${n2(r)} 0 1 0 ${n2(C + r)} ${n2(C)} A${n2(r)} ${n2(r)} 0 1 0 ${n2(C - r)} ${n2(C)} Z`;
 }
 
@@ -243,7 +248,7 @@ function segmentDistance(p: Pt, a: Pt, b: Pt): number {
 }
 
 /** Distance to the polygon's edge, negative inside (even-odd rule). */
-function sdPolygon(p: Pt, points: readonly Pt[]): number {
+export function sdPolygon(p: Pt, points: readonly Pt[]): number {
   let d = Infinity;
   let inside = false;
   for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
@@ -260,7 +265,8 @@ function sdPolygon(p: Pt, points: readonly Pt[]): number {
   return inside ? -d : d;
 }
 
-function sdCircle(p: Pt, r: number): number {
+/** Distance to a centred circle's edge, negative inside. */
+export function sdCircle(p: Pt, r: number): number {
   return Math.hypot(p[0], p[1]) - r;
 }
 
@@ -306,11 +312,20 @@ export function trackIconDistance(
  * distance to the shape's edge, 192 on the edge, more inside.
  */
 export function trackIconSdf(t: Trust, directional: boolean): PatternImage {
+  return sdfBitmap((p) => trackIconDistance(t, directional, p));
+}
+
+/**
+ * Any icon given as a signed distance (icon pixels, centre origin,
+ * negative inside) as an SDF bitmap of TRACK_ICON_PX square, in the
+ * encoding `trackIconSdf` uses. WP-12's manned icons are drawn with it.
+ */
+export function sdfBitmap(distance: (p: Pt) => number): PatternImage {
   const size = TRACK_ICON_PX;
   const data = new Uint8Array(size * size * 4);
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
-      const d = trackIconDistance(t, directional, [x + 0.5 - C, y + 0.5 - C]);
+      const d = distance([x + 0.5 - C, y + 0.5 - C]);
       const a = 255 - 255 * (d / SDF_RADIUS + SDF_CUTOFF);
       data[(y * size + x) * 4 + 3] = Math.max(0, Math.min(255, Math.round(a)));
     }
