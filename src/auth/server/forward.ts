@@ -10,6 +10,7 @@
 // Nothing here logs: a request or answer body may hold a credential.
 import { NextResponse, type NextRequest } from "next/server.js";
 
+import { guardResponse } from "../../api/body.js";
 import { PROBLEM_TYPE_PREFIX } from "../../api/problem.js";
 import { isUnsafeMethod } from "../contract.js";
 import {
@@ -28,7 +29,10 @@ export interface ForwardOptions {
    * normalised pathname. Anchor them (`/^\/v1\/zones(\/|$)/`).
    */
   allowPaths: RegExp[];
-  /** How long the BFF waits for the API's answer headers. Configuration. */
+  /**
+   * How long the BFF waits for the API's answer headers, and then for each
+   * chunk of its body while one is being read. Configuration.
+   */
   timeoutMs: number;
   /** The fetch to use; the platform's by default. */
   fetch?: typeof fetch;
@@ -56,8 +60,12 @@ export const FORWARDED_REQUEST_HEADERS: readonly string[] = [
 
 /**
  * Response headers never passed back: the hop-by-hop set (RFC 9110
- * §7.6.1), cookies (the BFF owns the browser's cookie jar), and the
- * encoding and length the platform's fetch has already undone.
+ * §7.6.1), cookies (the BFF owns the browser's cookie jar), the encoding
+ * and length the platform's fetch has already undone, and the headers
+ * that describe the API's own server rather than the answer (retro-audit
+ * S5). Every `Access-Control-*` header is dropped too (`downstreamHeaders`):
+ * one the API wrote for its own origin must not be replayed on the
+ * console's.
  */
 export const DROPPED_RESPONSE_HEADERS: readonly string[] = [
   "connection",
@@ -72,6 +80,9 @@ export const DROPPED_RESPONSE_HEADERS: readonly string[] = [
   "set-cookie",
   "content-encoding",
   "content-length",
+  "server",
+  "via",
+  "x-powered-by",
 ];
 
 /** An `application/problem+json` answer of the BFF itself (M28 shape). */
@@ -199,10 +210,30 @@ export async function redirectRefused(
   );
 }
 
-/** The API's headers minus the dropped set. */
+/**
+ * An absolute or scheme-relative URL reference (`http://api:8080/...`,
+ * `//api:8080/...`): it names a host, which is the API's internal one.
+ */
+function namesAHost(ref: string): boolean {
+  return /^[A-Za-z][A-Za-z0-9+.-]*:/.test(ref) || /^[\\/]{2}/.test(ref);
+}
+
+/**
+ * The API's headers minus the dropped set and every `Access-Control-*`
+ * header. A `Location` (a 201's, a 202's) passes only as a relative
+ * reference: an absolute one would hand the browser the API's internal
+ * address (retro-audit S5).
+ */
 export function downstreamHeaders(upstream: Response): Headers {
   const out = new Headers(upstream.headers);
   for (const name of DROPPED_RESPONSE_HEADERS) out.delete(name);
+  for (const name of [...out.keys()]) {
+    if (name.startsWith("access-control-")) out.delete(name);
+  }
+  const location = out.get("location");
+  if (location !== null && namesAHost(location.trim())) {
+    out.delete("location");
+  }
   return out;
 }
 
@@ -212,7 +243,10 @@ export type UpstreamResult =
 /**
  * One call to the API under the BFF's own timeout and controller, with
  * redirects not followed. A timeout is a 504 problem and a failure before
- * an answer a 502 problem, both counted.
+ * an answer a 502 problem, both counted. The answer's body stays under the
+ * same controller: a read that waits `timeoutMs` for its next chunk aborts
+ * the call, errors the body and is counted as a timeout, so a body that
+ * stalls after the headers never holds the route open (retro-audit S4).
  */
 export async function callUpstream(
   url: URL,
@@ -232,7 +266,20 @@ export async function callUpstream(
       redirect: "manual",
       signal: controller.signal,
     });
-    return { ok: true, response };
+    const guarded = guardResponse(response, {
+      signal: controller.signal,
+      idleMs: timeoutMs,
+      onIdle: () => {
+        countAuth("upstream_timeout");
+        const reason = new DOMException(
+          `no body chunk within ${timeoutMs} ms`,
+          "TimeoutError",
+        );
+        controller.abort(reason);
+        return reason;
+      },
+    });
+    return { ok: true, response: guarded ?? response };
   } catch {
     if (timedOut) {
       countAuth("upstream_timeout");
@@ -261,8 +308,35 @@ export async function callUpstream(
 }
 
 /**
+ * Whether every segment of `pathname` decodes to what the allow-list saw:
+ * no encoded `/` or `\`, no `.` or `..` however encoded, nothing that does
+ * not decode. The allow-list matches the raw pathname, so
+ * `/v1/zones/..%2F..%2Fadmin` would pass it, and what the API does with
+ * it depends on its router (retro-audit N7).
+ */
+export function isPlainPath(pathname: string): boolean {
+  for (const segment of pathname.split("/")) {
+    let decoded: string;
+    try {
+      decoded = decodeURIComponent(segment);
+    } catch {
+      return false;
+    }
+    if (
+      decoded === "." ||
+      decoded === ".." ||
+      decoded.includes("/") ||
+      decoded.includes("\\")
+    )
+      return false;
+  }
+  return true;
+}
+
+/**
  * Forwards `req` to `target` (docs/PLAN.md §3.16). Refusals happen before
- * any upstream call: a target path outside `allowPaths` is a 404 problem,
+ * any upstream call: a target path outside `allowPaths`, or one with an
+ * encoded slash or dot segment (`isPlainPath`), is a 404 problem,
  * an unsafe method without a matching CSRF pair a 403 problem. The answer
  * is the API's own status, body and headers (minus the dropped set); on a
  * 401 the BFF also clears both cookies (the session is gone).
@@ -272,7 +346,10 @@ export async function forward(
   target: URL,
   opts: ForwardOptions,
 ): Promise<Response> {
-  if (!opts.allowPaths.some((re) => re.test(target.pathname))) {
+  if (
+    !isPlainPath(target.pathname) ||
+    !opts.allowPaths.some((re) => re.test(target.pathname))
+  ) {
     countAuth("proxy_path_refused");
     return problemResponse(404, "not_found", "Not found");
   }

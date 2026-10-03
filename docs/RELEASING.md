@@ -45,9 +45,9 @@ prints the URL of the version in `package.json`.
    `git tag v0.1.0-rc.2 && git push origin v0.1.0-rc.2`. Agents do not
    tag.
 3. `release.yml` runs:
-   - `tag`: fails unless the tag is exactly `v<version>`, and unless
-     `CHANGELOG.md` has a non-empty section for the version. Nothing is
-     built before this passes.
+   - `tag`: fails unless the tagged commit is on `main`, unless the tag
+     is exactly `v<version>`, and unless `CHANGELOG.md` has a non-empty
+     section for the version. Nothing is built before this passes.
    - `checks`: every job of `ci.yml` on the tag, through
      `workflow_call`. That includes `pack`, which builds, runs
      `pnpm pack`, checks that the tarball holds exactly `files`, runs
@@ -68,6 +68,17 @@ A failed run releases nothing; fix on `main`, delete the tag, and tag
 again. Do not replace an asset of a published release: consumers'
 lockfiles pin its bytes, so a replaced asset breaks their installs, and
 it should.
+
+### Who may tag
+
+`release.yml` runs on any `v*` tag push, and the `tag` job only checks
+that the tagged commit is on `main`; it cannot tell who pushed the tag.
+The owner keeps a repository ruleset (Settings, Rules, Rulesets) that
+targets tags matching `refs/tags/v*`, restricts creation, update and
+deletion to the maintainers in its bypass list, and is active. Without
+it, any account with push rights can cut a release of a commit on
+`main`. Check it is still there before the first release after a change
+of collaborators.
 
 ## Proving the release path without releasing
 

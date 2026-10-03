@@ -75,8 +75,19 @@ export interface BffOptions {
   session: SessionCookieOptions;
   /** The API paths `proxy` may reach (see `forward`). */
   allowPaths: RegExp[];
-  /** See `ForwardOptions.trustedProxyHops`; the same for every call. */
+  /**
+   * See `ForwardOptions.trustedProxyHops`; the same for every call. With
+   * `session.secure`, this or `noTrustedProxy` is required.
+   */
   trustedProxyHops?: number;
+  /**
+   * Says that no reverse proxy in front of Next.js records the client:
+   * the API is sent no client address and sees the BFF's for every user,
+   * so it must not key sign-in lockout or rate limits by address alone.
+   * With `session.secure`, this or `trustedProxyHops` is required, so a
+   * production build cannot forget the proxy (retro-audit S6).
+   */
+  noTrustedProxy?: true;
   /** The upstream timeout of every call the handlers make. Configuration. */
   timeoutMs: number;
   /** The fetch to use; the platform's by default. */
@@ -300,14 +311,20 @@ function signedIn(
   if (Array.isArray(codes) && codes.every((c) => typeof c === "string")) {
     result.recoveryCodes = codes as string[];
   }
-  const res = noStoreJson(result);
-  // The cookie lives no longer than the session the API issued.
+  // The cookie lives no longer than the session the API issued. A session
+  // already over would set a cookie with Max-Age 0, which the browser
+  // drops, while the page was told signed_in: it is an invalid answer, as
+  // an expired challenge is (retro-audit N10).
   let maxAgeS = opts.session.maxAgeS;
   const expiresAt = answer["expires_at"];
   if (typeof expiresAt === "string") {
     const left = Math.floor((Date.parse(expiresAt) - Date.now()) / 1000);
-    if (Number.isFinite(left)) maxAgeS = Math.max(0, Math.min(maxAgeS, left));
+    if (Number.isFinite(left)) {
+      if (left <= 0) return invalidAnswer();
+      maxAgeS = Math.min(maxAgeS, left);
+    }
   }
+  const res = noStoreJson(result);
   const session = { ...opts.session, maxAgeS };
   setSession(res, token, session);
   issueCsrf(res, session);
@@ -341,10 +358,32 @@ function postJson(
   return { method: "POST", headers, body: JSON.stringify(body) };
 }
 
+/**
+ * Throws when a secure (production) build leaves the proxy unsaid, or
+ * says both. Unsaid behind a proxy, the API would see the BFF's address
+ * for every sign-in, and one attacker's failures would lock every user
+ * out together.
+ */
+function checkProxyDeclared(opts: BffOptions): void {
+  const hops = opts.trustedProxyHops !== undefined;
+  const none = opts.noTrustedProxy === true;
+  if (hops && none) {
+    throw new Error(
+      "bffHandlers: trustedProxyHops and noTrustedProxy contradict each other; set one",
+    );
+  }
+  if (opts.session.secure && !hops && !none) {
+    throw new Error(
+      "bffHandlers: a secure session needs trustedProxyHops (the reverse proxies in front of Next.js) or noTrustedProxy: true (none; the API then gets no client address)",
+    );
+  }
+}
+
 /** The three route handlers of `/_bff/*`. */
 export function bffHandlers(opts: BffOptions): BffHandlers {
   const base = new URL(opts.apiBase);
   checkTrustedProxyHops(opts.trustedProxyHops);
+  checkProxyDeclared(opts);
   if (opts.apiMfaPath !== undefined) {
     checkChallengeSecret(opts.mfaChallengeSecret);
   }

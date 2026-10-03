@@ -180,6 +180,44 @@ describe("forward: refusals before upstream", () => {
     expect(stub.calls[0]?.url).toBe(`${API}/v1/zones/TEST-Z1`);
   });
 
+  it("refuses an encoded slash or dot segment that the allow-list would match raw (retro-audit N7)", async () => {
+    for (const path of [
+      "/v1/zones/..%2F..%2Fadmin",
+      "/v1/zones/..%2fadmin",
+      "/v1/zones/x%5C..%5Cadmin",
+      "/v1/zones/%E0%A4%A",
+    ]) {
+      resetAuthCountersForTests();
+      const stub = stubFetch(() => json(200, {}));
+      const t = target(path);
+      // The raw pathname still matches the allow-list...
+      expect(
+        ALLOW.some((re) => re.test(t.pathname)),
+        path,
+      ).toBe(true);
+      const res = await forward(
+        request("/_bff/api/v1/zones", { cookies: signedIn }),
+        t,
+        opts(stub.fetch),
+      );
+      // ...and is refused anyway.
+      expect(res.status, path).toBe(404);
+      expect(stub.fn, path).not.toHaveBeenCalled();
+      expect(authCounters().proxy_path_refused, path).toBe(1);
+    }
+  });
+
+  it("forwards an identifier with other percent-encoding (the twin)", async () => {
+    const stub = stubFetch(() => json(200, {}));
+    const res = await forward(
+      request("/_bff/api/v1/zones", { cookies: signedIn }),
+      target("/v1/zones/GEO-TEST%200001"),
+      opts(stub.fetch),
+    );
+    expect(res.status).toBe(200);
+    expect(stub.calls[0]?.url).toBe(`${API}/v1/zones/GEO-TEST%200001`);
+  });
+
   it("refuses an unsafe method without the CSRF header with 403 and never calls upstream", async () => {
     const stub = stubFetch(() => json(200, {}));
     const req = request("/_bff/api/v1/zones", {
@@ -308,6 +346,76 @@ describe("forward: the API's answer", () => {
     expect(res.headers.get("x-request-id")).toBe("TEST-req-1");
   });
 
+  it("drops the API's absolute Location and server-identifying headers (retro-audit S5)", async () => {
+    for (const location of [
+      "http://api:8080/v1/zones/123",
+      "//api:8080/v1/zones/123",
+      "HTTPS://api.internal/v1/zones/123",
+      // Browsers read a backslash as a slash in a special URL.
+      "\\\\api:8080/v1/zones/123",
+      "/\\api:8080/v1/zones/123",
+    ]) {
+      const stub = stubFetch(
+        () =>
+          new Response("{}", {
+            status: 201,
+            headers: {
+              Location: location,
+              Server: "TEST-server/1.0",
+              Via: "1.1 TEST-proxy",
+              "X-Powered-By": "TEST-framework",
+              "Access-Control-Allow-Origin": "http://api:8080",
+              "Access-Control-Allow-Credentials": "true",
+              "Access-Control-Expose-Headers": "ETag",
+              ETag: '"v1"',
+            },
+          }),
+      );
+      const res = await forward(
+        request("/_bff/api/v1/zones", {
+          method: "POST",
+          cookies: signedIn,
+          headers: { "X-CSRF-Token": FIXTURE.csrf },
+        }),
+        target("/v1/zones"),
+        opts(stub.fetch),
+      );
+      expect(res.status).toBe(201);
+      for (const h of [
+        "location",
+        "server",
+        "via",
+        "x-powered-by",
+        "access-control-allow-origin",
+        "access-control-allow-credentials",
+        "access-control-expose-headers",
+      ]) {
+        expect(res.headers.get(h), `${location} ${h}`).toBeNull();
+      }
+      expect(res.headers.get("etag")).toBe('"v1"');
+    }
+  });
+
+  it("passes a relative Location on a 201 through (the twin)", async () => {
+    const stub = stubFetch(
+      () =>
+        new Response("{}", {
+          status: 201,
+          headers: { Location: "/v1/zones/123" },
+        }),
+    );
+    const res = await forward(
+      request("/_bff/api/v1/zones", {
+        method: "POST",
+        cookies: signedIn,
+        headers: { "X-CSRF-Token": FIXTURE.csrf },
+      }),
+      target("/v1/zones"),
+      opts(stub.fetch),
+    );
+    expect(res.headers.get("location")).toBe("/v1/zones/123");
+  });
+
   it("clears both cookies on a 401: the session is gone", async () => {
     const stub = stubFetch(() => problem(401, "unauthenticated"));
     const res = await forward(
@@ -393,5 +501,77 @@ describe("forward: upstream failures", () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+});
+
+describe("forward: a body that stalls after the headers (retro-audit S4)", () => {
+  // The API answers its headers and one chunk, then nothing; the body does
+  // not watch the signal, so only the BFF's own bound can end it.
+  function stalled(): { fetch: typeof fetch; signal: () => AbortSignal } {
+    let seen: AbortSignal | undefined;
+    const f = vi.fn((_url: RequestInfo | URL, init?: RequestInit) => {
+      seen = init?.signal ?? undefined;
+      return Promise.resolve(
+        new Response(
+          new ReadableStream<Uint8Array>({
+            start(ctrl) {
+              ctrl.enqueue(new TextEncoder().encode('{"features":['));
+            },
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        ),
+      );
+    });
+    return {
+      fetch: f as unknown as typeof fetch,
+      signal: () => {
+        if (seen === undefined) throw new Error("fetch was not called");
+        return seen;
+      },
+    };
+  }
+
+  it("errors the body after timeoutMs of silence, aborts upstream and counts it", async () => {
+    const up = stalled();
+    const res = await forward(
+      request("/_bff/api/v1/zones", { cookies: signedIn }),
+      target("/v1/zones"),
+      opts(up.fetch, { timeoutMs: 30 }),
+    );
+    expect(res.status).toBe(200);
+    const read = await res.text().then(
+      () => "read",
+      () => "errored",
+    );
+    expect(read).toBe("errored");
+    expect(up.signal().aborted).toBe(true);
+    expect(authCounters().upstream_timeout).toBe(1);
+  });
+
+  it("streams a slow body whose chunks each come within timeoutMs (the twin)", async () => {
+    const parts = ['{"a":', "1,", '"b":', "2}"];
+    const slow = stubFetch(
+      () =>
+        new Response(
+          new ReadableStream<Uint8Array>({
+            async start(ctrl) {
+              for (const p of parts) {
+                await new Promise((r) => setTimeout(r, 15));
+                ctrl.enqueue(new TextEncoder().encode(p));
+              }
+              ctrl.close();
+            },
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        ),
+    );
+    // 60 ms in all, more than timeoutMs, but never 40 ms of silence.
+    const res = await forward(
+      request("/_bff/api/v1/zones", { cookies: signedIn }),
+      target("/v1/zones"),
+      opts(slow.fetch, { timeoutMs: 40 }),
+    );
+    expect(await res.json()).toEqual({ a: 1, b: 2 });
+    expect(authCounters().upstream_timeout).toBe(0);
   });
 });

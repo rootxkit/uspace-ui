@@ -468,6 +468,85 @@ describe("createClient: timeout", () => {
   });
 });
 
+describe("createClient: timeout covers the body (retro-audit S4)", () => {
+  // Headers come back at once; the body sends one chunk and then nothing,
+  // and does not watch the request's signal, so only the client's own
+  // deadline can end the read.
+  function stalling(status: number, contentType: string): Stub {
+    return stub(
+      () =>
+        new Response(
+          new ReadableStream<Uint8Array>({
+            start(ctrl) {
+              ctrl.enqueue(new TextEncoder().encode('{"cis_'));
+            },
+          }),
+          { status, headers: { "Content-Type": contentType } },
+        ),
+    );
+  }
+
+  it("times out a 2xx whose body stalls after the headers", async () => {
+    const err = await client(stalling(200, "application/json"), {
+      timeoutMs: 30,
+    })
+      .GET("/v1/zones")
+      .then(
+        () => null,
+        (e: unknown) => e,
+      );
+    expect(err).toBeInstanceOf(DOMException);
+    expect((err as DOMException).name).toBe("TimeoutError");
+  });
+
+  it("times out an error answer whose problem body stalls", async () => {
+    const err = await client(stalling(503, PROBLEM), { timeoutMs: 30 })
+      .GET("/v1/zones")
+      .then(
+        () => null,
+        (e: unknown) => e,
+      );
+    expect(err).toBeInstanceOf(DOMException);
+    expect((err as DOMException).name).toBe("TimeoutError");
+  });
+
+  it("reads a body that arrives in pieces within timeoutMs, then clears its timer (the twin)", async () => {
+    const text = JSON.stringify(ZONES);
+    const s = stub(
+      () =>
+        new Response(
+          new ReadableStream<Uint8Array>({
+            async start(ctrl) {
+              for (const part of [text.slice(0, 10), text.slice(10)]) {
+                await new Promise((r) => setTimeout(r, 5));
+                ctrl.enqueue(new TextEncoder().encode(part));
+              }
+              ctrl.close();
+            },
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        ),
+    );
+    const { data } = await client(s, { timeoutMs: 1000 }).GET("/v1/zones");
+    expect(data?.cis_version).toBe(42);
+  });
+
+  it("keeps the timer until the body is read, and clears it after", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    try {
+      const s = stub(() => json(ZONES));
+      const { response } = await client(s, { timeoutMs: 20 }).GET("/v1/zones", {
+        parseAs: "stream",
+      });
+      expect(vi.getTimerCount()).toBe(1);
+      await response.text();
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
 describe("createClient: Sunset", () => {
   const SUNSET = "Thu, 01 Apr 2027 00:00:00 GMT";
 

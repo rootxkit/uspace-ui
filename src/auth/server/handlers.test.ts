@@ -56,6 +56,8 @@ function handlers(
     allowPaths: [/^\/v1\/zones(\/|$)/],
     timeoutMs: 1000,
     fetch: f,
+    // SESSION is secure, which needs one of the two said (retro-audit S6).
+    ...("trustedProxyHops" in extra ? {} : { noTrustedProxy: true as const }),
     ...extra,
   };
   const opts = Object.fromEntries(
@@ -455,6 +457,36 @@ describe("login", () => {
     );
   });
 
+  it("does not answer signed_in for a session that has already expired (retro-audit N10)", async () => {
+    for (const expires_at of [
+      new Date(Date.now() - 60 * 1000).toISOString(),
+      new Date(Date.now()).toISOString(),
+    ]) {
+      resetAuthCountersForTests();
+      const stub = stubFetch(() => json(200, { ...ISSUED, expires_at }));
+      const res = await handlers(stub.fetch).login(loginRequest(CREDENTIALS));
+      expect(res.status, expires_at).toBe(502);
+      expect(await res.json()).toMatchObject({
+        type: "https://schemas.uspace.ge/problems/upstream_invalid",
+      });
+      expect(res.headers.getSetCookie(), expires_at).toEqual([]);
+      expect(authCounters().login_answer_invalid).toBe(1);
+    }
+    // The same through the code step.
+    const second = stubFetch((url) =>
+      url.endsWith(LOGIN)
+        ? json(200, CHALLENGE)
+        : json(200, {
+            ...ISSUED,
+            expires_at: new Date(Date.now() - 1000).toISOString(),
+          }),
+    );
+    const h = handlers(second.fetch);
+    const res = await h.login(otpRequest(await passwordStep(h)));
+    expect(res.status).toBe(502);
+    expect(setCookies(res).has("uspace_session")).toBe(false);
+  });
+
   it("refuses a sign-in without Origin, or from another origin, and never calls the API", async () => {
     const stub = stubFetch(() => json(200, ISSUED));
     const h = handlers(stub.fetch);
@@ -725,6 +757,26 @@ describe("login", () => {
     expect(res2.status).toBe(504);
   });
 
+  it("gives up on a sign-in answer whose body stalls after the headers (retro-audit S4)", async () => {
+    const stall = (() =>
+      Promise.resolve(
+        new Response(
+          new ReadableStream<Uint8Array>({
+            start(ctrl) {
+              ctrl.enqueue(new TextEncoder().encode('{"token":'));
+            },
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        ),
+      )) as typeof fetch;
+    const res = await handlers(stall, { timeoutMs: 30 }).login(
+      loginRequest(CREDENTIALS),
+    );
+    expect(res.status).toBe(502);
+    expect(res.headers.getSetCookie()).toEqual([]);
+    expect(authCounters().upstream_timeout).toBe(1);
+  });
+
   it("sends the API the client address its trusted proxy recorded, not the client's header", async () => {
     const chain = { "X-Forwarded-For": "203.0.113.66, 192.0.2.10" };
     const trusted = stubFetch(() => json(200, ISSUED));
@@ -743,6 +795,43 @@ describe("login", () => {
     const f = stubFetch(() => json(200, {})).fetch;
     expect(() => handlers(f, { trustedProxyHops: 0 })).toThrow(RangeError);
     expect(() => handlers(f, { trustedProxyHops: 1 })).not.toThrow();
+  });
+
+  it("refuses a secure build that says nothing about proxies (retro-audit S6)", () => {
+    const f = stubFetch(() => json(200, {})).fetch;
+    const base: BffOptions = {
+      apiBase: API,
+      apiLoginPath: LOGIN,
+      session: { secure: true, maxAgeS: 3600 },
+      allowPaths: [],
+      timeoutMs: 1000,
+      fetch: f,
+    };
+    // Behind an unconfigured proxy the API would see one address for every
+    // user, so its per-address lockout would lock them all out together.
+    expect(() => bffHandlers(base)).toThrow(/trustedProxyHops/);
+    // Both at once contradict each other.
+    expect(() =>
+      bffHandlers({ ...base, trustedProxyHops: 1, noTrustedProxy: true }),
+    ).toThrow(/trustedProxyHops/);
+    // The acceptances: either one said, or a plain-HTTP development build.
+    expect(() => bffHandlers({ ...base, trustedProxyHops: 1 })).not.toThrow();
+    expect(() => bffHandlers({ ...base, noTrustedProxy: true })).not.toThrow();
+    expect(() =>
+      bffHandlers({ ...base, session: { secure: false, maxAgeS: 3600 } }),
+    ).not.toThrow();
+  });
+
+  it("with noTrustedProxy sends the API no X-Forwarded-For, whatever the client wrote", async () => {
+    const stub = stubFetch(() => json(200, ISSUED));
+    await handlers(stub.fetch, { noTrustedProxy: true }).login(
+      loginRequest(CREDENTIALS, {
+        Origin: ORIGIN,
+        Host: HOST,
+        "X-Forwarded-For": "203.0.113.66",
+      }),
+    );
+    expect(stub.calls[0]?.headers.get("x-forwarded-for")).toBeNull();
   });
 
   it("never writes the credentials, the challenge or the token to any log", async () => {

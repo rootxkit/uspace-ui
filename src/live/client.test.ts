@@ -365,12 +365,30 @@ describe("the URL: same origin, the cookie, no token (M22)", () => {
     expect(resolveFeedUrl("/ws", undefined)).toEqual({
       refused: "unresolvable",
     });
+    // Without a page there is no origin to hold an absolute URL to: refused
+    // rather than accepted unchecked (retro-audit N8).
     expect(resolveFeedUrl("wss://a.example.test/ws", undefined)).toEqual({
-      url: "wss://a.example.test/ws",
+      refused: "no_page",
     });
     expect(resolveFeedUrl("ws://console.example.test/ws", PAGE)).toEqual({
       refused: "cross_origin",
     });
+  });
+
+  it("refuses an absolute URL when the page URL is unknown, and opens no socket (retro-audit N8)", () => {
+    vi.stubGlobal("location", undefined);
+    const { client: c } = start({ url: WS_URL });
+    expect(server.sockets.length).toBe(0);
+    expect(liveCounters().url_refused).toBe(1);
+    expect(c.getStatus().connection).toBe("down");
+  });
+
+  it("opens the same absolute URL once the page is known (the twin)", () => {
+    const { client: c } = start({ url: WS_URL });
+    expect(server.sockets.length).toBe(1);
+    expect(server.urls).toEqual([WS_URL]);
+    expect(liveCounters().url_refused).toBe(0);
+    expect(c.getStatus().connection).toBe("connecting");
   });
 
   it("a URL function that rejects, and a constructor that throws, are retried", async () => {
