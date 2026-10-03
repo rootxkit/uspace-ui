@@ -311,14 +311,20 @@ function signedIn(
   if (Array.isArray(codes) && codes.every((c) => typeof c === "string")) {
     result.recoveryCodes = codes as string[];
   }
-  const res = noStoreJson(result);
-  // The cookie lives no longer than the session the API issued.
+  // The cookie lives no longer than the session the API issued. A session
+  // already over would set a cookie with Max-Age 0, which the browser
+  // drops, while the page was told signed_in: it is an invalid answer, as
+  // an expired challenge is (retro-audit N10).
   let maxAgeS = opts.session.maxAgeS;
   const expiresAt = answer["expires_at"];
   if (typeof expiresAt === "string") {
     const left = Math.floor((Date.parse(expiresAt) - Date.now()) / 1000);
-    if (Number.isFinite(left)) maxAgeS = Math.max(0, Math.min(maxAgeS, left));
+    if (Number.isFinite(left)) {
+      if (left <= 0) return invalidAnswer();
+      maxAgeS = Math.min(maxAgeS, left);
+    }
   }
+  const res = noStoreJson(result);
   const session = { ...opts.session, maxAgeS };
   setSession(res, token, session);
   issueCsrf(res, session);

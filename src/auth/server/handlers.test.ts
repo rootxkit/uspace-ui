@@ -457,6 +457,36 @@ describe("login", () => {
     );
   });
 
+  it("does not answer signed_in for a session that has already expired (retro-audit N10)", async () => {
+    for (const expires_at of [
+      new Date(Date.now() - 60 * 1000).toISOString(),
+      new Date(Date.now()).toISOString(),
+    ]) {
+      resetAuthCountersForTests();
+      const stub = stubFetch(() => json(200, { ...ISSUED, expires_at }));
+      const res = await handlers(stub.fetch).login(loginRequest(CREDENTIALS));
+      expect(res.status, expires_at).toBe(502);
+      expect(await res.json()).toMatchObject({
+        type: "https://schemas.uspace.ge/problems/upstream_invalid",
+      });
+      expect(res.headers.getSetCookie(), expires_at).toEqual([]);
+      expect(authCounters().login_answer_invalid).toBe(1);
+    }
+    // The same through the code step.
+    const second = stubFetch((url) =>
+      url.endsWith(LOGIN)
+        ? json(200, CHALLENGE)
+        : json(200, {
+            ...ISSUED,
+            expires_at: new Date(Date.now() - 1000).toISOString(),
+          }),
+    );
+    const h = handlers(second.fetch);
+    const res = await h.login(otpRequest(await passwordStep(h)));
+    expect(res.status).toBe(502);
+    expect(setCookies(res).has("uspace_session")).toBe(false);
+  });
+
   it("refuses a sign-in without Origin, or from another origin, and never calls the API", async () => {
     const stub = stubFetch(() => json(200, ISSUED));
     const h = handlers(stub.fetch);
