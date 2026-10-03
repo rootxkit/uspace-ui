@@ -308,8 +308,35 @@ export async function callUpstream(
 }
 
 /**
+ * Whether every segment of `pathname` decodes to what the allow-list saw:
+ * no encoded `/` or `\`, no `.` or `..` however encoded, nothing that does
+ * not decode. The allow-list matches the raw pathname, so
+ * `/v1/zones/..%2F..%2Fadmin` would pass it, and what the API does with
+ * it depends on its router (retro-audit N7).
+ */
+export function isPlainPath(pathname: string): boolean {
+  for (const segment of pathname.split("/")) {
+    let decoded: string;
+    try {
+      decoded = decodeURIComponent(segment);
+    } catch {
+      return false;
+    }
+    if (
+      decoded === "." ||
+      decoded === ".." ||
+      decoded.includes("/") ||
+      decoded.includes("\\")
+    )
+      return false;
+  }
+  return true;
+}
+
+/**
  * Forwards `req` to `target` (docs/PLAN.md §3.16). Refusals happen before
- * any upstream call: a target path outside `allowPaths` is a 404 problem,
+ * any upstream call: a target path outside `allowPaths`, or one with an
+ * encoded slash or dot segment (`isPlainPath`), is a 404 problem,
  * an unsafe method without a matching CSRF pair a 403 problem. The answer
  * is the API's own status, body and headers (minus the dropped set); on a
  * 401 the BFF also clears both cookies (the session is gone).
@@ -319,7 +346,10 @@ export async function forward(
   target: URL,
   opts: ForwardOptions,
 ): Promise<Response> {
-  if (!opts.allowPaths.some((re) => re.test(target.pathname))) {
+  if (
+    !isPlainPath(target.pathname) ||
+    !opts.allowPaths.some((re) => re.test(target.pathname))
+  ) {
     countAuth("proxy_path_refused");
     return problemResponse(404, "not_found", "Not found");
   }

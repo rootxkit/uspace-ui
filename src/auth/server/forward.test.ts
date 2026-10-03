@@ -180,6 +180,44 @@ describe("forward: refusals before upstream", () => {
     expect(stub.calls[0]?.url).toBe(`${API}/v1/zones/TEST-Z1`);
   });
 
+  it("refuses an encoded slash or dot segment that the allow-list would match raw (retro-audit N7)", async () => {
+    for (const path of [
+      "/v1/zones/..%2F..%2Fadmin",
+      "/v1/zones/..%2fadmin",
+      "/v1/zones/x%5C..%5Cadmin",
+      "/v1/zones/%E0%A4%A",
+    ]) {
+      resetAuthCountersForTests();
+      const stub = stubFetch(() => json(200, {}));
+      const t = target(path);
+      // The raw pathname still matches the allow-list...
+      expect(
+        ALLOW.some((re) => re.test(t.pathname)),
+        path,
+      ).toBe(true);
+      const res = await forward(
+        request("/_bff/api/v1/zones", { cookies: signedIn }),
+        t,
+        opts(stub.fetch),
+      );
+      // ...and is refused anyway.
+      expect(res.status, path).toBe(404);
+      expect(stub.fn, path).not.toHaveBeenCalled();
+      expect(authCounters().proxy_path_refused, path).toBe(1);
+    }
+  });
+
+  it("forwards an identifier with other percent-encoding (the twin)", async () => {
+    const stub = stubFetch(() => json(200, {}));
+    const res = await forward(
+      request("/_bff/api/v1/zones", { cookies: signedIn }),
+      target("/v1/zones/GEO-TEST%200001"),
+      opts(stub.fetch),
+    );
+    expect(res.status).toBe(200);
+    expect(stub.calls[0]?.url).toBe(`${API}/v1/zones/GEO-TEST%200001`);
+  });
+
   it("refuses an unsafe method without the CSRF header with 403 and never calls upstream", async () => {
     const stub = stubFetch(() => json(200, {}));
     const req = request("/_bff/api/v1/zones", {
