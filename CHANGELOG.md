@@ -7,7 +7,12 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
-Nothing yet.
+- `alerts` (WP-11): `AlertList`, `AlertSummary` / `alertSummary` (one
+  line per alert and violation kind, `ka` and `en`), `AlertToaster` with
+  the gesture-gated repeating tone (`useAlertTone(active, repeatMs)`; the
+  period is required, no default) and `SeverityMark`; `layers` gains
+  `AlertLayer` and the counters `alert_peer_missing`,
+  `alert_aircraft_missing`. The `alerts` stub marker `ENTRY` is gone.
 
 ## 0.1.0-rc.1
 

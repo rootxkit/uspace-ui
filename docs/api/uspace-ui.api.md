@@ -118,13 +118,67 @@ function AgeSwatch(props: {
 function ageToken(b: AgeBucket): string;
 
 // @public (undocumented)
+const ALERT_DASH: [number, number];
+
+// @public
+const ALERT_KIND_KEYS: Readonly<Record<AlertKind | ViolationKind, Key>>;
+
+// @public (undocumented)
 const ALERT_KINDS: readonly ["proximity", "nonconformance", "nonconformance_nearby", "height_exceedance", "zone_incursion", "lost_link", "restriction_activated", "emergency_nearby"];
+
+// @public
+const ALERT_LAYER_ID = "us-alerts";
+
+// @public (undocumented)
+const ALERT_RING_RADIUS_PX = 20;
+
+// @public (undocumented)
+const ALERT_STATE_KEYS: Readonly<Record<AlertState, Key>>;
 
 // @public (undocumented)
 const ALERT_STATES: readonly ["raised", "updated", "cleared"];
 
 // @public (undocumented)
 const ALERT_STORE_LIMIT = 500;
+
+// @public
+const ALERT_SUMMARY_KEYS: Readonly<Record<AlertKind | ViolationKind, Key>>;
+
+// @public (undocumented)
+const ALERT_WIDTH_PX: Readonly<Record<Severity, number>>;
+
+// @public
+interface AlertChange {
+    // (undocumented)
+    alert: AlertView;
+    change: "new" | "rose";
+}
+
+// @public
+function alertChanges(seen: ReadonlyMap<string, Seen>, alerts: readonly AlertView[]): {
+    seen: Map<string, Seen>;
+    changes: AlertChange[];
+};
+
+// @public (undocumented)
+type AlertCounter =
+/**
+* A second entry under one `alertId` in one `alerts` list: the later
+* one is shown, the earlier one is dropped (C-06: a raise replaces).
+*/
+"alert_duplicate_id"
+/** No Web Audio in this browser, or it refused to start. */
+| "tone_unavailable"
+/** A tone that failed to play on a started audio context. */
+| "tone_failed"
+/**
+* A `repeatMs` that is not a positive finite number: the tone sounds
+* once and does not repeat, and the period shows as a dash.
+*/
+| "tone_repeat_invalid";
+
+// @public
+function alertCounters(): Readonly<Record<AlertCounter, number>>;
 
 // @public (undocumented)
 function AlertDialog(input: React_2.ComponentProps<typeof AlertDialog_2.Root>): React_2.JSX.Element;
@@ -164,15 +218,139 @@ function AlertDialogTitle(input: React_2.ComponentProps<typeof AlertDialog_2.Tit
 // @public (undocumented)
 function AlertDialogTrigger(input: React_2.ComponentProps<typeof AlertDialog_2.Trigger>): React_2.JSX.Element;
 
+// @public (undocumented)
+type AlertFeature = GeoJSON_2.Feature<GeoJSON_2.LineString | GeoJSON_2.Point, AlertFeatureProperties>;
+
+// @public (undocumented)
+type AlertFeatureCollection = GeoJSON_2.FeatureCollection<GeoJSON_2.LineString | GeoJSON_2.Point, AlertFeatureProperties>;
+
+// @public (undocumented)
+function alertFeatureCollection(alerts: Iterable<AlertView>, tracks: ReadonlyMap<string, TrackView>, gaps: AlertGaps): AlertFeatureCollection;
+
+// @public (undocumented)
+interface AlertFeatureProperties {
+    // (undocumented)
+    alertId: string;
+    dashed: boolean;
+    // (undocumented)
+    kind: AlertView["kind"];
+    // (undocumented)
+    severity: Severity;
+    trackId?: string;
+}
+
+// @public
+class AlertGaps {
+    // (undocumented)
+    readonly aircraft: Set<string>;
+    keep(ids: ReadonlySet<string>): void;
+    // (undocumented)
+    note(set: Set<string>, id: string, missing: boolean): void;
+    // (undocumented)
+    readonly peer: Set<string>;
+}
+
 // @public
 type AlertInput = Omit<AlertView, "receivedAtMs" | "acknowledged">;
 
 // @public (undocumented)
 type AlertKind = (typeof ALERT_KINDS)[number];
 
+// @public (undocumented)
+function AlertLayer(props: AlertLayerProps): null;
+
+// @public (undocumented)
+interface AlertLayerIds {
+    // (undocumented)
+    line: string;
+    // (undocumented)
+    lineDashed: string;
+    // (undocumented)
+    ring: string;
+    // (undocumented)
+    source: string;
+}
+
+// @public (undocumented)
+function alertLayerIds(id: string): AlertLayerIds;
+
+// @public (undocumented)
+interface AlertLayerProps {
+    alerts: Iterable<AlertView>;
+    id?: string;
+    tracks: ReadonlyMap<string, TrackView>;
+    visible?: boolean;
+}
+
+// @public (undocumented)
+function AlertList(props: AlertListProps): JSX.Element;
+
+// @public (undocumented)
+interface AlertListProps {
+    alerts: readonly AlertView[];
+    canAcknowledge: boolean;
+    // (undocumented)
+    className?: string;
+    nowMs: number;
+    onAcknowledge?(a: AlertView): void;
+    onSelect?(a: AlertView): void;
+    tracks?: ReadonlyMap<string, TrackView>;
+}
+
+// @public
+interface AlertPeer {
+    // (undocumented)
+    trackId: string | null;
+    // (undocumented)
+    trust: string | null;
+}
+
+// @public
+function alertPeer(alert: AlertView): AlertPeer;
+
 declare namespace alerts {
     export {
-        ENTRY
+        AlertList,
+        AlertListProps,
+        AlertToaster,
+        TOAST_HOLD_MS,
+        TOAST_LIMIT,
+        AlertToasterProps,
+        alertChanges,
+        soundingAlerts,
+        sortAlerts,
+        uniqueById,
+        AlertChange,
+        Seen,
+        alertCounters,
+        resetAlertCountersForTests,
+        AlertCounter,
+        SeverityMark,
+        SeverityMarkProps,
+        AlertSummary,
+        alertPeer,
+        alertSummary,
+        detailFlag,
+        isKnownKind,
+        kindName,
+        detailNumber,
+        detailString,
+        detailStrings,
+        AlertPeer,
+        AlertSummaryProps,
+        TONE_GAIN,
+        TONE_HZ,
+        TONE_S,
+        playTone,
+        useAlertTone,
+        validRepeatMs,
+        AlertTone,
+        AlertToneState,
+        ALERT_KIND_KEYS,
+        ALERT_STATE_KEYS,
+        ALERT_SUMMARY_KEYS,
+        CLEAR_REASON_KEYS,
+        NONCONFORMANCE_REASON_KEYS
     }
 }
 
@@ -211,6 +389,50 @@ interface AlertStoreOptions {
     maxAlerts?: number;
     now?: () => number;
 }
+
+// @public
+function AlertSummary(props: AlertSummaryProps): string;
+
+// @public
+function alertSummary(alert: AlertView, t: Translate, lang: Lang): string;
+
+// @public (undocumented)
+interface AlertSummaryProps {
+    // (undocumented)
+    alert: AlertView;
+    catalogues?: Catalogues;
+    // (undocumented)
+    lang: Lang;
+}
+
+// @public (undocumented)
+function AlertToaster(props: AlertToasterProps): JSX.Element;
+
+// @public (undocumented)
+interface AlertToasterProps {
+    alerts: readonly AlertView[];
+    // (undocumented)
+    className?: string;
+    critical?: {
+        tone: boolean;
+        repeatMs: number;
+    };
+}
+
+// @public (undocumented)
+interface AlertTone {
+    enable(): void;
+    // (undocumented)
+    mute(): void;
+    sounding: boolean;
+    // (undocumented)
+    state: AlertToneState;
+    // (undocumented)
+    unmute(): void;
+}
+
+// @public
+type AlertToneState = "needs_gesture" | "on" | "muted" | "unavailable";
 
 // @public (undocumented)
 interface AlertView {
@@ -650,6 +872,9 @@ function CheckboxField(props: FieldBaseProps): JSX.Element;
 function checkCsrf(req: NextRequest, opts?: Pick<SessionCookieOptions, "csrfName">): boolean;
 
 // @public (undocumented)
+const CLEAR_REASON_KEYS: Readonly<Record<ClearReason, Key>>;
+
+// @public (undocumented)
 const CLEAR_REASONS: readonly ["resolved", "stale", "source_disabled", "flight_ended", "acknowledged_timeout", "landed"];
 
 // @public (undocumented)
@@ -986,6 +1211,20 @@ interface DegradedBannerProps {
 // @public
 function degradedLabel(slug: string, t: Translate): string;
 
+// Warning: (ae-forgotten-export) The symbol "Detail" needs to be exported by the entry point entry.d.ts
+//
+// @public
+function detailFlag(d: Detail, key: string): boolean | null;
+
+// @public
+function detailNumber(d: Detail, ...keys: string[]): number | null;
+
+// @public
+function detailString(d: Detail, ...keys: string[]): string | null;
+
+// @public
+function detailStrings(d: Detail, key: string): string[];
+
 // @public (undocumented)
 function Dialog(input: React_2.ComponentProps<typeof Dialog_2.Root>): React_2.JSX.Element;
 
@@ -1105,9 +1344,6 @@ interface EmptyStateProps {
 
 // @public (undocumented)
 const en: Readonly<Record<Key, string>>;
-
-// @public (undocumented)
-const ENTRY = "alerts";
 
 // @public
 function EnumField<E extends string>(props: EnumFieldProps<E>): JSX.Element;
@@ -1858,6 +2094,9 @@ const isIdentReason: (x: unknown) => x is "matched" | "session_binding" | "uas_s
 const isIdentStatus: (x: unknown) => x is "registered" | "suspended" | "unknown_operator" | "unidentified";
 
 // @public
+function isKnownKind(kind: string): kind is AlertView["kind"];
+
+// @public
 function isPiiColumn(id: string): boolean;
 
 // @public (undocumented)
@@ -1914,6 +2153,9 @@ type Key = keyof typeof catalogue;
 type KeyOf<Row, V> = {
     [K in keyof Row]-?: Row[K] extends V ? K : never;
 }[keyof Row] & string;
+
+// @public
+function kindName(t: Translate, kind: string): string;
 
 // @public (undocumented)
 const KIT_CATALOGUES: Readonly<Record<Lang, Catalogue>>;
@@ -1998,7 +2240,19 @@ type LayerCounter =
 */
 | "track_time_unordered"
 /** A trail point pushed out of its track's bounded ring (E-10). */
-| "trail_point_evicted";
+| "trail_point_evicted"
+/**
+* A proximity alert whose peer is not in the track map (WP-11): a ring
+* is drawn on the party that is, never a line to a guessed position.
+* Counted once per alert while the peer stays missing.
+*/
+| "alert_peer_missing"
+/**
+* An alert none of whose aircraft is in the track map (WP-11): nothing
+* can be drawn for it on the map; the list still shows it. Counted once
+* per alert while it stays so.
+*/
+| "alert_aircraft_missing";
 
 // @public
 function layerCounters(): Readonly<Record<LayerCounter, number>>;
@@ -2017,6 +2271,20 @@ interface LayerPanelProps {
 
 declare namespace layers {
     export {
+        ALERT_DASH,
+        ALERT_LAYER_ID,
+        ALERT_RING_RADIUS_PX,
+        ALERT_WIDTH_PX,
+        AlertLayer,
+        alertLayerIds,
+        resolveSeverityColours,
+        AlertLayerIds,
+        AlertLayerProps,
+        AlertGaps,
+        alertFeatureCollection,
+        AlertFeature,
+        AlertFeatureCollection,
+        AlertFeatureProperties,
         countLayer,
         layerCounters,
         resetLayerCountersForTests,
@@ -2540,6 +2808,9 @@ function nextGridPos(k: GridKey, pos: GridPos, size: GridSize, pageStep?: number
 const NO_EXTRAS: StatusExtras;
 
 // @public
+const NONCONFORMANCE_REASON_KEYS: Readonly<Record<string, Key>>;
+
+// @public
 const notoSans: NextFontWithVariable;
 
 // @public
@@ -2627,6 +2898,9 @@ interface PatternImage {
 
 // @public
 const PII_FILTER_DENY_LIST: readonly string[];
+
+// @public
+function playTone(ctx: AudioContext): void;
 
 // @public
 const plugin: ESLint.Plugin;
@@ -2800,6 +3074,9 @@ interface RequireRoleProps {
 }
 
 // @public
+function resetAlertCountersForTests(): void;
+
+// @public
 function resetApiCountersForTests(): void;
 
 // @public
@@ -2835,6 +3112,9 @@ function resolveFeedUrl(url: string, page: string | undefined): {
 } | {
     refused: string;
 };
+
+// @public
+function resolveSeverityColours(map: Map_2): Record<Severity, string>;
 
 // @public
 function resolveTrackColours(map: Map_2): TrackColours;
@@ -2942,6 +3222,14 @@ function ScrollArea(input: React_2.ComponentProps<typeof ScrollArea_2.Root>): Re
 
 // @public (undocumented)
 function ScrollBar(input: React_2.ComponentProps<typeof ScrollArea_2.ScrollAreaScrollbar>): React_2.JSX.Element;
+
+// @public
+interface Seen {
+    // (undocumented)
+    severity: Severity;
+    // (undocumented)
+    state: AlertState;
+}
 
 // @public (undocumented)
 function Select(input: React_2.ComponentProps<typeof Select_2.Root>): React_2.JSX.Element;
@@ -3087,6 +3375,17 @@ interface SeverityLegendProps {
 }
 
 // @public (undocumented)
+function SeverityMark(props: SeverityMarkProps): JSX.Element;
+
+// @public (undocumented)
+interface SeverityMarkProps {
+    // (undocumented)
+    className?: string;
+    // (undocumented)
+    severity: Severity;
+}
+
+// @public (undocumented)
 function severityOrder(): readonly Severity[];
 
 // @public
@@ -3165,6 +3464,12 @@ interface SnapshotTarget<I> {
         replace(items: readonly I[]): void;
     };
 }
+
+// @public
+function sortAlerts(alerts: readonly AlertView[]): AlertView[];
+
+// @public
+function soundingAlerts(alerts: readonly AlertView[]): AlertView[];
 
 // @public
 const SOURCE_INFO_TIMEOUT_MS = 5000;
@@ -3720,6 +4025,12 @@ interface Times {
 // @public (undocumented)
 type TimeSource = (typeof TIME_SOURCES)[number];
 
+// @public
+const TOAST_HOLD_MS = 15000;
+
+// @public
+const TOAST_LIMIT = 5;
+
 // @public (undocumented)
 const Toaster: (input: ToasterProps) => JSX.Element;
 
@@ -3746,6 +4057,15 @@ interface Tokens {
 
 // @public (undocumented)
 const tokens: Tokens;
+
+// @public (undocumented)
+const TONE_GAIN = 0.2;
+
+// @public (undocumented)
+const TONE_HZ = 880;
+
+// @public (undocumented)
+const TONE_S = 0.25;
 
 // @public (undocumented)
 function Tooltip(input: React_2.ComponentProps<typeof Tooltip_2.Root>): React_2.JSX.Element;
@@ -4206,6 +4526,9 @@ declare namespace ui {
 }
 
 // @public
+function uniqueById(alerts: readonly AlertView[]): AlertView[];
+
+// @public
 const UNIT_KEYS: Readonly<{
     readonly m: "unit.symbol.m";
     readonly m_amsl: "unit.symbol.m_amsl";
@@ -4233,6 +4556,9 @@ interface UnverifiedSessionClaims {
     // (undocumented)
     sub: string | null;
 }
+
+// @public
+function useAlertTone(active: boolean, repeatMs: number, cue?: string): AlertTone;
 
 // @public
 function useBBoxSubscription(opts: BBoxSubscriptionOptions): void;
@@ -4329,6 +4655,9 @@ function utcTime(): z.ZodString;
 
 // @public
 function utcToInput(iso: string | null): string;
+
+// @public
+function validRepeatMs(repeatMs: number): boolean;
 
 // @public (undocumented)
 type Vars = Readonly<Record<string, string | number>>;

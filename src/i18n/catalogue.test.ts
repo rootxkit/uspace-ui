@@ -6,7 +6,20 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-import { DISABLED_BYS, SOURCE_STATES } from "../model/index.js";
+import {
+  ALERT_KIND_KEYS,
+  ALERT_STATE_KEYS,
+  ALERT_SUMMARY_KEYS,
+  CLEAR_REASON_KEYS,
+  NONCONFORMANCE_REASON_KEYS,
+} from "../alerts/words.js";
+import {
+  ALERT_KINDS,
+  CLEAR_REASONS,
+  DISABLED_BYS,
+  SOURCE_STATES,
+  VIOLATION_KINDS,
+} from "../model/index.js";
 import { AGE_BUCKET_KEYS } from "../symbology/age.js";
 import {
   IDENT_BASIS_KEYS,
@@ -165,6 +178,16 @@ const DYNAMIC_KEYS: Readonly<Record<string, readonly string[]>> = {
   "src/status/words.ts DISABLED_BY_KEYS": Object.values(DISABLED_BY_KEYS),
   "src/status/words.ts DEGRADED_KEYS": Object.values(DEGRADED_KEYS),
   "src/status/words.ts CONNECTION_KEYS": Object.values(CONNECTION_KEYS),
+  // WP-11 alerts: t(ALERT_KIND_KEYS[k]) (kindName), t(ALERT_STATE_KEYS[s]),
+  // t(CLEAR_REASON_KEYS[r]), t(NONCONFORMANCE_REASON_KEYS[r]),
+  // t(ALERT_SUMMARY_KEYS[k]) (summary.ts)
+  "src/alerts/words.ts ALERT_KIND_KEYS": Object.values(ALERT_KIND_KEYS),
+  "src/alerts/words.ts ALERT_STATE_KEYS": Object.values(ALERT_STATE_KEYS),
+  "src/alerts/words.ts CLEAR_REASON_KEYS": Object.values(CLEAR_REASON_KEYS),
+  "src/alerts/words.ts NONCONFORMANCE_REASON_KEYS": Object.values(
+    NONCONFORMANCE_REASON_KEYS,
+  ),
+  "src/alerts/words.ts ALERT_SUMMARY_KEYS": Object.values(ALERT_SUMMARY_KEYS),
 };
 
 describe("keys used in src/", () => {
@@ -241,6 +264,9 @@ describe("R-05: broadcast and unverified", () => {
       "track.provider",
       "ident.caveat.as_broadcast",
       "ident.caveat.provider",
+      // WP-11: a proximity or emergency peer that is not authenticated
+      "alert.summary.peer_broadcast",
+      "alert.summary.peer_provider",
     ];
     for (const k of broadcast) {
       expect(en[k], k).toMatch(UNVERIFIED.en);
@@ -355,5 +381,60 @@ describe("G-10: no registry personal data in track strings", () => {
 
   it("the check sees one", () => {
     expect(PII.test("operator {legal_name}")).toBe(true);
+  });
+});
+
+describe("WP-11: alert wording", () => {
+  const alertKeys = keys.filter((k) => k.startsWith("alert."));
+
+  it("every alert and violation kind, and every clear reason, has a name", () => {
+    for (const k of [...ALERT_KINDS, ...VIOLATION_KINDS]) {
+      expect(keys).toContain(`alert.kind.${k}`);
+      expect(keys).toContain(`alert.summary.${k}`);
+    }
+    for (const r of CLEAR_REASONS) {
+      expect(keys).toContain(`alert.clear_reason.${r}`);
+    }
+  });
+
+  it("no alert text claims a collision or advises a manoeuvre (C-11, C-12)", () => {
+    const advice =
+      /collision|collide|descend|climb|hold position|turn (left|right)|land now/i;
+    expect(alertKeys.filter((k) => advice.test(en[k]))).toEqual([]);
+  });
+
+  it("the advice check sees one", () => {
+    expect(/collision|descend/i.test("Descend now")).toBe(true);
+  });
+
+  it("lost_link is worded as no telemetry, in both languages (C-12)", () => {
+    for (const k of [
+      "alert.kind.lost_link",
+      "alert.numbers.lost_link",
+    ] as const) {
+      expect(en[k]).toMatch(/no telemetry/i);
+      expect(ka[k]).toMatch(/ტელემეტრია არ მოდის/);
+      expect(en[k]).not.toMatch(LOST);
+      expect(ka[k]).not.toMatch(LOST);
+    }
+  });
+
+  it("every number in an alert sentence carries its unit", () => {
+    const numbered = alertKeys.filter((k) => k.startsWith("alert.numbers."));
+    for (const k of numbered) {
+      for (const hole of holes(en[k]).filter((h) => h !== "{zone}")) {
+        // The hole is followed by " m" or " s" and then a non-letter.
+        const after = `${en[k]}.`.split(hole).slice(1);
+        expect(
+          after.every((rest) => /^ (m|s)[^a-z]/.test(rest)),
+          `${k} ${hole}`,
+        ).toBe(true);
+      }
+    }
+  });
+
+  it("the AGL height says AGL, in both languages (E-13)", () => {
+    expect(en["alert.numbers.height_120m"]).toContain("m AGL");
+    expect(ka["alert.numbers.height_120m"]).toContain("მიწიდან");
   });
 });

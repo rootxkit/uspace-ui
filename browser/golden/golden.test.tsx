@@ -14,6 +14,12 @@ import {
   useT,
 } from "../../src/i18n/index.js";
 import { LoginForm } from "../../src/auth/client/index.js";
+import {
+  ListView,
+  Summaries,
+  checkList,
+  checkSummaries,
+} from "../alerts/views.js";
 import { LOGIN_PROPS } from "../auth/login.js";
 import {
   IntentForm,
@@ -124,7 +130,8 @@ const table = (ui: ReactNode): ReactNode => (
 // state, the degraded banner and age chips (WP-8), and one page of the
 // registry table with its empty and error states (WP-9), the zone form
 // with the API's field errors replayed and the intent form with the ten
-// Annex IV items (WP-10).
+// Annex IV items (WP-10), the alert list with every kind raised and
+// cleared and one summary per kind (WP-11).
 const GOLDEN: Record<
   string,
   [ReactNode, Look, (canvas: HTMLElement) => void | Promise<void>]
@@ -218,6 +225,18 @@ const GOLDEN: Record<
     <IntentForm />,
     KA_DARK,
     (c) => checkIntentForm(c, /^4D ტრაექტორია: დაწყება/),
+  ],
+  "alert-list.en": [<ListView />, EN_LIGHT, checkList],
+  "alert-list.ka": [<ListView />, KA_DARK, checkList],
+  "alert-summaries.en": [
+    <Summaries />,
+    EN_LIGHT,
+    (c) => checkSummaries(c, / m horizontally in /),
+  ],
+  "alert-summaries.ka": [
+    <Summaries />,
+    KA_DARK,
+    (c) => checkSummaries(c, / წმ-ში/),
   ],
 };
 
