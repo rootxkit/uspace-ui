@@ -1,0 +1,13 @@
+# Every `uses:` in .github/workflows is pinned to a full commit SHA with
+# the version in a trailing comment (retro-audit B1). Dependabot moves the
+# SHAs by pull request, so a pin is reviewed instead of drifting with a
+# mutable tag. npm dependencies are pinned exactly and updated by hand.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
