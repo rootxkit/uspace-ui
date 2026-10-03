@@ -7,6 +7,15 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
+- `layers` (WP-12): `MannedLayer` (plane symbols by trust class, hollow
+  for broadcast, faded by age and never removed by the client, hover
+  card with both altitudes by datum), `IntentLayer` (footprints passed
+  through, styled by DSS state, `peer` pattern, emphasis by the app's
+  `activeIds`; replaces PLAN's `nowIso`), `ReceiverLayer` (source-state
+  colour, mark and words, B-11), `IntentCard`, `HoverPortal`;
+  `symbology` gains `manned` and `intent` (`DSS_STATES` from uspace-core
+  v1.3.0, `MannedTrack`); `status` gains `TrackDetail` and
+  `sourceDetailLines`. `docs/CORE_VERSION` moves to v1.3.0.
 - `alerts` (WP-11): `AlertList`, `AlertSummary` / `alertSummary` (one
   line per alert and violation kind, `ka` and `en`), `AlertToaster` with
   the gesture-gated repeating tone (`useAlertTone(active, repeatMs)`; the
