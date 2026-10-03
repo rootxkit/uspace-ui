@@ -7,6 +7,19 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
+- Retro-audit fixes: `auth/server` keeps its timeout over the API's
+  answer body (an upstream body silent for `timeoutMs` is aborted and
+  counted as `upstream_timeout`) and `api`'s client keeps its deadline
+  until the body is read (S4); the BFF drops an absolute `Location`,
+  `Server`, `Via`, `X-Powered-By` and every `Access-Control-*` header
+  (S5); `bffHandlers` with `session.secure` now refuses to build unless
+  it gets `trustedProxyHops` or the new `noTrustedProxy: true` (S6; a
+  consumer that set neither must add one); the proxy refuses an encoded
+  slash or dot segment (N7); a sign-in answer whose session has already
+  expired is `502 upstream_invalid` (N10); `resolveFeedUrl` refuses
+  every URL as `no_page` when the page URL is unknown (N8). CI pins
+  every action to a commit SHA (B1) and releases only a tag on `main`
+  (N6).
 - `layers` (WP-12): `MannedLayer` (plane symbols by trust class, hollow
   for broadcast, faded by age and never removed by the client, hover
   card with both altitudes by datum), `IntentLayer` (footprints passed
