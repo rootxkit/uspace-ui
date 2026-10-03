@@ -41,6 +41,9 @@ import {
   TRUST_MEANING_KEYS,
 } from "../symbology/track.js";
 import { ZONE_PATTERN_KEYS, ZONE_TYPE_KEYS } from "../symbology/zone.js";
+import { INTENT_STATE_KEYS } from "../symbology/intent.js";
+import { MANNED_SOURCE_CLASS_KEYS } from "../symbology/manned.js";
+import { ALT_SOURCE_KEYS, TIME_SOURCE_KEYS } from "../status/TrackDetail.js";
 import { en, type Key } from "./en.js";
 import { ALTITUDE_KEYS, HEIGHT_KEYS } from "./format.js";
 import { ka } from "./ka.js";
@@ -188,6 +191,17 @@ const DYNAMIC_KEYS: Readonly<Record<string, readonly string[]>> = {
     NONCONFORMANCE_REASON_KEYS,
   ),
   "src/alerts/words.ts ALERT_SUMMARY_KEYS": Object.values(ALERT_SUMMARY_KEYS),
+  // WP-12: IntentLayer and IntentCard t(INTENT_STATE_KEYS[s]); TrackDetail
+  // t(ALT_SOURCE_KEYS[s]), t(TIME_SOURCE_KEYS[s]),
+  // t(MANNED_SOURCE_CLASS_KEYS[c]) (sourceClassLabel); ReceiverLayer
+  // t(SOURCE_STATE_KEYS[s]) (listed under WP-8)
+  "src/symbology/intent.ts INTENT_STATE_KEYS": Object.values(INTENT_STATE_KEYS),
+  "src/status/TrackDetail.tsx ALT_SOURCE_KEYS": Object.values(ALT_SOURCE_KEYS),
+  "src/status/TrackDetail.tsx TIME_SOURCE_KEYS":
+    Object.values(TIME_SOURCE_KEYS),
+  "src/symbology/manned.ts MANNED_SOURCE_CLASS_KEYS": Object.values(
+    MANNED_SOURCE_CLASS_KEYS,
+  ),
 };
 
 describe("keys used in src/", () => {
@@ -267,6 +281,9 @@ describe("R-05: broadcast and unverified", () => {
       // WP-11: a proximity or emergency peer that is not authenticated
       "alert.summary.peer_broadcast",
       "alert.summary.peer_provider",
+      // WP-12: a manned track with no trust class, a peer's intent
+      "manned.trust_unstated",
+      "intent.peer",
     ];
     for (const k of broadcast) {
       expect(en[k], k).toMatch(UNVERIFIED.en);
@@ -436,5 +453,34 @@ describe("WP-11: alert wording", () => {
   it("the AGL height says AGL, in both languages (E-13)", () => {
     expect(en["alert.numbers.height_120m"]).toContain("m AGL");
     expect(ka["alert.numbers.height_120m"]).toContain("მიწიდან");
+  });
+});
+
+describe("WP-12: traffic wording", () => {
+  it("the pressure rows never say AMSL or sea level (R-09)", () => {
+    for (const k of [
+      "detail.alt_pressure",
+      "detail.alt_source.pressure",
+    ] as const) {
+      expect(en[k], k).toMatch(/pressure altitude|Pressure altitude/);
+      expect(en[k], k).not.toMatch(/AMSL|sea level/);
+      expect(ka[k], k).toMatch(/ბარომეტრული სიმაღლე/);
+      expect(ka[k], k).not.toMatch(/ზღვის/);
+    }
+  });
+
+  it("the geodetic source line does not claim to be a pressure altitude (the twin)", () => {
+    expect(en["detail.alt_source.geodetic"]).not.toMatch(/pressure/);
+    expect(ka["detail.alt_source.geodetic"]).not.toMatch(/ბარომეტრ/);
+  });
+
+  it("'current' is the server's word, never the kit's", () => {
+    expect(en["intent.active"]).toMatch(/as the server reports/);
+    expect(ka["intent.active"]).toMatch(/სერვერის/);
+  });
+
+  it("vertical speed says which way is positive (R-10)", () => {
+    expect(en["detail.vspeed"]).toMatch(/positive up/);
+    expect(ka["detail.vspeed"]).toMatch(/დადებითი ზემოთ/);
   });
 });

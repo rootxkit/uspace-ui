@@ -1,0 +1,501 @@
+<div lang="en" class="bg-background p-4 text-foreground">
+<div class="grid gap-4" data-testid="details" style="max-width: 420px;">
+<div data-class="uas-authenticated">
+<article class="us-track-detail grid gap-2 text-xs" data-detail="uas" data-trust="authenticated" aria-labelledby="id-0">
+<h3 id="id-0" class="m-0 text-sm font-semibold">Unmanned aircraft TEST-TRK-0101</h3>
+<section aria-labelledby="id-1" data-section="id-1">
+<h4 id="id-1" class="m-0 mb-1 text-xs font-semibold uppercase">Identification</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="ident-status" data-kind="text">
+<dt class="text-muted-foreground">Status</dt>
+<dd class="m-0 font-medium break-words">
+<span data-ident="registered">registered</span>
+<span class="block font-normal" data-part="status-hint">The serial and the operator match an active registration.</span>
+</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="ident-reason" data-kind="text">
+<dt class="text-muted-foreground">Reason</dt>
+<dd class="m-0 font-medium break-words">Bound by the operator's authenticated session.</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="ident-basis" data-kind="text">
+<dt class="text-muted-foreground">Basis</dt>
+<dd class="m-0 font-medium break-words">authenticated</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="serial" data-kind="text">
+<dt class="text-muted-foreground">Serial number</dt>
+<dd class="m-0 font-medium break-words">TEST-SN-0101</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="registration" data-kind="text">
+<dt class="text-muted-foreground">Operator registration (public part)</dt>
+<dd class="m-0 font-medium break-words">GEO-TEST-OP-0101</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-2" data-section="id-2">
+<h4 id="id-2" class="m-0 mb-1 text-xs font-semibold uppercase">Position and altitude</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="position" data-kind="text">
+<dt class="text-muted-foreground">Position</dt>
+<dd class="m-0 font-medium break-words">41.70000, 44.80000 (WGS84)</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="alt-amsl" data-kind="altitude">
+<dt class="text-muted-foreground">Altitude</dt>
+<dd class="m-0 font-medium break-words">552 m AMSL</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="alt-source" data-kind="text">
+<dt class="text-muted-foreground">Altitude source</dt>
+<dd class="m-0 font-medium break-words">geodetic: satellite fix through the geoid</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="alt-wgs84" data-kind="altitude">
+<dt class="text-muted-foreground">Altitude above the ellipsoid</dt>
+<dd class="m-0 font-medium break-words">571 m above the WGS84 ellipsoid</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="height" data-kind="altitude">
+<dt class="text-muted-foreground">Height</dt>
+<dd class="m-0 font-medium break-words">42 m above take-off</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-3" data-section="id-3">
+<h4 id="id-3" class="m-0 mb-1 text-xs font-semibold uppercase">Motion</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="speed" data-kind="text">
+<dt class="text-muted-foreground">Ground speed</dt>
+<dd class="m-0 font-medium break-words">8.4 m/s</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="track" data-kind="text">
+<dt class="text-muted-foreground">Course over ground (degrees true)</dt>
+<dd class="m-0 font-medium break-words">090°</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="vspeed" data-kind="text">
+<dt class="text-muted-foreground">Vertical speed (positive up)</dt>
+<dd class="m-0 font-medium break-words">1.5 m/s</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="operational-status" data-kind="text">
+<dt class="text-muted-foreground">Operational status</dt>
+<dd class="m-0 font-medium break-words">Airborne</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="emergency" data-kind="text">
+<dt class="text-muted-foreground">Emergency</dt>
+<dd class="m-0 font-medium break-words">
+<span data-emergency="false">none reported</span>
+</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-4" data-section="id-4">
+<h4 id="id-4" class="m-0 mb-1 text-xs font-semibold uppercase">Source and trust</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="trust" data-kind="text">
+<dt class="text-muted-foreground">Trust class</dt>
+<dd class="m-0 font-medium break-words">Authenticated<span class="block font-normal" data-part="trust-meaning">Sent over the operator's own authenticated session for this aircraft.</span>
+</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="source" data-kind="text">
+<dt class="text-muted-foreground">Source</dt>
+<dd class="m-0 font-medium break-words">operator_ws</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="instance" data-kind="text">
+<dt class="text-muted-foreground">Instance</dt>
+<dd class="m-0 font-medium break-words">TEST-CLIENT-1</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="flight" data-kind="text">
+<dt class="text-muted-foreground">Flight</dt>
+<dd class="m-0 font-medium break-words">
+<a href="#flight-TEST-FLT-0101" class="inline-block min-h-6 underline">TEST-FLT-0101</a>
+</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="intent" data-kind="text">
+<dt class="text-muted-foreground">Intent</dt>
+<dd class="m-0 font-medium break-words">
+<a href="#intent-TEST-INT-0001" class="inline-block min-h-6 underline">TEST-INT-0001</a>
+</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-5" data-section="id-5">
+<h4 id="id-5" class="m-0 mb-1 text-xs font-semibold uppercase">Times and age</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="ts" data-kind="time">
+<dt class="text-muted-foreground">Source time (the source's clock)</dt>
+<dd class="m-0 font-medium break-words">2026-01-01 11:59:57 UTC</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="rx-ts" data-kind="time">
+<dt class="text-muted-foreground">Received (this system's clock)</dt>
+<dd class="m-0 font-medium break-words">2026-01-01 11:59:58 UTC</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="captured-at" data-kind="time">
+<dt class="text-muted-foreground">Captured (this system's clock)</dt>
+<dd class="m-0 font-medium break-words">2026-01-01 11:59:57 UTC</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="time-source" data-kind="text">
+<dt class="text-muted-foreground">Capture time placed by</dt>
+<dd class="m-0 font-medium break-words">the source's clock</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="age-received" data-kind="text">
+<dt class="text-muted-foreground">Age since received</dt>
+<dd class="m-0 font-medium break-words">
+<span data-age="live">2 s · Live</span>
+</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="age-captured" data-kind="text">
+<dt class="text-muted-foreground">Age since captured</dt>
+<dd class="m-0 font-medium break-words">—</dd>
+</div>
+</dl>
+</section>
+</article>
+</div>
+<div data-class="uas-broadcast">
+<article class="us-track-detail grid gap-2 text-xs" data-detail="uas" data-trust="broadcast" aria-labelledby="id-6">
+<h3 id="id-6" class="m-0 text-sm font-semibold">Unmanned aircraft TEST-TRK-0102</h3>
+<p class="m-0 font-semibold" data-part="broadcast-caveat">Broadcast and unverified: anyone can transmit this identity and position.</p>
+<section aria-labelledby="id-7" data-section="id-7">
+<h4 id="id-7" class="m-0 mb-1 text-xs font-semibold uppercase">Identification</h4>
+<p class="m-0 text-xs font-semibold" data-part="basis-caveat">registered, as broadcast and unverified</p>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="ident-status" data-kind="text">
+<dt class="text-muted-foreground">Status</dt>
+<dd class="m-0 font-medium break-words">
+<span data-ident="registered">registered</span>
+<span class="block font-normal" data-part="status-hint">The serial and the operator match an active registration.</span>
+</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="ident-reason" data-kind="text">
+<dt class="text-muted-foreground">Reason</dt>
+<dd class="m-0 font-medium break-words">Serial and operator match the registry.</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="ident-basis" data-kind="text">
+<dt class="text-muted-foreground">Basis</dt>
+<dd class="m-0 font-medium break-words">as broadcast and unverified</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="serial" data-kind="text">
+<dt class="text-muted-foreground">Serial number</dt>
+<dd class="m-0 font-medium break-words">TEST-SN-0102</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="registration" data-kind="text">
+<dt class="text-muted-foreground">Operator registration (public part)</dt>
+<dd class="m-0 font-medium break-words">GEO-TEST-OP-0102</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-8" data-section="id-8">
+<h4 id="id-8" class="m-0 mb-1 text-xs font-semibold uppercase">Position and altitude</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="position" data-kind="text">
+<dt class="text-muted-foreground">Position</dt>
+<dd class="m-0 font-medium break-words">41.71200, 44.81500 (WGS84)</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="alt-amsl" data-kind="altitude">
+<dt class="text-muted-foreground">Pressure altitude</dt>
+<dd class="m-0 font-medium break-words">598 m pressure altitude</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="alt-source" data-kind="text">
+<dt class="text-muted-foreground">Altitude source</dt>
+<dd class="m-0 font-medium break-words">barometric: a pressure altitude, referenced to 1013.25 hPa<span class="block font-normal" data-part="pressure-note">Pressure altitude is referenced to 1013.25 hPa, not to sea level: its error is unknown</span>
+</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="alt-wgs84" data-kind="altitude">
+<dt class="text-muted-foreground">Altitude above the ellipsoid</dt>
+<dd class="m-0 font-medium break-words">—</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="height" data-kind="altitude">
+<dt class="text-muted-foreground">Height</dt>
+<dd class="m-0 font-medium break-words">35 m above ground</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-9" data-section="id-9">
+<h4 id="id-9" class="m-0 mb-1 text-xs font-semibold uppercase">Motion</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="speed" data-kind="text">
+<dt class="text-muted-foreground">Ground speed</dt>
+<dd class="m-0 font-medium break-words">8.4 m/s</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="track" data-kind="text">
+<dt class="text-muted-foreground">Course over ground (degrees true)</dt>
+<dd class="m-0 font-medium break-words">090°</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="vspeed" data-kind="text">
+<dt class="text-muted-foreground">Vertical speed (positive up)</dt>
+<dd class="m-0 font-medium break-words">1.5 m/s</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="operational-status" data-kind="text">
+<dt class="text-muted-foreground">Operational status</dt>
+<dd class="m-0 font-medium break-words">Airborne</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="emergency" data-kind="text">
+<dt class="text-muted-foreground">Emergency</dt>
+<dd class="m-0 font-medium break-words">
+<span data-emergency="false">none reported</span>
+</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-10" data-section="id-10">
+<h4 id="id-10" class="m-0 mb-1 text-xs font-semibold uppercase">Source and trust</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="trust" data-kind="text">
+<dt class="text-muted-foreground">Trust class</dt>
+<dd class="m-0 font-medium break-words">Broadcast (unverified)<span class="block font-normal" data-part="trust-meaning">Broadcast and unverified: anyone can transmit this identity and position.</span>
+</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="source" data-kind="text">
+<dt class="text-muted-foreground">Source</dt>
+<dd class="m-0 font-medium break-words">direct_rid</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="instance" data-kind="text">
+<dt class="text-muted-foreground">Heard by</dt>
+<dd class="m-0 font-medium break-words">TEST-RX-0001</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="flight" data-kind="text">
+<dt class="text-muted-foreground">Flight</dt>
+<dd class="m-0 font-medium break-words">—</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="intent" data-kind="text">
+<dt class="text-muted-foreground">Intent</dt>
+<dd class="m-0 font-medium break-words">—</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-11" data-section="id-11">
+<h4 id="id-11" class="m-0 mb-1 text-xs font-semibold uppercase">Times and age</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="ts" data-kind="time">
+<dt class="text-muted-foreground">Source time (the source's clock)</dt>
+<dd class="m-0 font-medium break-words">2026-01-01 11:59:58 UTC</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="rx-ts" data-kind="time">
+<dt class="text-muted-foreground">Received (this system's clock)</dt>
+<dd class="m-0 font-medium break-words">2026-01-01 11:59:59 UTC</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="captured-at" data-kind="time">
+<dt class="text-muted-foreground">Captured (this system's clock)</dt>
+<dd class="m-0 font-medium break-words">2026-01-01 11:59:58 UTC</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="time-source" data-kind="text">
+<dt class="text-muted-foreground">Capture time placed by</dt>
+<dd class="m-0 font-medium break-words">the broadcast time</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="age-received" data-kind="text">
+<dt class="text-muted-foreground">Age since received</dt>
+<dd class="m-0 font-medium break-words">
+<span data-age="live">1 s · Live</span>
+</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="age-captured" data-kind="text">
+<dt class="text-muted-foreground">Age since captured</dt>
+<dd class="m-0 font-medium break-words">—</dd>
+</div>
+</dl>
+</section>
+</article>
+</div>
+<div data-class="manned-surveillance">
+<article class="us-track-detail grid gap-2 text-xs" data-detail="manned" data-trust="surveillance" aria-labelledby="id-12">
+<h3 id="id-12" class="m-0 text-sm font-semibold">Manned aircraft TEST001</h3>
+<section aria-labelledby="id-13" data-section="id-13">
+<h4 id="id-13" class="m-0 mb-1 text-xs font-semibold uppercase">Identification</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="callsign" data-kind="text">
+<dt class="text-muted-foreground">Callsign</dt>
+<dd class="m-0 font-medium break-words">TEST001</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="icao24" data-kind="text">
+<dt class="text-muted-foreground">ICAO 24-bit address</dt>
+<dd class="m-0 font-medium break-words">4c0001</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-14" data-section="id-14">
+<h4 id="id-14" class="m-0 mb-1 text-xs font-semibold uppercase">Position and altitude</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="position" data-kind="text">
+<dt class="text-muted-foreground">Position</dt>
+<dd class="m-0 font-medium break-words">41.70500, 44.79000 (WGS84)</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="alt-pressure" data-kind="altitude">
+<dt class="text-muted-foreground">Pressure altitude</dt>
+<dd class="m-0 font-medium break-words">914 m pressure altitude</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="alt-wgs84" data-kind="altitude">
+<dt class="text-muted-foreground">Altitude above the ellipsoid</dt>
+<dd class="m-0 font-medium break-words">962 m above the WGS84 ellipsoid</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-15" data-section="id-15">
+<h4 id="id-15" class="m-0 mb-1 text-xs font-semibold uppercase">Motion</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="speed" data-kind="text">
+<dt class="text-muted-foreground">Ground speed</dt>
+<dd class="m-0 font-medium break-words">61.7 m/s</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="track" data-kind="text">
+<dt class="text-muted-foreground">Course over ground (degrees true)</dt>
+<dd class="m-0 font-medium break-words">135°</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="vspeed" data-kind="text">
+<dt class="text-muted-foreground">Vertical speed (positive up)</dt>
+<dd class="m-0 font-medium break-words">-2.5 m/s</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="emergency" data-kind="text">
+<dt class="text-muted-foreground">Emergency</dt>
+<dd class="m-0 font-medium break-words">
+<span data-emergency="false">none reported</span>
+</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-16" data-section="id-16">
+<h4 id="id-16" class="m-0 mb-1 text-xs font-semibold uppercase">Source and trust</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="trust" data-kind="text">
+<dt class="text-muted-foreground">Trust class</dt>
+<dd class="m-0 font-medium break-words">Surveillance<span class="block font-normal" data-part="trust-meaning">Air traffic surveillance, through the ANSP.</span>
+</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="source-class" data-kind="text">
+<dt class="text-muted-foreground">Source class</dt>
+<dd class="m-0 font-medium break-words">ATM surveillance feed</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-17" data-section="id-17">
+<h4 id="id-17" class="m-0 mb-1 text-xs font-semibold uppercase">Times and age</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="ts" data-kind="time">
+<dt class="text-muted-foreground">Source time (the source's clock)</dt>
+<dd class="m-0 font-medium break-words">2026-01-01 11:59:58 UTC</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="rx-ts" data-kind="time">
+<dt class="text-muted-foreground">Received (this system's clock)</dt>
+<dd class="m-0 font-medium break-words">2026-01-01 11:59:59 UTC</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="captured-at" data-kind="time">
+<dt class="text-muted-foreground">Captured (this system's clock)</dt>
+<dd class="m-0 font-medium break-words">2026-01-01 11:59:58 UTC</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="time-source" data-kind="text">
+<dt class="text-muted-foreground">Capture time placed by</dt>
+<dd class="m-0 font-medium break-words">the source's clock</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="age-received" data-kind="text">
+<dt class="text-muted-foreground">Age since received</dt>
+<dd class="m-0 font-medium break-words">
+<span data-age="live">1 s · Live</span>
+</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="age-captured" data-kind="text">
+<dt class="text-muted-foreground">Age since captured</dt>
+<dd class="m-0 font-medium break-words">—</dd>
+</div>
+</dl>
+</section>
+</article>
+</div>
+<div data-class="manned-broadcast">
+<article class="us-track-detail grid gap-2 text-xs" data-detail="manned" data-trust="broadcast" aria-labelledby="id-18">
+<h3 id="id-18" class="m-0 text-sm font-semibold">Manned aircraft 4c0002</h3>
+<section aria-labelledby="id-19" data-section="id-19">
+<h4 id="id-19" class="m-0 mb-1 text-xs font-semibold uppercase">Identification</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="callsign" data-kind="text">
+<dt class="text-muted-foreground">Callsign</dt>
+<dd class="m-0 font-medium break-words">—</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="icao24" data-kind="text">
+<dt class="text-muted-foreground">ICAO 24-bit address</dt>
+<dd class="m-0 font-medium break-words">4c0002</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-20" data-section="id-20">
+<h4 id="id-20" class="m-0 mb-1 text-xs font-semibold uppercase">Position and altitude</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="position" data-kind="text">
+<dt class="text-muted-foreground">Position</dt>
+<dd class="m-0 font-medium break-words">41.71800, 44.78500 (WGS84)</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="alt-pressure" data-kind="altitude">
+<dt class="text-muted-foreground">Pressure altitude</dt>
+<dd class="m-0 font-medium break-words">914 m pressure altitude</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="alt-wgs84" data-kind="altitude">
+<dt class="text-muted-foreground">Altitude above the ellipsoid</dt>
+<dd class="m-0 font-medium break-words">—</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-21" data-section="id-21">
+<h4 id="id-21" class="m-0 mb-1 text-xs font-semibold uppercase">Motion</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="speed" data-kind="text">
+<dt class="text-muted-foreground">Ground speed</dt>
+<dd class="m-0 font-medium break-words">61.7 m/s</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="track" data-kind="text">
+<dt class="text-muted-foreground">Course over ground (degrees true)</dt>
+<dd class="m-0 font-medium break-words">—</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="vspeed" data-kind="text">
+<dt class="text-muted-foreground">Vertical speed (positive up)</dt>
+<dd class="m-0 font-medium break-words">-2.5 m/s</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="emergency" data-kind="text">
+<dt class="text-muted-foreground">Emergency</dt>
+<dd class="m-0 font-medium break-words">
+<span data-emergency="true">declared</span>
+</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-22" data-section="id-22">
+<h4 id="id-22" class="m-0 mb-1 text-xs font-semibold uppercase">Source and trust</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="trust" data-kind="text">
+<dt class="text-muted-foreground">Trust class</dt>
+<dd class="m-0 font-medium break-words">Broadcast (unverified)<span class="block font-normal" data-part="trust-meaning">Broadcast and unverified: anyone can transmit this identity and position.</span>
+</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="source-class" data-kind="text">
+<dt class="text-muted-foreground">Source class</dt>
+<dd class="m-0 font-medium break-words">ADS-B</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-23" data-section="id-23">
+<h4 id="id-23" class="m-0 mb-1 text-xs font-semibold uppercase">Times and age</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="ts" data-kind="time">
+<dt class="text-muted-foreground">Source time (the source's clock)</dt>
+<dd class="m-0 font-medium break-words">2026-01-01 11:59:58 UTC</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="rx-ts" data-kind="time">
+<dt class="text-muted-foreground">Received (this system's clock)</dt>
+<dd class="m-0 font-medium break-words">2026-01-01 11:59:59 UTC</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="captured-at" data-kind="time">
+<dt class="text-muted-foreground">Captured (this system's clock)</dt>
+<dd class="m-0 font-medium break-words">2026-01-01 11:59:58 UTC</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="time-source" data-kind="text">
+<dt class="text-muted-foreground">Capture time placed by</dt>
+<dd class="m-0 font-medium break-words">the source's clock</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="age-received" data-kind="text">
+<dt class="text-muted-foreground">Age since received</dt>
+<dd class="m-0 font-medium break-words">
+<span data-age="live">1 s · Live</span>
+</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="age-captured" data-kind="text">
+<dt class="text-muted-foreground">Age since captured</dt>
+<dd class="m-0 font-medium break-words">—</dd>
+</div>
+</dl>
+</section>
+</article>
+</div>
+</div>
+</div>
