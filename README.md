@@ -200,7 +200,11 @@ that address, or no header at all. This holds only when Next.js is
 reachable through those proxies alone. The API must list the BFF (the
 `web` container's address) as a trusted proxy, for example in the
 authority's `AUTHORITY_TRUSTED_PROXIES`. Otherwise it applies its
-per-address sign-in limits to the BFF instead of the client.
+per-address sign-in limits to the BFF instead of the client. With
+`session.secure`, `bffHandlers` refuses to build unless it is told one
+of `trustedProxyHops: n` or `noTrustedProxy: true` (no proxy records the
+client; the API is sent no address and must not key lockout by address
+alone), so a production build cannot forget its proxy.
 
 **WebSockets: there is no ticket route.** The BFF cannot proxy a
 WebSocket, and a ticket in a query string ends up in access logs. The

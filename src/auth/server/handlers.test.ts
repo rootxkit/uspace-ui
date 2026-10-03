@@ -56,6 +56,8 @@ function handlers(
     allowPaths: [/^\/v1\/zones(\/|$)/],
     timeoutMs: 1000,
     fetch: f,
+    // SESSION is secure, which needs one of the two said (retro-audit S6).
+    ...("trustedProxyHops" in extra ? {} : { noTrustedProxy: true as const }),
     ...extra,
   };
   const opts = Object.fromEntries(
@@ -763,6 +765,43 @@ describe("login", () => {
     const f = stubFetch(() => json(200, {})).fetch;
     expect(() => handlers(f, { trustedProxyHops: 0 })).toThrow(RangeError);
     expect(() => handlers(f, { trustedProxyHops: 1 })).not.toThrow();
+  });
+
+  it("refuses a secure build that says nothing about proxies (retro-audit S6)", () => {
+    const f = stubFetch(() => json(200, {})).fetch;
+    const base: BffOptions = {
+      apiBase: API,
+      apiLoginPath: LOGIN,
+      session: { secure: true, maxAgeS: 3600 },
+      allowPaths: [],
+      timeoutMs: 1000,
+      fetch: f,
+    };
+    // Behind an unconfigured proxy the API would see one address for every
+    // user, so its per-address lockout would lock them all out together.
+    expect(() => bffHandlers(base)).toThrow(/trustedProxyHops/);
+    // Both at once contradict each other.
+    expect(() =>
+      bffHandlers({ ...base, trustedProxyHops: 1, noTrustedProxy: true }),
+    ).toThrow(/trustedProxyHops/);
+    // The acceptances: either one said, or a plain-HTTP development build.
+    expect(() => bffHandlers({ ...base, trustedProxyHops: 1 })).not.toThrow();
+    expect(() => bffHandlers({ ...base, noTrustedProxy: true })).not.toThrow();
+    expect(() =>
+      bffHandlers({ ...base, session: { secure: false, maxAgeS: 3600 } }),
+    ).not.toThrow();
+  });
+
+  it("with noTrustedProxy sends the API no X-Forwarded-For, whatever the client wrote", async () => {
+    const stub = stubFetch(() => json(200, ISSUED));
+    await handlers(stub.fetch, { noTrustedProxy: true }).login(
+      loginRequest(CREDENTIALS, {
+        Origin: ORIGIN,
+        Host: HOST,
+        "X-Forwarded-For": "203.0.113.66",
+      }),
+    );
+    expect(stub.calls[0]?.headers.get("x-forwarded-for")).toBeNull();
   });
 
   it("never writes the credentials, the challenge or the token to any log", async () => {

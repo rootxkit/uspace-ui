@@ -776,6 +776,7 @@ interface BffOptions {
     apiMfaPath?: string;
     fetch?: typeof fetch;
     mfaChallengeSecret?: string;
+    noTrustedProxy?: true;
     // (undocumented)
     session: SessionCookieOptions;
     timeoutMs: number;
