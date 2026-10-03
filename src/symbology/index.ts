@@ -1,7 +1,47 @@
 // `@rootxkit/uspace-ui/symbology` (docs/PLAN.md §3.8): pure functions from
 // enumerations to visual values and MapLibre expressions. No React, no map.
-// WP-6 adds the zone and restriction part; WP-7 adds the track part.
+// WP-6 adds the zone and restriction part; WP-7 adds the track part;
+// WP-12 adds the manned and intent parts.
 export { AGE_BUCKET_KEYS, ageBucket, ageOpacity, ageToken } from "./age.js";
+export {
+  DSS_STATES,
+  INTENT_ACTIVE_EXTRA_FILL,
+  INTENT_ACTIVE_EXTRA_WIDTH_PX,
+  INTENT_PATTERN_TILE_PX,
+  INTENT_PEER_PATTERN_ID,
+  INTENT_SELECTED_EXTRA_WIDTH_PX,
+  INTENT_STATE_KEYS,
+  INTENT_STATE_KEYS_ORDER,
+  intentLook,
+  intentPeerPatternImage,
+  intentStateDrawn,
+  intentStateFilter,
+  isDssState,
+  type DssState,
+  type IntentFeatureProperties,
+  type IntentKey,
+  type IntentLook,
+  type IntentStateKey,
+} from "./intent.js";
+export {
+  MANNED_COLOUR_TOKENS,
+  MANNED_ICON_IDS,
+  MANNED_ICON_PX,
+  MANNED_SOURCE_CLASS_KEYS,
+  mannedFill,
+  mannedIconDistance,
+  mannedIconId,
+  mannedIconParts,
+  mannedIconSdf,
+  mannedStyle,
+  mannedToken,
+  mannedTrustDrawn,
+  type MannedColours,
+  type MannedFeatureProperties,
+  type MannedFill,
+  type MannedStyle,
+  type MannedTrack,
+} from "./manned.js";
 export {
   IDENT_BASIS_KEYS,
   IDENT_ORDER,
@@ -88,6 +128,7 @@ export {
   trustFill,
   trustShape,
   type IconPart,
+  type IconPoint,
   type Shape,
   type ShapeFill,
 } from "./trackIcon.js";

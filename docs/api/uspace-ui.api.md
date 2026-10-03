@@ -464,6 +464,9 @@ interface AlertView {
     state: AlertState;
 }
 
+// @public
+const ALT_SOURCE_KEYS: Readonly<Record<AltSource, Key>>;
+
 // @public (undocumented)
 const ALT_SOURCES: readonly ["geodetic", "pressure", "network", "none"];
 
@@ -1217,6 +1220,14 @@ function degradedLabel(slug: string, t: Translate): string;
 function detailFlag(d: Detail, key: string): boolean | null;
 
 // @public
+interface DetailLink {
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    kind: "flight" | "intent";
+}
+
+// @public
 function detailNumber(d: Detail, ...keys: string[]): number | null;
 
 // @public
@@ -1325,6 +1336,12 @@ function DropdownMenuTrigger(input: React_2.ComponentProps<typeof DropdownMenu_2
 
 // @public
 const DROPPED_RESPONSE_HEADERS: readonly string[];
+
+// @public
+const DSS_STATES: readonly ["Accepted", "Activated", "Nonconforming", "Contingent"];
+
+// @public (undocumented)
+type DssState = (typeof DSS_STATES)[number];
 
 // @public
 function EmptyState(props: EmptyStateProps): ReactNode;
@@ -1843,6 +1860,13 @@ function HoverCard(props: {
     restriction?: boolean;
 }): ReactPortal;
 
+// @public (undocumented)
+function HoverPortal(props: {
+    map: Map_2;
+    hover: PointerHover;
+    children: ReactNode;
+}): ReactPortal;
+
 declare namespace i18n {
     export {
         i18nCounters,
@@ -1939,6 +1963,9 @@ interface IconPart {
     // (undocumented)
     strokeWidth: number;
 }
+
+// @public
+type IconPoint = readonly [number, number];
 
 // @public (undocumented)
 const IDENT_BASES: readonly ["authenticated", "as_broadcast", "provider"];
@@ -2047,6 +2074,143 @@ function Input(input: React_2.ComponentProps<"input">): React_2.JSX.Element;
 function inputToUtc(local: string): string | null;
 
 // @public (undocumented)
+const INTENT_ACTIVE_EXTRA_FILL = 0.12;
+
+// @public
+const INTENT_ACTIVE_EXTRA_WIDTH_PX = 1.5;
+
+// @public
+const INTENT_LABEL_SIZE_PX = 12;
+
+// @public (undocumented)
+const INTENT_LAYER_ID = "us-intents";
+
+// @public
+const INTENT_PATTERN_TILE_PX = 12;
+
+// @public
+const INTENT_PEER_PATTERN_ID = "us-intent-peer";
+
+// @public
+const INTENT_SELECTED_EXTRA_WIDTH_PX = 2;
+
+// @public
+const INTENT_STATE_KEYS: Readonly<Record<IntentStateKey, Key>>;
+
+// @public (undocumented)
+const INTENT_STATE_KEYS_ORDER: readonly IntentStateKey[];
+
+// @public
+function IntentCard(props: IntentCardProps): JSX.Element;
+
+// @public (undocumented)
+interface IntentCardProps {
+    active: boolean;
+    // (undocumented)
+    className?: string;
+    // (undocumented)
+    intent: IntentInput;
+    // (undocumented)
+    lang: Lang;
+}
+
+// @public (undocumented)
+type IntentFeatureCollection = GeoJSON_2.FeatureCollection<GeoJSON_2.Polygon | GeoJSON_2.MultiPolygon, IntentFeatureProperties>;
+
+// @public
+function intentFeatureCollection(intents: readonly IntentInput[], opts: {
+    selectedId: string | null;
+    activeIds: ReadonlySet<string>;
+    t: Translate;
+}): IntentFeatureCollection;
+
+// @public
+interface IntentFeatureProperties {
+    active: boolean;
+    identifier: string;
+    label: string;
+    // (undocumented)
+    peer: boolean;
+    // (undocumented)
+    selected: boolean;
+    // (undocumented)
+    state: IntentStateKey;
+    volume: number;
+}
+
+// @public
+type IntentInput = Omit<IntentView, "volumes"> & {
+    volumes: readonly (GeoJSON_2.Polygon | GeoJSON_2.MultiPolygon)[];
+    peer?: boolean;
+};
+
+// @public
+type IntentKey = DssState | "peer";
+
+// @public
+function intentLabel(i: IntentInput, t: Translate): string;
+
+// @public (undocumented)
+function IntentLayer(props: IntentLayerProps): JSX.Element | null;
+
+// @public (undocumented)
+interface IntentLayerIds {
+    // (undocumented)
+    fill: string;
+    // (undocumented)
+    label: string;
+    // (undocumented)
+    lines: Readonly<Record<IntentStateKey, string>>;
+    // (undocumented)
+    pattern: string;
+    // (undocumented)
+    source: string;
+}
+
+// @public (undocumented)
+function intentLayerIds(id: string): IntentLayerIds;
+
+// @public (undocumented)
+interface IntentLayerProps {
+    activeIds?: Iterable<string>;
+    id?: string;
+    // (undocumented)
+    intents: readonly IntentInput[];
+    labels?: boolean;
+    onSelect?(id: string): void;
+    // (undocumented)
+    selectedId?: string | null;
+    visible?: boolean;
+}
+
+// @public
+interface IntentLook {
+    dash: readonly number[] | null;
+    // (undocumented)
+    fillOpacity: number;
+    // (undocumented)
+    lineWidthPx: number;
+    // (undocumented)
+    pattern: "none" | "diamond";
+    token: string;
+}
+
+// @public
+function intentLook(k: IntentKey | "unstated"): IntentLook;
+
+// @public
+function intentPeerPatternImage(rgb: Rgb): PatternImage;
+
+// @public
+function intentStateDrawn(dssState: string | null): IntentStateKey;
+
+// @public
+function intentStateFilter(k: IntentStateKey): FilterSpecification;
+
+// @public
+type IntentStateKey = DssState | "unstated";
+
+// @public (undocumented)
 interface IntentView {
     // (undocumented)
     authorisationNumber: string | null;
@@ -2085,6 +2249,9 @@ const isClearReason: (x: unknown) => x is "resolved" | "stale" | "source_disable
 const isDisabledBy: (x: unknown) => x is "type" | "instance" | "default_deny";
 
 // @public (undocumented)
+function isDssState(v: unknown): v is DssState;
+
+// @public (undocumented)
 const isIdentBasis: (x: unknown) => x is "authenticated" | "provider" | "as_broadcast";
 
 // @public (undocumented)
@@ -2095,6 +2262,9 @@ const isIdentStatus: (x: unknown) => x is "registered" | "suspended" | "unknown_
 
 // @public
 function isKnownKind(kind: string): kind is AlertView["kind"];
+
+// @public
+function isMannedTrack(v: TrackView | MannedTrack): v is MannedTrack;
 
 // @public
 function isPiiColumn(id: string): boolean;
@@ -2289,6 +2459,42 @@ declare namespace layers {
         layerCounters,
         resetLayerCountersForTests,
         LayerCounter,
+        HoverPortal,
+        INTENT_LABEL_SIZE_PX,
+        INTENT_LAYER_ID,
+        IntentCard,
+        IntentLayer,
+        intentFeatureCollection,
+        intentLabel,
+        intentLayerIds,
+        IntentCardProps,
+        IntentFeatureCollection,
+        IntentInput,
+        IntentLayerIds,
+        IntentLayerProps,
+        MANNED_LAYER_ID,
+        MannedLayer,
+        mannedAge,
+        mannedFeatureCollection,
+        mannedLabel,
+        mannedLayerIds,
+        putMannedIcons,
+        resolveMannedColours,
+        MannedFeatureCollection,
+        MannedFeatureOptions,
+        MannedLayerIds,
+        MannedLayerProps,
+        RECEIVER_LAYER_ID,
+        ReceiverLayer,
+        receiverFeatureCollection,
+        receiverLayerIds,
+        receiverMark,
+        receiverToken,
+        ReceiverFeatureCollection,
+        ReceiverFeatureProperties,
+        ReceiverInput,
+        ReceiverLayerIds,
+        ReceiverLayerProps,
         RESTRICTION_FILL_OPACITY,
         RESTRICTION_LAYER_ID,
         RestrictionLayer,
@@ -2574,8 +2780,174 @@ type LoginResult = {
     };
 };
 
+// @public
+const MANNED_COLOUR_TOKENS: Readonly<{
+    emergency: string;
+    selected: "--us-text";
+    halo: "--us-surface";
+}>;
+
+// @public
+const MANNED_ICON_IDS: readonly {
+    id: string;
+    trust: Trust;
+    directional: boolean;
+}[];
+
+// @public
+const MANNED_ICON_PX = 56;
+
+// @public
+const MANNED_LAYER_ID = "us-manned";
+
+// @public
+const MANNED_SOURCE_CLASS_KEYS: Readonly<Record<string, Key>>;
+
+// @public
+function mannedAge(m: MannedTrack, nowMs: number, staleAfterS: number): AgeBucket;
+
+// @public
+interface MannedColours {
+    // (undocumented)
+    emergency: string;
+    // (undocumented)
+    halo: string;
+    // (undocumented)
+    selected: string;
+    // (undocumented)
+    trust: Readonly<Record<Trust, string>>;
+}
+
+// @public (undocumented)
+type MannedFeatureCollection = GeoJSON_2.FeatureCollection<GeoJSON_2.Point, MannedFeatureProperties>;
+
+// @public
+function mannedFeatureCollection(tracks: readonly MannedTrack[], opts: MannedFeatureOptions): MannedFeatureCollection;
+
+// @public (undocumented)
+interface MannedFeatureOptions {
+    // (undocumented)
+    nowMs: number;
+    // (undocumented)
+    selectedId: string | null;
+    // (undocumented)
+    staleAfterS: number;
+    // (undocumented)
+    t: Translate;
+}
+
+// @public
+interface MannedFeatureProperties {
+    // (undocumented)
+    age: AgeBucket;
+    // (undocumented)
+    emergency: boolean;
+    identifier: string;
+    // (undocumented)
+    kind: "manned";
+    label: string;
+    // (undocumented)
+    selected: boolean;
+    trackDeg: number | null;
+    trust: Trust;
+    trustStated: boolean;
+}
+
+// @public
+type MannedFill = "solid" | "hollow";
+
+// @public
+function mannedFill(t: Trust): MannedFill;
+
+// @public
+function mannedIconDistance(t: Trust, directional: boolean, p: IconPoint): number;
+
+// @public
+function mannedIconId(t: Trust, directional: boolean): string;
+
+// @public
+function mannedIconParts(t: Trust, directional: boolean): IconPart[];
+
+// @public
+function mannedIconSdf(t: Trust, directional: boolean): PatternImage;
+
+// @public
+function mannedLabel(m: MannedTrack, age: AgeBucket, t: Translate): string;
+
+// @public (undocumented)
+function MannedLayer(props: MannedLayerProps): JSX.Element | null;
+
+// @public (undocumented)
+interface MannedLayerIds {
+    // (undocumented)
+    emergency: string;
+    // (undocumented)
+    icon: string;
+    // (undocumented)
+    label: string;
+    // (undocumented)
+    selected: string;
+    // (undocumented)
+    source: string;
+}
+
+// @public (undocumented)
+function mannedLayerIds(id: string): MannedLayerIds;
+
+// @public (undocumented)
+interface MannedLayerProps {
+    id?: string;
+    labels?: boolean;
+    nowMs: number;
+    onSelect?(id: string): void;
+    // (undocumented)
+    selectedId?: string | null;
+    staleAfterS: number;
+    tracks: Iterable<MannedTrack>;
+    visible?: boolean;
+}
+
 // @public (undocumented)
 type MannedStore = PositionStore<MannedView>;
+
+// @public (undocumented)
+interface MannedStyle {
+    // (undocumented)
+    emergencyFilter: FilterSpecification;
+    // (undocumented)
+    emergencyRadius: ExpressionSpecification;
+    // (undocumented)
+    iconColor: ExpressionSpecification;
+    // (undocumented)
+    iconImage: ExpressionSpecification;
+    // (undocumented)
+    iconOpacity: ExpressionSpecification;
+    // (undocumented)
+    iconRotate: ExpressionSpecification;
+    // (undocumented)
+    iconSize: ExpressionSpecification;
+    // (undocumented)
+    ringRadius: ExpressionSpecification;
+    // (undocumented)
+    selectedFilter: FilterSpecification;
+    // (undocumented)
+    textSize: ExpressionSpecification;
+}
+
+// @public
+function mannedStyle(colours: MannedColours): MannedStyle;
+
+// @public
+function mannedToken(t: Trust): string;
+
+// @public
+type MannedTrack = MannedView & {
+    trust?: Trust | null;
+    anomaly?: string | null;
+};
+
+// @public
+function mannedTrustDrawn(t: unknown): Trust;
 
 // @public (undocumented)
 interface MannedView {
@@ -2981,6 +3353,9 @@ function problemSlug(type: string): string | null;
 function putImage(map: Map_2, name: string, image: PatternImage): void;
 
 // @public
+function putMannedIcons(map: Map_2): void;
+
+// @public
 function putTrackIcons(map: Map_2): void;
 
 // @public
@@ -3019,6 +3394,84 @@ interface ReasonFieldProps {
 
 // @public
 function receivedAgeS(t: TrackView, nowMs: number): number | null;
+
+// @public (undocumented)
+const RECEIVER_LAYER_ID = "us-receivers";
+
+// @public (undocumented)
+type ReceiverFeatureCollection = GeoJSON_2.FeatureCollection<GeoJSON_2.Point, ReceiverFeatureProperties>;
+
+// @public (undocumented)
+function receiverFeatureCollection(receivers: readonly ReceiverInput[], selectedId: string | null, t: Translate): ReceiverFeatureCollection;
+
+// @public (undocumented)
+interface ReceiverFeatureProperties {
+    // (undocumented)
+    identifier: string;
+    label: string;
+    // (undocumented)
+    mark: string;
+    // (undocumented)
+    selected: boolean;
+    // (undocumented)
+    state: SourceState;
+}
+
+// @public
+interface ReceiverInput {
+    // (undocumented)
+    disabledBy?: SourceView["disabledBy"];
+    // (undocumented)
+    disabledByWho?: string | null;
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    lagS?: number | null;
+    // (undocumented)
+    lastSeenAt?: string | null;
+    // (undocumented)
+    lat: number;
+    // (undocumented)
+    lng: number;
+    // (undocumented)
+    state: SourceState;
+}
+
+// @public (undocumented)
+function ReceiverLayer(props: ReceiverLayerProps): JSX.Element | null;
+
+// @public (undocumented)
+interface ReceiverLayerIds {
+    // (undocumented)
+    circle: string;
+    // (undocumented)
+    label: string;
+    // (undocumented)
+    mark: string;
+    // (undocumented)
+    source: string;
+}
+
+// @public (undocumented)
+function receiverLayerIds(id: string): ReceiverLayerIds;
+
+// @public (undocumented)
+interface ReceiverLayerProps {
+    id?: string;
+    labels?: boolean;
+    onSelect?(id: string): void;
+    // (undocumented)
+    receivers: readonly ReceiverInput[];
+    // (undocumented)
+    selectedId?: string | null;
+    visible?: boolean;
+}
+
+// @public
+function receiverMark(s: SourceState): string;
+
+// @public
+function receiverToken(s: SourceState): string;
 
 // @public (undocumented)
 const RECENTLY_REMOVED_LIMIT = 50;
@@ -3112,6 +3565,9 @@ function resolveFeedUrl(url: string, page: string | undefined): {
 } | {
     refused: string;
 };
+
+// @public
+function resolveMannedColours(map: Map_2): MannedColours;
 
 // @public
 function resolveSeverityColours(map: Map_2): Record<Severity, string>;
@@ -3487,6 +3943,12 @@ const SOURCE_STORE_LIMIT = 1000;
 function sourceAgeS(s: Pick<LiveSourceView, "ageS" | "ageAtMs">, nowMs: number): number | null;
 
 // @public
+function sourceClassLabel(value: string, t: Translate): string;
+
+// @public
+function sourceDetailLines(s: Pick<SourceView, "state" | "disabledBy" | "disabledByWho" | "lastSeenAt" | "lagS">, age: number | null, t: Translate, lang: Lang): string[];
+
+// @public
 function sourceDisplayAgeS(s: SourceInput, nowMs: number): number | null;
 
 // @public
@@ -3599,11 +4061,19 @@ declare namespace status_2 {
         FrozenOverlay,
         FrozenOverlayProps,
         SourceStateBadge,
+        sourceDetailLines,
         sourceDisplayAgeS,
         SourceInput,
         SourceStateBadgeProps,
         SourcesPanel,
         SourcesPanelProps,
+        ALT_SOURCE_KEYS,
+        TIME_SOURCE_KEYS,
+        TrackDetail,
+        isMannedTrack,
+        sourceClassLabel,
+        DetailLink,
+        TrackDetailProps,
         CONNECTION_KEYS,
         DEGRADED_KEYS,
         DISABLED_BY_KEYS,
@@ -3719,6 +4189,41 @@ declare namespace symbology {
         ageBucket,
         ageOpacity,
         ageToken,
+        DSS_STATES,
+        INTENT_ACTIVE_EXTRA_FILL,
+        INTENT_ACTIVE_EXTRA_WIDTH_PX,
+        INTENT_PATTERN_TILE_PX,
+        INTENT_PEER_PATTERN_ID,
+        INTENT_SELECTED_EXTRA_WIDTH_PX,
+        INTENT_STATE_KEYS,
+        INTENT_STATE_KEYS_ORDER,
+        intentLook,
+        intentPeerPatternImage,
+        intentStateDrawn,
+        intentStateFilter,
+        isDssState,
+        DssState,
+        IntentFeatureProperties,
+        IntentKey,
+        IntentLook,
+        IntentStateKey,
+        MANNED_COLOUR_TOKENS,
+        MANNED_ICON_IDS,
+        MANNED_ICON_PX,
+        MANNED_SOURCE_CLASS_KEYS,
+        mannedFill,
+        mannedIconDistance,
+        mannedIconId,
+        mannedIconParts,
+        mannedIconSdf,
+        mannedStyle,
+        mannedToken,
+        mannedTrustDrawn,
+        MannedColours,
+        MannedFeatureProperties,
+        MannedFill,
+        MannedStyle,
+        MannedTrack,
         IDENT_BASIS_KEYS,
         IDENT_ORDER,
         IDENT_REASON_KEYS,
@@ -3794,6 +4299,7 @@ declare namespace symbology {
         trustFill,
         trustShape,
         IconPart,
+        IconPoint,
         Shape,
         ShapeFill
     }
@@ -4005,6 +4511,9 @@ interface ThemeProviderProps {
     scheme?: ColorScheme;
 }
 
+// @public
+const TIME_SOURCE_KEYS: Readonly<Record<TimeSource, Key>>;
+
 // @public (undocumented)
 const TIME_SOURCES: readonly ["source_clock", "broadcast", "receiver", "provider", "system"];
 
@@ -4109,6 +4618,22 @@ interface TrackColours {
     // (undocumented)
     ident: Readonly<Record<IdentKey, string>>;
     selected: string;
+}
+
+// @public (undocumented)
+function TrackDetail(props: TrackDetailProps): JSX.Element;
+
+// @public (undocumented)
+interface TrackDetailProps {
+    // (undocumented)
+    className?: string;
+    clockOffsetMs?: number | null;
+    compact?: boolean;
+    lang?: Lang;
+    nowMs: number;
+    renderLink?(link: DetailLink): ReactNode;
+    staleAfterS: number | null;
+    track: TrackView | MannedTrack;
 }
 
 // @public (undocumented)

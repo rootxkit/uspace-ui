@@ -27,6 +27,48 @@ export {
   resetLayerCountersForTests,
   type LayerCounter,
 } from "./counters.js";
+export { HoverPortal } from "./HoverPortal.js";
+export {
+  INTENT_LABEL_SIZE_PX,
+  INTENT_LAYER_ID,
+  IntentCard,
+  IntentLayer,
+  intentFeatureCollection,
+  intentLabel,
+  intentLayerIds,
+  type IntentCardProps,
+  type IntentFeatureCollection,
+  type IntentInput,
+  type IntentLayerIds,
+  type IntentLayerProps,
+} from "./IntentLayer.js";
+export {
+  MANNED_LAYER_ID,
+  MannedLayer,
+  mannedAge,
+  mannedFeatureCollection,
+  mannedLabel,
+  mannedLayerIds,
+  putMannedIcons,
+  resolveMannedColours,
+  type MannedFeatureCollection,
+  type MannedFeatureOptions,
+  type MannedLayerIds,
+  type MannedLayerProps,
+} from "./MannedLayer.js";
+export {
+  RECEIVER_LAYER_ID,
+  ReceiverLayer,
+  receiverFeatureCollection,
+  receiverLayerIds,
+  receiverMark,
+  receiverToken,
+  type ReceiverFeatureCollection,
+  type ReceiverFeatureProperties,
+  type ReceiverInput,
+  type ReceiverLayerIds,
+  type ReceiverLayerProps,
+} from "./ReceiverLayer.js";
 export {
   RESTRICTION_FILL_OPACITY,
   RESTRICTION_LAYER_ID,

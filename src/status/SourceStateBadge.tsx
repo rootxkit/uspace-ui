@@ -8,6 +8,8 @@
 // the badge only words it.
 import { fmtAge, fmtTimeUTC } from "../i18n/format.js";
 import { useLang, useT } from "../i18n/I18nProvider.js";
+import type { Lang } from "../i18n/lang.js";
+import type { Translate } from "../i18n/translate.js";
 import type { SourceState, SourceView } from "../model/index.js";
 import { sourceAgeS } from "../live/sourceStore.js";
 import { cn } from "../ui/cn.js";
@@ -48,7 +50,23 @@ export function sourceDisplayAgeS(
 export function useSourceDetail(s: SourceInput, nowMs: number): string[] {
   const t = useT();
   const { lang } = useLang();
-  const age = sourceDisplayAgeS(s, nowMs);
+  return sourceDetailLines(s, sourceDisplayAgeS(s, nowMs), t, lang);
+}
+
+/**
+ * The same lines without a provider, for a caller that has its own
+ * translator (ReceiverLayer's hover card, WP-12): `ageS` is the source's
+ * display age, or null.
+ */
+export function sourceDetailLines(
+  s: Pick<
+    SourceView,
+    "state" | "disabledBy" | "disabledByWho" | "lastSeenAt" | "lagS"
+  >,
+  age: number | null,
+  t: Translate,
+  lang: Lang,
+): string[] {
   const lines: string[] = [];
   switch (s.state) {
     case "disabled":

@@ -55,6 +55,7 @@ import {
 } from "../table/views.js";
 import { checkPalettes, Palettes } from "../theme/Palettes.js";
 import { LegendsBox, checkLegends } from "../tracks/views.js";
+import { Details, checkDetails } from "../traffic/views.js";
 import { Cards, LegendBox, checkCards, checkLegend } from "../zones/views.js";
 
 // One element per line, so a reviewed diff reads line by line.
@@ -131,7 +132,8 @@ const table = (ui: ReactNode): ReactNode => (
 // registry table with its empty and error states (WP-9), the zone form
 // with the API's field errors replayed and the intent form with the ten
 // Annex IV items (WP-10), the alert list with every kind raised and
-// cleared and one summary per kind (WP-11).
+// cleared and one summary per kind (WP-11), and the detail panel of each
+// traffic class (WP-12).
 const GOLDEN: Record<
   string,
   [ReactNode, Look, (canvas: HTMLElement) => void | Promise<void>]
@@ -237,6 +239,16 @@ const GOLDEN: Record<
     <Summaries />,
     KA_DARK,
     (c) => checkSummaries(c, / წმ-ში/),
+  ],
+  "track-detail.en": [
+    <Details />,
+    EN_LIGHT,
+    (c) => checkDetails(c, /unverified/),
+  ],
+  "track-detail.ka": [
+    <Details />,
+    KA_DARK,
+    (c) => checkDetails(c, /დაუდასტურებ/),
   ],
 };
 
