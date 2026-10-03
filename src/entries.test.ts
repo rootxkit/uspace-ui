@@ -68,6 +68,7 @@ const REAL = new Set([
   "./legend",
   "./live",
   "./status",
+  "./alerts",
   "./table",
   "./form",
   "./eslint",
