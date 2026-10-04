@@ -161,6 +161,17 @@
   }
 }
 
+/* While ThemeProvider changes the scheme it sets `data-scheme-changing`
+   on <html> for one style pass, so no transition carries the old
+   scheme's colours into the new one (a control fading from light text to
+   dark on a dark field fails contrast while it fades). */
+[data-scheme-changing],
+[data-scheme-changing] *,
+[data-scheme-changing] ::before,
+[data-scheme-changing] ::after {
+  transition: none !important;
+}
+
 /* Tailwind: `dark:` follows data-theme, not the media query, so the
    scheme chosen in the console wins over the system preference. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
