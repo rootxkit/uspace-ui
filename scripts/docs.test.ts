@@ -1,0 +1,101 @@
+// The documents that ship in the tarball (`files`: README.md and
+// CHANGELOG.md) and the plan describe the same release: the version in
+// package.json, its asset URL, and the entry points its CHANGELOG section
+// says ship. A README that still pins the last rc, or says an entry point
+// that ships "follows" in a later version, sends a consumer to the wrong
+// asset or away from a component that is there.
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { describe, expect, it } from "vitest";
+
+import { extractSection } from "./release-notes.mjs";
+import { assetUrl } from "./release.mjs";
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const read = (p: string): string =>
+  readFileSync(path.join(root, p), "utf8").replace(/\r\n/g, "\n");
+
+const pkg = JSON.parse(read("package.json")) as {
+  name: string;
+  version: string;
+  repository: { url: string };
+  exports: Record<string, unknown>;
+};
+
+/** The JS entry points of `exports`: `./map` -> `map`, `./auth/server` -> `auth/server`. */
+const ENTRY_POINTS = Object.keys(pkg.exports)
+  .map((k) => k.replace(/^\.\//, ""))
+  .filter((k) => !/[.*]/.test(k));
+
+/** The text under a `## ` / `### ` heading, up to the next heading of that level or higher. */
+function sectionOf(text: string, heading: string): string {
+  const lines = text.split("\n");
+  const start = lines.findIndex((l) => l === heading);
+  if (start === -1) return "";
+  const level = /^#+/.exec(heading)?.[0].length ?? 2;
+  const rest = lines.slice(start + 1);
+  const end = rest.findIndex((l) => {
+    const m = /^(#+) /.exec(l);
+    return m !== null && (m[1]?.length ?? 0) <= level;
+  });
+  return (end === -1 ? rest : rest.slice(0, end)).join("\n");
+}
+
+/** Every entry point named in backticks in `text`. */
+function entryPointsIn(text: string): string[] {
+  const named = new Set(
+    [...text.matchAll(/`([a-z0-9/]+)`/g)].map((m) => m[1] ?? ""),
+  );
+  return ENTRY_POINTS.filter((e) => named.has(e));
+}
+
+const changelogSection = extractSection(read("CHANGELOG.md"), pkg.version);
+const shipped = entryPointsIn(
+  sectionOf(changelogSection ?? "", "### Entry points that ship"),
+);
+
+describe("CHANGELOG.md, the reference", () => {
+  it("has a section for the version that lists the entry points it ships", () => {
+    expect(changelogSection).not.toBeNull();
+    // Every JS entry point of `exports` ships in 0.1.0.
+    expect(shipped).toEqual(ENTRY_POINTS);
+  });
+});
+
+describe("README.md describes the version in package.json", () => {
+  const readme = read("README.md");
+
+  it("pins the release asset of this version, and no other", () => {
+    const urls = [
+      ...readme.matchAll(
+        /https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/releases\/download\/[^\s"`)]+/g,
+      ),
+    ].map((m) => m[0]);
+    expect(urls.length).toBeGreaterThan(0);
+    expect(new Set(urls)).toEqual(new Set([assetUrl(pkg)]));
+  });
+
+  it("names the version, not an rc, where it says what it describes", () => {
+    const status = sectionOf(readme, "## Status");
+    expect(status).toContain(`\`${pkg.version}\``);
+    expect(readme).toMatch(
+      new RegExp(
+        `^## Consuming \\(\`${pkg.version.replace(/\./g, "\\.")}\`\\)$`,
+        "m",
+      ),
+    );
+    expect(status).not.toMatch(/^Planning\./m);
+  });
+
+  it("says that every entry point the CHANGELOG ships is in it", () => {
+    const status = sectionOf(readme, "## Status");
+    expect(entryPointsIn(status)).toEqual(shipped);
+    // And does not put one of them in a later version.
+    for (const sentence of status.replace(/\n/g, " ").split(/(?<=\.)\s+/)) {
+      if (/\bfollows?\b|\bnot (yet )?included\b|\blater\b/i.test(sentence)) {
+        expect(entryPointsIn(sentence), sentence).toEqual([]);
+      }
+    }
+  });
+});
