@@ -45,8 +45,11 @@ PLAN §11 is unchanged, since what it needs is here.
 
 - The API is not frozen: no semver gate in CI and no lab schema
   fixtures (WP-14, `v1.0.0`).
-- The hand accessibility audit of the public map and the registry check
-  page (PLAN §14 Q11) has not been done; `axe` gates CI.
+- Accessibility (docs/ACCESSIBILITY.md): the registry check page is a
+  system's page and was not audited here, no screen reader pass was
+  run, and two findings are open: `LoginForm` drops focus to `<body>`
+  after a refusal (A4) and the scheme is applied after hydration (A5).
+  The target, WCAG 2.2 AA, is pending GCAA.
 
 ### Changes since 0.1.0-rc.1
 
@@ -113,6 +116,14 @@ A consumer on `0.1.0-rc.1` must act on the first two of these.
   generated types, adapters, the basemap, the CSP, the Docker recipe,
   upgrading, the minimum versions, and where the example differs from
   the CISP's `web/`.
+- WP-13: the accessibility audit of the example's public map, sign-in
+  and role-gated pages (docs/ACCESSIBILITY.md; PLAN §14 Q11), by hand
+  and with `axe` at WCAG 2.2 AA in English light and Georgian dark.
+  `map` gains the catalogue key `map.canvas`: `MapView` names
+  MapLibre's focusable canvas in the page's language, apart from the
+  map region around it, where it was "Map" in English (A2). The
+  example gets page titles (A1) and a skip link that moves focus (A3);
+  its smoke test checks all of it.
 
 ## 0.1.0-rc.1
 

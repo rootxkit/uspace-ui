@@ -160,3 +160,37 @@ describe("CI's example job", () => {
     expect(job).not.toContain("SKIPPED");
   });
 });
+
+describe("the accessibility target and its audit", () => {
+  const config = JSON.parse(read("examples/next-app/config/example.json")) as {
+    policy: Record<string, { value: unknown; source: string; status: string }>;
+  };
+
+  it("keeps every policy value in config, the spec's default, pending GCAA", () => {
+    const entries = Object.entries(config.policy);
+    expect(entries.length).toBeGreaterThan(0);
+    for (const [name, p] of entries) {
+      expect(p.status, name).toBe("pending GCAA");
+      expect(p.source, name).toMatch(/spec|PLAN/);
+    }
+    expect(config.policy["accessibility_target"]?.value).toBe("WCAG 2.2 AA");
+  });
+
+  it("is recorded in docs/ACCESSIBILITY.md against the configured target", () => {
+    const audit = read("docs/ACCESSIBILITY.md");
+    expect(audit).toContain("## Target: WCAG 2.2 AA, pending GCAA");
+    expect(audit).toContain("policy.accessibility_target");
+    // What was not audited is said, not left out.
+    expect(audit).toMatch(/Not audited here:[\s\S]*registry check page/);
+  });
+
+  it("is no longer listed as not done in the 0.1.0 CHANGELOG section", () => {
+    const changelog = read("CHANGELOG.md");
+    const section = changelog.slice(
+      changelog.indexOf("\n## 0.1.0\n"),
+      changelog.indexOf("\n## 0.1.0-rc.1\n"),
+    );
+    expect(section).not.toContain("has not been done");
+    expect(section).toContain("docs/ACCESSIBILITY.md");
+  });
+});

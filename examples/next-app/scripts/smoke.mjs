@@ -18,7 +18,13 @@
 // - signed out, the protected page says so (the twin of the next check);
 // - a refused sign-in shows the API's detail and stays on the form;
 // - the one-role fixture user sees the protected page's denial;
-// - the two-role fixture user signs in and reaches the protected page.
+// - the two-role fixture user signs in and reaches the protected page;
+// - accessibility (docs/ACCESSIBILITY.md): every page, in English light
+//   and Georgian dark, has a title in its language and passes axe at
+//   WCAG 2.2 AA; the map canvas is named in the page's language, apart
+//   from the map region around it, also after a language switch; the
+//   skip link is the first Tab stop and moves focus to the content; at
+//   320 CSS px nothing scrolls sideways.
 //
 // Exit 0 when every check passed; 1 with the failing check otherwise.
 // The servers it starts are stopped on every path.
@@ -31,6 +37,7 @@ import {
   statSync,
 } from "node:fs";
 import { createServer } from "node:http";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
@@ -48,6 +55,185 @@ const BASEMAP_PORT = Number(process.env["SMOKE_BASEMAP_PORT"] ?? 4599);
 const APP = `http://127.0.0.1:${APP_PORT}`;
 /** Display-only bound: how long a page may take to show what it should. */
 const WAIT_MS = 30_000;
+const AXE_SOURCE = readFileSync(
+  createRequire(import.meta.url).resolve("axe-core/axe.min.js"),
+  "utf8",
+);
+/** The accessibility target (config/example.json: WCAG 2.2 AA, pending GCAA). */
+const AXE_TAGS = [
+  "wcag2a",
+  "wcag2aa",
+  "wcag21a",
+  "wcag21aa",
+  "wcag22a",
+  "wcag22aa",
+];
+const PAGES = ["/", "/login", "/protected"];
+const LANG_SETUPS = [
+  { lang: "en", colorScheme: "light", region: "Map", canvas: /^Map view/ },
+  { lang: "ka", colorScheme: "dark", region: "რუკა", canvas: /^რუკის ხედი/ },
+];
+
+/** axe in the page, through the debugging protocol (the CSP governs page scripts, not this). */
+async function axeViolations(page) {
+  await page.evaluate(AXE_SOURCE);
+  return page.evaluate(async (tags) => {
+    const r = await globalThis.axe.run(document, {
+      runOnly: { type: "tag", values: tags },
+    });
+    return r.violations.map(
+      (v) => `${v.id} (${v.nodes.length}): ${v.nodes[0]?.target.join(" ")}`,
+    );
+  }, AXE_TAGS);
+}
+
+/** The map canvas's name and the name of the map region around it. */
+async function mapNames(page) {
+  await page.locator("canvas.maplibregl-canvas").waitFor({ timeout: WAIT_MS });
+  return page.evaluate(() => ({
+    canvas:
+      document
+        .querySelector("canvas.maplibregl-canvas")
+        ?.getAttribute("aria-label") ?? null,
+    region:
+      document.querySelector(".us-map-canvas")?.getAttribute("aria-label") ??
+      null,
+  }));
+}
+
+async function checkAccessibility(browser) {
+  for (const s of LANG_SETUPS) {
+    const context = await browser.newContext({
+      locale: s.lang === "ka" ? "ka-GE" : "en-GB",
+      colorScheme: s.colorScheme,
+    });
+    try {
+      const page = await context.newPage();
+      for (const p of PAGES) {
+        await page.goto(`${APP}${p}`);
+        await page.locator("main h1").waitFor({ timeout: WAIT_MS });
+        if (p === "/") {
+          await page
+            .getByTestId("freshness")
+            .getByText("42")
+            .waitFor({ timeout: WAIT_MS });
+        }
+        const lang = await page.evaluate(() => document.documentElement.lang);
+        expect(lang === s.lang, `${p}: <html lang> is ${lang}, want ${s.lang}`);
+        const title = await page.title();
+        expect(title.trim() !== "", `${p} (${s.lang}) has no <title>`);
+        if (s.lang === "ka") {
+          expect(
+            /[ა-ჿ]/.test(title),
+            `${p} (ka): the title "${title}" is not in Georgian`,
+          );
+        }
+        // The scheme is applied after hydration (ThemeProvider sets
+        // data-theme) and the colours transition into it: measure contrast
+        // once the scheme is set and nothing is animating.
+        await page.waitForFunction(
+          (scheme) =>
+            document.documentElement.getAttribute("data-theme") === scheme &&
+            document.getAnimations().length === 0,
+          s.colorScheme,
+          { timeout: WAIT_MS },
+        );
+        const violations = await axeViolations(page);
+        expect(
+          violations.length === 0,
+          `${p} (${s.lang}, ${s.colorScheme}): axe ${violations.join("; ")}`,
+        );
+      }
+      await page.goto(`${APP}/`);
+      const names = await mapNames(page);
+      expect(
+        names.region === s.region,
+        `the map region is named ${JSON.stringify(names.region)}`,
+      );
+      expect(
+        names.canvas !== null &&
+          s.canvas.test(names.canvas) &&
+          names.canvas !== names.region,
+        `the map canvas is named ${JSON.stringify(names.canvas)} in a ${s.lang} page`,
+      );
+    } finally {
+      await context.close();
+    }
+  }
+  pass(
+    "every page has a title in its language and passes axe (WCAG 2.2 AA), English light and Georgian dark",
+  );
+
+  const context = await browser.newContext({ locale: "en-GB" });
+  try {
+    const page = await context.newPage();
+    // The canvas name follows a language switch on the same map.
+    await page.goto(`${APP}/`);
+    await mapNames(page);
+    await page.getByRole("button", { name: "ქართული" }).click();
+    await page.waitForFunction(
+      () => document.documentElement.lang === "ka",
+      null,
+      { timeout: WAIT_MS },
+    );
+    await page.waitForFunction(
+      () =>
+        /^რუკის ხედი/.test(
+          document
+            .querySelector("canvas.maplibregl-canvas")
+            ?.getAttribute("aria-label") ?? "",
+        ),
+      null,
+      { timeout: WAIT_MS },
+    );
+    pass(
+      "the map canvas is named in the page's language, apart from the map region, also after a switch",
+    );
+    await page.getByRole("button", { name: "English" }).click();
+    await page.waitForFunction(
+      () => document.documentElement.lang === "en",
+      null,
+      { timeout: WAIT_MS },
+    );
+
+    // The skip link: first Tab stop, and it moves focus to the content.
+    await page.goto(`${APP}/`);
+    await page.locator("main h1").waitFor({ timeout: WAIT_MS });
+    await page.keyboard.press("Tab");
+    const first = await page.evaluate(
+      () => document.activeElement?.textContent,
+    );
+    expect(
+      first === "Skip to content",
+      `the first Tab stop is ${JSON.stringify(first)}`,
+    );
+    await page.keyboard.press("Enter");
+    const focused = await page.evaluate(() => document.activeElement?.id);
+    expect(
+      focused === "main",
+      `the skip link moved focus to ${JSON.stringify(focused)}, want main`,
+    );
+    pass("the skip link is the first Tab stop and moves focus to the content");
+
+    // Reflow at 320 CSS px (WCAG 1.4.10).
+    await page.setViewportSize({ width: 320, height: 720 });
+    for (const p of PAGES) {
+      await page.goto(`${APP}${p}`);
+      await page.locator("main h1").waitFor({ timeout: WAIT_MS });
+      const widths = await page.evaluate(() => ({
+        scroll: document.documentElement.scrollWidth,
+        inner: window.innerWidth,
+      }));
+      expect(
+        widths.scroll <= widths.inner,
+        `${p} at 320 px scrolls sideways (${widths.scroll} > ${widths.inner})`,
+      );
+    }
+    pass("at 320 CSS px no page scrolls sideways");
+  } finally {
+    await context.close();
+  }
+}
 
 const TYPES = {
   ".json": "application/json",
@@ -184,6 +370,14 @@ async function run() {
   let page;
   try {
     await waitForApp();
+    if (process.argv.includes("--serve")) {
+      // For a hand audit: the same servers, no checks, until Ctrl-C.
+      console.log(
+        `serving ${APP} (basemap on ${BASEMAP_PORT}); Ctrl-C stops both`,
+      );
+      await new Promise((resolve) => process.once("SIGINT", resolve));
+      return;
+    }
     browser = await chromium.launch({
       args: ["--use-gl=angle", "--use-angle=swiftshader"],
     });
@@ -354,6 +548,8 @@ async function run() {
       .getByText("Signed in as TEST-account-0001")
       .waitFor({ timeout: WAIT_MS });
     pass("the two-role user signs in and reaches the protected page");
+
+    await checkAccessibility(browser);
 
     // Every page carried the CSP; nothing left the origin; nothing was refused.
     expect(

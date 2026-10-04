@@ -119,6 +119,9 @@ const catalogue = {
 
   // WP-3: map
   "map.region": "Map",
+  // WP-13 accessibility audit: MapLibre's focusable canvas, inside the
+  // "Map" region, in the page's language.
+  "map.canvas": "Map view: the arrow keys pan, plus and minus zoom",
   "map.loading": "Loading the base map",
   "map.no_basemap":
     "No base map: positions are drawn on a plain background. The base map files are missing or unreadable.",

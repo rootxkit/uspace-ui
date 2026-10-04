@@ -21,5 +21,6 @@
   "example.protected.denied": "ეს გვერდი აუდიტორის როლისთვისაა.",
   "example.protected.signed_out": "ამ გვერდის სანახავად შედით სისტემაში.",
   "example.session.signed_in_as": "შესული ხართ, როგორც {sub}",
-  "example.footer.a11y": "ხელმისაწვდომობის მიზანი: {target} ({status})"
+  "example.footer.a11y": "ხელმისაწვდომობის მიზანი: {target} ({status})",
+  "example.page_title": "{page} · {brand}"
 }

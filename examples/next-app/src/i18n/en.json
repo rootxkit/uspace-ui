@@ -21,5 +21,6 @@
   "example.protected.denied": "This page is for the auditor role.",
   "example.protected.signed_out": "Sign in to see this page.",
   "example.session.signed_in_as": "Signed in as {sub}",
-  "example.footer.a11y": "Accessibility target: {target} ({status})"
+  "example.footer.a11y": "Accessibility target: {target} ({status})",
+  "example.page_title": "{page} · {brand}"
 }

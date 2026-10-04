@@ -109,6 +109,10 @@ export const ka: Readonly<Record<Key, string>> = {
 
   // WP-3: map
   "map.region": "რუკა",
+  // WP-13 accessibility audit: MapLibre's focusable canvas, inside the
+  // "Map" region, in the page's language.
+  "map.canvas":
+    "რუკის ხედი: ისრები რუკას გადაადგილებს, პლიუსი და მინუსი მასშტაბს ცვლის",
   "map.loading": "საბაზისო რუკა იტვირთება",
   "map.no_basemap":
     "საბაზისო რუკა არ არის: პოზიციები ნაჩვენებია ცარიელ ფონზე. საბაზისო რუკის ფაილები აკლია ან ვერ იკითხება.",

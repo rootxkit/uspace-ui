@@ -74,7 +74,7 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
         )}
       </header>
-      <main id="main" className="p-4">
+      <main id="main" tabIndex={-1} className="p-4 focus:outline-none">
         {children}
       </main>
       <footer className="border-t border-border px-4 py-2 text-sm text-muted-foreground">

@@ -28,6 +28,7 @@ import {
 } from "./context.js";
 import { useTFor } from "../i18n/I18nProvider.js";
 import type { Lang } from "../i18n/lang.js";
+import { createTranslator } from "../i18n/translate.js";
 import { countMap } from "./counters.js";
 import { maplibre, registerPmtilesProtocol } from "./maplibre.js";
 import {
@@ -118,6 +119,10 @@ export function MapView(props: MapViewProps): ReactNode {
           p.attributionExtra === undefined
             ? { compact: false }
             : { compact: false, customAttribution: p.attributionExtra },
+        // MapLibre names its focusable canvas "Map" in English, a second
+        // region inside the kit's own "Map" region (WP-13 audit): name it
+        // in the page's language, apart from the region around it.
+        locale: { "Map.Title": createTranslator(p.lang)("map.canvas") },
       });
     } catch {
       // MapLibre throws when it cannot get a WebGL context.
@@ -161,6 +166,11 @@ export function MapView(props: MapViewProps): ReactNode {
       styleLoaded.current = false;
     };
   }, [ready]);
+
+  // The canvas's name follows the language without a new map.
+  useEffect(() => {
+    map?.getCanvas().setAttribute("aria-label", t("map.canvas"));
+  }, [map, t]);
 
   // Re-apply the style when the language, the scheme or the basemap info
   // changes, and only then: every kit layer is re-added on `style.load`.
