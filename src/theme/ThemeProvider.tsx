@@ -23,6 +23,9 @@ import {
 } from "./scheme.js";
 import { tokens } from "./tokens.js";
 
+/** On <html> while ThemeProvider changes the scheme (styles/tokens.css). */
+const SCHEME_CHANGING_ATTR = "data-scheme-changing";
+
 export interface ThemeContextValue {
   scheme: ColorScheme;
   resolved: ResolvedScheme;
@@ -66,6 +69,30 @@ const prefersDark = (): boolean => mediaQuery()?.matches ?? false;
 // the client corrects it before paint.
 const prefersDarkOnServer = (): boolean => false;
 
+/**
+ * Sets (or, for `null`, removes) `data-theme` on `root` without letting a
+ * CSS transition carry the old scheme's colours into the new one.
+ *
+ * A child's layout effect runs before this provider's, so the page can
+ * already have been styled in the previous scheme (a measured table does
+ * that) when the scheme lands. A control with `transition-[color]` then
+ * fades from the old text colour to the new one: in dark, near-black text
+ * on a dark field for the length of the transition, a contrast failure a
+ * user sees and axe reports. `data-scheme-changing` turns transitions off
+ * (styles/tokens.css) for one forced style pass, so every colour changes
+ * at once, and is removed after it; removing it starts nothing, as the
+ * colours have already changed.
+ */
+function applyScheme(root: HTMLElement, scheme: string | null): void {
+  root.setAttribute(SCHEME_CHANGING_ATTR, "");
+  if (scheme === null) root.removeAttribute("data-theme");
+  else root.setAttribute("data-theme", scheme);
+  // Reading a layout value forces the style pass of the whole page, with
+  // transitions off.
+  void root.offsetWidth;
+  root.removeAttribute(SCHEME_CHANGING_ATTR);
+}
+
 function initialScheme(prop: ColorScheme | undefined): ColorScheme {
   if (prop !== undefined) return prop;
   if (typeof document === "undefined") return "system";
@@ -94,10 +121,9 @@ export function ThemeProvider(props: ThemeProviderProps): ReactNode {
   useLayoutEffect(() => {
     const root = document.documentElement;
     const before = root.getAttribute("data-theme");
-    root.setAttribute("data-theme", resolved);
+    applyScheme(root, resolved);
     return () => {
-      if (before === null) root.removeAttribute("data-theme");
-      else root.setAttribute("data-theme", before);
+      applyScheme(root, before);
     };
   }, [resolved]);
 

@@ -7,6 +7,10 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
+- Fixed: ThemeProvider changes the scheme with CSS transitions off, so a
+  control no longer fades from the old scheme's text colour (near-black
+  on a dark field) after mounting in dark (WP-1).
+
 ## 0.1.0
 
 The first stable release, U-M1. It is a GitHub Release asset of this
