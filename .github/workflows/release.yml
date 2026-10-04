@@ -2,7 +2,9 @@
 # v<version>: the tag must equal package.json `version`, then every CI job
 # runs on the tag (ci.yml through workflow_call, including `pack`, which
 # builds the tarball and installs it into a scratch consumer), then the
-# tarball `pack` built is attached to a GitHub Release with SHA256SUMS.
+# tarball `pack` built is attested (keyless build provenance, Sigstore
+# through this run's OIDC token) and attached to a GitHub Release with
+# SHA256SUMS.
 # A version with a pre-release suffix (0.1.0-rc.1) is a GitHub pre-release.
 #
 # Distribution is the GitHub Release asset, not npmjs (PLAN D10, superseded
@@ -20,7 +22,8 @@ concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
-# Read-only by default; only `release` holds contents: write. Every
+# Read-only by default; only `release` holds contents: write (and the
+# id-token and attestations permissions of its provenance). Every
 # `uses:` is pinned to a full commit SHA (version in the trailing comment),
 # because the release job runs them beside a write-capable token, and
 # every checkout drops its credential (retro-audit B1).
@@ -69,6 +72,10 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: write
+      # Keyless signing: the OIDC token Sigstore's Fulcio certifies, and
+      # the attestation stored on this repository.
+      id-token: write
+      attestations: write
     env:
       GH_TOKEN: ${{ github.token }}
       NAME: ${{ needs.checks.outputs.tarball-name }}
@@ -90,6 +97,16 @@ jobs:
           test "$NAME" = "$(node scripts/release.mjs asset)"
           echo "$SHA256  release/$NAME" | sha256sum -c -
           (cd release && sha256sum "$NAME" > SHA256SUMS && cat SHA256SUMS)
+      # SHA256SUMS is written by this same job, so it says the bytes match
+      # what was uploaded, not who built them. The attestation is a
+      # Sigstore-signed SLSA provenance statement for the tarball's digest,
+      # keyless (no key to keep), naming this repository, this workflow
+      # and the tagged commit; a consumer checks it with
+      # `gh attestation verify` (docs/RELEASING.md).
+      - name: Attest the tarball's build provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: release/${{ env.NAME }}
       - name: Release notes from CHANGELOG.md
         run: |
           {
@@ -103,7 +120,12 @@ jobs:
             echo "\"@rootxkit/uspace-ui\": \"$(node scripts/release.mjs url)\""
             echo '```'
             echo ""
-            echo "SHA-256 \`$SHA256\` (also in \`SHA256SUMS\`)."
+            echo "SHA-256 \`$SHA256\` (also in \`SHA256SUMS\`). The tarball carries a"
+            echo "signed build provenance attestation; verify it with"
+            echo ""
+            echo '```sh'
+            echo "gh attestation verify $NAME --repo $GITHUB_REPOSITORY --signer-workflow $GITHUB_REPOSITORY/.github/workflows/release.yml"
+            echo '```'
           } > "$RUNNER_TEMP/notes.md"
           cat "$RUNNER_TEMP/notes.md"
       - name: Create the GitHub Release
@@ -128,3 +150,6 @@ jobs:
           test "$want_pre" = "$got_pre"
           curl -sSfL -o "$RUNNER_TEMP/$NAME" "$(node scripts/release.mjs url)"
           echo "$SHA256  $RUNNER_TEMP/$NAME" | sha256sum -c -
+          # The downloaded bytes carry this workflow's signed provenance.
+          gh attestation verify "$RUNNER_TEMP/$NAME" --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/release.yml"

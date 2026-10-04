@@ -7,6 +7,12 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
+- Release provenance: `release.yml` attests the tarball keylessly
+  (`actions/attest-build-provenance`, Sigstore through the run's OIDC
+  token) before it creates the GitHub Release, and its read-back
+  verifies the attestation on the asset downloaded from its public URL.
+  `SHA256SUMS` alone was unsigned, written by the same job. Consumers
+  verify with `gh attestation verify` (docs/RELEASING.md).
 - Retro-audit fixes: `auth/server` keeps its timeout over the API's
   answer body (an upstream body silent for `timeoutMs` is aborted and
   counted as `upstream_timeout`) and `api`'s client keeps its deadline

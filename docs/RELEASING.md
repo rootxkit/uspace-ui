@@ -55,19 +55,45 @@ prints the URL of the version in `package.json`.
      consumer, and uploads it as the `package` artifact.
    - `release` (the only job with `contents: write`, using this run's
      `GITHUB_TOKEN`): downloads that artifact, checks its SHA-256
-     against what `pack` reported, writes `SHA256SUMS`, and creates the
-     GitHub Release with both files. The release body is the CHANGELOG
+     against what `pack` reported, writes `SHA256SUMS`, attests the
+     tarball's build provenance (below), and creates the GitHub Release
+     with both files. The release body is the CHANGELOG
      section plus the dependency line. A version with a pre-release
      suffix (`-rc.1`, `-beta.2`) is marked as a pre-release. A plain
      version is marked latest. The job then reads the release back and
      re-downloads the asset from its public URL, checking the
-     pre-release flag and the SHA-256.
+     pre-release flag, the SHA-256 and the attestation.
 4. Tell each consumer the exact URL to pin.
 
 A failed run releases nothing; fix on `main`, delete the tag, and tag
 again. Do not replace an asset of a published release: consumers'
 lockfiles pin its bytes, so a replaced asset breaks their installs, and
 it should.
+
+### Provenance: the tarball is signed, keyless
+
+`SHA256SUMS` is written by the same job that uploads the tarball, so it
+only says the bytes match what that job uploaded; it does not say who
+built them, and a consumer's lockfile integrity pins whatever bytes it
+first saw. The release job therefore attests the tarball with
+`actions/attest-build-provenance` (pinned by SHA): a SLSA build
+provenance statement for the tarball's SHA-256, signed through
+Sigstore with a short-lived certificate for this run's GitHub OIDC
+identity. There is no signing key to keep or leak. The attestation is
+stored on this repository and names the repository, `release.yml` and
+the tagged commit. The job needs `id-token: write` and
+`attestations: write`, and only it has them.
+
+A consumer verifies a release asset before pinning it (and again before
+a bump):
+
+```sh
+gh attestation verify rootxkit-uspace-ui-<version>.tgz --repo rootxkit/uspace-ui \
+  --signer-workflow rootxkit/uspace-ui/.github/workflows/release.yml
+```
+
+Releases cut before this (`v0.1.0-rc.1`) carry `SHA256SUMS` only and no
+attestation.
 
 ### Who may tag
 
