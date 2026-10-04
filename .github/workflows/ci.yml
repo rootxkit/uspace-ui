@@ -168,7 +168,7 @@ jobs:
           SHA256: ${{ steps.pack.outputs.sha256 }}
         run: |
           files=$(tar -tzf "$TARBALL" | wc -l)
-          kind=release
+          kind="release, marked latest"
           if [ "$(node scripts/release.mjs prerelease)" = true ]; then kind=pre-release; fi
           {
             echo "Would release $NAME ($files files) as a GitHub $kind on tag v$(node -p 'require("./package.json").version')"

@@ -50,4 +50,42 @@ describe("release.yml provenance", () => {
       readBack.indexOf("curl -sSfL"),
     );
   });
+
+  it("reads back that a plain version is the latest release and an rc never is", () => {
+    const readBack = releaseJob.slice(
+      releaseJob.indexOf("- name: Read the release back"),
+    );
+    const create = releaseJob.slice(
+      releaseJob.indexOf("- name: Create the GitHub Release"),
+      releaseJob.indexOf("- name: Read the release back"),
+    );
+    // The flags that set it, both ways.
+    expect(create).toContain("flags+=(--prerelease)");
+    expect(create).toContain("flags+=(--latest)");
+    // The answer read back without a 404 when no plain release exists yet.
+    expect(readBack).toContain(
+      "gh release list --limit 100 --json tagName,isLatest",
+    );
+    expect(readBack).not.toMatch(/gh api [^\n]*releases\/latest/);
+    expect(readBack).toMatch(
+      /if \[ "\$want_pre" = true \]; then\n\s+test "\$latest" != "\$GITHUB_REF_NAME"\n\s+else\n\s+test "\$latest" = "\$GITHUB_REF_NAME"\n\s+fi\n/,
+    );
+  });
+});
+
+describe("workflow shells", () => {
+  it.each(["release.yml", "ci.yml"])(
+    "%s runs every step with bash -eo pipefail",
+    (name) => {
+      const text = readFileSync(
+        path.join(root, ".github/workflows", name),
+        "utf8",
+      ).replace(/\r\n/g, "\n");
+      const head = text.slice(0, text.indexOf("\njobs:\n"));
+      expect(head).toMatch(
+        /^defaults:\n {2}run:\n(?: {4}#.*\n)* {4}shell: bash$/m,
+      );
+      expect(text).not.toMatch(/^\s+shell: (?!bash$)/m);
+    },
+  );
 });
