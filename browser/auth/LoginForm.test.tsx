@@ -126,3 +126,46 @@ it("enrolment (ka dark)", async () => {
   expect(await canvas.findByText("TESTSECRETBASE32TESTSECRET")).toBeVisible();
   expect(canvas.getByLabelText("ერთჯერადი კოდი")).toBeVisible();
 });
+
+const refused: typeof fetch = () =>
+  Promise.resolve(
+    json(401, {
+      type: "https://schemas.uspace.ge/problems/invalid_credentials",
+      title: "Refused",
+      status: 401,
+      detail: "Wrong username or password.",
+      instance: null,
+      errors: [],
+    }),
+  );
+
+/**
+ * docs/ACCESSIBILITY.md A4: a click on the submit button disables it while
+ * the request runs; after the refusal the focus is on the cleared password,
+ * not on <body>.
+ */
+it("refused sign-in returns the focus (en light)", async () => {
+  const { container } = renderKit(
+    <LoginForm {...LOGIN_PROPS} fetch={refused} />,
+    EN_LIGHT,
+  );
+  await signIn(container);
+  const canvas = within(container);
+  await canvas.findByRole("alert");
+  await expect
+    .poll(() => document.activeElement)
+    .toBe(canvas.getByLabelText("Password"));
+  expect(document.activeElement).not.toBe(document.body);
+});
+
+it("refused sign-in returns the focus (ka dark)", async () => {
+  const { container } = renderKit(
+    <LoginForm {...LOGIN_PROPS} fetch={refused} />,
+    KA_DARK,
+  );
+  await signIn(container);
+  const canvas = within(container);
+  await canvas.findByRole("alert");
+  const passwordField = container.querySelectorAll("input")[1];
+  await expect.poll(() => document.activeElement).toBe(passwordField);
+});

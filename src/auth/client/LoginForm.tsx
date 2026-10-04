@@ -11,6 +11,13 @@
 // carries `{username, password}`, the second `{username, otp}`. The BFF keeps
 // the API's challenge in an `HttpOnly` cookie between them, and the form
 // drops the password from its state as soon as the first step succeeds.
+//
+// Focus (docs/ACCESSIBILITY.md A4, WCAG 2.4.3): the submit button is
+// disabled while a request runs, so a click on it leaves the focus on
+// <body> when the answer is a refusal. Once the request is over, the focus
+// goes to the field the person has to fill again: the password (cleared)
+// after a refused first step, the code after a refused second step. The
+// refusal itself is announced by its `role="alert"` message.
 import {
   useEffect,
   useId,
@@ -57,6 +64,7 @@ export function LoginForm(props: LoginFormProps): ReactNode {
   const t = useT();
   const id = useId();
   const otpRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
@@ -66,6 +74,14 @@ export function LoginForm(props: LoginFormProps): ReactNode {
   const [message, setMessage] = useState<Message>(null);
   const [retryS, setRetryS] = useState(0);
   const [busy, setBusy] = useState(false);
+  // The field to focus once the request is over (A4); null: leave it.
+  const [refocus, setRefocus] = useState<Step | null>(null);
+
+  useEffect(() => {
+    if (busy || refocus === null) return;
+    (refocus === "otp" ? otpRef : passwordRef).current?.focus();
+    setRefocus(null);
+  }, [busy, refocus]);
 
   // One interval for the whole countdown, stopped when it reaches zero.
   const counting = retryS > 0;
@@ -91,6 +107,7 @@ export function LoginForm(props: LoginFormProps): ReactNode {
       if (sent === "password") setPassword("");
       setOtp("");
       setMessage({ kind: "error", text });
+      setRefocus(sent);
       return "refused";
     };
     let res: Response;
@@ -122,6 +139,7 @@ export function LoginForm(props: LoginFormProps): ReactNode {
         problemSlug(problem.type) === "mfa_challenge_missing"
       ) {
         restart({ kind: "error", text });
+        setRefocus("password");
         return "refused";
       }
       return refuse(text);
@@ -228,6 +246,7 @@ export function LoginForm(props: LoginFormProps): ReactNode {
           <div className="flex flex-col gap-1">
             <Label htmlFor={`${id}-password`}>{t("auth.password")}</Label>
             <Input
+              ref={passwordRef}
               id={`${id}-password`}
               name="password"
               type="password"
