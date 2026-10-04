@@ -427,6 +427,34 @@ describe.each(Object.entries(SCHEMES))("%s scheme", (_scheme, s) => {
   });
 });
 
+/** Names whose values differ between two blocks, or that one lacks. */
+function blockDifferences(
+  a: Record<string, string>,
+  b: Record<string, string>,
+): string[] {
+  const names = new Set([...Object.keys(a), ...Object.keys(b)]);
+  return [...names].filter((n) => a[n] !== b[n]).sort();
+}
+
+describe("tokens.css first paint (docs/ACCESSIBILITY.md A5)", () => {
+  const media = block(":root:not([data-theme])");
+
+  it("gives a page without data-theme the dark values under a dark preference", () => {
+    expect(Object.keys(media).length).toBeGreaterThan(30);
+    expect(blockDifferences(media, SCHEMES.dark)).toEqual([]);
+    expect(css).toMatch(
+      /@media \(prefers-color-scheme: dark\)\s*\{\s*:root:not\(\[data-theme\]\)\s*\{/,
+    );
+  });
+
+  it("would report a value that drifted from the dark block (the twin)", () => {
+    const drifted = { ...media, "--us-surface": "#ffffff" };
+    expect(blockDifferences(drifted, SCHEMES.dark)).toEqual(["--us-surface"]);
+    const { ["--us-focus"]: _dropped, ...missing } = media;
+    expect(blockDifferences(missing, SCHEMES.dark)).toEqual(["--us-focus"]);
+  });
+});
+
 describe("tokens.css", () => {
   it("names no organisation colour: the accent default is the focus blue", () => {
     for (const s of Object.values(SCHEMES)) {

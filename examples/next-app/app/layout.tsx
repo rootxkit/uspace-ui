@@ -7,7 +7,12 @@ import {
 } from "@rootxkit/uspace-ui/auth/server";
 import { fontClassName } from "@rootxkit/uspace-ui/fonts";
 import { LANG_COOKIE, negotiateLang } from "@rootxkit/uspace-ui/i18n";
-import { brandFromEnv } from "@rootxkit/uspace-ui/theme";
+import {
+  SCHEME_COOKIE,
+  brandFromEnv,
+  parseScheme,
+  schemeAttribute,
+} from "@rootxkit/uspace-ui/theme";
 import { Providers } from "@/src/components/Providers";
 import { Shell } from "@/src/components/Shell";
 import "./globals.css";
@@ -34,8 +39,17 @@ export default async function RootLayout({
   const nonce = h.get(CSP_NONCE_HEADER) ?? undefined;
   // UI_BRAND_* from the environment, read at request time (06 §4).
   const brand = brandFromEnv(process.env);
+  // An explicit scheme is painted from the first byte; `system` (or none)
+  // leaves data-theme off, and the kit's tokens follow the preference
+  // until ThemeProvider sets it (docs/ACCESSIBILITY.md A5).
+  const scheme = schemeAttribute(parseScheme(jar.get(SCHEME_COOKIE)?.value));
   return (
-    <html lang={lang} className={fontClassName} suppressHydrationWarning>
+    <html
+      lang={lang}
+      className={fontClassName}
+      data-theme={scheme}
+      suppressHydrationWarning
+    >
       <body className="font-sans antialiased">
         <Providers lang={lang} brand={brand} nonce={nonce} session={session}>
           <Shell>{children}</Shell>

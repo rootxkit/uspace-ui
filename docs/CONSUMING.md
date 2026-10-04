@@ -83,7 +83,7 @@ import { cookies, headers } from "next/headers";
 import { CSP_NONCE_HEADER, readSessionToken, sessionDisplay } from "@rootxkit/uspace-ui/auth/server";
 import { fontClassName } from "@rootxkit/uspace-ui/fonts";
 import { LANG_COOKIE, negotiateLang } from "@rootxkit/uspace-ui/i18n";
-import { brandFromEnv } from "@rootxkit/uspace-ui/theme";
+import { SCHEME_COOKIE, brandFromEnv, parseScheme, schemeAttribute } from "@rootxkit/uspace-ui/theme";
 
 export const dynamic = "force-dynamic"; // the nonce, the language and the session are per request
 
@@ -93,8 +93,9 @@ export default async function RootLayout({ children }) {
   const lang = negotiateLang(h.get("accept-language"), jar.get(LANG_COOKIE)?.value ?? null);
   const session = sessionDisplay(readSessionToken(jar)); // display only, decoded unverified
   const nonce = h.get(CSP_NONCE_HEADER) ?? undefined;
+  const scheme = schemeAttribute(parseScheme(jar.get(SCHEME_COOKIE)?.value)); // 1.0.0: no first-paint flash
   return (
-    <html lang={lang} className={fontClassName}>
+    <html lang={lang} className={fontClassName} data-theme={scheme} suppressHydrationWarning>
       <body className="font-sans antialiased">
         {/* a client component: CspNonceProvider > ThemeProvider brand={brandFromEnv(process.env)}
             > I18nProvider lang catalogues onLangChange > SessionProvider session */}
@@ -107,6 +108,13 @@ export default async function RootLayout({ children }) {
 - **Fonts**: `fontClassName` on `<html>` loads Noto Sans and Noto Sans
   Georgian through `next/font/local` from the package. No Google Fonts,
   no font request off your origin (D7).
+- **Colour scheme** (1.0.0): render `data-theme` on `<html>` with
+  `schemeAttribute` from the `uspace_scheme` cookie, so an explicit
+  scheme is painted from the first byte. For `system` (or no cookie) it
+  renders nothing, and `tokens.css` follows `prefers-color-scheme` until
+  `ThemeProvider` sets `data-theme`: a dark preference no longer paints
+  light first and turns dark after hydration. `suppressHydrationWarning`
+  because `ThemeProvider` sets the attribute on the client.
 - **Branding** is configuration: `UI_BRAND_NAME`, `UI_BRAND_SHORT_NAME`,
   `UI_BRAND_LOGO_URL`, `UI_BRAND_CONTACT`, `UI_BRAND_ACCENT`, read at
   request time with `brandFromEnv(process.env)`.

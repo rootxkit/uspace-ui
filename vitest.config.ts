@@ -1,6 +1,19 @@
 import tailwindcss from "@tailwindcss/vite";
 import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
+import type { BrowserCommand } from "vitest/node";
+
+/**
+ * Test-only browser command: emulates `prefers-color-scheme` in the
+ * page (Playwright `emulateMedia`); null restores the default. The theme
+ * tests use it to see the first paint before ThemeProvider has run
+ * (docs/ACCESSIBILITY.md A5).
+ */
+const emulateColorScheme: BrowserCommand<
+  [scheme: "light" | "dark" | null]
+> = async (ctx, scheme) => {
+  await ctx.page.emulateMedia({ colorScheme: scheme });
+};
 
 // Three projects (PLAN §9): `node` for pure code, `jsdom` for components,
 // `browser` for components in a real browser (Playwright Chromium, axe
@@ -66,6 +79,7 @@ export default defineConfig({
               },
             }),
             instances: [{ browser: "chromium" }],
+            commands: { emulateColorScheme },
           },
           setupFiles: ["browser/setup.ts"],
         },

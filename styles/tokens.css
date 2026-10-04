@@ -7,9 +7,10 @@
    which Tailwind v4 reads and a browser ignores.
 
    Schemes: the light values apply on `:root` and under any element with
-   `data-theme="light"`; the dark values under `data-theme="dark"`.
-   ThemeProvider sets `data-theme` on <html>; a subtree (the map, a
-   preview) may carry its own.
+   `data-theme="light"`; the dark values under `data-theme="dark"`, and on
+   a `:root` without `data-theme` when the system prefers dark (the first
+   paint before ThemeProvider runs). ThemeProvider sets `data-theme` on
+   <html>; a subtree (the map, a preview) may carry its own.
 
    The four semantic palettes (severity, trust class, identification
    status, zone type) and the age buckets say nothing about meaning;
@@ -122,6 +123,62 @@
   --us-age-unknown: #f7f7f8;
 }
 
+/* Before ThemeProvider has set data-theme (the first paint of a page the
+   server rendered without one, so before hydration), a dark system
+   preference gets the dark values at once instead of a light first paint
+   that turns dark after hydration (docs/ACCESSIBILITY.md A5). These are
+   the [data-theme="dark"] values, value for value; src/theme/tokens.test.ts
+   fails if the two blocks differ. An explicit scheme the server knows
+   (the uspace_scheme cookie) is rendered as data-theme on <html> with
+   schemeAttribute(), which this block then leaves alone. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+
+    --us-surface: #111418;
+    --us-surface-raised: #1b1f26;
+    --us-surface-sunken: #232832;
+    --us-text: #eef0f3;
+    --us-text-muted: #a3aab5;
+    --us-border: #2f3540;
+    --us-border-strong: #7d8592;
+    --us-focus: #78a9ff;
+    --us-hover: #2a303b;
+    --us-danger: #f0544a;
+    --us-on-danger: #111418;
+    --us-brand-accent: #78a9ff;
+    --us-on-brand-accent: #0b1220;
+
+    --us-severity-info: #87c0f6;
+    --us-severity-warning: #ffba33;
+    --us-severity-critical: #e96582;
+
+    --us-trust-authenticated: #38b47a;
+    --us-trust-provider: #4e75e8;
+    --us-trust-surveillance: #caa9eb;
+    --us-trust-broadcast: #ed6c15;
+    --us-trust-sensor: #22efcd;
+    --us-trust-simulated: #7c7f87;
+
+    --us-ident-registered: #44ec9f;
+    --us-ident-suspended: #ff9b02;
+    --us-ident-unknown_operator: #e74c58;
+    --us-ident-unidentified: #f7f7f8;
+    --us-ident-none: #796e81;
+
+    --us-zone-PROHIBITED: #e64c64;
+    --us-zone-REQ_AUTHORIZATION: #fc7f08;
+    --us-zone-CONDITIONAL: #fff841;
+    --us-zone-NO_RESTRICTION: #48eaa4;
+    --us-zone-USPACE: #6c8fde;
+
+    --us-age-live: #50c793;
+    --us-age-aging: #fe710f;
+    --us-age-stale: #6c7069;
+    --us-age-unknown: #f7f7f8;
+  }
+}
+
 /* The shadcn/ui semantic set, mapped onto the kit's tokens. Every value
    is a reference, so it follows the scheme of the nearest data-theme. */
 :root,
@@ -172,9 +229,19 @@
   transition: none !important;
 }
 
-/* Tailwind: `dark:` follows data-theme, not the media query, so the
-   scheme chosen in the console wins over the system preference. */
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+/* Tailwind: `dark:` follows data-theme, so the scheme chosen in the
+   console wins over the system preference; the media query only counts
+   while <html> has no data-theme yet (the first paint, A5). */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme]), :root:not([data-theme]) *) {
+      @slot;
+    }
+  }
+}
 
 /* Tailwind: utilities for the shadcn set and the semantic palettes, such
    as `bg-primary`, `text-severity-critical`, `border-zone-PROHIBITED`. */
