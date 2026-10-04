@@ -62,14 +62,21 @@ describe("release.yml provenance", () => {
     // The flags that set it, both ways.
     expect(create).toContain("flags+=(--prerelease)");
     expect(create).toContain("flags+=(--latest)");
-    // The answer read back without a 404 when no plain release exists yet.
-    expect(readBack).toContain(
-      "gh release list --limit 100 --json tagName,isLatest",
-    );
-    expect(readBack).not.toMatch(/gh api [^\n]*releases\/latest/);
+    // Read back per tag, with a bounded wait for a slow index
+    // (scripts/release.mjs checkLatest), not from a list a slow index
+    // leaves stale and not from releases/latest, which is 404 for an rc
+    // before any plain release exists.
     expect(readBack).toMatch(
-      /if \[ "\$want_pre" = true \]; then\n\s+test "\$latest" != "\$GITHUB_REF_NAME"\n\s+else\n\s+test "\$latest" = "\$GITHUB_REF_NAME"\n\s+fi\n/,
+      /^ {10}node scripts\/release\.mjs check-latest "\$GITHUB_REF_NAME"$/m,
     );
+    expect(readBack).not.toContain("gh release list");
+    expect(readBack).not.toMatch(/gh api [^\n]*releases\/latest/);
+    // The check runs before the bytes are downloaded and verified, and
+    // the job's bound leaves room for its wait.
+    expect(readBack.indexOf("check-latest")).toBeLessThan(
+      readBack.indexOf("curl -sSfL"),
+    );
+    expect(releaseJob).toMatch(/^ {4}timeout-minutes: 10$/m);
   });
 });
 

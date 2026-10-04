@@ -159,17 +159,12 @@ jobs:
           # The latest mark, read back too: v0.1.0 is the first tag to take
           # the `--latest` branch, which has never run. A plain version must
           # be the repository's latest release, and a pre-release must never
-          # be. `gh release list` answers with no latest at all where
-          # `releases/latest` answers 404, which is what an rc sees before
-          # any plain release exists.
-          latest=$(gh release list --limit 100 --json tagName,isLatest \
-            --jq '.[] | select(.isLatest) | .tagName')
-          echo "latest release: ${latest:-none}"
-          if [ "$want_pre" = true ]; then
-            test "$latest" != "$GITHUB_REF_NAME"
-          else
-            test "$latest" = "$GITHUB_REF_NAME"
-          fi
+          # be. Read per tag (GraphQL Release.isLatest; `gh release view`
+          # has no isLatest field), up to 10 times 6 s apart, because the
+          # release index can answer behind the release just created; it
+          # fails after the bound and passes only on a read that showed the
+          # mark (scripts/release.mjs checkLatest).
+          node scripts/release.mjs check-latest "$GITHUB_REF_NAME"
           curl -sSfL -o "$RUNNER_TEMP/$NAME" "$(node scripts/release.mjs url)"
           echo "$SHA256  $RUNNER_TEMP/$NAME" | sha256sum -c -
           # The downloaded bytes carry this workflow's signed provenance.

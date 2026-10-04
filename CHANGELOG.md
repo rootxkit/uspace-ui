@@ -92,7 +92,10 @@ A consumer on `0.1.0-rc.1` must act on the first two of these.
   `SHA256SUMS` alone was unsigned, written by the same job. `v0.1.0` is
   the first release that carries an attestation.
 - The release read-back also checks the latest mark: a plain version
-  must be the repository's latest release, a pre-release never. Every
+  must be the repository's latest release, a pre-release never. It
+  reads the tag's own release up to 10 times 6 s apart, so a slow
+  release index does not fail a correct release and a missing mark
+  fails after the bound (`release.mjs check-latest`). Every
   `release.yml` step runs with `bash -eo pipefail`, as CI's do.
 - `version` is `0.1.0`.
 
