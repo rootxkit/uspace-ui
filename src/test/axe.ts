@@ -10,12 +10,22 @@ export const WCAG_22_AA_TAGS: readonly string[] = [
   "wcag22aa",
 ];
 
-/** Formats axe violations one per line: rule id, impact, help and targets. */
+/**
+ * Formats axe violations: one line per violation (rule id, impact, help and
+ * targets), then one indented line per node with its target, what axe
+ * measured (for color-contrast, the two colours and the ratio) and the
+ * node's markup, so a failure in CI says which element failed and why.
+ */
 export function formatViolations(violations: readonly axe.Result[]): string {
   return violations
     .map((v) => {
       const targets = v.nodes.map((n) => n.target.join(" ")).join(", ");
-      return `${v.id} (${v.impact ?? "unknown"}): ${v.help} [${targets}]`;
+      const head = `${v.id} (${v.impact ?? "unknown"}): ${v.help} [${targets}]`;
+      const nodes = v.nodes.map((n) => {
+        const why = (n.failureSummary ?? "").replace(/\s+/g, " ").trim();
+        return `  ${v.id} ${n.target.join(" ")}: ${why} | ${n.html}`;
+      });
+      return [head, ...nodes].join("\n");
     })
     .join("\n");
 }

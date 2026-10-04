@@ -92,12 +92,20 @@ describe("axeCheck", () => {
           id: "image-alt",
           impact: "critical",
           help: "Images must have alternative text",
-          nodes: [{ target: ["img"] }],
+          nodes: [
+            {
+              target: ["img"],
+              html: '<img src="data:,">',
+              failureSummary: "Fix any of the following:\n  Element has no alt",
+            },
+          ],
         },
         { id: "x", impact: null, help: "h", nodes: [] },
       ] as unknown as Parameters<typeof formatViolations>[0]),
     ).toBe(
-      "image-alt (critical): Images must have alternative text [img]\nx (unknown): h []",
+      "image-alt (critical): Images must have alternative text [img]\n" +
+        '  image-alt img: Fix any of the following: Element has no alt | <img src="data:,">\n' +
+        "x (unknown): h []",
     );
   });
 });
