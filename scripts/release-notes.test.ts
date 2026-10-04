@@ -42,6 +42,17 @@ describe("extractSection", () => {
     expect(extractSection(CHANGELOG, "0.1.0-rc")).toBeNull();
   });
 
+  it("reads a release's section, and none of its candidates, once it exists", () => {
+    const released = CHANGELOG.replace(
+      "## 0.1.0-rc.2",
+      "## 0.1.0\n\n### Changes since 0.1.0-rc.2\n\n- release line\n\n## 0.1.0-rc.2",
+    );
+    expect(extractSection(released, "0.1.0")).toBe(
+      "### Changes since 0.1.0-rc.2\n\n- release line",
+    );
+    expect(extractSection(released, "0.1.0-rc.2")).toBe("- rc.2 line");
+  });
+
   it("returns null for an empty section", () => {
     expect(extractSection("## 1.0.0\n\n## 0.9.0\n- x\n", "1.0.0")).toBeNull();
   });

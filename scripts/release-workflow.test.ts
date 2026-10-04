@@ -50,4 +50,49 @@ describe("release.yml provenance", () => {
       readBack.indexOf("curl -sSfL"),
     );
   });
+
+  it("reads back that a plain version is the latest release and an rc never is", () => {
+    const readBack = releaseJob.slice(
+      releaseJob.indexOf("- name: Read the release back"),
+    );
+    const create = releaseJob.slice(
+      releaseJob.indexOf("- name: Create the GitHub Release"),
+      releaseJob.indexOf("- name: Read the release back"),
+    );
+    // The flags that set it, both ways.
+    expect(create).toContain("flags+=(--prerelease)");
+    expect(create).toContain("flags+=(--latest)");
+    // Read back per tag, with a bounded wait for a slow index
+    // (scripts/release.mjs checkLatest), not from a list a slow index
+    // leaves stale and not from releases/latest, which is 404 for an rc
+    // before any plain release exists.
+    expect(readBack).toMatch(
+      /^ {10}node scripts\/release\.mjs check-latest "\$GITHUB_REF_NAME"$/m,
+    );
+    expect(readBack).not.toContain("gh release list");
+    expect(readBack).not.toMatch(/gh api [^\n]*releases\/latest/);
+    // The check runs before the bytes are downloaded and verified, and
+    // the job's bound leaves room for its wait.
+    expect(readBack.indexOf("check-latest")).toBeLessThan(
+      readBack.indexOf("curl -sSfL"),
+    );
+    expect(releaseJob).toMatch(/^ {4}timeout-minutes: 10$/m);
+  });
+});
+
+describe("workflow shells", () => {
+  it.each(["release.yml", "ci.yml"])(
+    "%s runs every step with bash -eo pipefail",
+    (name) => {
+      const text = readFileSync(
+        path.join(root, ".github/workflows", name),
+        "utf8",
+      ).replace(/\r\n/g, "\n");
+      const head = text.slice(0, text.indexOf("\njobs:\n"));
+      expect(head).toMatch(
+        /^defaults:\n {2}run:\n(?: {4}#.*\n)* {4}shell: bash$/m,
+      );
+      expect(text).not.toMatch(/^\s+shell: (?!bash$)/m);
+    },
+  );
 });

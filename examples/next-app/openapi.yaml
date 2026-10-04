@@ -1,0 +1,227 @@
+openapi: 3.1.0
+info:
+  title: uspace-ui example stub API
+  version: 0.1.0
+  description: |
+    The two endpoints the example app's stub API serves
+    (examples/next-app/src/stub/stub.ts): the console sign-in and the
+    zone collection. A tiny fixture for the example's generated types
+    (`pnpm gen:api`), never a template for a system's API: each system
+    owns its `api/openapi.yaml`.
+
+    Every error is `application/problem+json` in the shape of `Problem`
+    (decision M28).
+servers:
+  - url: /
+paths:
+  /v1/auth/login:
+    post:
+      operationId: login
+      summary: Console sign-in (the BFF's first step)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Signed in. The BFF puts `token` in the HttpOnly session cookie.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/auth/logout:
+    post:
+      operationId: logout
+      summary: Console sign-out
+      responses:
+        "204":
+          description: Signed out.
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/zones:
+    get:
+      operationId: listZones
+      summary: The zone collection (ED-318)
+      description: |
+        The whole collection with its version in `ETag` and
+        `cis_version`, and its last change in `cis_updated_at`. With
+        `applies_at`, every feature carries
+        `properties.extendedProperties.cis_applicability`; nothing is
+        filtered (spec 02 F3; reconciliation M17).
+      parameters:
+        - name: applies_at
+          in: query
+          required: false
+          description: RFC 3339 time to annotate applicability at.
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: The collection.
+          headers:
+            ETag:
+              description: The collection version.
+              schema:
+                type: string
+          content:
+            application/geo+json:
+              schema:
+                $ref: "#/components/schemas/ZoneCollection"
+        "304":
+          description: Not modified since the ETag sent in If-None-Match.
+        default:
+          $ref: "#/components/responses/Problem"
+components:
+  responses:
+    Problem:
+      description: Any error.
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+  schemas:
+    LoginRequest:
+      type: object
+      additionalProperties: false
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    Session:
+      type: object
+      required: [token, expires_at]
+      properties:
+        token:
+          type: string
+          description: The session JWT (never shown to page script).
+        expires_at:
+          type: string
+          format: date-time
+    FieldError:
+      type: object
+      required: [field, reason]
+      properties:
+        field:
+          type: string
+        reason:
+          type: string
+    Problem:
+      type: object
+      required: [type, title, status]
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/FieldError"
+        truncated:
+          type: boolean
+    Text:
+      type: object
+      required: [text, lang]
+      properties:
+        text:
+          type: string
+        lang:
+          type: string
+    Layer:
+      type: object
+      description: ED-318's vertical extent on the geometry.
+      properties:
+        upper:
+          type: number
+        upperReference:
+          type: string
+          enum: [AGL, AMSL, WGS84]
+        lower:
+          type: number
+        lowerReference:
+          type: string
+          enum: [AGL, AMSL, WGS84]
+        uom:
+          type: string
+    Geometry:
+      type: object
+      required: [type, coordinates]
+      properties:
+        type:
+          type: string
+          enum: [Polygon, MultiPolygon]
+        coordinates:
+          type: array
+          items: {}
+        layer:
+          $ref: "#/components/schemas/Layer"
+    ZoneProperties:
+      type: object
+      required: [identifier, type, variant]
+      properties:
+        identifier:
+          type: string
+        name:
+          type: array
+          items:
+            $ref: "#/components/schemas/Text"
+        type:
+          type: string
+          enum:
+            [USPACE, PROHIBITED, REQ_AUTHORIZATION, CONDITIONAL, NO_RESTRICTION]
+        variant:
+          type: string
+        reason:
+          type: array
+          items:
+            type: string
+        message:
+          type: array
+          items:
+            $ref: "#/components/schemas/Text"
+        extendedProperties:
+          type: object
+          properties:
+            cis_applicability:
+              type: string
+              enum: [applies, not_applicable, unknown]
+    ZoneFeature:
+      type: object
+      required: [type, geometry, properties]
+      properties:
+        type:
+          type: string
+          enum: [Feature]
+        geometry:
+          $ref: "#/components/schemas/Geometry"
+        properties:
+          $ref: "#/components/schemas/ZoneProperties"
+    ZoneCollection:
+      type: object
+      required: [type, cis_version, cis_updated_at, features]
+      properties:
+        type:
+          type: string
+          enum: [FeatureCollection]
+        cis_version:
+          type: integer
+        cis_updated_at:
+          type: string
+          format: date-time
+        features:
+          type: array
+          items:
+            $ref: "#/components/schemas/ZoneFeature"

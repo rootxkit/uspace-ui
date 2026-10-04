@@ -62,7 +62,13 @@ prints the URL of the version in `package.json`.
      suffix (`-rc.1`, `-beta.2`) is marked as a pre-release. A plain
      version is marked latest. The job then reads the release back and
      re-downloads the asset from its public URL, checking the
-     pre-release flag, the SHA-256 and the attestation.
+     pre-release flag, the latest mark (a plain version is the latest
+     release, a pre-release never), the SHA-256 and the attestation.
+     The latest mark is read per tag (`node scripts/release.mjs
+     check-latest <tag>`, GraphQL `Release.isLatest`, since `gh release
+     view` has no `isLatest` field) up to 10 times 6 s apart: a slow
+     release index does not fail a correct release, and a mark that
+     never comes fails the job after the bound.
 4. Tell each consumer the exact URL to pin.
 
 A failed run releases nothing; fix on `main`, delete the tag, and tag

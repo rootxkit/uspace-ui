@@ -1,0 +1,42 @@
+{
+  "name": "uspace-ui-example-next-app",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The minimal Next.js consumer of @rootxkit/uspace-ui: the public zone map, the three BFF routes, the CSP. A stub API stands in for a system; never a template for one.",
+  "type": "module",
+  "packageManager": "pnpm@11.9.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "gen:api": "uspace-ui-gen-api openapi.yaml src/api/generated/openapi.d.ts",
+    "check:api": "uspace-ui-gen-api openapi.yaml src/api/generated/openapi.d.ts --check",
+    "lint": "eslint --max-warnings 0 .",
+    "typecheck": "next typegen && tsc --noEmit",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "dependencies": {
+    "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v0.1.0-rc.1/rootxkit-uspace-ui-0.1.0-rc.1.tgz",
+    "maplibre-gl": "5.24.0",
+    "next": "16.3.8",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "22.20.4",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "axe-core": "4.13.0",
+    "eslint": "9.39.5",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "playwright": "1.63.0",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.71.0"
+  }
+}

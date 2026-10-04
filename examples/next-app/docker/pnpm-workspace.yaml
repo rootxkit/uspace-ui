@@ -1,0 +1,11 @@
+# pnpm settings of the Docker build (Dockerfile), where the example is
+# alone in its context and installs the kit from its GitHub Release asset.
+# In the kit's repository these come from the root pnpm-workspace.yaml.
+engineStrict: true
+saveExact: true
+autoInstallPeers: false
+# No install script runs: sharp (next's optional image optimiser) and
+# unrs-resolver are not needed; the kit ships built output.
+allowBuilds:
+  sharp: false
+  unrs-resolver: false

@@ -20,16 +20,23 @@ kit's view models in an adapter it owns.
 
 ## Status
 
-Planning. `docs/PLAN.md` and the work package briefs are on `main`;
-WP-0 (scaffold, frozen view models, lint rules, CI) is the first code.
-The first release is a pre-release, `0.1.0-rc.1`, a GitHub Release
-asset (WP-13a; see Installing), so the CISP's `web/` can start on it. The first release `v0.1.0` (U-M1 of the roadmap, with the CISP's
-C-M1) ships the theme, `ui`, `i18n` and fonts, the map with the zone,
-restriction and legend components, the API adapter, the BFF helpers
-and the ESLint config. Tracks, live feed, status, table and form follow
-in `0.2`; alerts and the traffic layers in `0.3`; `v1.0.0` when two
-consoles use them. Distribution is GitHub Release tarballs; every
-consumer installs with pnpm, pinned to one release asset URL.
+`0.1.0` is the first stable release (U-M1 of the roadmap, with the
+CISP's C-M1), a GitHub Release asset of this repository (see
+Installing). It ships every entry point: `model`, `theme`, `ui`,
+`i18n`, `fonts`, `map`, `api` (with the `uspace-ui-gen-api` bin),
+`auth/server`, `auth/client`, `symbology`, `layers` (zones,
+restrictions, tracks, alerts, manned traffic, intents and Remote ID
+receivers), `legend`, `live`, `status`, `alerts`, `table`, `form`,
+`eslint` and `test`, with the tokens, the map stylesheet and the
+fonts. `CHANGELOG.md` lists what is in it, what is not yet, and what
+changed since `0.1.0-rc.1`; a consumer on the rc must act on the first
+two of those changes.
+
+The API is not frozen before `v1.0.0`: an export may still change in a
+minor, and the CHANGELOG says what moved and why. `v1.0.0` comes when
+two consoles use the track and alert components in production and CI
+has the semver gate (WP-14). Distribution is GitHub Release tarballs;
+every consumer installs with pnpm, pinned to one release asset URL.
 
 ## Links
 
@@ -56,7 +63,7 @@ path for later. Depend on the asset URL of one release, exactly:
 ```jsonc
 // web/package.json
 "dependencies": {
-  "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v0.1.0-rc.1/rootxkit-uspace-ui-0.1.0-rc.1.tgz",
+  "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v0.1.0/rootxkit-uspace-ui-0.1.0.tgz",
   "maplibre-gl": "5.x"
 }
 ```
@@ -67,9 +74,11 @@ The repository is public, so no token is needed. The tarball is built
 output only: there is no `prepare` step and no devDependency to install.
 Pre-releases (`0.1.0-rc.N`) are marked as such on GitHub and are pinned
 the same way; to upgrade, replace the URL and commit the lockfile. Never
-depend on a `github:` spec or a branch.
+depend on a `github:` spec or a branch. From `0.1.0` the tarball carries
+a signed build provenance attestation; check it with `gh attestation
+verify` before pinning (`docs/RELEASING.md`).
 
-## Consuming (from `0.1.0-rc.1`)
+## Consuming (`0.1.0`)
 
 ```css
 /* web/app/globals.css */
@@ -244,8 +253,10 @@ export function proxy(req: NextRequest) {
 
 Entry points: `@rootxkit/uspace-ui/{model,theme,ui,i18n,fonts,map,api,
 auth/server,auth/client,symbology,layers,legend,live,status,alerts,
-table,form,eslint,test}`. The full step list for a `web/` app is in
-`docs/CONSUMING.md` (WP-13).
+table,form,eslint,test}`. The full step list for a `web/` app, from
+`package.json` to the Docker image, is
+[`docs/CONSUMING.md`](docs/CONSUMING.md); every step runs in
+[`examples/next-app/`](examples/next-app/), which CI builds and smokes.
 
 ## Developing
 

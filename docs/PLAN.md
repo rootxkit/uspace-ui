@@ -511,6 +511,7 @@ pinned exact in `package.json` and locked; peers carry ranges.
 | dev: `@vitest/browser-playwright`, `@vitest/coverage-v8`, `vite`, `@testing-library/dom`, `@types/react`, `@types/react-dom`, `@types/node` | tests | The Vitest 4 Playwright provider and v8 coverage; the Vite the browser project runs on; the peer of `@testing-library/react`; type packages (WP-0). |
 | dev: `tailwindcss`, `@tailwindcss/vite` | the browser tests and the golden set | Tailwind v4 compiled the way the apps compile it (D4), so the vendored shadcn/ui classes and the token utilities exist in the browser tests and in axe's contrast checks (WP-1). Build-time only; never in `dist/`. |
 | dev: `@maplibre/maplibre-gl-style-spec` (exact pin, the version `maplibre-gl` already resolves) | tests | MapLibre's own expression parser and style validator: the symbology's expressions are evaluated as MapLibre would and the layers a layer component builds are validated, without a WebGL context (§9 "tested as data"; WP-6). Never imported by `src/` outside tests. |
+| example dev: `@tailwindcss/postcss` (exact pin, the `tailwindcss` version) | `examples/next-app` only | Tailwind v4's PostCSS plugin, which Next.js runs to compile `globals.css` with the kit's tokens and `@source` scan (D4, §14 Q13); every `web/` has it. Not a dependency of the package. (WP-13) |
 
 Rejected: any geometry or geodesy library (the lint rule forbids it for
 everyone, the kit included); `i18next`/`react-intl` (two catalogues and
@@ -844,19 +845,30 @@ D10).
   as soon as WP-0..WP-5 merge: `model`, `theme`, `ui`, `i18n`, `fonts`,
   `map`, `api`, `auth/*`, `eslint`, `test`, and whatever else is on
   `main` by then (its CHANGELOG section lists what ships and what does
-  not). `rc.2`, `rc.3`, ... follow each
-  merge that the CISP's `web/` needs (WP-6 first). An rc may still
+  not). `rc.2`, `rc.3`, ... were to follow each merge the CISP's `web/`
+  needs; none was cut, and `v0.1.0` followed `rc.1`. An rc may still
   change an export; the CHANGELOG says what moved.
-- `v0.1.0` = U-M1 (`07`): the rc entry points plus `ZoneLayer`,
-  `RestrictionLayer` and `ZoneLegend` (WP-6; `RestrictionLayer` is in
-  `0.1.0` because the ANSP's N-M1 console, WP-11, needs it: M33), and
-  the example app; the CISP public map and console build on it and
-  nothing else. Tagged by the owner from `main`.
-- `v0.2.0`: `live`, `status`, `TrackLayer`, `TrackLegend`,
-  `IdentificationLegend`, `table`, `form` (the authority's A-M1/A-M2 and
-  the USSP's S-M1 consoles).
-- `v0.3.0`: `alerts`, `AlertLayer`, `MannedLayer`, `IntentLayer`,
-  `ReceiverLayer` (S-M2, S-M3, N-M2).
+- `v0.1.0` = U-M1 (`07`), tagged by the owner from `main`. *Amended on
+  2026-10-04 to what it ships:* everything that was on `main` before
+  the tag, which is every entry point of §2: `model`, `theme`, `ui`,
+  `i18n`, `fonts`, `map`, `api`, `auth/server`, `auth/client`,
+  `symbology`, `layers` (`ZoneLayer`, `RestrictionLayer`, `TrackLayer`,
+  `AlertLayer`, `MannedLayer`, `IntentLayer`, `ReceiverLayer`), `legend`
+  (`ZoneLegend`, `TrackLegend`, `IdentificationLegend`, `AgeLegend`,
+  `SeverityLegend`), `live`, `status`, `alerts`, `table`, `form`,
+  `eslint` and `test`. In the repository at the tag, not in the
+  tarball: the example app (`examples/next-app/`) and
+  `docs/CONSUMING.md`. The CISP public map and console build on it and
+  nothing else. *Was:* the rc entry points plus `ZoneLayer`,
+  `RestrictionLayer` and `ZoneLegend` (WP-6; `RestrictionLayer` because
+  the ANSP's N-M1 console, WP-11, needs it: M33) and the example app.
+- `v0.2.0` and `v0.3.0`: *amended on 2026-10-04.* What they were to
+  bring (WP-7..WP-12: the live feed, status, tracks, table, form,
+  alerts and the traffic layers) merged before `v0.1.0` and shipped in
+  it, so neither has planned content. A minor before `v1.0.0` now
+  carries whatever merges next, and its CHANGELOG section says what
+  moved and why. The `0.2` and `0.3` minimums of §11 name components
+  that are all in `0.1.0`, so a consumer can pin `0.1.0` for them.
 - `v1.0.0` (D12): the API report of §3 declared stable, the semver gate
   in CI, the lab's schema examples wired, two consoles in use.
 - From `v1`: within a major only additive changes (new exports, new
@@ -969,7 +981,7 @@ the default is a proposal, not the answer.
 | Q8 | Which font: Noto Sans Georgian alone has no Latin; a single family with both is Noto Sans (no Georgian) plus Noto Sans Georgian. Mtavruli (U+1C90) is required for upper-case Georgian since Unicode 11. | D7: both families bundled, `unicode-range` split, the glyph test covers all four Georgian blocks. Alternative families (BPG, Sylfaen) have licence or coverage problems for a public repo. | **Decided** (M38): Noto Sans + Noto Sans Georgian, OFL, bundled, loaded by every `web/` through `next/font/local`. |
 | Q9 | The console session JWT's claim names for display gating are not fixed by the spec (`00 §6.2` fixes `iss`, `aud`, `sub`, `scope`, `exp`, `jti`, `kid`). | One session shape in every system (§6.3 contract): `scope = "session"`, `roles: [string]`, `realm` (`console` / `police` / `portal`), `aud` = the system's own host, `jti` = session id, `exp` ≤ 12 h. `sessionClaimsUnverified` reads `sub`, `exp`, `roles[]`, `realm`; `RequireRole` intersects `roles`. The kit gates display only. | **Decided** (M20, M21): the authority's role model is the largest, so `roles` is always an array. |
 | Q10 | Branding config bundle shape (`06 §4` says it exists outside the repo; nothing names its keys). | §6.3's five `UI_BRAND_*` variables and a static `/brand/` directory for the logo; a missing name renders the role ("U-space authority"), never an organisation. | **Decided**: as proposed (branding is configuration, `06 §4`). |
-| Q11 | Accessibility obligations for Georgian public interfaces (`08` Q15) are unanswered. | WCAG 2.2 AA is the target and `axe` gates CI; the public map and the registry check page are the first to be audited by hand (WP-13). | **Open, owner-only** (the ministry answers spec Q15). Default until answered: WCAG 2.2 AA, `axe` gates CI, hand audit in WP-13. |
+| Q11 | Accessibility obligations for Georgian public interfaces (`08` Q15) are unanswered. | WCAG 2.2 AA is the target and `axe` gates CI; the public map and the registry check page are the first to be audited by hand (WP-13). | **Open, owner-only** (the ministry answers spec Q15). Default until answered: WCAG 2.2 AA, `axe` gates CI, hand audit in WP-13. The target is configuration marked "pending GCAA" (`examples/next-app/config/example.json`). WP-13 audited the example's public map, sign-in and role-gated pages on 2026-10-04 (`docs/ACCESSIBILITY.md`); the registry check page is a system's page and is audited by the system that ships it. |
 | Q12 | Next.js and React majors at implementation time (this plan says `next >=15`, `react ^19` from the stack decisions); vitest browser mode versions move quickly. | WP-0 pins what is current on its day, records the versions in `CHANGELOG.md`, and the peers stay ranges. Nothing in this plan depends on a feature newer than Next.js App Router, React 19 and Tailwind v4. | **Decided**: WP-0 verifies, does not assume. |
 | Q13 | Tailwind v4 `@source` scanning of a compiled package versus a prebuilt stylesheet. | D4: `@source` (one theme, tree-shaken utilities); the example app proves it. A prebuilt `uspace-ui.css` can be added as an additive export for a non-Tailwind consumer (the lab dashboard?) without changing anything else. | **Decided**: `@source`; a prebuilt stylesheet only if a non-Tailwind consumer appears. |
 | Q14 | Should the kit ship the OpenAPI → TypeScript generation (`openapi-typescript`) as a CLI so all five `web/` generate identically, and check the output is committed and current? | WP-4 ships `uspace-ui-gen-api <openapi.yaml> <out.d.ts>` (a thin wrapper that pins the generator version and writes a header the `noHandWrittenApiTypes` rule recognises) and a CI snippet each `web/` copies. | **Decided**: every `web/` uses it. |

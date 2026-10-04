@@ -5,7 +5,8 @@
 # tarball `pack` built is attested (keyless build provenance, Sigstore
 # through this run's OIDC token) and attached to a GitHub Release with
 # SHA256SUMS.
-# A version with a pre-release suffix (0.1.0-rc.1) is a GitHub pre-release.
+# A version with a pre-release suffix (0.1.0-rc.1) is a GitHub pre-release;
+# a plain version (0.1.0) is marked the latest release.
 #
 # Distribution is the GitHub Release asset, not npmjs (PLAN D10, superseded
 # on 2026-10-02): consumers depend on the asset URL and their pnpm lockfile
@@ -29,6 +30,13 @@ concurrency:
 # every checkout drops its credential (retro-audit B1).
 permissions:
   contents: read
+
+defaults:
+  run:
+    # Explicit bash runs steps with -eo pipefail, as in ci.yml: the
+    # runner's default, bash -e without it, lets a failing command on the
+    # left of a pipe pass the step, and this workflow publishes.
+    shell: bash
 
 jobs:
   tag:
@@ -148,6 +156,15 @@ jobs:
           want_pre=$(node scripts/release.mjs prerelease)
           got_pre=$(gh release view "$GITHUB_REF_NAME" --json isPrerelease --jq .isPrerelease)
           test "$want_pre" = "$got_pre"
+          # The latest mark, read back too: v0.1.0 is the first tag to take
+          # the `--latest` branch, which has never run. A plain version must
+          # be the repository's latest release, and a pre-release must never
+          # be. Read per tag (GraphQL Release.isLatest; `gh release view`
+          # has no isLatest field), up to 10 times 6 s apart, because the
+          # release index can answer behind the release just created; it
+          # fails after the bound and passes only on a read that showed the
+          # mark (scripts/release.mjs checkLatest).
+          node scripts/release.mjs check-latest "$GITHUB_REF_NAME"
           curl -sSfL -o "$RUNNER_TEMP/$NAME" "$(node scripts/release.mjs url)"
           echo "$SHA256  $RUNNER_TEMP/$NAME" | sha256sum -c -
           # The downloaded bytes carry this workflow's signed provenance.

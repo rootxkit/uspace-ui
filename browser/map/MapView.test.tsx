@@ -130,6 +130,23 @@ async function expectSameOriginOnly(map: MapLibreMap): Promise<void> {
   expect(styleUrls.filter((u) => !u.startsWith(origin))).toEqual([]);
 }
 
+/**
+ * MapLibre's focusable canvas is named in the page's language, apart from
+ * the kit's map region around it (WP-13 accessibility audit: it was "Map",
+ * in English, on a Georgian page, the same name as the region).
+ */
+function expectNames(canvasElement: HTMLElement, lang: Lang): void {
+  const region = within(canvasElement).getByRole("region", {
+    name: lang === "en" ? "Map" : "რუკა",
+  });
+  const canvas = region.querySelector("canvas.maplibregl-canvas");
+  expect(canvas?.getAttribute("aria-label")).toBe(
+    lang === "en"
+      ? "Map view: the arrow keys pan, plus and minus zoom"
+      : "რუკის ხედი: ისრები რუკას გადაადგილებს, პლიუსი და მინუსი მასშტაბს ცვლის",
+  );
+}
+
 async function renderedNames(map: MapLibreMap): Promise<string[]> {
   const layers = LABEL_LAYERS.filter((id) => map.getLayer(id) !== undefined);
   return map
@@ -147,6 +164,7 @@ it("English, light", async () => {
     EN_LIGHT,
   ).container;
   const map = await loadedMap(canvasElement);
+  expectNames(canvasElement, "en");
   const attribution = canvasElement.querySelector(".maplibregl-ctrl-attrib");
   await waitFor(() =>
     expect(attribution?.textContent).toContain("OSM data as of 2026-10-01"),
@@ -161,6 +179,7 @@ it("Georgian, light", async () => {
     EN_LIGHT,
   ).container;
   const map = await loadedMap(canvasElement);
+  expectNames(canvasElement, "ka");
   // A label layer drew a Georgian name (Mkhedruli), read from the map's
   // rendered features rather than from pixels.
   await waitFor(

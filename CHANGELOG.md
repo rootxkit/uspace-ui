@@ -7,25 +7,65 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
-- Release provenance: `release.yml` attests the tarball keylessly
-  (`actions/attest-build-provenance`, Sigstore through the run's OIDC
-  token) before it creates the GitHub Release, and its read-back
-  verifies the attestation on the asset downloaded from its public URL.
-  `SHA256SUMS` alone was unsigned, written by the same job. Consumers
-  verify with `gh attestation verify` (docs/RELEASING.md).
-- Retro-audit fixes: `auth/server` keeps its timeout over the API's
-  answer body (an upstream body silent for `timeoutMs` is aborted and
-  counted as `upstream_timeout`) and `api`'s client keeps its deadline
-  until the body is read (S4); the BFF drops an absolute `Location`,
-  `Server`, `Via`, `X-Powered-By` and every `Access-Control-*` header
-  (S5); `bffHandlers` with `session.secure` now refuses to build unless
-  it gets `trustedProxyHops` or the new `noTrustedProxy: true` (S6; a
-  consumer that set neither must add one); the proxy refuses an encoded
-  slash or dot segment (N7); a sign-in answer whose session has already
-  expired is `502 upstream_invalid` (N10); `resolveFeedUrl` refuses
-  every URL as `no_page` when the page URL is unknown (N8). CI pins
-  every action to a commit SHA (B1) and releases only a tag on `main`
-  (N6).
+## 0.1.0
+
+The first stable release, U-M1. It is a GitHub Release asset of this
+repository, not an npm version (PLAN D10; docs/RELEASING.md), marked the
+latest release. Pin it exactly; the pnpm lockfile records its integrity:
+
+```jsonc
+"@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v0.1.0/rootxkit-uspace-ui-0.1.0.tgz"
+```
+
+The asset carries a signed build provenance attestation; verify it
+with `gh attestation verify` before pinning it (docs/RELEASING.md).
+
+Before `v1.0.0` an export may still change in a minor, and its
+CHANGELOG section says what moved and why (PLAN §12).
+
+### Entry points that ship
+
+`model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api` (with the
+`uspace-ui-gen-api` bin), `auth/server`, `auth/client`, `symbology`
+(zones, restrictions, tracks, identification, age, severity, manned,
+intent), `layers` (`ZoneLayer`, `RestrictionLayer`, `ZoneCard`,
+`TrackLayer`, `AlertLayer`, `MannedLayer`, `IntentLayer`,
+`ReceiverLayer`, `IntentCard`, `HoverPortal`, `useLayer`), `legend`
+(`ZoneLegend`, `TrackLegend`, `IdentificationLegend`, `AgeLegend`,
+`SeverityLegend`), `live`, `status` (with `TrackDetail`), `alerts`,
+`table`, `form`, `eslint`, `test`, and `styles/tokens.css`,
+`styles/map.css`, `fonts/fonts.css` with the woff2 files.
+
+PLAN §12 put `live`, `status`, `table`, `form` and the track legends in
+`0.2.0` and `alerts` and the traffic layers in `0.3.0`. They were on
+`main` before this tag and ship in it; a console's minimum version of
+PLAN §11 is unchanged, since what it needs is here.
+
+### Not yet
+
+- The API is not frozen: no semver gate in CI and no lab schema
+  fixtures (WP-14, `v1.0.0`).
+- Accessibility (docs/ACCESSIBILITY.md): the registry check page is a
+  system's page and was not audited here, no screen reader pass was
+  run, and two findings are open: `LoginForm` drops focus to `<body>`
+  after a refusal (A4) and the scheme is applied after hydration (A5).
+  The target, WCAG 2.2 AA, is pending GCAA.
+
+### Changes since 0.1.0-rc.1
+
+A consumer on `0.1.0-rc.1` must act on the first two of these.
+
+- Removed: the `alerts` stub export `ENTRY` (the only line the API
+  report removes since rc.1; everything else is added).
+- `bffHandlers` with `session.secure` now refuses to build unless it
+  gets `trustedProxyHops` or `noTrustedProxy: true` (retro-audit S6). A
+  consumer that set neither must add one.
+- `alerts` (WP-11): `AlertList`, `AlertSummary` / `alertSummary` (one
+  line per alert and violation kind, `ka` and `en`), `AlertToaster` with
+  the gesture-gated repeating tone (`useAlertTone(active, repeatMs)`;
+  the period is required, no default) and `SeverityMark`; `layers` gains
+  `AlertLayer` and the counters `alert_peer_missing`,
+  `alert_aircraft_missing`.
 - `layers` (WP-12): `MannedLayer` (plane symbols by trust class, hollow
   for broadcast, faded by age and never removed by the client, hover
   card with both altitudes by datum), `IntentLayer` (footprints passed
@@ -35,12 +75,55 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
   `symbology` gains `manned` and `intent` (`DSS_STATES` from uspace-core
   v1.3.0, `MannedTrack`); `status` gains `TrackDetail` and
   `sourceDetailLines`. `docs/CORE_VERSION` moves to v1.3.0.
-- `alerts` (WP-11): `AlertList`, `AlertSummary` / `alertSummary` (one
-  line per alert and violation kind, `ka` and `en`), `AlertToaster` with
-  the gesture-gated repeating tone (`useAlertTone(active, repeatMs)`; the
-  period is required, no default) and `SeverityMark`; `layers` gains
-  `AlertLayer` and the counters `alert_peer_missing`,
-  `alert_aircraft_missing`. The `alerts` stub marker `ENTRY` is gone.
+- Retro-audit fixes: `auth/server` keeps its timeout over the API's
+  answer body (an upstream body silent for `timeoutMs` is aborted and
+  counted as `upstream_timeout`) and `api`'s client keeps its deadline
+  until the body is read (S4); the BFF drops an absolute `Location`,
+  `Server`, `Via`, `X-Powered-By` and every `Access-Control-*` header
+  (S5); the proxy refuses an encoded slash or dot segment (N7); a
+  sign-in answer whose session has already expired is
+  `502 upstream_invalid` (N10); `resolveFeedUrl` refuses every URL as
+  `no_page` when the page URL is unknown (N8). CI pins every action to a
+  commit SHA (B1) and releases only a tag on `main` (N6).
+- Release provenance: `release.yml` attests the tarball keylessly
+  (`actions/attest-build-provenance`, Sigstore through the run's OIDC
+  token) before it creates the GitHub Release, and its read-back
+  verifies the attestation on the asset downloaded from its public URL.
+  `SHA256SUMS` alone was unsigned, written by the same job. `v0.1.0` is
+  the first release that carries an attestation.
+- The release read-back also checks the latest mark: a plain version
+  must be the repository's latest release, a pre-release never. It
+  reads the tag's own release up to 10 times 6 s apart, so a slow
+  release index does not fail a correct release and a missing mark
+  fails after the bound (`release.mjs check-latest`). Every
+  `release.yml` step runs with `bash -eo pipefail`, as CI's do.
+- `version` is `0.1.0`.
+- WP-13: `examples/next-app/`, the minimal Next.js consumer (in the
+  repository, not in the tarball): the tokens and `@source`, the fonts,
+  the theme with the brand from `UI_BRAND_*`, the language from the
+  cookie and `Accept-Language`, the kit's ESLint config, the three BFF
+  routes, types generated with `uspace-ui-gen-api`, the public zone map
+  with "version V, updated T", `LoginForm`, `RequireRole`, the CSP of
+  PLAN §7 per request with its nonce, `output: "standalone"` and a
+  `Dockerfile` that installs the release tarball with
+  `--frozen-lockfile`, over a stub API that is not a template. CI's
+  `example` job builds it against the current source and smokes the
+  standalone server in Chromium (CSP on every page and no violation,
+  nothing off the origin, the map, Georgian, sign-in, roles).
+- WP-13: `docs/CONSUMING.md`, the step list for a `web/`: install from
+  the GitHub Release tarball with pnpm and verify its attestation, CSS,
+  layout, lint, the BFF routes and cookies, the same-origin WebSocket,
+  generated types, adapters, the basemap, the CSP, the Docker recipe,
+  upgrading, the minimum versions, and where the example differs from
+  the CISP's `web/`.
+- WP-13: the accessibility audit of the example's public map, sign-in
+  and role-gated pages (docs/ACCESSIBILITY.md; PLAN §14 Q11), by hand
+  and with `axe` at WCAG 2.2 AA in English light and Georgian dark.
+  `map` gains the catalogue key `map.canvas`: `MapView` names
+  MapLibre's focusable canvas in the page's language, apart from the
+  map region around it, where it was "Map" in English (A2). The
+  example gets page titles (A1) and a skip link that moves focus (A3);
+  its smoke test checks all of it.
 
 ## 0.1.0-rc.1
 

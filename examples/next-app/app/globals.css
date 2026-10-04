@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@import "@rootxkit/uspace-ui/styles/tokens.css";
+@import "@rootxkit/uspace-ui/styles/map.css";
+@import "@rootxkit/uspace-ui/fonts/fonts.css";
+@source "../node_modules/@rootxkit/uspace-ui/dist";
+
+body {
+  background: var(--us-surface);
+  color: var(--us-text);
+}

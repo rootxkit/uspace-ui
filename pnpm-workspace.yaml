@@ -1,13 +1,25 @@
-# pnpm settings (pnpm 11 reads them here, not from .npmrc). Not a workspace:
-# the package is the repository root.
+# pnpm settings (pnpm 11 reads them here, not from .npmrc). The package is
+# the repository root; the one other workspace package is the example app
+# (WP-13), which CI builds against the kit's current source.
+packages:
+  - examples/next-app
 engineStrict: true
 saveExact: true
 # Peers are the consumer's (react, next, the eslint plugins); the dev
 # copies this repo needs are listed in devDependencies.
 autoInstallPeers: false
 # esbuild (through vite) works from its platform package; its postinstall
-# only re-checks the binary, so it is not run.
+# only re-checks the binary, so it is not run. sharp (next's optional image
+# optimiser) and unrs-resolver are not needed by the example.
 allowBuilds:
   esbuild: false
+  sharp: false
+  unrs-resolver: false
 minimumReleaseAgeExclude:
   - publint@0.3.25
+# The example pins a release asset URL, exactly as a system's web/ does
+# (examples/next-app/package.json; its own pnpm-lock.yaml is the Docker
+# build's). In this workspace it is linked to the repository root instead,
+# so CI builds it against the current source, never a download.
+overrides:
+  "@rootxkit/uspace-ui": "link:."

@@ -1,0 +1,19 @@
+{
+  "$comment": "Stub accounts for examples/next-app only (test values, never a credential): the smoke test signs in as TEST-operator. Two roles; the protected page gates on the second.",
+  "users": [
+    {
+      "username": "TEST-operator",
+      "password": "TEST-password-not-a-secret",
+      "sub": "TEST-account-0001",
+      "roles": ["viewer", "auditor"],
+      "realm": "console"
+    },
+    {
+      "username": "TEST-viewer",
+      "password": "TEST-password-not-a-secret",
+      "sub": "TEST-account-0002",
+      "roles": ["viewer"],
+      "realm": "console"
+    }
+  ]
+}
