@@ -99,3 +99,39 @@ describe("README.md describes the version in package.json", () => {
     }
   });
 });
+
+describe("docs/PLAN.md §12 says what 0.1.0 shipped", () => {
+  const plan = read("docs/PLAN.md");
+  const versioning = sectionOf(plan, "## 12. Versioning and release");
+  /** The top-level bullets of §12, by the version they open with. */
+  const bullets = new Map(
+    versioning
+      .split(/\n(?=- )/)
+      .map((b) => [/^- `(v[^`]+)`/.exec(b)?.[1] ?? "", b] as const)
+      .filter(([v]) => v !== ""),
+  );
+  const shipParagraph = sectionOf(
+    changelogSection ?? "",
+    "### Entry points that ship",
+  );
+  /** Every backticked name the CHANGELOG ships: entry points and components. */
+  const shippedNames = new Set(
+    [...shipParagraph.matchAll(/`([A-Za-z0-9/]+)`/g)].map((m) => m[1] ?? ""),
+  );
+
+  it("has a bullet for v0.1.0 that names every entry point it shipped", () => {
+    const b = bullets.get(`v${pkg.version}`) ?? "";
+    expect(b).not.toBe("");
+    expect(entryPointsIn(b)).toEqual(shipped);
+  });
+
+  it("puts nothing that shipped in 0.1.0 in a later version's bullet", () => {
+    for (const [version, b] of bullets) {
+      if (!/^v0\.[2-9]\./.test(version)) continue;
+      const named = [...b.matchAll(/`([A-Za-z0-9/]+)`/g)]
+        .map((m) => m[1] ?? "")
+        .filter((n) => shippedNames.has(n));
+      expect(named, `${version}: ${b}`).toEqual([]);
+    }
+  });
+});

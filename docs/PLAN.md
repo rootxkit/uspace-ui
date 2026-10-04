@@ -844,19 +844,30 @@ D10).
   as soon as WP-0..WP-5 merge: `model`, `theme`, `ui`, `i18n`, `fonts`,
   `map`, `api`, `auth/*`, `eslint`, `test`, and whatever else is on
   `main` by then (its CHANGELOG section lists what ships and what does
-  not). `rc.2`, `rc.3`, ... follow each
-  merge that the CISP's `web/` needs (WP-6 first). An rc may still
+  not). `rc.2`, `rc.3`, ... were to follow each merge the CISP's `web/`
+  needs; none was cut, and `v0.1.0` followed `rc.1`. An rc may still
   change an export; the CHANGELOG says what moved.
-- `v0.1.0` = U-M1 (`07`): the rc entry points plus `ZoneLayer`,
-  `RestrictionLayer` and `ZoneLegend` (WP-6; `RestrictionLayer` is in
-  `0.1.0` because the ANSP's N-M1 console, WP-11, needs it: M33), and
-  the example app; the CISP public map and console build on it and
-  nothing else. Tagged by the owner from `main`.
-- `v0.2.0`: `live`, `status`, `TrackLayer`, `TrackLegend`,
-  `IdentificationLegend`, `table`, `form` (the authority's A-M1/A-M2 and
-  the USSP's S-M1 consoles).
-- `v0.3.0`: `alerts`, `AlertLayer`, `MannedLayer`, `IntentLayer`,
-  `ReceiverLayer` (S-M2, S-M3, N-M2).
+- `v0.1.0` = U-M1 (`07`), tagged by the owner from `main`. *Amended on
+  2026-10-04 to what it ships:* everything that was on `main` before
+  the tag, which is every entry point of §2: `model`, `theme`, `ui`,
+  `i18n`, `fonts`, `map`, `api`, `auth/server`, `auth/client`,
+  `symbology`, `layers` (`ZoneLayer`, `RestrictionLayer`, `TrackLayer`,
+  `AlertLayer`, `MannedLayer`, `IntentLayer`, `ReceiverLayer`), `legend`
+  (`ZoneLegend`, `TrackLegend`, `IdentificationLegend`, `AgeLegend`,
+  `SeverityLegend`), `live`, `status`, `alerts`, `table`, `form`,
+  `eslint` and `test`. In the repository at the tag, not in the
+  tarball: the example app (`examples/next-app/`) and
+  `docs/CONSUMING.md`. The CISP public map and console build on it and
+  nothing else. *Was:* the rc entry points plus `ZoneLayer`,
+  `RestrictionLayer` and `ZoneLegend` (WP-6; `RestrictionLayer` because
+  the ANSP's N-M1 console, WP-11, needs it: M33) and the example app.
+- `v0.2.0` and `v0.3.0`: *amended on 2026-10-04.* What they were to
+  bring (WP-7..WP-12: the live feed, status, tracks, table, form,
+  alerts and the traffic layers) merged before `v0.1.0` and shipped in
+  it, so neither has planned content. A minor before `v1.0.0` now
+  carries whatever merges next, and its CHANGELOG section says what
+  moved and why. The `0.2` and `0.3` minimums of §11 name components
+  that are all in `0.1.0`, so a consumer can pin `0.1.0` for them.
 - `v1.0.0` (D12): the API report of §3 declared stable, the semver gate
   in CI, the lab's schema examples wired, two consoles in use.
 - From `v1`: within a major only additive changes (new exports, new
