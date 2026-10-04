@@ -7,25 +7,65 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
-- Release provenance: `release.yml` attests the tarball keylessly
-  (`actions/attest-build-provenance`, Sigstore through the run's OIDC
-  token) before it creates the GitHub Release, and its read-back
-  verifies the attestation on the asset downloaded from its public URL.
-  `SHA256SUMS` alone was unsigned, written by the same job. Consumers
-  verify with `gh attestation verify` (docs/RELEASING.md).
-- Retro-audit fixes: `auth/server` keeps its timeout over the API's
-  answer body (an upstream body silent for `timeoutMs` is aborted and
-  counted as `upstream_timeout`) and `api`'s client keeps its deadline
-  until the body is read (S4); the BFF drops an absolute `Location`,
-  `Server`, `Via`, `X-Powered-By` and every `Access-Control-*` header
-  (S5); `bffHandlers` with `session.secure` now refuses to build unless
-  it gets `trustedProxyHops` or the new `noTrustedProxy: true` (S6; a
-  consumer that set neither must add one); the proxy refuses an encoded
-  slash or dot segment (N7); a sign-in answer whose session has already
-  expired is `502 upstream_invalid` (N10); `resolveFeedUrl` refuses
-  every URL as `no_page` when the page URL is unknown (N8). CI pins
-  every action to a commit SHA (B1) and releases only a tag on `main`
-  (N6).
+## 0.1.0
+
+The first stable release, U-M1. It is a GitHub Release asset of this
+repository, not an npm version (PLAN D10; docs/RELEASING.md), marked the
+latest release. Pin it exactly; the pnpm lockfile records its integrity:
+
+```jsonc
+"@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v0.1.0/rootxkit-uspace-ui-0.1.0.tgz"
+```
+
+The asset carries a signed build provenance attestation; verify it
+with `gh attestation verify` before pinning it (docs/RELEASING.md).
+
+Before `v1.0.0` an export may still change in a minor, and its
+CHANGELOG section says what moved and why (PLAN §12).
+
+### Entry points that ship
+
+`model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api` (with the
+`uspace-ui-gen-api` bin), `auth/server`, `auth/client`, `symbology`
+(zones, restrictions, tracks, identification, age, severity, manned,
+intent), `layers` (`ZoneLayer`, `RestrictionLayer`, `ZoneCard`,
+`TrackLayer`, `AlertLayer`, `MannedLayer`, `IntentLayer`,
+`ReceiverLayer`, `IntentCard`, `HoverPortal`, `useLayer`), `legend`
+(`ZoneLegend`, `TrackLegend`, `IdentificationLegend`, `AgeLegend`,
+`SeverityLegend`), `live`, `status` (with `TrackDetail`), `alerts`,
+`table`, `form`, `eslint`, `test`, and `styles/tokens.css`,
+`styles/map.css`, `fonts/fonts.css` with the woff2 files.
+
+PLAN §12 put `live`, `status`, `table`, `form` and the track legends in
+`0.2.0` and `alerts` and the traffic layers in `0.3.0`. They were on
+`main` before this tag and ship in it; a console's minimum version of
+PLAN §11 is unchanged, since what it needs is here.
+
+### Not yet
+
+- There is no example app (`examples/next-app/`) and no
+  `docs/CONSUMING.md`; CI's `example` job still reports that nothing was
+  built (WP-13). Until then `README.md` "Consuming" is the guide.
+- The API is not frozen: no semver gate in CI and no lab schema
+  fixtures (WP-14, `v1.0.0`).
+- The hand accessibility audit of the public map and the registry check
+  page (PLAN §14 Q11) has not been done; `axe` gates CI.
+
+### Changes since 0.1.0-rc.1
+
+A consumer on `0.1.0-rc.1` must act on the first two of these.
+
+- Removed: the `alerts` stub export `ENTRY` (the only line the API
+  report removes since rc.1; everything else is added).
+- `bffHandlers` with `session.secure` now refuses to build unless it
+  gets `trustedProxyHops` or `noTrustedProxy: true` (retro-audit S6). A
+  consumer that set neither must add one.
+- `alerts` (WP-11): `AlertList`, `AlertSummary` / `alertSummary` (one
+  line per alert and violation kind, `ka` and `en`), `AlertToaster` with
+  the gesture-gated repeating tone (`useAlertTone(active, repeatMs)`;
+  the period is required, no default) and `SeverityMark`; `layers` gains
+  `AlertLayer` and the counters `alert_peer_missing`,
+  `alert_aircraft_missing`.
 - `layers` (WP-12): `MannedLayer` (plane symbols by trust class, hollow
   for broadcast, faded by age and never removed by the client, hover
   card with both altitudes by datum), `IntentLayer` (footprints passed
@@ -35,12 +75,26 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
   `symbology` gains `manned` and `intent` (`DSS_STATES` from uspace-core
   v1.3.0, `MannedTrack`); `status` gains `TrackDetail` and
   `sourceDetailLines`. `docs/CORE_VERSION` moves to v1.3.0.
-- `alerts` (WP-11): `AlertList`, `AlertSummary` / `alertSummary` (one
-  line per alert and violation kind, `ka` and `en`), `AlertToaster` with
-  the gesture-gated repeating tone (`useAlertTone(active, repeatMs)`; the
-  period is required, no default) and `SeverityMark`; `layers` gains
-  `AlertLayer` and the counters `alert_peer_missing`,
-  `alert_aircraft_missing`. The `alerts` stub marker `ENTRY` is gone.
+- Retro-audit fixes: `auth/server` keeps its timeout over the API's
+  answer body (an upstream body silent for `timeoutMs` is aborted and
+  counted as `upstream_timeout`) and `api`'s client keeps its deadline
+  until the body is read (S4); the BFF drops an absolute `Location`,
+  `Server`, `Via`, `X-Powered-By` and every `Access-Control-*` header
+  (S5); the proxy refuses an encoded slash or dot segment (N7); a
+  sign-in answer whose session has already expired is
+  `502 upstream_invalid` (N10); `resolveFeedUrl` refuses every URL as
+  `no_page` when the page URL is unknown (N8). CI pins every action to a
+  commit SHA (B1) and releases only a tag on `main` (N6).
+- Release provenance: `release.yml` attests the tarball keylessly
+  (`actions/attest-build-provenance`, Sigstore through the run's OIDC
+  token) before it creates the GitHub Release, and its read-back
+  verifies the attestation on the asset downloaded from its public URL.
+  `SHA256SUMS` alone was unsigned, written by the same job. `v0.1.0` is
+  the first release that carries an attestation.
+- The release read-back also checks the latest mark: a plain version
+  must be the repository's latest release, a pre-release never. Every
+  `release.yml` step runs with `bash -eo pipefail`, as CI's do.
+- `version` is `0.1.0`.
 
 ## 0.1.0-rc.1
 

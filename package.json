@@ -1,6 +1,6 @@
 {
   "name": "@rootxkit/uspace-ui",
-  "version": "0.1.0-rc.1",
+  "version": "0.1.0",
   "description": "Shared UI kit of the U-space systems: theme, map, symbology, i18n, live feed, table, form and BFF helpers. Renders, never judges.",
   "repository": {
     "type": "git",
