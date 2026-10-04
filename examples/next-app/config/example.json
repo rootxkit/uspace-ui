@@ -1,0 +1,23 @@
+{
+  "$comment": "The example's configuration. `policy` holds values a regulator sets; GCAA has not answered its policy questions, so each is the spec's default, kept here and not in code, and marked pending until it does. `map` is display-only.",
+  "policy": {
+    "session_max_age_s": {
+      "value": 43200,
+      "source": "spec 00 §6.2 and docs/PLAN.md §6.3: a console session lasts at most 12 h",
+      "status": "pending GCAA"
+    },
+    "accessibility_target": {
+      "value": "WCAG 2.2 AA",
+      "source": "spec 08 Q15 unanswered; docs/PLAN.md §14 Q11 default",
+      "status": "pending GCAA"
+    }
+  },
+  "map": {
+    "$comment": "Display-only sample camera over the browser tests' Tbilisi extract (browser/public/basemap/), which the smoke test serves; a system configures its own.",
+    "center": [44.8, 41.705],
+    "zoom": 13.4
+  },
+  "bff": {
+    "timeout_ms": 10000
+  }
+}

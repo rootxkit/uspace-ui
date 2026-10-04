@@ -43,9 +43,8 @@ PLAN §11 is unchanged, since what it needs is here.
 
 ### Not yet
 
-- There is no example app (`examples/next-app/`) and no
-  `docs/CONSUMING.md`; CI's `example` job still reports that nothing was
-  built (WP-13). Until then `README.md` "Consuming" is the guide.
+- There is no `docs/CONSUMING.md` yet (WP-13). Until then `README.md`
+  "Consuming" and `examples/next-app/` are the guide.
 - The API is not frozen: no semver gate in CI and no lab schema
   fixtures (WP-14, `v1.0.0`).
 - The hand accessibility audit of the public map and the registry check
@@ -98,6 +97,18 @@ A consumer on `0.1.0-rc.1` must act on the first two of these.
   fails after the bound (`release.mjs check-latest`). Every
   `release.yml` step runs with `bash -eo pipefail`, as CI's do.
 - `version` is `0.1.0`.
+- WP-13: `examples/next-app/`, the minimal Next.js consumer (in the
+  repository, not in the tarball): the tokens and `@source`, the fonts,
+  the theme with the brand from `UI_BRAND_*`, the language from the
+  cookie and `Accept-Language`, the kit's ESLint config, the three BFF
+  routes, types generated with `uspace-ui-gen-api`, the public zone map
+  with "version V, updated T", `LoginForm`, `RequireRole`, the CSP of
+  PLAN §7 per request with its nonce, `output: "standalone"` and a
+  `Dockerfile` that installs the release tarball with
+  `--frozen-lockfile`, over a stub API that is not a template. CI's
+  `example` job builds it against the current source and smokes the
+  standalone server in Chromium (CSP on every page and no violation,
+  nothing off the origin, the map, Georgian, sign-in, roles).
 
 ## 0.1.0-rc.1
 

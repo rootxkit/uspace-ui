@@ -1,0 +1,233 @@
+{
+  "$comment": "Stub data for examples/next-app only: invented ED-318 zones over the browser tests' Tbilisi extract (the same shapes as browser/zones/zones.ts). None is a real zone (spec 06 §4). `stub_applicability` is the answer the stub gives on ?applies_at= (copied into extendedProperties.cis_applicability; a real API evaluates it, this stub does not); it never leaves the stub.",
+  "type": "FeatureCollection",
+  "cis_version": 42,
+  "cis_updated_at": "2026-10-01T08:30:00Z",
+  "features": [
+    {
+      "type": "Feature",
+      "stub_applicability": "applies",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [44.772, 41.682],
+            [44.828, 41.682],
+            [44.828, 41.728],
+            [44.772, 41.728],
+            [44.772, 41.682]
+          ]
+        ],
+        "layer": {
+          "upper": 150,
+          "upperReference": "AMSL",
+          "lower": 0,
+          "lowerReference": "AGL",
+          "uom": "m"
+        }
+      },
+      "properties": {
+        "identifier": "GEO-TEST-Z0001",
+        "name": [
+          {
+            "text": "Test U-space airspace",
+            "lang": "en-GB"
+          },
+          {
+            "text": "სატესტო U-space საჰაერო სივრცე",
+            "lang": "ka-GE"
+          }
+        ],
+        "type": "USPACE",
+        "variant": "COMMON",
+        "reason": ["AIR_TRAFFIC"],
+        "message": [
+          {
+            "text": "Test: network identification and flight authorisation required",
+            "lang": "en-GB"
+          },
+          {
+            "text": "ტესტი: საჭიროა ქსელური იდენტიფიკაცია და ფრენის ნებართვა",
+            "lang": "ka-GE"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "stub_applicability": "applies",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [44.795, 41.695],
+            [44.805, 41.695],
+            [44.805, 41.703],
+            [44.795, 41.703],
+            [44.795, 41.695]
+          ]
+        ],
+        "layer": {
+          "upper": 120,
+          "upperReference": "AGL",
+          "lower": 0,
+          "lowerReference": "AGL",
+          "uom": "m"
+        }
+      },
+      "properties": {
+        "identifier": "GEO-TEST-Z0002",
+        "name": [
+          {
+            "text": "Test prohibited area",
+            "lang": "en-GB"
+          },
+          {
+            "text": "სატესტო აკრძალული ზონა",
+            "lang": "ka-GE"
+          }
+        ],
+        "type": "PROHIBITED",
+        "variant": "COMMON",
+        "reason": ["SECURITY"],
+        "message": [
+          {
+            "text": "Test: no flights",
+            "lang": "en-GB"
+          },
+          {
+            "text": "ტესტი: ფრენა აკრძალულია",
+            "lang": "ka-GE"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "stub_applicability": "unknown",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [44.78, 41.705],
+            [44.792, 41.705],
+            [44.792, 41.715],
+            [44.78, 41.715],
+            [44.78, 41.705]
+          ]
+        ],
+        "layer": {
+          "upper": 600,
+          "upperReference": "AMSL",
+          "lower": 0,
+          "lowerReference": "AGL",
+          "uom": "m"
+        }
+      },
+      "properties": {
+        "identifier": "GEO-TEST-Z0003",
+        "name": [
+          {
+            "text": "Test authorisation area",
+            "lang": "en-GB"
+          },
+          {
+            "text": "სატესტო ნებართვის ზონა",
+            "lang": "ka-GE"
+          }
+        ],
+        "type": "REQ_AUTHORIZATION",
+        "variant": "COMMON",
+        "reason": ["PRIVACY"]
+      }
+    },
+    {
+      "type": "Feature",
+      "stub_applicability": "not_applicable",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [44.808, 41.685],
+              [44.815, 41.685],
+              [44.815, 41.692],
+              [44.808, 41.692],
+              [44.808, 41.685]
+            ]
+          ],
+          [
+            [
+              [44.818, 41.69],
+              [44.825, 41.69],
+              [44.825, 41.697],
+              [44.818, 41.697],
+              [44.818, 41.69]
+            ]
+          ]
+        ],
+        "layer": {
+          "upper": 90,
+          "upperReference": "AGL",
+          "lower": 0,
+          "lowerReference": "AGL",
+          "uom": "m"
+        }
+      },
+      "properties": {
+        "identifier": "GEO-TEST-Z0004",
+        "name": [
+          {
+            "text": "Test conditional area (two parts)",
+            "lang": "en-GB"
+          },
+          {
+            "text": "სატესტო პირობითი ზონა (ორი ნაწილი)",
+            "lang": "ka-GE"
+          }
+        ],
+        "type": "CONDITIONAL",
+        "variant": "COMMON",
+        "reason": ["NATURE"]
+      }
+    },
+    {
+      "type": "Feature",
+      "stub_applicability": "unknown",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [44.81, 41.71],
+            [44.825, 41.71],
+            [44.825, 41.72],
+            [44.81, 41.72],
+            [44.81, 41.71]
+          ]
+        ],
+        "layer": {
+          "upper": 120,
+          "upperReference": "AGL",
+          "lower": 0,
+          "lowerReference": "AGL",
+          "uom": "m"
+        }
+      },
+      "properties": {
+        "identifier": "GEO-TEST-Z0005",
+        "name": [
+          {
+            "text": "Test open area",
+            "lang": "en-GB"
+          },
+          {
+            "text": "სატესტო ღია ზონა",
+            "lang": "ka-GE"
+          }
+        ],
+        "type": "NO_RESTRICTION",
+        "variant": "COMMON"
+      }
+    }
+  ]
+}

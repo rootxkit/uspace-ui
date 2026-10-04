@@ -511,6 +511,7 @@ pinned exact in `package.json` and locked; peers carry ranges.
 | dev: `@vitest/browser-playwright`, `@vitest/coverage-v8`, `vite`, `@testing-library/dom`, `@types/react`, `@types/react-dom`, `@types/node` | tests | The Vitest 4 Playwright provider and v8 coverage; the Vite the browser project runs on; the peer of `@testing-library/react`; type packages (WP-0). |
 | dev: `tailwindcss`, `@tailwindcss/vite` | the browser tests and the golden set | Tailwind v4 compiled the way the apps compile it (D4), so the vendored shadcn/ui classes and the token utilities exist in the browser tests and in axe's contrast checks (WP-1). Build-time only; never in `dist/`. |
 | dev: `@maplibre/maplibre-gl-style-spec` (exact pin, the version `maplibre-gl` already resolves) | tests | MapLibre's own expression parser and style validator: the symbology's expressions are evaluated as MapLibre would and the layers a layer component builds are validated, without a WebGL context (§9 "tested as data"; WP-6). Never imported by `src/` outside tests. |
+| example dev: `@tailwindcss/postcss` (exact pin, the `tailwindcss` version) | `examples/next-app` only | Tailwind v4's PostCSS plugin, which Next.js runs to compile `globals.css` with the kit's tokens and `@source` scan (D4, §14 Q13); every `web/` has it. Not a dependency of the package. (WP-13) |
 
 Rejected: any geometry or geodesy library (the lint rule forbids it for
 everyone, the kit included); `i18next`/`react-intl` (two catalogues and

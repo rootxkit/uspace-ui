@@ -222,16 +222,47 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      # WP-13 adds examples/next-app (next build, its lint, the generated
-      # types diff). Until then this job says so in its summary.
-      - name: Example present?
-        run: |
-          if [ -f examples/next-app/package.json ]; then
-            echo "examples/next-app exists but this job has no steps for it yet; WP-13 writes them." >&2
-            exit 1
-          fi
-          echo "SKIPPED: no examples/next-app yet (WP-13); nothing was built." | tee -a "$GITHUB_STEP_SUMMARY"
-          echo "::notice title=example skipped::no examples/next-app yet (WP-13)"
+      # examples/next-app (WP-13) against the kit's current source: the
+      # workspace links it to the root (pnpm-workspace.yaml overrides), so
+      # the kit's dist/ is built first. Its Docker state, the release
+      # tarball with its lockfile integrity, is asserted by
+      # scripts/example.test.ts in the `test` job.
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      # The committed types are what openapi.yaml generates.
+      - run: pnpm --dir examples/next-app check:api
+      # The kit's ESLint config, as a consumer extends it.
+      - run: pnpm --dir examples/next-app lint
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: examples/next-app/.next/cache
+          key: next-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('examples/next-app/**/*.ts', 'examples/next-app/**/*.tsx', 'examples/next-app/**/*.json', 'examples/next-app/**/*.css') }}
+          restore-keys: next-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+      # The smoke's basemap rewrite is baked in at build time.
+      - env:
+          EXAMPLE_BASEMAP_ORIGIN: http://127.0.0.1:4599
+        run: pnpm --dir examples/next-app build
+      - run: pnpm --dir examples/next-app typecheck
+      - name: Playwright version
+        id: pw
+        run: echo "version=$(pnpm exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        id: pw-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+      - if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install --with-deps chromium
+      - if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: pnpm exec playwright install-deps chromium
+      # The standalone server in Chromium: CSP on every page, nothing off
+      # the origin, the map with its version, Georgian, sign-in and roles.
+      - run: pnpm --dir examples/next-app smoke
 
   gitleaks:
     runs-on: ubuntu-latest

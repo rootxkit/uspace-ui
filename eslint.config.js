@@ -11,6 +11,9 @@ export default [
       ".cache/",
       "node_modules/",
       "src/api/test/generated/",
+      // The example app is linted with its own config, the kit's as a
+      // consumer extends it (CI's example job).
+      "examples/",
       "**/*.d.ts",
       "**/*.d.mts",
     ],
