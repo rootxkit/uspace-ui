@@ -79,8 +79,8 @@ release asset URL. The two installs differ only in where that URL goes:
 - **In a Docker build** the context is this directory alone, and
   `docker/pnpm-lock.yaml` records the asset's integrity, so `pnpm
   install --frozen-lockfile` refuses changed bytes. The pin is the
-  latest published release; it moves to `v0.1.0` after the owner tags
-  it (replace the URL, regenerate the lockfile as below, commit both).
+  latest published release, `v0.1.0`; when a newer one is published,
+  replace the URL, regenerate the lockfile as below and commit both.
 
 `scripts/example.test.ts` at the root asserts both states. To regenerate
 `docker/pnpm-lock.yaml` after a change to `package.json`:

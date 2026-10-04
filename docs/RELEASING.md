@@ -15,7 +15,7 @@ An exact release asset URL, never a range, a branch or a `github:` spec:
 ```jsonc
 // web/package.json
 "dependencies": {
-  "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v0.1.0-rc.1/rootxkit-uspace-ui-0.1.0-rc.1.tgz"
+  "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v0.1.0/rootxkit-uspace-ui-0.1.0.tgz"
 }
 ```
 
