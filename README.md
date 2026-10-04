@@ -253,8 +253,10 @@ export function proxy(req: NextRequest) {
 
 Entry points: `@rootxkit/uspace-ui/{model,theme,ui,i18n,fonts,map,api,
 auth/server,auth/client,symbology,layers,legend,live,status,alerts,
-table,form,eslint,test}`. The full step list for a `web/` app is in
-`docs/CONSUMING.md` (WP-13).
+table,form,eslint,test}`. The full step list for a `web/` app, from
+`package.json` to the Docker image, is
+[`docs/CONSUMING.md`](docs/CONSUMING.md); every step runs in
+[`examples/next-app/`](examples/next-app/), which CI builds and smokes.
 
 ## Developing
 

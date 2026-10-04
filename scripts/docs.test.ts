@@ -135,3 +135,57 @@ describe("docs/PLAN.md §12 says what 0.1.0 shipped", () => {
     }
   });
 });
+
+describe("docs/CONSUMING.md, the step list for a web/", () => {
+  const consuming = (() => {
+    try {
+      return read("docs/CONSUMING.md");
+    } catch {
+      return "";
+    }
+  })();
+
+  it("exists and installs this version from its GitHub Release asset", () => {
+    expect(consuming).not.toBe("");
+    const urls = [
+      ...consuming.matchAll(
+        /https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/releases\/download\/[^\s"`)]+/g,
+      ),
+    ].map((m) => m[0]);
+    expect(new Set(urls)).toEqual(new Set([assetUrl(pkg)]));
+    expect(consuming).toContain("gh attestation verify");
+    expect(consuming).not.toMatch(/npmjs\.com|"next" dist-tag|npm ci/);
+  });
+
+  it.each([
+    ["pnpm pinned", /"packageManager": "pnpm@/],
+    ["frozen lockfile", /pnpm install --frozen-lockfile/],
+    ["the CSS", /@source "\.\.\/node_modules\/@rootxkit\/uspace-ui\/dist"/],
+    ["the fonts", /fontClassName/],
+    ["the lint config", /@rootxkit\/uspace-ui\/eslint/],
+    [
+      "the BFF routes",
+      /\/_bff\/login[\s\S]*\/_bff\/logout[\s\S]*\/_bff\/api\/\*/,
+    ],
+    ["the cookies", /uspace_session[\s\S]*uspace_csrf[\s\S]*X-CSRF-Token/],
+    ["the WebSocket", /same-origin[\s\S]*no ticket/i],
+    ["generated types", /uspace-ui-gen-api/],
+    ["the applicability adapter", /cis_applicability/],
+    ["the basemap", /\/basemap\//],
+    ["the CSP", /connect-src 'self'[\s\S]*worker-src blob:/],
+    [
+      "the Docker recipe",
+      /output: "standalone"[\s\S]*RUN pnpm install --frozen-lockfile/,
+    ],
+    ["the upgrade policy", /## Upgrading/],
+    ["the minimum versions", /## Minimum version per consumer/],
+    ["the example", /examples\/next-app/],
+  ])("covers %s", (_name, pattern) => {
+    expect(consuming).toMatch(pattern);
+  });
+
+  it("is linked from README.md and no longer listed as missing", () => {
+    expect(read("README.md")).toContain("](docs/CONSUMING.md)");
+    expect(changelogSection ?? "").not.toMatch(/no `docs\/CONSUMING\.md`/);
+  });
+});

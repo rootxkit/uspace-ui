@@ -43,8 +43,6 @@ PLAN §11 is unchanged, since what it needs is here.
 
 ### Not yet
 
-- There is no `docs/CONSUMING.md` yet (WP-13). Until then `README.md`
-  "Consuming" and `examples/next-app/` are the guide.
 - The API is not frozen: no semver gate in CI and no lab schema
   fixtures (WP-14, `v1.0.0`).
 - The hand accessibility audit of the public map and the registry check
@@ -109,6 +107,12 @@ A consumer on `0.1.0-rc.1` must act on the first two of these.
   `example` job builds it against the current source and smokes the
   standalone server in Chromium (CSP on every page and no violation,
   nothing off the origin, the map, Georgian, sign-in, roles).
+- WP-13: `docs/CONSUMING.md`, the step list for a `web/`: install from
+  the GitHub Release tarball with pnpm and verify its attestation, CSS,
+  layout, lint, the BFF routes and cookies, the same-origin WebSocket,
+  generated types, adapters, the basemap, the CSP, the Docker recipe,
+  upgrading, the minimum versions, and where the example differs from
+  the CISP's `web/`.
 
 ## 0.1.0-rc.1
 
