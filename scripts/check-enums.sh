@@ -1,13 +1,18 @@
 #!/bin/sh
 # Compares the enumerations of src/model with the string constants of
-# uspace-core/core at the tag in docs/CORE_VERSION (PLAN §10 job 7).
+# uspace-core at the tag in docs/CORE_VERSION (PLAN §10 job 7; WP-14):
+# core/ (Trust, Severity, ZoneType, the identification enumerations, the
+# vertical and time enumerations, FieldError), alerting/ (ClearReason) and
+# sources/ (Why, the kit's DisabledBy).
 #
-# Online: it fetches core/ by a sparse, shallow clone. The extraction here
-# is deliberately small (awk over the `const (` blocks and the FieldError
-# struct); the vitest file that follows is the real check, and it fails if
-# the extraction comes back empty or partial.
+# Online: it fetches those packages by a sparse, shallow clone. The
+# constants are read by scripts/go-consts.mjs, a tokenizer over the Go
+# source (not a line pattern); the vitest file that follows compares every
+# enumeration, prints a table, and fails on any difference, on an empty
+# or partial extraction, and on a listed skip core has since gained.
 #
-# USPACE_CORE_REPO overrides the clone URL (a local path works).
+# USPACE_CORE_REPO overrides the clone URL (a local path works);
+# CORE_ENUMS_OUT the extraction file (default .cache/core-enums.tsv).
 set -eu
 
 root=$(cd "$(dirname "$0")/.." && pwd)
@@ -19,41 +24,28 @@ if [ -z "$tag" ]; then
   exit 1
 fi
 repo=${USPACE_CORE_REPO:-https://github.com/rootxkit/uspace-core.git}
+packages="core alerting sources"
 
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 
-echo "check-enums: fetching core/ of $repo at $tag"
+echo "check-enums: fetching $packages of $repo at $tag"
 git -c advice.detachedHead=false clone --quiet --depth 1 --branch "$tag" --filter=blob:none --sparse "$repo" "$work/core"
-git -C "$work/core" sparse-checkout set core
+# shellcheck disable=SC2086 # the package names are words
+git -C "$work/core" sparse-checkout set $packages
 commit=$(git -C "$work/core" rev-parse HEAD)
 
-mkdir -p .cache
-out=.cache/core-enums.tsv
-{
-  printf '# uspace-core %s %s\n' "$tag" "$commit"
-  for f in "$work"/core/core/*.go; do
-    case "$f" in *_test.go) continue ;; esac
-    awk '
-      /^const \(/ { inconst = 1; next }
-      inconst && /^\)/ { inconst = 0; next }
-      inconst && /^[ \t]+[A-Za-z_][A-Za-z0-9_]*[ \t]+[A-Z][A-Za-z0-9_]*[ \t]*=[ \t]*"/ {
-        value = $0
-        sub(/^[^"]*"/, "", value)
-        sub(/".*$/, "", value)
-        printf "%s\t%s\n", $2, value
-      }
-      /^type FieldError struct \{/ { instruct = 1; next }
-      instruct && /^\}/ { instruct = 0; next }
-      instruct && $1 ~ /^[A-Z]/ { printf "FieldError\t%s\n", $1 }
-    ' "$f"
-  done
-} > "$out"
+out=${CORE_ENUMS_OUT:-.cache/core-enums.tsv}
+mkdir -p "$(dirname "$out")"
+printf '# uspace-core %s %s
+' "$tag" "$commit" > "$out"
+# shellcheck disable=SC2086
+node scripts/go-consts.mjs "$work/core" $packages >> "$out"
 
 count=$(grep -vc '^#' "$out" || true)
 echo "check-enums: extracted $count constants from $tag ($commit) into $out"
 if [ "$count" -eq 0 ]; then
-  echo "check-enums: nothing extracted; the parser or the source layout changed" >&2
+  echo "check-enums: nothing extracted; the reader or the source layout changed" >&2
   exit 1
 fi
 
