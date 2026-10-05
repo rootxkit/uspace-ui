@@ -75,13 +75,14 @@ export function LoginForm(props: LoginFormProps): ReactNode {
   const [retryS, setRetryS] = useState(0);
   const [busy, setBusy] = useState(false);
   // The field to focus once the request is over (A4); null: leave it.
-  const [refocus, setRefocus] = useState<Step | null>(null);
+  const refocus = useRef<Step | null>(null);
 
   useEffect(() => {
-    if (busy || refocus === null) return;
-    (refocus === "otp" ? otpRef : passwordRef).current?.focus();
-    setRefocus(null);
-  }, [busy, refocus]);
+    const field = refocus.current;
+    if (busy || field === null) return;
+    refocus.current = null;
+    (field === "otp" ? otpRef : passwordRef).current?.focus();
+  }, [busy]);
 
   // One interval for the whole countdown, stopped when it reaches zero.
   const counting = retryS > 0;
@@ -107,7 +108,7 @@ export function LoginForm(props: LoginFormProps): ReactNode {
       if (sent === "password") setPassword("");
       setOtp("");
       setMessage({ kind: "error", text });
-      setRefocus(sent);
+      refocus.current = sent;
       return "refused";
     };
     let res: Response;
@@ -139,7 +140,7 @@ export function LoginForm(props: LoginFormProps): ReactNode {
         problemSlug(problem.type) === "mfa_challenge_missing"
       ) {
         restart({ kind: "error", text });
-        setRefocus("password");
+        refocus.current = "password";
         return "refused";
       }
       return refuse(text);

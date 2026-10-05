@@ -450,7 +450,8 @@ describe("tokens.css first paint (docs/ACCESSIBILITY.md A5)", () => {
   it("would report a value that drifted from the dark block (the twin)", () => {
     const drifted = { ...media, "--us-surface": "#ffffff" };
     expect(blockDifferences(drifted, SCHEMES.dark)).toEqual(["--us-surface"]);
-    const { ["--us-focus"]: _dropped, ...missing } = media;
+    const missing = { ...media };
+    delete missing["--us-focus"];
     expect(blockDifferences(missing, SCHEMES.dark)).toEqual(["--us-focus"]);
   });
 });
