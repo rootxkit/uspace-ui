@@ -9,13 +9,19 @@
 // shape the bus can carry and the kit cannot show is found in a test, not
 // on a console).
 
-/** An adapter's answer: the view model, or the field it could not map. */
+/**
+ * An adapter's answer: the view model, or the field it could not map.
+ *
+ * @public
+ */
 export type Adapted<T> =
   | { ok: true; value: T }
   | { ok: false; field: string; value: unknown; reason: string };
 
+/** @beta */
 export const adapted = <T>(value: T): Adapted<T> => ({ ok: true, value });
 
+/** @beta */
 export function refused<T>(
   field: string,
   value: unknown,
@@ -24,7 +30,11 @@ export function refused<T>(
   return { ok: false, field, value, reason };
 }
 
-/** Thrown by `unwrap` with the refusal it found. */
+/**
+ * Thrown by `unwrap` with the refusal it found.
+ *
+ * @beta
+ */
 export class AdapterRefusal extends Error {
   readonly field: string;
   readonly value: unknown;
@@ -36,7 +46,11 @@ export class AdapterRefusal extends Error {
   }
 }
 
-/** The value, or a thrown AdapterRefusal naming the field. */
+/**
+ * The value, or a thrown AdapterRefusal naming the field.
+ *
+ * @beta
+ */
 export function unwrap<T>(a: Adapted<T>): T {
   if (a.ok) return a.value;
   throw new AdapterRefusal(a.field, a.value, a.reason);

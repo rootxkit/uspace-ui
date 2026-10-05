@@ -211,6 +211,12 @@ export interface FeedStatus { connection: "connecting" | "live" | "down"; sinceM
 export interface FieldError { field: string; reason: string }      // uspace-core core.FieldError (its CLAUDE.md rule 5: an error names the field and the reason)
 export interface Problem { type: string; title: string; status: number; detail: string | null; instance: string | null; errors: FieldError[]; truncated?: boolean }   // §14 Q2 (decided, M28): `type` = https://schemas.uspace.ge/problems/<slug>; `errors` capped at 100 by the server, `truncated: true` when it was cut; the form kit says "and more" on it
 export interface SessionDisplay { sub: string; roles: string[]; realm: string; exp: number }   // the session JWT claims the BFF decodes for display (M20): `roles` is always an array (one element where a system has single-role users); `realm` is `console` (default), `police` (authority) or `portal` (USSP operators)
+
+// 1.0.0 (additive): an outline a person is drawing or typing (layers/DrawLayer, form/OutlineFields), passed to the app as entered. The kit never closes, simplifies, buffers or measures it, and never turns a circle into a polygon: the API judges the outline and, where a circle must be drawn, draws its outline in Go (uspace-core geodesy) and returns it.
+export interface DrawPoint { lat: number; lng: number }   // WGS84 degrees, as clicked (MapLibre's lngLat) or typed
+export type DrawOutline =
+  | { kind: "polygon"; vertices: readonly DrawPoint[] }   // in the order given; the first is not repeated
+  | { kind: "circle"; center: DrawPoint | null; radiusM: number | null };   // radius in metres as typed; null: not yet given
 ```
 
 ### 3.2 `theme` (WP-1)
@@ -221,6 +227,7 @@ export function brandFromEnv(env: Record<string, string | undefined>, prefix?: s
 export type ColorScheme = "light" | "dark" | "system";
 export function ThemeProvider(props: { brand: Brand; scheme?: ColorScheme; children }): JSX.Element   // sets data-theme and the brand CSS variables
 export function useTheme(): { scheme: ColorScheme; resolved: "light" | "dark"; setScheme(s: ColorScheme): void; brand: Brand }
+export function schemeAttribute(scheme: ColorScheme | null | undefined): "light" | "dark" | undefined   // 1.0.0: the data-theme the server renders on <html> for an explicit scheme (the uspace_scheme cookie); undefined for system, so tokens.css follows prefers-color-scheme until ThemeProvider sets it (no first-paint flash, docs/ACCESSIBILITY.md A5)
 export const tokens: { severity: Record<Severity, string>; trust: Record<Trust, string>; ident: Record<IdentStatus, string>; zone: Record<ZoneType, string>; age: readonly string[] }   // CSS variable names, not colours; colours live in styles/tokens.css
 ```
 
@@ -363,6 +370,7 @@ export function AlertLayer(props: { alerts: Iterable<AlertView>; tracks: Readonl
 export function IntentLayer(props: { intents: IntentInput[]; activeIds?: Iterable<string>; selectedId?: string | null; onSelect?(id: string): void; labels?: boolean; visible?: boolean }): null   // footprints as the API derived them (volumes passed through, Polygon or MultiPolygon); fill and outline per DSS state, a diamond pattern for `peer`; WP-12 replaced `nowIso` with `activeIds` (the WP-12 brief): "current" is the app's list from the API's state, never a time comparison in the kit
 export function RestrictionLayer(props: { restrictions: ZoneView[]; visible?: boolean }): null   // ED-318 features with reason DAR, styled by restrictionState (02 F2)
 export function ReceiverLayer(props: { receivers: ReceiverInput[]; selectedId?: string | null; onSelect?(id: string): void; labels?: boolean; visible?: boolean }): null   // authority: receiver positions and state; ReceiverInput = { id, lat, lng, state } plus the optional SourceView fields its hover card words in B-11's terms (disabledBy, disabledByWho, lastSeenAt, lagS)
+export function DrawLayer(props: { outline: DrawOutline; onChange(next: DrawOutline): void; maxVertices: number; circleOutline?: GeoJSON.Polygon | GeoJSON.MultiPolygon | null; active?: boolean; visible?: boolean; id?: string }): null   // 1.0.0 (uspace-ussp Q28 gap 1): a click adds a polygon vertex or places a circle's centre, a drag moves a point, every point as MapLibre reports it; the edges closed by a copy of the first vertex; a circle's outline is the app's `circleOutline` as its API drew it (geodesy is Go's, §1.1), else the centre only; `maxVertices` required, a click past it refused and counted (`draw_vertex_refused`); a crosshair while clicks place points
 ```
 
 ### 3.10 `legend` (WP-6, WP-7)
@@ -386,6 +394,7 @@ export function createAlertStore(): AlertStore    // raised/updated replace by a
 export function createSourceStore(): SourceStore  // per (type, instance) SourceView from status frames; `disabled` beats every other state (B-11)
 export function useStore<T>(store: { subscribe; snapshot }): T   // useSyncExternalStore
 export function ageS(t: { receivedAtMs: number } | { times: Times }, nowMs: number, by?: "received" | "captured"): number | null   // display age; captured age needs the server's clock offset from the status frame, else null
+// 1.0.0: StatusExtras (LiveStatus.extras) gains `thresholds: Readonly<Record<string, number>> | null` (a status frame's thresholds{} by wire name, each ending in its unit, `_s` or `_m`; the USSP's cpa_tcpa_max_s, cpa_horizontal_min_m, cpa_vertical_min_m, cpa_neighbour_radius_m, cpa_clear_after_s, traffic_radius_m) and `evaluationPeriodS: number | null`, read leniently because console/status/v1 does not name them yet (§14 Q21): a malformed member is left out and counted (`status_extra_ignored`), the frame still applies; never defaulted
 ```
 
 ### 3.12 `status` (WP-8)
@@ -398,6 +407,7 @@ export function DegradedBanner(props: { degraded: string[]; cisAgeS?: number | n
 export function AgeChip(props: { ageS: number | null; staleAfterS: number }): JSX.Element
 export function FrozenOverlay(props: { status: FeedStatus; nowMs: number }): JSX.Element   // when the feed is down: the picture stays, dimmed, with "showing data as of" and the age (05 §6)
 export function TrackDetail(props: { track: TrackView | MannedTrack; nowMs: number; staleAfterS: number | null; clockOffsetMs?: number | null; renderLink?(link: { kind: "flight" | "intent"; id: string }): ReactNode; compact?: boolean; lang?: Lang }): JSX.Element   // WP-12: identification block (status, hint, reason, basis caveat, mismatch, public registration part, serial), position, every altitude with its datum in the same string, speed, course, vertical speed positive up, emergency, trust with its meaning, source and instance ("heard by" for broadcast), the three times each labelled with its clock, time source, backlog badge, ages; every null a dash
+export function ThresholdsPanel(props: { thresholds: Readonly<Record<string, number>> | null; evaluationPeriodS?: number | null; policyVersion: string | null; className?: string }): JSX.Element   // 1.0.0 (uspace-ussp Q28 gap 2): the thresholds in force as the status frame carries them, each with its unit and the policy version; "the system sends no thresholds; none is assumed" when it carries none; a name the kit has no words for shown as the system spells it; judges nothing (INV-03)
 ```
 
 ### 3.13 `alerts` (WP-11)
@@ -426,6 +436,7 @@ export function Field(props: { name: string; labelKey: string; unit?: string; da
 export function NumberField, TextField, SelectField, CheckboxField, UTCDateTimeField (label says UTC; value RFC 3339 Z), BBoxField, EnumField<E>(options from a `model` enumeration with i18n labels)
 export function FieldErrors(props: { errors: FieldError[] }): JSX.Element    // the unmapped remainder, by field path
 export function ConfirmDialog(props: { titleKey; bodyKey; reason?: { required: true; minLength: number }; destructive?: boolean; onConfirm(reason?: string) }): JSX.Element   // every audited act (a source switch, a publication, a certificate status) goes through a dialog with a reason (02 §1 failure rule: "every disable is an audited act by a person")
+export function OutlineFields(props: { outline: DrawOutline; onChange(next: DrawOutline): void; maxVertices: number; circleOutlineShown?: boolean; kinds?: readonly ("polygon" | "circle")[]; legendKey?: string }): JSX.Element   // 1.0.0: the typed and keyboard path to DrawLayer's outline (WCAG 2.5.7): vertices added, edited, removed; a circle's centre and radius, said in words; checks only the form of a number (WGS84 ranges, a radius above zero), the API judges the outline; emptyOutline(kind)
 ```
 
 ### 3.16 `auth/server` and `auth/client` (WP-5)
@@ -479,7 +490,8 @@ are reported.
 
 ```ts
 export function renderWithKit(ui: ReactNode, opts?: { lang?: Lang; scheme?; brand?; now?: number }): RenderResult   // providers wired; fake timers friendly
-export function fixtures(): { tracks: TrackView[]; zones: ZoneView[]; alerts: AlertView[]; manned: MannedView[]; sources: SourceView[]; status: FeedStatus }   // deterministic, synthetic (GEO-TEST-* numbers, TEST* serials, 06 §4), covering every enumeration value at least once; WP-14 replaces the generator's inputs with the lab's schema examples
+export function fixtures(opts?: { source?: "synthetic" | "lab" }): { tracks: TrackView[]; zones: ZoneView[]; alerts: AlertView[]; manned: MannedView[]; sources: SourceView[]; status: FeedStatus }   // synthetic by default (GEO-TEST-* numbers, TEST* serials, 06 §4), covering every enumeration value at least once; `{ source: "lab" }` (WP-14): the lab's schema examples at the commits in src/test/fixtures/VERSION, decoded through the reference adapters
+export function labFixtures(): Fixtures; export function labDecodings(): LabDecoding[]; export const LAB_COMMIT: string   // WP-14: the lab-derived set, and what each example decoded to (the conformance hook of 04 §4); the reference adapters (adaptTelemetry, adaptManned, adaptAlert, adaptSource, adaptStatus, adaptEd318Feature, adaptApplicability, adaptCisChange) are exported as @beta examples
 export function axeCheck(container: HTMLElement): Promise<void>   // fails on any WCAG 2.2 AA violation
 ```
 

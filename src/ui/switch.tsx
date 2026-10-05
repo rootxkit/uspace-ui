@@ -4,6 +4,7 @@ import * as React from "react"
 import { cn } from "./cn.js"
 import { Switch as SwitchPrimitive } from "radix-ui"
 
+/** @public */
 function Switch({
   className,
   size = "default",

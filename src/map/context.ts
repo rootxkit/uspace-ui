@@ -6,9 +6,14 @@ import type { MapScheme } from "./basemap.js";
 import type { Lang } from "../i18n/lang.js";
 import type { BBox, Viewport } from "./viewport.js";
 
-/** Adds a kit layer's sources and layers to a freshly loaded style. */
+/**
+ * Adds a kit layer's sources and layers to a freshly loaded style.
+ *
+ * @beta
+ */
 export type StyleLoadHandler = (map: MapLibreMap) => void;
 
+/** @beta */
 export interface MapContextValue {
   /** The map after its `load` event; null before, and with no WebGL. */
   map: MapLibreMap | null;
@@ -23,7 +28,11 @@ export interface MapContextValue {
 
 export const MapContext = createContext<MapContextValue | null>(null);
 
-/** The context of the enclosing `MapView`; throws outside one. */
+/**
+ * The context of the enclosing `MapView`; throws outside one.
+ *
+ * @beta
+ */
 export function useMapContext(): MapContextValue {
   const ctx = useContext(MapContext);
   if (ctx === null) {
@@ -32,7 +41,11 @@ export function useMapContext(): MapContextValue {
   return ctx;
 }
 
-/** The MapLibre map after load, or null (before load, no WebGL, outside a MapView). */
+/**
+ * The MapLibre map after load, or null (before load, no WebGL, outside a MapView).
+ *
+ * @public
+ */
 export function useMap(): MapLibreMap | null {
   return useContext(MapContext)?.map ?? null;
 }
@@ -41,6 +54,8 @@ export function useMap(): MapLibreMap | null {
  * Calls `add(map)` once the map has loaded and again after every style
  * re-apply (language or scheme change), which drops every source and
  * layer. Layer components put their sources and layers back here.
+ *
+ * @beta
  */
 export function useStyleLoad(add: StyleLoadHandler): void {
   const { onStyleLoad } = useMapContext();

@@ -1,6 +1,7 @@
 // Every empty state of the map is counted as well as shown (CLAUDE.md rule
 // 9, LESSONS E-02): WP-8's status components read these.
 
+/** @beta */
 export type MapCounter =
   /** SOURCE.json absent, refused, timed out or malformed: the null path. */
   | "basemap_missing"
@@ -19,7 +20,11 @@ export function countMap(counter: MapCounter): void {
   counts[counter] += 1;
 }
 
-/** A snapshot of the map counters since the page loaded. */
+/**
+ * A snapshot of the map counters since the page loaded.
+ *
+ * @beta
+ */
 export function mapCounters(): Readonly<Record<MapCounter, number>> {
   return { ...counts };
 }

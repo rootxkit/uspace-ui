@@ -2,9 +2,14 @@ import type { ReactNode } from "react";
 
 import { cn } from "../cn.js";
 
-/** What a Stat shows for a value the API did not provide (PLAN §3). */
+/**
+ * What a Stat shows for a value the API did not provide (PLAN §3).
+ *
+ * @beta
+ */
 export const STAT_UNKNOWN = "—";
 
+/** @beta */
 export interface StatProps {
   label: ReactNode;
   /** `null` is unknown and renders a dash, never a zero. */
@@ -14,7 +19,11 @@ export interface StatProps {
   className?: string;
 }
 
-/** A labelled value with its unit. */
+/**
+ * A labelled value with its unit.
+ *
+ * @beta
+ */
 export function Stat(props: StatProps): ReactNode {
   const { label, value, unit, className } = props;
   const unknown = value === null;

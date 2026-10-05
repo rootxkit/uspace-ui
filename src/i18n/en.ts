@@ -695,7 +695,12 @@ const catalogue = {
   "detail.intent": "Intent",
 } as const;
 
-/** A key of the kit's own catalogue. Apps add keys of their own. */
+/**
+ * A key of the kit's own catalogue. Apps add keys of their own.
+ *
+ * @public
+ */
 export type Key = keyof typeof catalogue;
 
+/** @public */
 export const en: Readonly<Record<Key, string>> = catalogue;

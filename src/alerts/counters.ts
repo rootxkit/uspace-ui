@@ -1,6 +1,7 @@
 // What the alert components drop or cannot do is counted as well as shown
 // (CLAUDE.md rule 9, LESSONS E-09, E-10).
 
+/** @beta */
 export type AlertCounter =
   /**
    * A second entry under one `alertId` in one `alerts` list: the later
@@ -28,12 +29,20 @@ export function countAlert(counter: AlertCounter): void {
   counts[counter] += 1;
 }
 
-/** A snapshot of the alert counters since the page loaded. */
+/**
+ * A snapshot of the alert counters since the page loaded.
+ *
+ * @beta
+ */
 export function alertCounters(): Readonly<Record<AlertCounter, number>> {
   return { ...counts };
 }
 
-/** Tests only: start the counters again from zero (LESSONS E-11). */
+/**
+ * Tests only: start the counters again from zero (LESSONS E-11).
+ *
+ * @beta
+ */
 export function resetAlertCountersForTests(): void {
   for (const k of Object.keys(counts) as AlertCounter[]) counts[k] = 0;
 }

@@ -21,10 +21,16 @@ function names<K extends string>(
   return Object.freeze(out);
 }
 
-/** The age buckets of the track and source age display, in order. */
+/**
+ * The age buckets of the track and source age display, in order.
+ *
+ * @public
+ */
 export const AGE_BUCKETS = ["live", "aging", "stale", "unknown"] as const;
+/** @public */
 export type AgeBucket = (typeof AGE_BUCKETS)[number];
 
+/** @public */
 export interface Tokens {
   severity: Readonly<Record<Severity, string>>;
   trust: Readonly<Record<Trust, string>>;
@@ -38,6 +44,7 @@ export interface Tokens {
   brandAccent: string;
 }
 
+/** @public */
 export const tokens: Tokens = Object.freeze({
   severity: names("severity", SEVERITIES),
   trust: names("trust", TRUSTS),

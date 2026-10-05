@@ -26,6 +26,7 @@ import { Field, heldError, type FieldProps } from "./Field.js";
 import { formatLocaleNumber, parseLocaleNumber } from "./number.js";
 import { inputToUtc, utcToInput } from "./utc.js";
 
+/** @public */
 export type FieldBaseProps = Omit<FieldProps, "children" | "inline" | "utc">;
 
 const SELECT_CLASS =
@@ -48,12 +49,17 @@ function TextControl(props: {
   );
 }
 
+/** @public */
 export interface TextFieldProps extends FieldBaseProps {
   type?: "text" | "email" | "tel" | "url";
   autoComplete?: string;
 }
 
-/** A line of text, stored as typed. */
+/**
+ * A line of text, stored as typed.
+ *
+ * @public
+ */
 export function TextField(props: TextFieldProps) {
   const { type = "text", autoComplete, ...field } = props;
   return (
@@ -109,6 +115,8 @@ function NumberControl(props: { name: string }) {
  * A number typed in the person's language ("1,5" in `ka`, "1.5" in `en`),
  * stored as a number; an empty box is `null`, never `0`. Give `unit` and,
  * for a vertical value, `datum`: both go into the label.
+ *
+ * @public
  */
 export function NumberField(props: FieldBaseProps) {
   return (
@@ -118,6 +126,7 @@ export function NumberField(props: FieldBaseProps) {
   );
 }
 
+/** @public */
 export interface SelectOption {
   value: string;
   labelKey: string;
@@ -148,11 +157,16 @@ function SelectControl(props: {
   );
 }
 
+/** @public */
 export interface SelectFieldProps extends FieldBaseProps {
   options: readonly SelectOption[];
 }
 
-/** A choice among options; nothing chosen is `null`. */
+/**
+ * A choice among options; nothing chosen is `null`.
+ *
+ * @public
+ */
 export function SelectField(props: SelectFieldProps) {
   const { options, ...field } = props;
   return (
@@ -162,6 +176,7 @@ export function SelectField(props: SelectFieldProps) {
   );
 }
 
+/** @public */
 export interface EnumFieldProps<E extends string> extends FieldBaseProps {
   /** A `model` enumeration (`TRUSTS`, `ZONE_TYPES`, ...). */
   values: readonly E[];
@@ -169,7 +184,11 @@ export interface EnumFieldProps<E extends string> extends FieldBaseProps {
   i18nPrefix: string;
 }
 
-/** A value of an enumeration, labelled from the catalogues. */
+/**
+ * A value of an enumeration, labelled from the catalogues.
+ *
+ * @public
+ */
 export function EnumField<E extends string>(props: EnumFieldProps<E>) {
   const { values, i18nPrefix, ...field } = props;
   return (
@@ -198,7 +217,11 @@ function CheckboxControl(props: { name: string }) {
   );
 }
 
-/** A yes or no, stored as a boolean. */
+/**
+ * A yes or no, stored as a boolean.
+ *
+ * @public
+ */
 export function CheckboxField(props: FieldBaseProps) {
   return (
     <Field {...props} inline>
@@ -239,6 +262,7 @@ function UtcControl(props: { name: string; seconds: boolean }) {
   );
 }
 
+/** @public */
 export interface UTCDateTimeFieldProps extends FieldBaseProps {
   /** Offer seconds (default: minutes). */
   seconds?: boolean;
@@ -248,6 +272,8 @@ export interface UTCDateTimeFieldProps extends FieldBaseProps {
  * A date and time in UTC. The label ends with "UTC"; the box's wall clock
  * is read as UTC by text, so the person's own zone and its daylight-saving
  * changes never move the instant. Stored as RFC 3339 with `Z`, or null.
+ *
+ * @public
  */
 export function UTCDateTimeField(props: UTCDateTimeFieldProps) {
   const { seconds = false, hintKey = "form.utc_hint", ...field } = props;
@@ -265,6 +291,7 @@ const BBOX_KEYS = [
   "form.bbox.max_lat",
 ] as const;
 
+/** @public */
 export interface BBoxFieldProps {
   /** The field; its value is `[minLng, minLat, maxLng, maxLat]`. */
   name: string;
@@ -280,6 +307,8 @@ export interface BBoxFieldProps {
  * in WGS84 degrees, with the order in every label (spec 02 §1 `[lng,
  * lat]`). The order check is the schema's (`shapes.bbox()`); its error
  * names the pair and sits on the box.
+ *
+ * @public
  */
 export function BBoxField(props: BBoxFieldProps) {
   const {
@@ -359,6 +388,7 @@ export function BBoxField(props: BBoxFieldProps) {
   );
 }
 
+/** @beta */
 export interface ReasonFieldProps {
   name: string;
   /** The minimum length the caller's policy sets; no default. */
@@ -401,6 +431,8 @@ function ReasonControl(props: { name: string; countId: string }) {
  * The reason a person gives for an audited act (02 §1: "every disable is
  * an audited act by a person"; LESSONS B-09, B-11). Always required; the
  * minimum length is the caller's. Pair with `shapes.reason(minLength)`.
+ *
+ * @beta
  */
 export function ReasonField(props: ReasonFieldProps) {
   const {

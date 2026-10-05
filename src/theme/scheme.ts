@@ -2,19 +2,25 @@
 // action writes `uspace_scheme`; the kit only reads it. Nothing goes to
 // localStorage.
 
+/** @public */
 export type ColorScheme = "light" | "dark" | "system";
+/** @public */
 export type ResolvedScheme = "light" | "dark";
 
+/** @beta */
 export const SCHEME_COOKIE = "uspace_scheme";
 
+/** @beta */
 export const COLOR_SCHEMES: readonly ColorScheme[] = [
   "light",
   "dark",
   "system",
 ];
 
+/** @beta */
 export const DARK_QUERY = "(prefers-color-scheme: dark)";
 
+/** @beta */
 export function parseScheme(v: string | null | undefined): ColorScheme | null {
   return v === "light" || v === "dark" || v === "system" ? v : null;
 }
@@ -27,6 +33,8 @@ export function parseScheme(v: string | null | undefined): ColorScheme | null {
  * ThemeProvider sets it. The server never guesses the preference.
  *
  *     <html data-theme={schemeAttribute(schemeFromCookie(cookieHeader))}>
+ *
+ * @public
  */
 export function schemeAttribute(
   scheme: ColorScheme | null | undefined,
@@ -37,6 +45,8 @@ export function schemeAttribute(
 /**
  * The scheme in a `Cookie` header or `document.cookie`, or null when the
  * cookie is absent or holds anything but a scheme.
+ *
+ * @beta
  */
 export function schemeFromCookie(
   cookie: string | null | undefined,

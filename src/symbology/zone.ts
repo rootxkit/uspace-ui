@@ -22,10 +22,18 @@ import {
 } from "../model/index.js";
 import { tokens } from "../theme/tokens.js";
 
-/** How a zone's area is filled; the second cue beside colour. */
+/**
+ * How a zone's area is filled; the second cue beside colour.
+ *
+ * @public
+ */
 export type ZonePattern = "solid" | "hatched" | "dotted" | "none";
 
-/** The CSS variable of a zone type's colour (styles/tokens.css). */
+/**
+ * The CSS variable of a zone type's colour (styles/tokens.css).
+ *
+ * @public
+ */
 export function zoneToken(t: ZoneType): string {
   switch (t) {
     case "PROHIBITED":
@@ -44,6 +52,8 @@ export function zoneToken(t: ZoneType): string {
  * hatched, CONDITIONAL dotted, NO_RESTRICTION and USPACE outline only (the
  * two told apart by line weight, `zoneLineWidthPx`). Every type is
  * distinguishable without colour.
+ *
+ * @public
  */
 export function zonePattern(t: ZoneType): ZonePattern {
   switch (t) {
@@ -64,6 +74,8 @@ export function zonePattern(t: ZoneType): ZonePattern {
 /**
  * Outline width per type, in CSS pixels. Display-only constants: USPACE
  * is the heavy outline, NO_RESTRICTION the light one.
+ *
+ * @beta
  */
 export function zoneLineWidthPx(t: ZoneType): number {
   switch (t) {
@@ -81,7 +93,11 @@ export function zoneLineWidthPx(t: ZoneType): number {
   }
 }
 
-/** The catalogue key of a zone type's name (both catalogues carry it). */
+/**
+ * The catalogue key of a zone type's name (both catalogues carry it).
+ *
+ * @beta
+ */
 export const ZONE_TYPE_KEYS: Readonly<Record<ZoneType, Key>> = Object.freeze({
   PROHIBITED: "zone.type.PROHIBITED",
   REQ_AUTHORIZATION: "zone.type.REQ_AUTHORIZATION",
@@ -90,7 +106,11 @@ export const ZONE_TYPE_KEYS: Readonly<Record<ZoneType, Key>> = Object.freeze({
   USPACE: "zone.type.USPACE",
 });
 
-/** The catalogue key naming a pattern, for the legend's text. */
+/**
+ * The catalogue key naming a pattern, for the legend's text.
+ *
+ * @beta
+ */
 export const ZONE_PATTERN_KEYS: Readonly<Record<ZonePattern, Key>> =
   Object.freeze({
     solid: "zone.pattern.solid",
@@ -99,7 +119,11 @@ export const ZONE_PATTERN_KEYS: Readonly<Record<ZonePattern, Key>> =
     none: "zone.pattern.none",
   });
 
-/** Fill opacity per pattern before dimming. Display-only constants. */
+/**
+ * Fill opacity per pattern before dimming. Display-only constants.
+ *
+ * @beta
+ */
 export function zonePatternFillOpacity(p: ZonePattern): number {
   switch (p) {
     case "solid":
@@ -118,6 +142,8 @@ export function zonePatternFillOpacity(p: ZonePattern): number {
 /**
  * Legend order, gravest first. A display-only constant: the order a
  * legend lists the types in, not a ranking any logic reads.
+ *
+ * @beta
  */
 export const ZONE_LEGEND_ORDER: readonly ZoneType[] = Object.freeze([
   "PROHIBITED",
@@ -127,16 +153,23 @@ export const ZONE_LEGEND_ORDER: readonly ZoneType[] = Object.freeze([
   "NO_RESTRICTION",
 ] satisfies ZoneType[]);
 
+/** @beta */
 export function zoneOrder(): readonly ZoneType[] {
   return ZONE_LEGEND_ORDER;
 }
 
-/** Opacity factor of a dimmed zone. Display-only constant. */
+/**
+ * Opacity factor of a dimmed zone. Display-only constant.
+ *
+ * @beta
+ */
 export const ZONE_DIMMED_OPACITY = 0.35;
 
 /**
  * The restriction states that draw dimmed (spec 02 F2): not yet in force,
  * or no longer. The state is the server's; the kit only reads it.
+ *
+ * @beta
  */
 export const DIMMED_RESTRICTION_STATES: readonly RestrictionState[] =
   Object.freeze(["planned", "ended", "cancelled"] satisfies RestrictionState[]);
@@ -146,6 +179,8 @@ export const DIMMED_RESTRICTION_STATES: readonly RestrictionState[] =
  * dimmed when the server said `applies: false` or the restriction state is
  * planned, ended or cancelled. `applies: null` (the server did not say) is
  * drawn in full: not stated is not "off" (CLAUDE.md rule 6).
+ *
+ * @public
  */
 export function zoneOpacity(
   z: Pick<ZoneView, "applies" | "restrictionState">,
@@ -160,20 +195,33 @@ export function zoneOpacity(
   return 1;
 }
 
-/** The map image name of a type's fill pattern, or null for none. */
+/**
+ * The map image name of a type's fill pattern, or null for none.
+ *
+ * @beta
+ */
 export function zonePatternImageId(t: ZoneType): string | null {
   const p = zonePattern(t);
   return p === "hatched" || p === "dotted" ? `us-zone-pattern-${t}` : null;
 }
 
-/** The zone types that draw a pattern image. */
+/**
+ * The zone types that draw a pattern image.
+ *
+ * @beta
+ */
 export const PATTERNED_ZONE_TYPES: readonly ZoneType[] = Object.freeze(
   ZONE_TYPES.filter((t) => zonePatternImageId(t) !== null),
 );
 
-/** Side of a generated pattern tile, in pixels. Display-only constant. */
+/**
+ * Side of a generated pattern tile, in pixels. Display-only constant.
+ *
+ * @beta
+ */
 export const PATTERN_TILE_PX = 8;
 
+/** @beta */
 export interface PatternImage {
   width: number;
   height: number;
@@ -181,11 +229,14 @@ export interface PatternImage {
   data: Uint8Array;
 }
 
+/** @beta */
 export type Rgb = readonly [number, number, number];
 
 /**
  * `#rrggbb` or `#rgb` as three bytes; null for anything else (a token
  * that did not resolve, a colour function). The caller counts the null.
+ *
+ * @beta
  */
 export function parseHexColour(s: string): Rgb | null {
   const v = s.trim();
@@ -212,6 +263,8 @@ export function parseHexColour(s: string): Rgb | null {
  * A pattern tile in `rgb`: diagonal stripes for "hatched", a dot grid for
  * "dotted"; the rest is transparent. Pixel arithmetic on a tile, not
  * geometry: the tile repeats across whatever polygon the API sent.
+ *
+ * @beta
  */
 export function zonePatternImage(
   pattern: "hatched" | "dotted",
@@ -236,10 +289,18 @@ export function zonePatternImage(
   return { width: size, height: size, data };
 }
 
-/** Each zone type's colour as resolved from its token, per scheme. */
+/**
+ * Each zone type's colour as resolved from its token, per scheme.
+ *
+ * @public
+ */
 export type ZoneColours = Readonly<Record<ZoneType, string>>;
 
-/** The `properties` a zone feature carries onto the map (ZoneLayer). */
+/**
+ * The `properties` a zone feature carries onto the map (ZoneLayer).
+ *
+ * @beta
+ */
 export interface ZoneFeatureProperties {
   identifier: string;
   name: string | null;
@@ -268,6 +329,8 @@ function byType(
 /**
  * The dimming factor as an expression, the same rule as `zoneOpacity`:
  * `applies == false` or a dimmed restriction state; `null` is full.
+ *
+ * @beta
  */
 export function zoneDimExpression(): ExpressionSpecification {
   return [
@@ -284,9 +347,14 @@ export function zoneDimExpression(): ExpressionSpecification {
   ];
 }
 
-/** Extra outline width of the selected zone. Display-only constant. */
+/**
+ * Extra outline width of the selected zone. Display-only constant.
+ *
+ * @beta
+ */
 export const SELECTED_EXTRA_WIDTH_PX = 2;
 
+/** @public */
 export interface ZoneStyle {
   fillColor: ExpressionSpecification;
   fillOpacity: ExpressionSpecification;
@@ -305,6 +373,8 @@ export interface ZoneStyle {
  * `properties.selected`. `colours` are the tokens resolved in the map's
  * scheme (MapLibre cannot read a CSS variable); a pattern's colour is in
  * its image.
+ *
+ * @public
  */
 export function zoneStyle(colours: ZoneColours): ZoneStyle {
   const dim = zoneDimExpression();

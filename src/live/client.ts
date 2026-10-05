@@ -46,17 +46,29 @@ import { utcMs } from "./time.js";
 import type { MannedStore, TrackStore } from "./trackStore.js";
 import type { FeedStatus, MannedView, TrackView } from "../model/index.js";
 
-/** The close code a system's WS process uses when the session is gone. */
+/**
+ * The close code a system's WS process uses when the session is gone.
+ *
+ * @beta
+ */
 export const CLOSE_UNAUTHORIZED = 4401;
 
-/** Where a snapshot collection goes: the app's adapter, then a store. */
+/**
+ * Where a snapshot collection goes: the app's adapter, then a store.
+ *
+ * @public
+ */
 export interface SnapshotTarget<I> {
   store: { replace(items: readonly I[]): void };
   /** The app's adapter (typed by its generated types); null skips it. */
   adapt(frame: ConsoleFrame): I | null;
 }
 
-/** The stores the feed fills by itself (PLAN §6.3 "Kit behaviour"). */
+/**
+ * The stores the feed fills by itself (PLAN §6.3 "Kit behaviour").
+ *
+ * @public
+ */
 export interface FeedStores {
   /** Filled from every status frame's `sources[]`. */
   sources?: SourceStore;
@@ -72,6 +84,7 @@ export interface FeedStores {
   alerts?: SnapshotTarget<AlertInput>;
 }
 
+/** @public */
 export interface FeedOptions {
   /**
    * The system's WS path (relative, resolved against the page) or a
@@ -93,7 +106,11 @@ export interface FeedOptions {
   stores?: FeedStores;
 }
 
-/** `FeedStatus` with what the status components and the app need too. */
+/**
+ * `FeedStatus` with what the status components and the app need too.
+ *
+ * @public
+ */
 export interface LiveStatus extends FeedStatus {
   /** The status frame's `connection_id`. */
   connectionId: string | null;
@@ -137,6 +154,8 @@ const TOKENISH =
  * Without `page` there is no origin to compare with, so even an absolute
  * URL is refused (`no_page`) rather than accepted unchecked (retro-audit
  * N8).
+ *
+ * @beta
  */
 export function resolveFeedUrl(
   url: string,
@@ -197,6 +216,8 @@ const OPEN = 1;
  * The feed, without React: `useFeed` wraps it. `start` and `stop` may be
  * called again (React's development double effect); it never throws from
  * a socket event.
+ *
+ * @beta
  */
 export class FeedClient {
   private opts: FeedOptions;

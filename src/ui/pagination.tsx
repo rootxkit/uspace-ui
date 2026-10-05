@@ -8,6 +8,7 @@ import {
 
 import { buttonVariants, type Button } from "./button.js"
 
+/** @public */
 function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
   return (
     <nav
@@ -20,6 +21,7 @@ function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
   )
 }
 
+/** @public */
 function PaginationContent({
   className,
   ...props
@@ -33,6 +35,7 @@ function PaginationContent({
   )
 }
 
+/** @public */
 function PaginationItem({ ...props }: React.ComponentProps<"li">) {
   return <li data-slot="pagination-item" {...props} />
 }
@@ -42,6 +45,7 @@ type PaginationLinkProps = {
 } & Pick<React.ComponentProps<typeof Button>, "size"> &
   React.ComponentProps<"a">
 
+/** @public */
 function PaginationLink({
   className,
   isActive,
@@ -65,6 +69,7 @@ function PaginationLink({
   )
 }
 
+/** @public */
 function PaginationPrevious({
   className,
   ...props
@@ -82,6 +87,7 @@ function PaginationPrevious({
   )
 }
 
+/** @public */
 function PaginationNext({
   className,
   ...props
@@ -99,6 +105,7 @@ function PaginationNext({
   )
 }
 
+/** @public */
 function PaginationEllipsis({
   className,
   ...props

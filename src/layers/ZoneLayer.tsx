@@ -30,12 +30,21 @@ import {
 } from "./zoneFeatures.js";
 import { putImage, resolveColour, useLayer } from "./useLayer.js";
 
-/** The default source id; pass `id` to draw two zone layers on one map. */
+/**
+ * The default source id; pass `id` to draw two zone layers on one map.
+ *
+ * @beta
+ */
 export const ZONE_LAYER_ID = "us-zones";
 
-/** Label size in CSS pixels. Display-only constant. */
+/**
+ * Label size in CSS pixels. Display-only constant.
+ *
+ * @beta
+ */
 export const ZONE_LABEL_SIZE_PX = 12;
 
+/** @beta */
 export interface ZoneLayerIds {
   source: string;
   fill: string;
@@ -44,6 +53,7 @@ export interface ZoneLayerIds {
   label: string;
 }
 
+/** @beta */
 export function zoneLayerIds(id: string): ZoneLayerIds {
   return {
     source: id,
@@ -54,7 +64,11 @@ export function zoneLayerIds(id: string): ZoneLayerIds {
   };
 }
 
-/** Each zone type's token resolved on the map's element. */
+/**
+ * Each zone type's token resolved on the map's element.
+ *
+ * @beta
+ */
 export function resolveZoneColours(map: MapLibreMap): ZoneColours {
   const out = {} as Record<ZoneType, string>;
   for (const t of ZONE_TYPES) out[t] = resolveColour(map, zoneToken(t));
@@ -64,6 +78,8 @@ export function resolveZoneColours(map: MapLibreMap): ZoneColours {
 /**
  * Puts the generated fill patterns on the map in the given colours, once
  * per style (re-put after a scheme change, in that scheme's colours).
+ *
+ * @beta
  */
 export function putZonePatterns(map: MapLibreMap, colours: ZoneColours): void {
   for (const t of ZONE_TYPES) {
@@ -133,10 +149,18 @@ function buildZoneLayers(map: MapLibreMap, id: string): readonly string[] {
   return [ids.fill, ids.pattern, ids.line, ids.label];
 }
 
-/** Offset of the hover card from the pointer. Display-only constant. */
+/**
+ * Offset of the hover card from the pointer. Display-only constant.
+ *
+ * @beta
+ */
 export const HOVER_OFFSET_PX = 12;
 
-/** The hover card of `zone`, placed beside the pointer, within the map. */
+/**
+ * The hover card of `zone`, placed beside the pointer, within the map.
+ *
+ * @beta
+ */
 export function HoverCard(props: {
   map: MapLibreMap;
   hover: PointerHover;
@@ -160,6 +184,7 @@ export function HoverCard(props: {
   );
 }
 
+/** @public */
 export interface ZoneLayerProps {
   zones: readonly ZoneView[];
   selectedId?: string | null;
@@ -173,6 +198,7 @@ export interface ZoneLayerProps {
   id?: string;
 }
 
+/** @public */
 export function ZoneLayer(props: ZoneLayerProps) {
   const {
     zones,

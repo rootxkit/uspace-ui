@@ -22,6 +22,7 @@ import type { MapScheme } from "./basemap.js";
 import { useMapContext } from "./context.js";
 import { maplibre } from "./maplibre.js";
 
+/** @public */
 export interface LayerToggle {
   id: string;
   /**
@@ -33,9 +34,14 @@ export interface LayerToggle {
   onChange(v: boolean): void;
 }
 
-/** Resolves a layer's `labelKey` instead of the catalogues. */
+/**
+ * Resolves a layer's `labelKey` instead of the catalogues.
+ *
+ * @public
+ */
 export type Translate = (key: string) => string;
 
+/** @public */
 export interface LayerPanelProps {
   layers: LayerToggle[];
   translate?: Translate;
@@ -47,6 +53,8 @@ export interface LayerPanelProps {
  * The layer toggles as a sheet (the kit's shadcn/ui `Sheet`), opened by a
  * "Layers" button. The sheet traps focus while open; Escape and the close
  * button return focus to the button.
+ *
+ * @public
  */
 export function LayerPanel(props: LayerPanelProps): ReactNode {
   const ctx = useMapContext();
@@ -97,6 +105,7 @@ export function LayerPanel(props: LayerPanelProps): ReactNode {
   );
 }
 
+/** @public */
 export interface MapControlsProps {
   layers: LayerToggle[];
   /** Show the light/dark toggle; it needs `onSchemeChange`. */
@@ -107,6 +116,7 @@ export interface MapControlsProps {
   translate?: Translate;
 }
 
+/** @public */
 export function MapControls(props: MapControlsProps): ReactNode {
   const { layers, scheme = false, onSchemeChange, translate } = props;
   const ctx = useMapContext();

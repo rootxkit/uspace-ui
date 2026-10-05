@@ -25,7 +25,11 @@ export {
   type FontFile,
 } from "./faces.js";
 
-/** Latin, Latin Extended, Greek and Cyrillic, regular and bold. */
+/**
+ * Latin, Latin Extended, Greek and Cyrillic, regular and bold.
+ *
+ * @public
+ */
 export const notoSans = localFont({
   src: [
     {
@@ -50,6 +54,8 @@ export const notoSans = localFont({
  * Mkhedruli, Mtavruli, Nuskhuri and Asomtavruli, regular and bold. No
  * metric fallback: a fallback face would cover Latin and stand in front of
  * Noto Sans in the stack.
+ *
+ * @public
  */
 export const notoSansGeorgian = localFont({
   src: [
@@ -76,5 +82,7 @@ export const notoSansGeorgian = localFont({
  * Both loaders' classes: they define `--us-font-georgian` and
  * `--us-font-latin`, which `fontFamily` (and `fonts.css`'s `font-sans`)
  * stack Georgian first, so Georgian text falls to the Georgian face.
+ *
+ * @public
  */
 export const fontClassName = `${notoSansGeorgian.variable} ${notoSans.variable}`;

@@ -7,6 +7,7 @@ import type { Key } from "../i18n/en.js";
 import type { Translate } from "../i18n/translate.js";
 import type { DisabledBy, FeedStatus, SourceState } from "../model/index.js";
 
+/** @beta */
 export const SOURCE_STATE_KEYS: Readonly<Record<SourceState, Key>> =
   Object.freeze({
     disabled: "source.state.disabled",
@@ -17,6 +18,7 @@ export const SOURCE_STATE_KEYS: Readonly<Record<SourceState, Key>> =
     never_heard: "source.state.never_heard",
   });
 
+/** @beta */
 export const DISABLED_BY_KEYS: Readonly<Record<DisabledBy, Key>> =
   Object.freeze({
     type: "source.disabled_by.type",
@@ -24,7 +26,11 @@ export const DISABLED_BY_KEYS: Readonly<Record<DisabledBy, Key>> =
     default_deny: "source.disabled_by.default_deny",
   });
 
-/** The degraded keys the kit has words for; any other is shown as sent. */
+/**
+ * The degraded keys the kit has words for; any other is shown as sent.
+ *
+ * @beta
+ */
 export const DEGRADED_KEYS: Readonly<Record<string, Key>> = Object.freeze({
   manned: "degraded.manned",
   dss: "degraded.dss",
@@ -32,6 +38,7 @@ export const DEGRADED_KEYS: Readonly<Record<string, Key>> = Object.freeze({
   publisher_stale: "degraded.publisher_stale",
 });
 
+/** @beta */
 export const CONNECTION_KEYS: Readonly<Record<FeedStatus["connection"], Key>> =
   Object.freeze({
     connecting: "feed.connecting",
@@ -39,7 +46,11 @@ export const CONNECTION_KEYS: Readonly<Record<FeedStatus["connection"], Key>> =
     down: "feed.down_retrying",
   });
 
-/** One degraded entry in words: ours for a known key, the server's otherwise. */
+/**
+ * One degraded entry in words: ours for a known key, the server's otherwise.
+ *
+ * @beta
+ */
 export function degradedLabel(slug: string, t: Translate): string {
   const key = Object.hasOwn(DEGRADED_KEYS, slug)
     ? DEGRADED_KEYS[slug]

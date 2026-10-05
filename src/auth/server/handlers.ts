@@ -47,16 +47,25 @@ import {
   upstreamHeaders,
 } from "./forward.js";
 
-/** A Next.js App Router route handler. */
+/**
+ * A Next.js App Router route handler.
+ *
+ * @public
+ */
 export type RouteHandler = (req: NextRequest) => Promise<Response>;
 
-/** Exactly the three routes of the contract; there is no `wsTicket` (M22). */
+/**
+ * Exactly the three routes of the contract; there is no `wsTicket` (M22).
+ *
+ * @public
+ */
 export interface BffHandlers {
   readonly login: RouteHandler;
   readonly logout: RouteHandler;
   readonly proxy: RouteHandler;
 }
 
+/** @public */
 export interface BffOptions {
   /** The system's API as the BFF reaches it (server side), e.g. the compose service URL. */
   apiBase: string | URL;
@@ -379,7 +388,11 @@ function checkProxyDeclared(opts: BffOptions): void {
   }
 }
 
-/** The three route handlers of `/_bff/*`. */
+/**
+ * The three route handlers of `/_bff/*`.
+ *
+ * @public
+ */
 export function bffHandlers(opts: BffOptions): BffHandlers {
   const base = new URL(opts.apiBase);
   checkTrustedProxyHops(opts.trustedProxyHops);

@@ -14,6 +14,7 @@ import type {
 
 import { countTable } from "./counters.js";
 
+/** @public */
 export interface TableState {
   sorting: SortingState;
   columnFilters: ColumnFiltersState;
@@ -21,15 +22,28 @@ export interface TableState {
   columnVisibility: VisibilityState;
 }
 
-/** Rows per page when the app gives none. A display-only constant. */
+/**
+ * Rows per page when the app gives none. A display-only constant.
+ *
+ * @beta
+ */
 export const DEFAULT_PAGE_SIZE = 25;
 
-/** The page sizes the footer offers. Display-only constants. */
+/**
+ * The page sizes the footer offers. Display-only constants.
+ *
+ * @beta
+ */
 export const PAGE_SIZES: readonly number[] = Object.freeze([10, 25, 50, 100]);
 
-/** The largest page size a URL may ask for; larger is malformed. */
+/**
+ * The largest page size a URL may ask for; larger is malformed.
+ *
+ * @beta
+ */
 export const MAX_PAGE_SIZE = 1000;
 
+/** @beta */
 export function initialTableState(
   pageSize: number = DEFAULT_PAGE_SIZE,
 ): TableState {
@@ -50,6 +64,8 @@ export function initialTableState(
  * non-personal column that ends in `name` (a zone's name) is kept in
  * memory as well: over-matching costs a shareable link, under-matching a
  * leak.
+ *
+ * @beta
  */
 export const PII_FILTER_DENY_LIST: readonly string[] = Object.freeze([
   "name",
@@ -70,7 +86,11 @@ function words(id: string): string[] {
     .filter((w) => w !== "");
 }
 
-/** True when a filter on column `id` must never be written to a URL. */
+/**
+ * True when a filter on column `id` must never be written to a URL.
+ *
+ * @beta
+ */
 export function isPiiColumn(id: string): boolean {
   const w = words(id);
   for (let n = 1; n <= 3 && n <= w.length; n++) {
@@ -100,6 +120,8 @@ function splitList(v: string): string[] {
  * that does not parse is ignored and counted (`url_state_malformed`), and
  * a filter on a PII column is dropped and counted (`url_pii_refused`):
  * whoever wrote it, it is not applied from a URL.
+ *
+ * @beta
  */
 export function readTableState(
   params: URLSearchParams,
@@ -161,6 +183,8 @@ export function readTableState(
  * left out (page 1, the default page size, no sort), a PII filter is left
  * out, and so is a filter whose value is not a string (the URL carries
  * text; anything else stays in memory). Other parameters are untouched.
+ *
+ * @beta
  */
 export function writeTableState(
   params: URLSearchParams,

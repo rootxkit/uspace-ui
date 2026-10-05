@@ -52,7 +52,66 @@ import { VariantProps } from 'class-variance-authority';
 import type { VisibilityState } from '@tanstack/react-table';
 import { z } from 'zod';
 
+// @beta
+function adaptAlert(f: ConsoleFrame): Adapted<AlertInput>;
+
+// @beta
+function adaptApplicability(f: ConsoleFrame): Adapted<{
+    identifier: string;
+    applies: boolean | null;
+}>;
+
+// @beta
+function adaptCisChange(f: ConsoleFrame): Adapted<CisChange>;
+
 // @public
+type Adapted<T> = {
+    ok: true;
+    value: T;
+} | {
+    ok: false;
+    field: string;
+    value: unknown;
+    reason: string;
+};
+
+// @beta (undocumented)
+const adapted: <T>(value: T) => Adapted<T>;
+
+// @beta
+function adaptEd318Collection(doc: unknown): Adapted<ZoneView[]>;
+
+// @beta
+function adaptEd318Feature(feature: unknown, applies?: boolean | null): Adapted<ZoneView>;
+
+// @beta
+class AdapterRefusal extends Error {
+    constructor(field: string, value: unknown, reason: string);
+    // (undocumented)
+    readonly field: string;
+    // (undocumented)
+    readonly value: unknown;
+}
+
+// @beta
+function adaptManned(f: ConsoleFrame): Adapted<Omit<MannedTrack, "receivedAtMs">>;
+
+// @beta
+function adaptSource(raw: unknown, at: string): Adapted<SourceView>;
+
+// @beta
+function adaptSourceFrame(f: ConsoleFrame): Adapted<SourceView>;
+
+// @beta
+function adaptStatus(f: ConsoleFrame, receivedAtMs: number): Adapted<{
+    status: FeedStatus;
+    sources: SourceView[];
+}>;
+
+// @beta
+function adaptTelemetry(f: ConsoleFrame): Adapted<Omit<TrackView, "receivedAtMs">>;
+
+// @beta
 const AGE_BUCKET_KEYS: Readonly<Record<AgeBucket, Key>>;
 
 // @public
@@ -78,7 +137,7 @@ interface AgeChipProps {
     staleAfterS: number | null;
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 interface AgeColumnOptions<Row> extends ColumnOptions {
     ageS(row: Row, nowMs: number): number | null;
     staleAfterS: number | null;
@@ -96,10 +155,10 @@ interface AgeLegendProps {
     staleAfterS: number;
 }
 
-// @public
+// @beta
 function ageOpacity(b: AgeBucket): number;
 
-// @public
+// @beta
 function ageOpacityExpression(): ExpressionSpecification;
 
 // @public
@@ -109,58 +168,58 @@ function ageS(t: {
     times: Times;
 }, nowMs: number, by?: AgeBasis, clockOffsetMs?: number | null): number | null;
 
-// @public
+// @beta
 function AgeSwatch(props: {
     bucket: AgeBucket;
 }): JSX.Element;
 
-// @public
+// @beta
 function ageToken(b: AgeBucket): string;
 
-// @public (undocumented)
+// @beta (undocumented)
 const ALERT_DASH: [number, number];
 
-// @public
+// @beta
 const ALERT_KIND_KEYS: Readonly<Record<AlertKind | ViolationKind, Key>>;
 
 // @public (undocumented)
 const ALERT_KINDS: readonly ["proximity", "nonconformance", "nonconformance_nearby", "height_exceedance", "zone_incursion", "lost_link", "restriction_activated", "emergency_nearby"];
 
-// @public
+// @beta
 const ALERT_LAYER_ID = "us-alerts";
 
-// @public (undocumented)
+// @beta (undocumented)
 const ALERT_RING_RADIUS_PX = 20;
 
-// @public (undocumented)
+// @beta (undocumented)
 const ALERT_STATE_KEYS: Readonly<Record<AlertState, Key>>;
 
 // @public (undocumented)
 const ALERT_STATES: readonly ["raised", "updated", "cleared"];
 
-// @public (undocumented)
+// @beta (undocumented)
 const ALERT_STORE_LIMIT = 500;
 
-// @public
+// @beta
 const ALERT_SUMMARY_KEYS: Readonly<Record<AlertKind | ViolationKind, Key>>;
 
-// @public (undocumented)
+// @beta (undocumented)
 const ALERT_WIDTH_PX: Readonly<Record<Severity, number>>;
 
-// @public
+// @beta
 interface AlertChange {
     // (undocumented)
     alert: AlertView;
     change: "new" | "rose";
 }
 
-// @public
+// @beta
 function alertChanges(seen: ReadonlyMap<string, Seen>, alerts: readonly AlertView[]): {
     seen: Map<string, Seen>;
     changes: AlertChange[];
 };
 
-// @public (undocumented)
+// @beta (undocumented)
 type AlertCounter =
 /**
 * A second entry under one `alertId` in one `alerts` list: the later
@@ -177,7 +236,7 @@ type AlertCounter =
 */
 | "tone_repeat_invalid";
 
-// @public
+// @beta
 function alertCounters(): Readonly<Record<AlertCounter, number>>;
 
 // @public (undocumented)
@@ -218,16 +277,16 @@ function AlertDialogTitle(input: React_2.ComponentProps<typeof AlertDialog_2.Tit
 // @public (undocumented)
 function AlertDialogTrigger(input: React_2.ComponentProps<typeof AlertDialog_2.Trigger>): React_2.JSX.Element;
 
-// @public (undocumented)
+// @beta (undocumented)
 type AlertFeature = GeoJSON_2.Feature<GeoJSON_2.LineString | GeoJSON_2.Point, AlertFeatureProperties>;
 
-// @public (undocumented)
+// @beta (undocumented)
 type AlertFeatureCollection = GeoJSON_2.FeatureCollection<GeoJSON_2.LineString | GeoJSON_2.Point, AlertFeatureProperties>;
 
-// @public (undocumented)
+// @beta (undocumented)
 function alertFeatureCollection(alerts: Iterable<AlertView>, tracks: ReadonlyMap<string, TrackView>, gaps: AlertGaps): AlertFeatureCollection;
 
-// @public (undocumented)
+// @beta (undocumented)
 interface AlertFeatureProperties {
     // (undocumented)
     alertId: string;
@@ -239,7 +298,7 @@ interface AlertFeatureProperties {
     trackId?: string;
 }
 
-// @public
+// @beta
 class AlertGaps {
     // (undocumented)
     readonly aircraft: Set<string>;
@@ -259,7 +318,7 @@ type AlertKind = (typeof ALERT_KINDS)[number];
 // @public (undocumented)
 function AlertLayer(props: AlertLayerProps): null;
 
-// @public (undocumented)
+// @beta (undocumented)
 interface AlertLayerIds {
     // (undocumented)
     line: string;
@@ -271,7 +330,7 @@ interface AlertLayerIds {
     source: string;
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 function alertLayerIds(id: string): AlertLayerIds;
 
 // @public (undocumented)
@@ -297,7 +356,7 @@ interface AlertListProps {
     tracks?: ReadonlyMap<string, TrackView>;
 }
 
-// @public
+// @beta
 interface AlertPeer {
     // (undocumented)
     trackId: string | null;
@@ -305,7 +364,7 @@ interface AlertPeer {
     trust: string | null;
 }
 
-// @public
+// @beta
 function alertPeer(alert: AlertView): AlertPeer;
 
 declare namespace alerts {
@@ -393,7 +452,7 @@ interface AlertStoreOptions {
 // @public
 function AlertSummary(props: AlertSummaryProps): string;
 
-// @public
+// @beta
 function alertSummary(alert: AlertView, t: Translate, lang: Lang): string;
 
 // @public (undocumented)
@@ -464,13 +523,13 @@ interface AlertView {
     state: AlertState;
 }
 
-// @public
+// @beta
 const ALT_SOURCE_KEYS: Readonly<Record<AltSource, Key>>;
 
 // @public (undocumented)
 const ALT_SOURCES: readonly ["geodetic", "pressure", "network", "none"];
 
-// @public
+// @beta
 const ALTITUDE_KEYS: Readonly<Record<VerticalRef | AltSource, Key | null>>;
 
 // @public (undocumented)
@@ -502,7 +561,7 @@ declare namespace api {
     }
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 type ApiCounter =
 /** A response that carried a `Sunset` header: its API major is deprecated. */
 "sunset_seen"
@@ -517,7 +576,7 @@ type ApiCounter =
 /** A `401` answer; `onUnauthorized` is called on the first of a run. */
 | "unauthorized";
 
-// @public
+// @beta
 function apiCounters(): Readonly<Record<ApiCounter, number>>;
 
 // @public
@@ -659,7 +718,7 @@ const badgeVariants: (props?: ({
     variant?: "default" | "link" | "destructive" | "outline" | "secondary" | "ghost" | null | undefined;
 } & ClassProp) | undefined) => string;
 
-// @public
+// @beta
 const BASEMAP_DEFAULT_PATHS: {
     readonly pmtilesPath: "/basemap/basemap.pmtiles";
     readonly glyphsPath: "/basemap/fonts/{fontstack}/{range}.pbf";
@@ -667,10 +726,10 @@ const BASEMAP_DEFAULT_PATHS: {
     readonly sourceInfoPath: "/basemap/SOURCE.json";
 };
 
-// @public
+// @beta
 const BASEMAP_SOURCE_ID = "protomaps";
 
-// @public
+// @beta
 function basemapAttribution(info: BasemapInfo | null, lang: Lang): string;
 
 // @public (undocumented)
@@ -694,7 +753,7 @@ function basemapStyle(cfg: BasemapConfig, info: BasemapInfo | null, lang: Lang, 
 
 // Warning: (ae-forgotten-export) The symbol "PathKey" needs to be exported by the entry point entry.d.ts
 //
-// @public
+// @beta
 function basemapUrl(cfg: BasemapConfig, key: PathKey): string;
 
 // @public
@@ -742,16 +801,16 @@ interface BBoxSubscriptionOptions {
     quantizeDeg: number;
 }
 
-// @public
+// @beta
 type BBoxValue = [number, number, number, number];
 
-// @public (undocumented)
+// @beta (undocumented)
 const BFF_API_PREFIX = "/_bff/api";
 
-// @public
+// @beta
 const BFF_LOGIN_PATH = "/_bff/login";
 
-// @public (undocumented)
+// @beta (undocumented)
 const BFF_LOGOUT_PATH = "/_bff/logout";
 
 // @public
@@ -796,10 +855,10 @@ interface Brand {
     shortName: string;
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 const BRAND_ENV_PREFIX = "UI_BRAND_";
 
-// @public
+// @beta
 const BRAND_FALLBACK_NAME = "U-space";
 
 // @public
@@ -875,7 +934,17 @@ function CheckboxField(props: FieldBaseProps): JSX.Element;
 // @public
 function checkCsrf(req: NextRequest, opts?: Pick<SessionCookieOptions, "csrfName">): boolean;
 
-// @public (undocumented)
+// @beta
+interface CisChange {
+    // (undocumented)
+    at: string;
+    // (undocumented)
+    dataset: string;
+    // (undocumented)
+    version: string;
+}
+
+// @beta (undocumented)
 const CLEAR_REASON_KEYS: Readonly<Record<ClearReason, Key>>;
 
 // @public (undocumented)
@@ -890,7 +959,7 @@ function clearSession(res: NextResponse, opts: SessionCookieOptions): void;
 // @public
 type Client<Paths extends {}> = Client_2<Paths>;
 
-// @public
+// @beta
 function clientAddress(req: NextRequest, hops: number | undefined): string | null;
 
 // @public (undocumented)
@@ -904,7 +973,7 @@ interface ClientOptions {
     timeoutMs?: number;
 }
 
-// @public
+// @beta
 const CLOSE_UNAUTHORIZED = 4401;
 
 // @public (undocumented)
@@ -919,13 +988,13 @@ function CollapsibleContent(input: React.ComponentProps<typeof Collapsible_2.Col
 // @public (undocumented)
 function CollapsibleTrigger(input: React.ComponentProps<typeof Collapsible_2.CollapsibleTrigger>): JSX.Element;
 
-// @public (undocumented)
+// @beta (undocumented)
 const COLOR_SCHEMES: readonly ColorScheme[];
 
 // @public (undocumented)
 type ColorScheme = "light" | "dark" | "system";
 
-// @public
+// @beta
 type ColumnFilterKind = {
     kind: "text";
 } | {
@@ -933,10 +1002,10 @@ type ColumnFilterKind = {
     options: readonly FilterOption[];
 };
 
-// @public
+// @beta
 function columnLabel<Row>(column: Column<Row, unknown>, t: Translate): string;
 
-// @public (undocumented)
+// @beta (undocumented)
 interface ColumnOptions {
     headerKey?: string;
     id?: string;
@@ -955,7 +1024,7 @@ const columns: Readonly<{
     select: typeof select;
 }>;
 
-// @public
+// @beta
 function columnsFor<Row>(): {
     num: (key: KeyOf<Row, number | null | undefined>, unitKey: string, digits: number, opts?: ColumnOptions) => TableColumn<Row>;
     utc: (key: KeyOf<Row, string | null | undefined>, opts?: ColumnOptions) => TableColumn<Row>;
@@ -1012,7 +1081,7 @@ function CommandSeparator(input: React_2.ComponentProps<typeof Command_2.Separat
 // @public (undocumented)
 function CommandShortcut(input: React_2.ComponentProps<"span">): React_2.JSX.Element;
 
-// @public
+// @beta
 function compareCapturedAt(a: string, b: string): number | null;
 
 // @public (undocumented)
@@ -1049,7 +1118,7 @@ interface ConfirmReason {
     required: true;
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 const CONNECTION_KEYS: Readonly<Record<FeedStatus["connection"], Key>>;
 
 // @public
@@ -1082,10 +1151,10 @@ interface CookieReader {
     } | undefined;
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 function countLayer(counter: LayerCounter): void;
 
-// @public (undocumented)
+// @beta (undocumented)
 function countLive(counter: LiveCounter, by?: number): void;
 
 // @public (undocumented)
@@ -1094,7 +1163,7 @@ function createAlertStore(opts?: AlertStoreOptions): AlertStore;
 // @public
 function createClient<Paths extends {}>(opts: ClientOptions): Client<Paths>;
 
-// @public
+// @beta
 function createMannedStore(opts: TrackStoreOptions): MannedStore;
 
 // @public (undocumented)
@@ -1105,7 +1174,7 @@ function createSourceStore(opts?: {
 // @public
 function createTrackStore(opts: TrackStoreOptions): TrackStore;
 
-// @public
+// @beta
 function createTranslator(lang: Lang, catalogues?: Catalogues): Translate;
 
 // @public
@@ -1126,10 +1195,10 @@ const CSRF_HEADER = "X-CSRF-Token";
 // @public
 function csrfToken(name?: string): string | null;
 
-// @public (undocumented)
+// @beta (undocumented)
 const DARK_QUERY = "(prefers-color-scheme: dark)";
 
-// @public (undocumented)
+// @beta (undocumented)
 const DASH = "\u2014";
 
 // @public
@@ -1174,28 +1243,28 @@ interface DataTableProps<Row> {
     virtualize?: boolean;
 }
 
-// @public
+// @beta
 const DATUM_KEYS: Readonly<Record<VerticalRef, Key>>;
 
-// @public (undocumented)
+// @beta (undocumented)
 const DEFAULT_BACKOFF: Readonly<Backoff>;
 
-// @public (undocumented)
+// @beta (undocumented)
 const DEFAULT_CLEARED_HOLD_MS = 30000;
 
-// @public
+// @beta
 const DEFAULT_FRESHNESS_PICK: Readonly<Required<FreshnessPick>>;
 
-// @public
+// @beta
 const DEFAULT_LANG: Lang;
 
-// @public
+// @beta
 const DEFAULT_PAGE_SIZE = 25;
 
-// @public
+// @beta
 const DEFAULT_TIMEOUT_MS = 30000;
 
-// @public
+// @beta
 const DEGRADED_KEYS: Readonly<Record<string, Key>>;
 
 // @public (undocumented)
@@ -1212,12 +1281,12 @@ interface DegradedBannerProps {
     projectionAgeS?: number | null;
 }
 
-// @public
+// @beta
 function degradedLabel(slug: string, t: Translate): string;
 
 // Warning: (ae-forgotten-export) The symbol "Detail" needs to be exported by the entry point entry.d.ts
 //
-// @public
+// @beta
 function detailFlag(d: Detail, key: string): boolean | null;
 
 // @public
@@ -1228,13 +1297,13 @@ interface DetailLink {
     kind: "flight" | "intent";
 }
 
-// @public
+// @beta
 function detailNumber(d: Detail, ...keys: string[]): number | null;
 
-// @public
+// @beta
 function detailString(d: Detail, ...keys: string[]): string | null;
 
-// @public
+// @beta
 function detailStrings(d: Detail, key: string): string[];
 
 // @public (undocumented)
@@ -1271,10 +1340,10 @@ function DialogTitle(input: React_2.ComponentProps<typeof Dialog_2.Title>): Reac
 // @public (undocumented)
 function DialogTrigger(input: React_2.ComponentProps<typeof Dialog_2.Trigger>): React_2.JSX.Element;
 
-// @public
+// @beta
 const DIMMED_RESTRICTION_STATES: readonly RestrictionState[];
 
-// @public (undocumented)
+// @beta (undocumented)
 const DISABLED_BY_KEYS: Readonly<Record<DisabledBy, Key>>;
 
 // @public (undocumented)
@@ -1282,6 +1351,82 @@ const DISABLED_BYS: readonly ["type", "instance", "default_deny"];
 
 // @public (undocumented)
 type DisabledBy = (typeof DISABLED_BYS)[number];
+
+// @beta (undocumented)
+const DRAW_FILL_OPACITY = 0.12;
+
+// @beta
+const DRAW_LAYER_ID = "uspace-draw";
+
+// @beta
+const DRAW_LINE_WIDTH_PX = 2;
+
+// @beta (undocumented)
+const DRAW_POINT_RADIUS_PX = 6;
+
+// @beta (undocumented)
+type DrawFeatureCollection = GeoJSON_2.FeatureCollection<GeoJSON_2.Geometry, {
+    role: DrawRole;
+    index: number;
+    label: string;
+}>;
+
+// @beta
+function drawFeatureCollection(outline: DrawOutline, circleOutline: GeoJSON_2.Polygon | GeoJSON_2.MultiPolygon | null): DrawFeatureCollection;
+
+// @public (undocumented)
+function DrawLayer(props: DrawLayerProps): null;
+
+// @beta (undocumented)
+interface DrawLayerIds {
+    // (undocumented)
+    circle: string;
+    // (undocumented)
+    fill: string;
+    // (undocumented)
+    labels: string;
+    // (undocumented)
+    line: string;
+    // (undocumented)
+    points: string;
+    // (undocumented)
+    source: string;
+}
+
+// @beta (undocumented)
+function drawLayerIds(id: string): DrawLayerIds;
+
+// @public (undocumented)
+interface DrawLayerProps {
+    active?: boolean;
+    circleOutline?: GeoJSON_2.Polygon | GeoJSON_2.MultiPolygon | null;
+    id?: string;
+    maxVertices: number;
+    onChange(next: DrawOutline): void;
+    outline: DrawOutline;
+    visible?: boolean;
+}
+
+// @public (undocumented)
+type DrawOutline = {
+    kind: "polygon";
+    vertices: readonly DrawPoint[];
+} | {
+    kind: "circle";
+    center: DrawPoint | null;
+    radiusM: number | null;
+};
+
+// @public (undocumented)
+interface DrawPoint {
+    // (undocumented)
+    lat: number;
+    // (undocumented)
+    lng: number;
+}
+
+// @beta
+type DrawRole = "area" | "edge" | "vertex" | "center" | "circle";
 
 // @public (undocumented)
 function DropdownMenu(input: React_2.ComponentProps<typeof DropdownMenu_2.Root>): React_2.JSX.Element;
@@ -1335,19 +1480,22 @@ function DropdownMenuSubTrigger(input: React_2.ComponentProps<typeof DropdownMen
 // @public (undocumented)
 function DropdownMenuTrigger(input: React_2.ComponentProps<typeof DropdownMenu_2.Trigger>): React_2.JSX.Element;
 
-// @public
+// @beta
 const DROPPED_RESPONSE_HEADERS: readonly string[];
 
-// @public
+// @beta
 const DSS_STATES: readonly ["Accepted", "Activated", "Nonconforming", "Contingent"];
 
-// @public (undocumented)
+// @beta (undocumented)
 type DssState = (typeof DSS_STATES)[number];
 
 // @public
+function emptyOutline(kind: OutlineKind): DrawOutline;
+
+// @beta
 function EmptyState(props: EmptyStateProps): ReactNode;
 
-// @public (undocumented)
+// @beta (undocumented)
 interface EmptyStateProps {
     action?: ReactNode;
     // (undocumented)
@@ -1372,7 +1520,7 @@ interface EnumFieldProps<E extends string> extends FieldBaseProps {
     values: readonly E[];
 }
 
-// @public
+// @beta
 function errorText(err: HeldError, t: Translate, hasKey: (k: string) => boolean): string;
 
 declare namespace eslint {
@@ -1391,7 +1539,7 @@ interface ExternalStore<T> {
     subscribe(fn: () => void): () => void;
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 interface FeatureOptions {
     // (undocumented)
     nowMs: number;
@@ -1403,7 +1551,7 @@ interface FeatureOptions {
     t: Translate;
 }
 
-// @public
+// @beta
 class FeedClient {
     constructor(opts: FeedOptions);
     // (undocumented)
@@ -1489,7 +1637,7 @@ function Field(props: FieldProps): JSX.Element;
 // @public (undocumented)
 type FieldBaseProps = Omit<FieldProps, "children" | "inline" | "utc">;
 
-// @public (undocumented)
+// @beta (undocumented)
 interface FieldControl {
     // (undocumented)
     describedBy: string | undefined;
@@ -1528,7 +1676,7 @@ interface FieldErrorsProps {
     truncated?: boolean;
 }
 
-// @public
+// @beta
 function fieldLabel(t: Translate, p: FieldLabelParts): string;
 
 // @public (undocumented)
@@ -1556,7 +1704,7 @@ interface FieldProps extends FieldLabelParts {
     required?: boolean;
 }
 
-// @public
+// @beta
 interface FilterOption {
     // (undocumented)
     labelKey: string;
@@ -1581,7 +1729,12 @@ interface Fixtures {
 }
 
 // @public
-function fixtures(): Fixtures;
+function fixtures(opts?: FixturesOptions): Fixtures;
+
+// @public
+interface FixturesOptions {
+    source?: "synthetic" | "lab";
+}
 
 // @public
 function fmtAge(ageS: number | null, lang: Lang): string;
@@ -1589,13 +1742,13 @@ function fmtAge(ageS: number | null, lang: Lang): string;
 // @public
 function fmtAltitude(v: number | null, ref: VerticalRef | AltSource | null, lang: Lang): string;
 
-// @public
+// @beta
 function fmtDistance(m: number | null, lang: Lang): string;
 
 // @public
 function fmtHeading(deg: number | null): string;
 
-// @public
+// @beta
 function fmtHeight(v: number | null, ref: HeightRef | null, lang: Lang): string;
 
 // @public
@@ -1615,10 +1768,10 @@ function fmtTimeUTC(iso: string | null, lang: Lang, opts?: {
     seconds?: boolean;
 }): string;
 
-// @public
+// @beta
 const FONT_FILES: readonly FontFile[];
 
-// @public
+// @beta
 const FONT_VARIABLES: {
     readonly latin: "--us-font-latin";
     readonly georgian: "--us-font-georgian";
@@ -1627,10 +1780,10 @@ const FONT_VARIABLES: {
 // @public
 const fontClassName: string;
 
-// @public
+// @beta
 const fontFamily: string;
 
-// @public (undocumented)
+// @beta (undocumented)
 interface FontFile {
     // (undocumented)
     family: "Noto Sans" | "Noto Sans Georgian";
@@ -1700,6 +1853,11 @@ declare namespace form {
         Form,
         FormProps,
         kitErrorMap,
+        OUTLINE_KINDS,
+        OutlineFields,
+        emptyOutline,
+        OutlineFieldsProps,
+        OutlineKind,
         formatLocaleNumber,
         parseLocaleNumber,
         toFieldName,
@@ -1713,7 +1871,7 @@ declare namespace form {
     }
 }
 
-// @public
+// @beta
 const FORM_UNIT_KEYS: Readonly<{
     readonly m: "form.unit.m";
     readonly ft: "form.unit.ft";
@@ -1725,10 +1883,10 @@ const FORM_UNIT_KEYS: Readonly<{
     readonly pct: "form.unit.pct";
 }>;
 
-// @public
+// @beta
 function formatLocaleNumber(v: number | null, lang: Lang): string;
 
-// @public (undocumented)
+// @beta (undocumented)
 type FormCounter =
 /** An API field error whose path matched no registered field. */
 "field_error_unmapped"
@@ -1737,7 +1895,7 @@ type FormCounter =
 /** A submission that threw something other than an `ApiError`. */
 | "submit_failed";
 
-// @public
+// @beta
 function formCounters(): Readonly<Record<FormCounter, number>>;
 
 // @public (undocumented)
@@ -1760,7 +1918,7 @@ interface FormProps<Schema extends z.ZodType> {
 // @public
 function forward(req: NextRequest, target: URL, opts: ForwardOptions): Promise<Response>;
 
-// @public
+// @beta
 const FORWARDED_REQUEST_HEADERS: readonly string[];
 
 // @public (undocumented)
@@ -1808,10 +1966,10 @@ interface FrozenOverlayProps {
     status: FeedStatusInput;
 }
 
-// @public
+// @beta
 const GEORGIAN_UNICODE_RANGE = "U+10A0-10FF, U+1C90-1CBF, U+2D00-2D2F";
 
-// @public (undocumented)
+// @beta (undocumented)
 interface GridKey {
     // (undocumented)
     ctrlKey: boolean;
@@ -1821,7 +1979,7 @@ interface GridKey {
     metaKey: boolean;
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 interface GridPos {
     // (undocumented)
     col: number;
@@ -1829,20 +1987,20 @@ interface GridPos {
     row: number;
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 interface GridSize {
     // (undocumented)
     cols: number;
     rows: number;
 }
 
-// @public
+// @beta
 const HEIGHT_KEYS: Readonly<Record<HeightRef, Key>>;
 
-// @public (undocumented)
+// @beta (undocumented)
 type HeightRef = "TakeoffLocation" | "GroundLevel";
 
-// @public
+// @beta
 interface HeldError {
     // (undocumented)
     message?: string;
@@ -1850,10 +2008,10 @@ interface HeldError {
     type?: string | number;
 }
 
-// @public
+// @beta
 const HOVER_OFFSET_PX = 12;
 
-// @public
+// @beta
 function HoverCard(props: {
     map: Map_2;
     hover: PointerHover;
@@ -1861,7 +2019,7 @@ function HoverCard(props: {
     restriction?: boolean;
 }): ReactPortal;
 
-// @public (undocumented)
+// @beta (undocumented)
 function HoverPortal(props: {
     map: Map_2;
     hover: PointerHover;
@@ -1917,7 +2075,7 @@ declare namespace i18n {
     }
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 interface I18nContextValue {
     catalogues: Catalogues;
     // (undocumented)
@@ -1928,7 +2086,7 @@ interface I18nContextValue {
     t: Translate;
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 type I18nCounter =
 /** A `ka` lookup that found nothing in `ka` and showed the `en` text. */
 "missing_ka"
@@ -1939,7 +2097,7 @@ type I18nCounter =
 /** A time without a zone designator, or not a time: shown as a dash. */
 | "time_refused";
 
-// @public
+// @beta
 function i18nCounters(): Readonly<Record<I18nCounter, number>>;
 
 // @public (undocumented)
@@ -1954,7 +2112,7 @@ interface I18nProviderProps {
     onLangChange?(l: Lang): void;
 }
 
-// @public
+// @beta
 interface IconPart {
     // (undocumented)
     d: string;
@@ -1965,28 +2123,28 @@ interface IconPart {
     strokeWidth: number;
 }
 
-// @public
+// @beta
 type IconPoint = readonly [number, number];
 
 // @public (undocumented)
 const IDENT_BASES: readonly ["authenticated", "as_broadcast", "provider"];
 
-// @public
+// @beta
 const IDENT_BASIS_KEYS: Readonly<Record<IdentBasis, Key>>;
 
-// @public
+// @beta
 const IDENT_ORDER: readonly IdentKey[];
 
-// @public
+// @beta
 const IDENT_REASON_KEYS: Readonly<Record<IdentReason, Key>>;
 
 // @public (undocumented)
 const IDENT_REASONS: readonly ["matched", "session_binding", "uas_suspended", "uas_revoked", "operator_suspended", "operator_revoked", "serial_unknown", "not_a_serial", "operator_absent", "operator_mismatch", "owner_unknown", "not_in_registry", "serial_conflict", "no_serial", "registry_unavailable"];
 
-// @public
+// @beta
 const IDENT_STATUS_HINT_KEYS: Readonly<Record<IdentKey, Key>>;
 
-// @public
+// @beta
 const IDENT_STATUS_KEYS: Readonly<Record<IdentKey, Key>>;
 
 // @public (undocumented)
@@ -1995,10 +2153,10 @@ const IDENT_STATUSES: readonly ["registered", "suspended", "unknown_operator", "
 // @public (undocumented)
 type IdentBasis = (typeof IDENT_BASES)[number];
 
-// @public
+// @beta
 function identDrawn(ident: Identification | null): IdentKey;
 
-// @public
+// @beta
 interface IdentHint {
     caveat: Key | null;
     mismatch: Key | null;
@@ -2006,7 +2164,7 @@ interface IdentHint {
     status: Key;
 }
 
-// @public
+// @beta
 function identHintKey(status: IdentStatus, reason: IdentReason, basis: IdentBasis, mismatch?: boolean): IdentHint;
 
 // @public (undocumented)
@@ -2042,7 +2200,7 @@ interface IdentificationLegendProps {
 // @public
 type IdentKey = IdentStatus | "none";
 
-// @public
+// @beta
 function identMark(s: IdentKey): string;
 
 // @public (undocumented)
@@ -2054,7 +2212,7 @@ type IdentReason = (typeof IDENT_REASONS)[number];
 // @public (undocumented)
 type IdentStatus = (typeof IDENT_STATUSES)[number];
 
-// @public
+// @beta
 function IdentSwatch(props: {
     status: IdentKey;
 }): JSX.Element;
@@ -2062,49 +2220,49 @@ function IdentSwatch(props: {
 // @public
 function identToken(s: IdentStatus | null): string;
 
-// @public (undocumented)
+// @beta (undocumented)
 function initialTableState(pageSize?: number): TableState;
 
-// @public
+// @beta
 function InlineCode(input: ComponentProps<"code">): ReactNode;
 
 // @public (undocumented)
 function Input(input: React_2.ComponentProps<"input">): React_2.JSX.Element;
 
-// @public
+// @beta
 function inputToUtc(local: string): string | null;
 
-// @public (undocumented)
+// @beta (undocumented)
 const INTENT_ACTIVE_EXTRA_FILL = 0.12;
 
-// @public
+// @beta
 const INTENT_ACTIVE_EXTRA_WIDTH_PX = 1.5;
 
-// @public
+// @beta
 const INTENT_LABEL_SIZE_PX = 12;
 
-// @public (undocumented)
+// @beta (undocumented)
 const INTENT_LAYER_ID = "us-intents";
 
-// @public
+// @beta
 const INTENT_PATTERN_TILE_PX = 12;
 
-// @public
+// @beta
 const INTENT_PEER_PATTERN_ID = "us-intent-peer";
 
-// @public
+// @beta
 const INTENT_SELECTED_EXTRA_WIDTH_PX = 2;
 
-// @public
+// @beta
 const INTENT_STATE_KEYS: Readonly<Record<IntentStateKey, Key>>;
 
-// @public (undocumented)
+// @beta (undocumented)
 const INTENT_STATE_KEYS_ORDER: readonly IntentStateKey[];
 
-// @public
+// @beta
 function IntentCard(props: IntentCardProps): JSX.Element;
 
-// @public (undocumented)
+// @beta (undocumented)
 interface IntentCardProps {
     active: boolean;
     // (undocumented)
@@ -2115,17 +2273,17 @@ interface IntentCardProps {
     lang: Lang;
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 type IntentFeatureCollection = GeoJSON_2.FeatureCollection<GeoJSON_2.Polygon | GeoJSON_2.MultiPolygon, IntentFeatureProperties>;
 
-// @public
+// @beta
 function intentFeatureCollection(intents: readonly IntentInput[], opts: {
     selectedId: string | null;
     activeIds: ReadonlySet<string>;
     t: Translate;
 }): IntentFeatureCollection;
 
-// @public
+// @beta
 interface IntentFeatureProperties {
     active: boolean;
     identifier: string;
@@ -2145,16 +2303,16 @@ type IntentInput = Omit<IntentView, "volumes"> & {
     peer?: boolean;
 };
 
-// @public
+// @beta
 type IntentKey = DssState | "peer";
 
-// @public
+// @beta
 function intentLabel(i: IntentInput, t: Translate): string;
 
 // @public (undocumented)
 function IntentLayer(props: IntentLayerProps): JSX.Element | null;
 
-// @public (undocumented)
+// @beta (undocumented)
 interface IntentLayerIds {
     // (undocumented)
     fill: string;
@@ -2168,7 +2326,7 @@ interface IntentLayerIds {
     source: string;
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 function intentLayerIds(id: string): IntentLayerIds;
 
 // @public (undocumented)
@@ -2184,7 +2342,7 @@ interface IntentLayerProps {
     visible?: boolean;
 }
 
-// @public
+// @beta
 interface IntentLook {
     dash: readonly number[] | null;
     // (undocumented)
@@ -2196,19 +2354,19 @@ interface IntentLook {
     token: string;
 }
 
-// @public
+// @beta
 function intentLook(k: IntentKey | "unstated"): IntentLook;
 
-// @public
+// @beta
 function intentPeerPatternImage(rgb: Rgb): PatternImage;
 
-// @public
+// @beta
 function intentStateDrawn(dssState: string | null): IntentStateKey;
 
-// @public
+// @beta
 function intentStateFilter(k: IntentStateKey): FilterSpecification;
 
-// @public
+// @beta
 type IntentStateKey = DssState | "unstated";
 
 // @public (undocumented)
@@ -2231,7 +2389,7 @@ interface IntentView {
     volumes: GeoJSON_2.Polygon[];
 }
 
-// @public
+// @beta
 function interpolate(template: string, vars?: Vars): string;
 
 // @public (undocumented)
@@ -2249,7 +2407,7 @@ const isClearReason: (x: unknown) => x is "resolved" | "stale" | "source_disable
 // @public (undocumented)
 const isDisabledBy: (x: unknown) => x is "type" | "instance" | "default_deny";
 
-// @public (undocumented)
+// @beta (undocumented)
 function isDssState(v: unknown): v is DssState;
 
 // @public (undocumented)
@@ -2261,22 +2419,22 @@ const isIdentReason: (x: unknown) => x is "matched" | "session_binding" | "uas_s
 // @public (undocumented)
 const isIdentStatus: (x: unknown) => x is "registered" | "suspended" | "unknown_operator" | "unidentified";
 
-// @public
+// @beta
 function isKnownKind(kind: string): kind is AlertView["kind"];
 
-// @public
+// @beta
 function isMannedTrack(v: TrackView | MannedTrack): v is MannedTrack;
 
-// @public
+// @beta
 function isPiiColumn(id: string): boolean;
 
 // @public (undocumented)
 const isRestrictionState: (x: unknown) => x is "planned" | "active" | "ended" | "cancelled";
 
-// @public
+// @beta
 function isRfc3339(v: string): boolean;
 
-// @public
+// @beta
 function isRfc3339Utc(v: string): boolean;
 
 // @public (undocumented)
@@ -2297,7 +2455,7 @@ const isTimeSource: (x: unknown) => x is "provider" | "broadcast" | "source_cloc
 // @public (undocumented)
 const isTrust: (x: unknown) => x is "authenticated" | "provider" | "surveillance" | "broadcast" | "sensor" | "simulated";
 
-// @public
+// @beta
 function isUnsafeMethod(method: string): boolean;
 
 // @public (undocumented)
@@ -2312,7 +2470,7 @@ const isZoneType: (x: unknown) => x is "PROHIBITED" | "REQ_AUTHORIZATION" | "CON
 // @public (undocumented)
 const ka: Readonly<Record<Key, string>>;
 
-// @public
+// @beta
 function Kbd(input: ComponentProps<"kbd">): ReactNode;
 
 // Warning: (ae-forgotten-export) The symbol "catalogue" needs to be exported by the entry point entry.d.ts
@@ -2320,15 +2478,15 @@ function Kbd(input: ComponentProps<"kbd">): ReactNode;
 // @public
 type Key = keyof typeof catalogue;
 
-// @public
+// @beta
 type KeyOf<Row, V> = {
     [K in keyof Row]-?: Row[K] extends V ? K : never;
 }[keyof Row] & string;
 
-// @public
+// @beta
 function kindName(t: Translate, kind: string): string;
 
-// @public (undocumented)
+// @beta (undocumented)
 const KIT_CATALOGUES: Readonly<Record<Lang, Catalogue>>;
 
 // @public
@@ -2345,7 +2503,7 @@ interface KitBrand {
     shortName: string;
 }
 
-// @public
+// @beta
 interface KitColumnMeta {
     align?: "start" | "end";
     // (undocumented)
@@ -2356,45 +2514,63 @@ interface KitColumnMeta {
     utc?: boolean;
 }
 
-// @public
+// @beta
 function kitColumnMeta(meta: KitColumnMeta): {
     uspace: KitColumnMeta;
 };
 
-// @public
+// @beta
 const kitErrorMap: $ZodErrorMap;
 
 // @public (undocumented)
 type KitLang = "ka" | "en";
 
-// @public
+// @beta
 function kitMetaOf<Row>(column: Column<Row, unknown>): KitColumnMeta | undefined;
 
 // @public (undocumented)
 type KitScheme = "light" | "dark" | "system";
 
+// @public
+const LAB_COMMIT = "18d6f321a12f897f96e24ef842f4ce9d5a6bde33";
+
+// @public
+interface LabDecoding {
+    example: string;
+    // (undocumented)
+    result: Adapted<unknown>;
+    // (undocumented)
+    schema: string;
+}
+
+// @public
+function labDecodings(): LabDecoding[];
+
 // @public (undocumented)
 function Label(input: React_2.ComponentProps<typeof Label_2.Root>): React_2.JSX.Element;
+
+// @public
+function labFixtures(): Fixtures;
 
 // @public (undocumented)
 type Lang = "ka" | "en";
 
-// @public (undocumented)
+// @beta (undocumented)
 const LANG_COOKIE = "uspace_lang";
 
-// @public
+// @beta
 function langFromAcceptLanguage(header: string | null | undefined): Lang | null;
 
-// @public
+// @beta
 function langFromCookie(cookie: string | null | undefined): Lang | null;
 
 // @public (undocumented)
 const LANGS: readonly Lang[];
 
-// @public
+// @beta
 const LATIN_UNICODE_RANGE = "U+0000-017F, U+018F, U+0192, U+0218-021B, U+0237, U+0259, U+02BB-02BC, U+02C6-02DD, U+0300-0304, U+0306-0308, U+030A-030C, U+0327-0328, U+0370-03FF, U+0400-04FF, U+1E9E, U+2000-206F, U+20AC, U+20B8, U+20BD, U+20BE, U+2116, U+2122, U+2190-2193, U+2212";
 
-// @public (undocumented)
+// @beta (undocumented)
 type LayerCounter =
 /** Data handed to a layer that a newer value replaced in the same frame. */
 "update_superseded"
@@ -2423,9 +2599,14 @@ type LayerCounter =
 * can be drawn for it on the map; the list still shows it. Counted once
 * per alert while it stays so.
 */
-| "alert_aircraft_missing";
+| "alert_aircraft_missing"
+/**
+* A click that would add a vertex past DrawLayer's `maxVertices` (the
+* app's bound from its API): nothing added (1.0.0).
+*/
+| "draw_vertex_refused";
 
-// @public
+// @beta
 function layerCounters(): Readonly<Record<LayerCounter, number>>;
 
 // @public
@@ -2460,6 +2641,19 @@ declare namespace layers {
         layerCounters,
         resetLayerCountersForTests,
         LayerCounter,
+        DRAW_FILL_OPACITY,
+        DRAW_LAYER_ID,
+        DRAW_LINE_WIDTH_PX,
+        DRAW_POINT_RADIUS_PX,
+        DrawLayer,
+        drawFeatureCollection,
+        drawLayerIds,
+        outlineWithClick,
+        outlineWithMove,
+        DrawFeatureCollection,
+        DrawLayerIds,
+        DrawLayerProps,
+        DrawRole,
         HoverPortal,
         INTENT_LABEL_SIZE_PX,
         INTENT_LAYER_ID,
@@ -2579,23 +2773,23 @@ declare namespace legend {
     }
 }
 
-// @public
+// @beta
 function LegendCount(props: {
     counts: Readonly<Record<string, number | undefined>> | undefined;
     row: string;
     format(count: number): string;
 }): JSX.Element | null;
 
-// @public
+// @beta
 function LegendNote(props: {
     note: string;
     children: ReactNode;
 }): JSX.Element;
 
-// @public (undocumented)
+// @beta (undocumented)
 function LegendSection(props: LegendSectionProps): JSX.Element;
 
-// @public (undocumented)
+// @beta (undocumented)
 interface LegendSectionProps {
     // (undocumented)
     children: ReactNode;
@@ -2639,7 +2833,9 @@ declare namespace live {
         parseFrameText,
         parseSnapshotBody,
         parseStatusBody,
+        parseStatusSource,
         subscribeFrame,
+        thresholdUnit,
         BBox_2 as BBox,
         ConsoleFrame,
         DatasetAge,
@@ -2679,7 +2875,7 @@ declare namespace live {
     }
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 type LiveCounter =
 /** A message that arrived on a feed socket, whatever it held. */
 "frames_received"
@@ -2692,6 +2888,12 @@ type LiveCounter =
 | "frames_unhandled"
 /** A `console/status/v1` whose body broke the schema: not applied. */
 | "status_malformed"
+/**
+* A malformed extra of an applied status frame that the lab schema does
+* not name (`thresholds`, `evaluation_period_s`): left out, one count
+* per member.
+*/
+| "status_extra_ignored"
 /** A `console/snapshot/v1` whose body broke the schema: not applied. */
 | "snapshot_malformed"
 /** One item of a snapshot that was not a frame: skipped. */
@@ -2720,7 +2922,7 @@ type LiveCounter =
 /** A subscribe frame replaced by a newer one before it could be sent. */
 | "subscribe_superseded";
 
-// @public
+// @beta
 function liveCounters(): Readonly<Record<LiveCounter, number>>;
 
 // @public
@@ -2752,10 +2954,10 @@ interface LiveStatus extends FeedStatus {
     zonesVersion: string | null;
 }
 
-// @public
+// @beta
 function loadBasemapInfo(cfg: BasemapConfig, signal: AbortSignal, timeoutMs?: number): Promise<BasemapInfo | null>;
 
-// @public
+// @beta
 const LOCALES: Readonly<Record<Lang, string>>;
 
 // @public (undocumented)
@@ -2781,33 +2983,33 @@ type LoginResult = {
     };
 };
 
-// @public
+// @beta
 const MANNED_COLOUR_TOKENS: Readonly<{
     emergency: string;
     selected: "--us-text";
     halo: "--us-surface";
 }>;
 
-// @public
+// @beta
 const MANNED_ICON_IDS: readonly {
     id: string;
     trust: Trust;
     directional: boolean;
 }[];
 
-// @public
+// @beta
 const MANNED_ICON_PX = 56;
 
-// @public
+// @beta
 const MANNED_LAYER_ID = "us-manned";
 
-// @public
+// @beta
 const MANNED_SOURCE_CLASS_KEYS: Readonly<Record<string, Key>>;
 
-// @public
+// @beta
 function mannedAge(m: MannedTrack, nowMs: number, staleAfterS: number): AgeBucket;
 
-// @public
+// @beta
 interface MannedColours {
     // (undocumented)
     emergency: string;
@@ -2819,13 +3021,13 @@ interface MannedColours {
     trust: Readonly<Record<Trust, string>>;
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 type MannedFeatureCollection = GeoJSON_2.FeatureCollection<GeoJSON_2.Point, MannedFeatureProperties>;
 
-// @public
+// @beta
 function mannedFeatureCollection(tracks: readonly MannedTrack[], opts: MannedFeatureOptions): MannedFeatureCollection;
 
-// @public (undocumented)
+// @beta (undocumented)
 interface MannedFeatureOptions {
     // (undocumented)
     nowMs: number;
@@ -2837,7 +3039,7 @@ interface MannedFeatureOptions {
     t: Translate;
 }
 
-// @public
+// @beta
 interface MannedFeatureProperties {
     // (undocumented)
     age: AgeBucket;
@@ -2854,31 +3056,31 @@ interface MannedFeatureProperties {
     trustStated: boolean;
 }
 
-// @public
+// @beta
 type MannedFill = "solid" | "hollow";
 
-// @public
+// @beta
 function mannedFill(t: Trust): MannedFill;
 
-// @public
+// @beta
 function mannedIconDistance(t: Trust, directional: boolean, p: IconPoint): number;
 
-// @public
+// @beta
 function mannedIconId(t: Trust, directional: boolean): string;
 
-// @public
+// @beta
 function mannedIconParts(t: Trust, directional: boolean): IconPart[];
 
-// @public
+// @beta
 function mannedIconSdf(t: Trust, directional: boolean): PatternImage;
 
-// @public
+// @beta
 function mannedLabel(m: MannedTrack, age: AgeBucket, t: Translate): string;
 
 // @public (undocumented)
 function MannedLayer(props: MannedLayerProps): JSX.Element | null;
 
-// @public (undocumented)
+// @beta (undocumented)
 interface MannedLayerIds {
     // (undocumented)
     emergency: string;
@@ -2892,7 +3094,7 @@ interface MannedLayerIds {
     source: string;
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 function mannedLayerIds(id: string): MannedLayerIds;
 
 // @public (undocumented)
@@ -2911,7 +3113,7 @@ interface MannedLayerProps {
 // @public (undocumented)
 type MannedStore = PositionStore<MannedView>;
 
-// @public (undocumented)
+// @beta (undocumented)
 interface MannedStyle {
     // (undocumented)
     emergencyFilter: FilterSpecification;
@@ -2935,10 +3137,10 @@ interface MannedStyle {
     textSize: ExpressionSpecification;
 }
 
-// @public
+// @beta
 function mannedStyle(colours: MannedColours): MannedStyle;
 
-// @public
+// @beta
 function mannedToken(t: Trust): string;
 
 // @public
@@ -2947,7 +3149,7 @@ type MannedTrack = MannedView & {
     anomaly?: string | null;
 };
 
-// @public
+// @beta
 function mannedTrustDrawn(t: unknown): Trust;
 
 // @public (undocumented)
@@ -3020,7 +3222,7 @@ declare namespace map {
     }
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 interface MapContextValue {
     // (undocumented)
     initial: Viewport;
@@ -3048,7 +3250,7 @@ interface MapControlsProps {
     translate?: Translate_2;
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 type MapCounter =
 /** SOURCE.json absent, refused, timed out or malformed: the null path. */
 "basemap_missing"
@@ -3057,7 +3259,7 @@ type MapCounter =
 /** The map could not be created (no WebGL). */
 | "webgl_unavailable";
 
-// @public
+// @beta
 function mapCounters(): Readonly<Record<MapCounter, number>>;
 
 // @public
@@ -3088,19 +3290,19 @@ interface MapViewProps {
     scheme: MapScheme;
 }
 
-// @public
+// @beta
 const MAX_PAGE_SIZE = 1000;
 
-// @public
+// @beta
 const MFA_CHALLENGE_COOKIE = "uspace_mfa";
 
-// @public
+// @beta
 const MFA_CHALLENGE_PATH = "/_bff";
 
-// @public
+// @beta
 const MIN_CHALLENGE_SECRET_BYTES = 32;
 
-// @public
+// @beta
 function missingKeys(): number;
 
 declare namespace model {
@@ -3164,7 +3366,9 @@ declare namespace model {
         FeedStatus,
         FieldError,
         Problem,
-        SessionDisplay
+        SessionDisplay,
+        DrawPoint,
+        DrawOutline
     }
 }
 
@@ -3174,13 +3378,13 @@ function needsAttention(s: IdentStatus | null): boolean;
 // @public
 function negotiateLang(acceptLanguage: string | null, cookie: string | null): Lang;
 
-// @public
+// @beta
 function nextGridPos(k: GridKey, pos: GridPos, size: GridSize, pageStep?: number): GridPos | null;
 
-// @public (undocumented)
+// @beta (undocumented)
 const NO_EXTRAS: StatusExtras;
 
-// @public
+// @beta
 const NONCONFORMANCE_REASON_KEYS: Readonly<Record<string, Key>>;
 
 // @public
@@ -3193,9 +3397,36 @@ const notoSansGeorgian: NextFontWithVariable;
 function NumberField(props: FieldBaseProps): JSX.Element;
 
 // @public
+const OUTLINE_KINDS: readonly ["polygon", "circle"];
+
+// @public (undocumented)
+function OutlineFields(props: OutlineFieldsProps): ReactNode;
+
+// @public (undocumented)
+interface OutlineFieldsProps {
+    circleOutlineShown?: boolean;
+    kinds?: readonly OutlineKind[];
+    legendKey?: string;
+    maxVertices: number;
+    // (undocumented)
+    onChange(next: DrawOutline): void;
+    // (undocumented)
+    outline: DrawOutline;
+}
+
+// @public (undocumented)
+type OutlineKind = (typeof OUTLINE_KINDS)[number];
+
+// @beta
+function outlineWithClick(outline: DrawOutline, p: DrawPoint, maxVertices: number): DrawOutline | null;
+
+// @beta
+function outlineWithMove(outline: DrawOutline, index: number, p: DrawPoint): DrawOutline;
+
+// @beta
 const PAGE_SIZES: readonly number[];
 
-// @public
+// @beta
 const PAGE_STEP_ROWS = 10;
 
 // @public (undocumented)
@@ -3221,46 +3452,49 @@ function PaginationNext(input: React_2.ComponentProps<typeof PaginationLink>): R
 // @public (undocumented)
 function PaginationPrevious(input: React_2.ComponentProps<typeof PaginationLink>): React_2.JSX.Element;
 
-// @public
+// @beta
 function parseFrame(raw: unknown): ConsoleFrame | null;
 
-// @public
+// @beta
 function parseFrameText(data: unknown): ConsoleFrame | null;
 
-// @public
+// @beta
 function parseHexColour(s: string): Rgb | null;
 
-// @public (undocumented)
+// @beta (undocumented)
 function parseLang(v: string | null | undefined): Lang | null;
 
-// @public
+// @beta
 function parseLocaleNumber(text: string, lang: Lang): number | null;
 
 // @public
 function parseProblem(res: Response): Promise<Problem | null>;
 
-// @public (undocumented)
+// @beta (undocumented)
 function parseScheme(v: string | null | undefined): ColorScheme | null;
 
-// @public
+// @beta
 function parseSnapshotBody(raw: unknown): {
     body: SnapshotBody;
     malformedItems: number;
 } | null;
 
-// @public
+// @beta
 function parseSourceInfo(body: unknown): BasemapInfo | null;
 
-// @public
+// @beta
 function parseStatusBody(raw: unknown): StatusBody | null;
 
-// @public
+// @beta
+function parseStatusSource(raw: unknown): StatusSource | null;
+
+// @beta
 const PATTERN_TILE_PX = 8;
 
-// @public
+// @beta
 const PATTERNED_ZONE_TYPES: readonly ZoneType[];
 
-// @public (undocumented)
+// @beta (undocumented)
 interface PatternImage {
     data: Uint8Array;
     // (undocumented)
@@ -3269,16 +3503,16 @@ interface PatternImage {
     width: number;
 }
 
-// @public
+// @beta
 const PII_FILTER_DENY_LIST: readonly string[];
 
-// @public
+// @beta
 function playTone(ctx: AudioContext): void;
 
-// @public
+// @beta
 const plugin: ESLint.Plugin;
 
-// @public
+// @beta
 interface PointerHover {
     // (undocumented)
     identifier: string;
@@ -3344,22 +3578,22 @@ interface Problem {
     type: string;
 }
 
-// @public
+// @beta
 const PROBLEM_TYPE_PREFIX = "https://schemas.uspace.ge/problems/";
 
-// @public
+// @beta
 function problemSlug(type: string): string | null;
 
-// @public
+// @beta
 function putImage(map: Map_2, name: string, image: PatternImage): void;
 
-// @public
+// @beta
 function putMannedIcons(map: Map_2): void;
 
-// @public
+// @beta
 function putTrackIcons(map: Map_2): void;
 
-// @public
+// @beta
 function putZonePatterns(map: Map_2, colours: ZoneColours): void;
 
 // @public (undocumented)
@@ -3371,16 +3605,16 @@ function RadioGroupItem(input: React_2.ComponentProps<typeof RadioGroup_2.Item>)
 // @public
 function readSessionToken(src: NextRequest | CookieReader, opts?: Pick<SessionCookieOptions, "name">): string | null;
 
-// @public
+// @beta
 function readTableState(params: URLSearchParams, key: string, base: TableState): TableState;
 
 // @public
 function reason(minLength: number): z.ZodString;
 
-// @public
+// @beta
 function ReasonField(props: ReasonFieldProps): JSX.Element;
 
-// @public (undocumented)
+// @beta (undocumented)
 interface ReasonFieldProps {
     // (undocumented)
     className?: string;
@@ -3393,19 +3627,19 @@ interface ReasonFieldProps {
     name: string;
 }
 
-// @public
+// @beta
 function receivedAgeS(t: TrackView, nowMs: number): number | null;
 
-// @public (undocumented)
+// @beta (undocumented)
 const RECEIVER_LAYER_ID = "us-receivers";
 
-// @public (undocumented)
+// @beta (undocumented)
 type ReceiverFeatureCollection = GeoJSON_2.FeatureCollection<GeoJSON_2.Point, ReceiverFeatureProperties>;
 
-// @public (undocumented)
+// @beta (undocumented)
 function receiverFeatureCollection(receivers: readonly ReceiverInput[], selectedId: string | null, t: Translate): ReceiverFeatureCollection;
 
-// @public (undocumented)
+// @beta (undocumented)
 interface ReceiverFeatureProperties {
     // (undocumented)
     identifier: string;
@@ -3441,7 +3675,7 @@ interface ReceiverInput {
 // @public (undocumented)
 function ReceiverLayer(props: ReceiverLayerProps): JSX.Element | null;
 
-// @public (undocumented)
+// @beta (undocumented)
 interface ReceiverLayerIds {
     // (undocumented)
     circle: string;
@@ -3453,7 +3687,7 @@ interface ReceiverLayerIds {
     source: string;
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 function receiverLayerIds(id: string): ReceiverLayerIds;
 
 // @public (undocumented)
@@ -3468,19 +3702,22 @@ interface ReceiverLayerProps {
     visible?: boolean;
 }
 
-// @public
+// @beta
 function receiverMark(s: SourceState): string;
 
-// @public
+// @beta
 function receiverToken(s: SourceState): string;
 
-// @public (undocumented)
+// @beta (undocumented)
 const RECENTLY_REMOVED_LIMIT = 50;
 
-// @public
+// @beta
 function reconnectDelayMs(attempt: number, backoff: Backoff, random: number): number;
 
-// @public (undocumented)
+// @beta (undocumented)
+function refused<T>(field: string, value: unknown, reason: string): Adapted<T>;
+
+// @beta (undocumented)
 interface RegisteredField {
     // (undocumented)
     id: string;
@@ -3527,68 +3764,68 @@ interface RequireRoleProps {
     fallback?: ReactNode;
 }
 
-// @public
+// @beta
 function resetAlertCountersForTests(): void;
 
-// @public
+// @beta
 function resetApiCountersForTests(): void;
 
-// @public
+// @beta
 function resetAuthCountersForTests(): void;
 
-// @public
+// @beta
 function resetFormCountersForTests(): void;
 
-// @public
+// @beta
 function resetI18nCounters(): void;
 
-// @public
+// @beta
 function resetLayerCountersForTests(): void;
 
-// @public
+// @beta
 function resetLiveCountersForTests(): void;
 
-// @public
+// @beta
 function resetTableCountersForTests(): void;
 
-// @public
+// @beta
 const RESIZE_STEP_PX = 16;
 
-// @public
+// @beta
 function resolveColour(map: Map_2, token: string): string;
 
 // @public (undocumented)
 type ResolvedScheme = "light" | "dark";
 
-// @public
+// @beta
 function resolveFeedUrl(url: string, page: string | undefined): {
     url: string;
 } | {
     refused: string;
 };
 
-// @public
+// @beta
 function resolveMannedColours(map: Map_2): MannedColours;
 
-// @public
+// @beta
 function resolveSeverityColours(map: Map_2): Record<Severity, string>;
 
-// @public
+// @beta
 function resolveTrackColours(map: Map_2): TrackColours;
 
-// @public
+// @beta
 function resolveZoneColours(map: Map_2): ZoneColours;
 
-// @public
+// @beta
 const RESTRICTION_FILL_OPACITY = 0.15;
 
-// @public (undocumented)
+// @beta (undocumented)
 const RESTRICTION_LAYER_ID = "us-restrictions";
 
-// @public (undocumented)
+// @beta (undocumented)
 const RESTRICTION_LINE_KEYS: readonly RestrictionLineKey[];
 
-// @public
+// @beta
 const RESTRICTION_STATE_KEYS: Readonly<Record<RestrictionState | "unstated", Key>>;
 
 // @public (undocumented)
@@ -3597,7 +3834,7 @@ const RESTRICTION_STATES: readonly ["planned", "active", "ended", "cancelled"];
 // @public (undocumented)
 function RestrictionLayer(props: RestrictionLayerProps): JSX.Element | null;
 
-// @public (undocumented)
+// @beta (undocumented)
 interface RestrictionLayerIds {
     // (undocumented)
     fill: string;
@@ -3607,7 +3844,7 @@ interface RestrictionLayerIds {
     source: string;
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 function restrictionLayerIds(id: string): RestrictionLayerIds;
 
 // @public (undocumented)
@@ -3619,7 +3856,7 @@ interface RestrictionLayerProps {
     visible?: boolean;
 }
 
-// @public
+// @beta
 interface RestrictionLine {
     dash: readonly number[] | null;
     // (undocumented)
@@ -3628,13 +3865,13 @@ interface RestrictionLine {
     widthPx: number;
 }
 
-// @public
+// @beta
 function restrictionLine(s: RestrictionState | null): RestrictionLine;
 
-// @public
+// @beta
 function restrictionLineFilter(k: RestrictionLineKey): FilterSpecification;
 
-// @public
+// @beta
 type RestrictionLineKey = RestrictionState | "unstated";
 
 // @public (undocumented)
@@ -3651,10 +3888,10 @@ interface RestrictionView extends ZoneView {
     startsAt?: string | null;
 }
 
-// @public
+// @beta
 function retryAfterSOf(value: string | null, nowMs: number): number | null;
 
-// @public (undocumented)
+// @beta (undocumented)
 type Rgb = readonly [number, number, number];
 
 // @public
@@ -3668,10 +3905,13 @@ const rules: {
     noHandWrittenApiTypes: Rule.RuleModule;
 };
 
-// @public (undocumented)
+// @beta (undocumented)
 const SCHEME_COOKIE = "uspace_scheme";
 
 // @public
+function schemeAttribute(scheme: ColorScheme | null | undefined): ResolvedScheme | undefined;
+
+// @beta
 function schemeFromCookie(cookie: string | null | undefined): ColorScheme | null;
 
 // @public (undocumented)
@@ -3680,7 +3920,7 @@ function ScrollArea(input: React_2.ComponentProps<typeof ScrollArea_2.Root>): Re
 // @public (undocumented)
 function ScrollBar(input: React_2.ComponentProps<typeof ScrollArea_2.ScrollAreaScrollbar>): React_2.JSX.Element;
 
-// @public
+// @beta
 interface Seen {
     // (undocumented)
     severity: Severity;
@@ -3694,7 +3934,7 @@ function Select(input: React_2.ComponentProps<typeof Select_2.Root>): React_2.JS
 // @public (undocumented)
 function SelectContent(input: React_2.ComponentProps<typeof Select_2.Content>): React_2.JSX.Element;
 
-// @public
+// @beta
 const SELECTED_EXTRA_WIDTH_PX = 2;
 
 // @public
@@ -3796,7 +4036,7 @@ interface SessionProviderProps {
 // @public
 function setSession(res: NextResponse, jwt: string, opts: SessionCookieOptions): void;
 
-// @public
+// @beta
 function setSourceData(sourceId: string): (map: Map_2, data: ZoneFeatureCollection) => void;
 
 // @public (undocumented)
@@ -3805,19 +4045,19 @@ const SEVERITIES: readonly ["info", "warning", "critical"];
 // @public (undocumented)
 type Severity = (typeof SEVERITIES)[number];
 
-// @public
+// @beta
 const SEVERITY_HINT_KEYS: Readonly<Record<Severity, Key>>;
 
-// @public
+// @beta
 const SEVERITY_KEYS: Readonly<Record<Severity, Key>>;
 
-// @public
+// @beta
 const SEVERITY_ORDER: readonly Severity[];
 
-// @public
+// @beta
 type SeverityGlyph = "octagon" | "triangle" | "circle";
 
-// @public (undocumented)
+// @beta (undocumented)
 function severityGlyph(s: Severity): SeverityGlyph;
 
 // @public (undocumented)
@@ -3831,10 +4071,10 @@ interface SeverityLegendProps {
     defaultCollapsed?: boolean;
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 function SeverityMark(props: SeverityMarkProps): JSX.Element;
 
-// @public (undocumented)
+// @beta (undocumented)
 interface SeverityMarkProps {
     // (undocumented)
     className?: string;
@@ -3845,7 +4085,7 @@ interface SeverityMarkProps {
 // @public (undocumented)
 function severityOrder(): readonly Severity[];
 
-// @public
+// @beta
 function SeveritySwatch(props: {
     severity: Severity;
 }): JSX.Element;
@@ -3856,7 +4096,7 @@ function severityToken(s: Severity): string;
 // @public
 type Shape = "triangle" | "diamond" | "square" | "circle" | "hexagon" | "cross";
 
-// @public
+// @beta
 type ShapeFill = "solid" | "hollow" | "dashed";
 
 declare namespace shapes {
@@ -3898,10 +4138,10 @@ function SheetTrigger(input: React_2.ComponentProps<typeof Dialog_2.Trigger>): R
 // @public (undocumented)
 function Skeleton(input: React.ComponentProps<"div">): JSX.Element;
 
-// @public (undocumented)
+// @beta (undocumented)
 const SNAPSHOT_SCHEMA = "console/snapshot/v1";
 
-// @public
+// @beta
 interface SnapshotBody {
     // (undocumented)
     alerts: ConsoleFrame[];
@@ -3922,34 +4162,34 @@ interface SnapshotTarget<I> {
     };
 }
 
-// @public
+// @beta
 function sortAlerts(alerts: readonly AlertView[]): AlertView[];
 
-// @public
+// @beta
 function soundingAlerts(alerts: readonly AlertView[]): AlertView[];
 
-// @public
+// @beta
 const SOURCE_INFO_TIMEOUT_MS = 5000;
 
-// @public (undocumented)
+// @beta (undocumented)
 const SOURCE_STATE_KEYS: Readonly<Record<SourceState, Key>>;
 
 // @public (undocumented)
 const SOURCE_STATES: readonly ["disabled", "healthy", "stale", "lagging", "unreachable", "never_heard"];
 
-// @public (undocumented)
+// @beta (undocumented)
 const SOURCE_STORE_LIMIT = 1000;
 
-// @public
+// @beta
 function sourceAgeS(s: Pick<LiveSourceView, "ageS" | "ageAtMs">, nowMs: number): number | null;
 
-// @public
+// @beta
 function sourceClassLabel(value: string, t: Translate): string;
 
-// @public
+// @beta
 function sourceDetailLines(s: Pick<SourceView, "state" | "disabledBy" | "disabledByWho" | "lastSeenAt" | "lagS">, age: number | null, t: Translate, lang: Lang): string[];
 
-// @public
+// @beta
 function sourceDisplayAgeS(s: SourceInput, nowMs: number): number | null;
 
 // @public
@@ -3987,7 +4227,7 @@ interface SourceStateBadgeProps {
     source: SourceInput;
 }
 
-// @public
+// @beta
 function sourceStateOf(s: StatusSource): SourceState;
 
 // @public (undocumented)
@@ -4031,16 +4271,16 @@ interface SourceView {
     state: SourceState;
 }
 
-// @public
+// @beta
 const STABLE_AFTER_MS = 10000;
 
-// @public
+// @beta
 function Stat(props: StatProps): ReactNode;
 
-// @public
+// @beta
 const STAT_UNKNOWN = "\u2014";
 
-// @public (undocumented)
+// @beta (undocumented)
 interface StatProps {
     // (undocumented)
     className?: string;
@@ -4068,6 +4308,9 @@ declare namespace status_2 {
         SourceStateBadgeProps,
         SourcesPanel,
         SourcesPanelProps,
+        THRESHOLD_KEYS,
+        ThresholdsPanel,
+        ThresholdsPanelProps,
         ALT_SOURCE_KEYS,
         TIME_SOURCE_KEYS,
         TrackDetail,
@@ -4083,10 +4326,10 @@ declare namespace status_2 {
     }
 }
 
-// @public
+// @beta
 const STATUS_SCHEMA = "console/status/v1";
 
-// @public
+// @beta
 interface StatusBody extends StatusExtras {
     // (undocumented)
     connectionId: string;
@@ -4094,6 +4337,7 @@ interface StatusBody extends StatusExtras {
     degraded: string[];
     // (undocumented)
     droppedFrames: number;
+    ignored: readonly string[];
     // (undocumented)
     liveMaxAgeS: number;
     // (undocumented)
@@ -4116,12 +4360,14 @@ interface StatusExtras {
     datasets: Readonly<Record<string, DatasetAge>> | null;
     // (undocumented)
     dpState: string | null;
+    evaluationPeriodS: number | null;
     // (undocumented)
     nats: string | null;
     // (undocumented)
     projectionAgeS: number | null;
     // (undocumented)
     resyncSince: string | null;
+    thresholds: Readonly<Record<string, number>> | null;
 }
 
 // @public
@@ -4141,7 +4387,7 @@ interface StatusSource {
     state: WireSourceState;
 }
 
-// @public
+// @beta
 type StyleLoadHandler = (map: Map_2) => void;
 
 // @public (undocumented)
@@ -4158,25 +4404,25 @@ interface SubscribeFrame {
     schema: typeof SUBSCRIBE_SCHEMA;
 }
 
-// @public
+// @beta
 function subscribeFrame(bbox: BBox_2, layers: readonly SubscribeLayer[]): SubscribeFrame;
 
 // @public
 type SubscribeLayer = "tracks" | "manned" | "alerts" | "zones";
 
-// @public
+// @beta
 function subscriptionBBox(b: BBox, marginFraction: number, quantizeDeg: number): BBox;
 
-// @public (undocumented)
+// @beta (undocumented)
 const SUNSET_NOTICE_LIMIT = 16;
 
-// @public
+// @beta
 interface SunsetNotice {
     schemaPath: string;
     sunset: string;
 }
 
-// @public
+// @beta
 function sunsetNotices(): readonly SunsetNotice[];
 
 // @public (undocumented)
@@ -4364,10 +4610,10 @@ function TableCell(input: React_2.ComponentProps<"td">): React_2.JSX.Element;
 // @public
 type TableColumn<Row> = ColumnDef<Row, unknown>;
 
-// @public
+// @beta
 function tableColumn<Row, V>(def: ColumnDef<Row, V>): TableColumn<Row>;
 
-// @public (undocumented)
+// @beta (undocumented)
 type TableCounter =
 /** A `<key>.*` search parameter that did not parse; it was ignored. */
 "url_state_malformed"
@@ -4378,7 +4624,7 @@ type TableCounter =
 /** A sort, filter or visibility entry for a column the table lacks. */
 | "state_unknown_column";
 
-// @public
+// @beta
 function tableCounters(): Readonly<Record<TableCounter, number>>;
 
 // @public (undocumented)
@@ -4436,6 +4682,28 @@ declare namespace test {
         WCAG_22_AA_TAGS,
         fixtures,
         Fixtures,
+        FixturesOptions,
+        LAB_COMMIT,
+        labDecodings,
+        labFixtures,
+        LabDecoding,
+        adaptAlert,
+        AdapterRefusal,
+        adapted,
+        refused,
+        unwrap,
+        Adapted,
+        adaptSource,
+        adaptSourceFrame,
+        adaptStatus,
+        adaptManned,
+        adaptTelemetry,
+        timesOf,
+        adaptApplicability,
+        adaptCisChange,
+        adaptEd318Collection,
+        adaptEd318Feature,
+        CisChange,
         renderWithKit,
         TEST_BRAND,
         KitBrand,
@@ -4445,7 +4713,7 @@ declare namespace test {
     }
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 const TEST_BRAND: KitBrand;
 
 // @public (undocumented)
@@ -4472,6 +4740,7 @@ declare namespace theme {
         DARK_QUERY,
         SCHEME_COOKIE,
         parseScheme,
+        schemeAttribute,
         schemeFromCookie,
         ColorScheme,
         ResolvedScheme,
@@ -4512,7 +4781,25 @@ interface ThemeProviderProps {
     scheme?: ColorScheme;
 }
 
-// @public
+// @beta
+const THRESHOLD_KEYS: Readonly<Record<string, Key>>;
+
+// @public (undocumented)
+function ThresholdsPanel(props: ThresholdsPanelProps): JSX.Element;
+
+// @public (undocumented)
+interface ThresholdsPanelProps {
+    // (undocumented)
+    className?: string;
+    evaluationPeriodS?: number | null;
+    policyVersion: string | null;
+    thresholds: Readonly<Record<string, number>> | null;
+}
+
+// @beta
+function thresholdUnit(name: string): "s" | "m" | null;
+
+// @beta
 const TIME_SOURCE_KEYS: Readonly<Record<TimeSource, Key>>;
 
 // @public (undocumented)
@@ -4532,22 +4819,25 @@ interface Times {
     ts: string | null;
 }
 
+// @beta
+function timesOf(f: ConsoleFrame): Times;
+
 // @public (undocumented)
 type TimeSource = (typeof TIME_SOURCES)[number];
 
-// @public
+// @beta
 const TOAST_HOLD_MS = 15000;
 
-// @public
+// @beta
 const TOAST_LIMIT = 5;
 
 // @public (undocumented)
 const Toaster: (input: ToasterProps) => JSX.Element;
 
-// @public
+// @beta
 function toFieldName(path: string): string;
 
-// @public
+// @beta
 function toJsonPath(name: string): string;
 
 // @public (undocumented)
@@ -4568,13 +4858,13 @@ interface Tokens {
 // @public (undocumented)
 const tokens: Tokens;
 
-// @public (undocumented)
+// @beta (undocumented)
 const TONE_GAIN = 0.2;
 
-// @public (undocumented)
+// @beta (undocumented)
 const TONE_HZ = 880;
 
-// @public (undocumented)
+// @beta (undocumented)
 const TONE_S = 0.25;
 
 // @public (undocumented)
@@ -4589,27 +4879,27 @@ function TooltipProvider(input: React_2.ComponentProps<typeof Tooltip_2.Provider
 // @public (undocumented)
 function TooltipTrigger(input: React_2.ComponentProps<typeof Tooltip_2.Trigger>): React_2.JSX.Element;
 
-// @public
+// @beta
 const TRACK_COLOUR_TOKENS: Readonly<{
     emergency: string;
     selected: "--us-text";
     halo: "--us-surface";
 }>;
 
-// @public
+// @beta
 const TRACK_ICON_IDS: readonly {
     id: string;
     trust: Trust;
     directional: boolean;
 }[];
 
-// @public
+// @beta
 const TRACK_ICON_PIXEL_RATIO = 2;
 
-// @public
+// @beta
 const TRACK_ICON_PX = 56;
 
-// @public
+// @beta
 const TRACK_LAYER_ID = "us-tracks";
 
 // @public
@@ -4637,16 +4927,16 @@ interface TrackDetailProps {
     track: TrackView | MannedTrack;
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 type TrackFeature = GeoJSON_2.Feature<GeoJSON_2.Point, TrackFeatureProperties>;
 
-// @public (undocumented)
+// @beta (undocumented)
 type TrackFeatureCollection = GeoJSON_2.FeatureCollection<GeoJSON_2.Point | GeoJSON_2.LineString, TrackFeatureProperties | TrailFeatureProperties>;
 
-// @public
+// @beta
 function trackFeatureCollection(hold: TrackHold, opts: FeatureOptions): TrackFeatureCollection;
 
-// @public
+// @beta
 interface TrackFeatureProperties {
     // (undocumented)
     age: AgeBucket;
@@ -4665,7 +4955,7 @@ interface TrackFeatureProperties {
     trust: Trust;
 }
 
-// @public
+// @beta
 class TrackHold {
     apply(tracks: readonly TrackView[], trailPoints: number): number;
     // Warning: (ae-forgotten-export) The symbol "Held" needs to be exported by the entry point entry.d.ts
@@ -4674,28 +4964,28 @@ class TrackHold {
 
 // Warning: (ae-forgotten-export) The symbol "Pt" needs to be exported by the entry point entry.d.ts
 //
-// @public
+// @beta
 function trackIconDistance(t: Trust, directional: boolean, p: Pt): number;
 
-// @public
+// @beta
 function trackIconId(t: Trust, directional: boolean): string;
 
-// @public
+// @beta
 function trackIconParts(t: Trust, directional: boolean): IconPart[];
 
-// @public
+// @beta
 function trackIconSdf(t: Trust, directional: boolean): PatternImage;
 
-// @public
+// @beta
 function trackIconSvg(t: Trust, directional: boolean, colour?: string): string;
 
-// @public
+// @beta
 function trackLabel(t: TrackView, drawn: IdentKey, tr: Translate): string;
 
 // @public (undocumented)
 function TrackLayer(props: TrackLayerProps): null;
 
-// @public (undocumented)
+// @beta (undocumented)
 interface TrackLayerIds {
     // (undocumented)
     emergency: string;
@@ -4713,7 +5003,7 @@ interface TrackLayerIds {
     trail: string;
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 function trackLayerIds(id: string): TrackLayerIds;
 
 // @public (undocumented)
@@ -4806,7 +5096,7 @@ interface TrackStyle {
 // @public
 function trackStyle(colours: TrackColours): TrackStyle;
 
-// @public
+// @beta
 function TrackSwatch(props: {
     trust: Trust;
     directional?: boolean;
@@ -4859,10 +5149,10 @@ interface TrackView {
     vspeedMs: number | null;
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 type TrailFeature = GeoJSON_2.Feature<GeoJSON_2.LineString, TrailFeatureProperties>;
 
-// @public
+// @beta
 interface TrailFeatureProperties {
     // (undocumented)
     age: AgeBucket;
@@ -4883,19 +5173,19 @@ type Translate_2 = (key: string) => string;
 // @public (undocumented)
 type Trust = (typeof TRUSTS)[number];
 
-// @public
+// @beta
 const TRUST_KEYS: Readonly<Record<Trust, Key>>;
 
-// @public
+// @beta
 const TRUST_MEANING_KEYS: Readonly<Record<Trust, Key>>;
 
-// @public
+// @beta
 const TRUST_ORDER: readonly Trust[];
 
-// @public (undocumented)
+// @beta (undocumented)
 function trustFill(t: Trust): ShapeFill;
 
-// @public (undocumented)
+// @beta (undocumented)
 function trustOrder(): readonly Trust[];
 
 // @public (undocumented)
@@ -5051,10 +5341,10 @@ declare namespace ui {
     }
 }
 
-// @public
+// @beta
 function uniqueById(alerts: readonly AlertView[]): AlertView[];
 
-// @public
+// @beta
 const UNIT_KEYS: Readonly<{
     readonly m: "unit.symbol.m";
     readonly m_amsl: "unit.symbol.m_amsl";
@@ -5070,7 +5360,7 @@ const UNIT_KEYS: Readonly<{
     readonly wh: "unit.symbol.wh";
 }>;
 
-// @public
+// @beta
 const UNRESOLVED_COLOUR = "#808080";
 
 // @public
@@ -5083,22 +5373,25 @@ interface UnverifiedSessionClaims {
     sub: string | null;
 }
 
+// @beta
+function unwrap<T>(a: Adapted<T>): T;
+
 // @public
 function useAlertTone(active: boolean, repeatMs: number, cue?: string): AlertTone;
 
 // @public
 function useBBoxSubscription(opts: BBoxSubscriptionOptions): void;
 
-// @public
+// @beta
 function useCspNonce(): string | undefined;
 
-// @public
+// @beta
 function useFeaturePointer(map: Map_2 | null, layerId: string, onSelect: ((identifier: string) => void) | undefined): PointerHover | null;
 
 // @public
 function useFeed(opts: FeedOptions): LiveFeed;
 
-// @public
+// @beta
 function useFieldControl(): {
     id: string;
     "aria-describedby": string | undefined;
@@ -5113,10 +5406,10 @@ function useLang(): {
     setLang(l: Lang): void;
 };
 
-// @public
+// @beta
 function useLayer<D>(opts: UseLayerOptions<D>): Map_2 | null;
 
-// @public (undocumented)
+// @beta (undocumented)
 interface UseLayerOptions<D> {
     build(map: Map_2): readonly string[];
     // (undocumented)
@@ -5129,16 +5422,16 @@ interface UseLayerOptions<D> {
 // @public
 function useMap(): Map_2 | null;
 
-// @public
+// @beta
 function useMapContext(): MapContextValue;
 
-// @public
+// @beta
 function useNowMs(periodMs: number, now?: () => number): number;
 
-// @public
+// @beta
 function useOptionalI18n(): I18nContextValue | null;
 
-// @public
+// @beta
 function useOptionalTheme(): ThemeContextValue | null;
 
 // @public
@@ -5147,7 +5440,7 @@ function useSession(): SessionContextValue;
 // @public
 function useStore<T>(store: ExternalStore<T>): T;
 
-// @public
+// @beta
 function useStyleLoad(add: StyleLoadHandler): void;
 
 // @public
@@ -5156,7 +5449,7 @@ function useT(): Translate;
 // @public
 function useTableUrlState(key: string, opts?: TableUrlStateOptions): [TableState, (s: TableState) => void];
 
-// @public
+// @beta
 function useTFor(lang: Lang): Translate;
 
 // @public
@@ -5173,16 +5466,16 @@ interface UTCDateTimeFieldProps extends FieldBaseProps {
     seconds?: boolean;
 }
 
-// @public
+// @beta
 function utcMs(iso: string | null | undefined): number | null;
 
-// @public
+// @beta
 function utcTime(): z.ZodString;
 
-// @public
+// @beta
 function utcToInput(iso: string | null): string;
 
-// @public
+// @beta
 function validRepeatMs(repeatMs: number): boolean;
 
 // @public (undocumented)
@@ -5222,46 +5515,46 @@ const VIOLATION_KINDS: readonly ["height_120m", "zone_incursion", "unregistered"
 // @public (undocumented)
 type ViolationKind = (typeof VIOLATION_KINDS)[number];
 
-// @public
+// @beta
 const VIRTUAL_VIEWPORT_PX = 480;
 
-// @public
+// @beta
 const VIRTUALIZE_ABOVE_ROWS = 200;
 
-// @public (undocumented)
+// @beta (undocumented)
 const WCAG_22_AA_TAGS: readonly string[];
 
 // @public
 type WireSourceState = "live" | "stale" | "disabled" | "down" | "unknown";
 
-// @public
+// @beta
 function writeTableState(params: URLSearchParams, key: string, state: TableState, defaultPageSize?: number): URLSearchParams;
 
-// @public
+// @beta
 const ZONE_DIMMED_OPACITY = 0.35;
 
-// @public
+// @beta
 const ZONE_LABEL_SIZE_PX = 12;
 
-// @public
+// @beta
 const ZONE_LAYER_ID = "us-zones";
 
-// @public
+// @beta
 const ZONE_LEGEND_ORDER: readonly ZoneType[];
 
-// @public
+// @beta
 const ZONE_PATTERN_KEYS: Readonly<Record<ZonePattern, Key>>;
 
-// @public
+// @beta
 const ZONE_TYPE_KEYS: Readonly<Record<ZoneType, Key>>;
 
 // @public (undocumented)
 const ZONE_TYPES: readonly ["PROHIBITED", "REQ_AUTHORIZATION", "CONDITIONAL", "NO_RESTRICTION", "USPACE"];
 
-// @public (undocumented)
+// @beta (undocumented)
 function ZoneCard(props: ZoneCardProps): JSX.Element;
 
-// @public (undocumented)
+// @beta (undocumented)
 interface ZoneCardProps {
     // (undocumented)
     className?: string;
@@ -5275,16 +5568,16 @@ interface ZoneCardProps {
 // @public
 type ZoneColours = Readonly<Record<ZoneType, string>>;
 
-// @public
+// @beta
 function zoneDimExpression(): ExpressionSpecification;
 
-// @public (undocumented)
+// @beta (undocumented)
 type ZoneFeatureCollection = GeoJSON_2.FeatureCollection<GeoJSON_2.Geometry, ZoneFeatureProperties>;
 
-// @public
+// @beta
 function zoneFeatureCollection(zones: readonly ZoneView[], selectedId: string | null): ZoneFeatureCollection;
 
-// @public
+// @beta
 interface ZoneFeatureProperties {
     // (undocumented)
     applies: boolean | null;
@@ -5311,7 +5604,7 @@ interface ZoneFeatureProperties {
 // @public (undocumented)
 function ZoneLayer(props: ZoneLayerProps): JSX.Element | null;
 
-// @public (undocumented)
+// @beta (undocumented)
 interface ZoneLayerIds {
     // (undocumented)
     fill: string;
@@ -5325,7 +5618,7 @@ interface ZoneLayerIds {
     source: string;
 }
 
-// @public (undocumented)
+// @beta (undocumented)
 function zoneLayerIds(id: string): ZoneLayerIds;
 
 // @public (undocumented)
@@ -5351,13 +5644,13 @@ interface ZoneLegendProps {
     defaultCollapsed?: boolean;
 }
 
-// @public
+// @beta
 function zoneLineWidthPx(t: ZoneType): number;
 
 // @public
 function zoneOpacity(z: Pick<ZoneView, "applies" | "restrictionState">): number;
 
-// @public (undocumented)
+// @beta (undocumented)
 function zoneOrder(): readonly ZoneType[];
 
 // @public
@@ -5366,13 +5659,13 @@ type ZonePattern = "solid" | "hatched" | "dotted" | "none";
 // @public
 function zonePattern(t: ZoneType): ZonePattern;
 
-// @public
+// @beta
 function zonePatternFillOpacity(p: ZonePattern): number;
 
-// @public
+// @beta
 function zonePatternImage(pattern: "hatched" | "dotted", rgb: Rgb): PatternImage;
 
-// @public
+// @beta
 function zonePatternImageId(t: ZoneType): string | null;
 
 // @public (undocumented)
@@ -5397,7 +5690,7 @@ interface ZoneStyle {
 // @public
 function zoneStyle(colours: ZoneColours): ZoneStyle;
 
-// @public
+// @beta
 function ZoneSwatch(props: {
     type: ZoneType;
 }): JSX.Element;
@@ -5444,15 +5737,15 @@ interface ZoneView {
 
 // Warnings were encountered during analysis:
 //
-// src/table/columns.tsx:567:21 - (ae-forgotten-export) The symbol "num" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:567:21 - (ae-forgotten-export) The symbol "utc" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:567:21 - (ae-forgotten-export) The symbol "age" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:567:21 - (ae-forgotten-export) The symbol "severity" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:567:21 - (ae-forgotten-export) The symbol "trust" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:567:21 - (ae-forgotten-export) The symbol "ident" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:567:21 - (ae-forgotten-export) The symbol "enumColumn" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:567:21 - (ae-forgotten-export) The symbol "text" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:567:21 - (ae-forgotten-export) The symbol "select" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:605:21 - (ae-forgotten-export) The symbol "num" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:605:21 - (ae-forgotten-export) The symbol "utc" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:605:21 - (ae-forgotten-export) The symbol "age" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:605:21 - (ae-forgotten-export) The symbol "severity" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:605:21 - (ae-forgotten-export) The symbol "trust" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:605:21 - (ae-forgotten-export) The symbol "ident" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:605:21 - (ae-forgotten-export) The symbol "enumColumn" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:605:21 - (ae-forgotten-export) The symbol "text" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:605:21 - (ae-forgotten-export) The symbol "select" needs to be exported by the entry point entry.d.ts
 
 // (No @packageDocumentation comment for this package)
 

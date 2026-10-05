@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { cn } from "../cn.js";
 
+/** @beta */
 export interface EmptyStateProps {
   title: ReactNode;
   description?: ReactNode;
@@ -14,6 +15,8 @@ export interface EmptyStateProps {
 /**
  * A visible "nothing here" with its reason (LESSONS E-02): an empty list
  * says why it is empty instead of rendering a blank.
+ *
+ * @beta
  */
 export function EmptyState(props: EmptyStateProps): ReactNode {
   const { title, description, icon, action, className } = props;

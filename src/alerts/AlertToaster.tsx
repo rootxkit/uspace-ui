@@ -36,12 +36,19 @@ import { useAlertTone, validRepeatMs, type AlertTone } from "./tone.js";
  * How long a warning or information notice stays before it leaves on its
  * own. A display constant, not a threshold: the alert itself stays in
  * the list for as long as the server holds it.
+ *
+ * @beta
  */
 export const TOAST_HOLD_MS = 15_000;
 
-/** At most this many notices on screen; the oldest non-critical goes first. Display constant. */
+/**
+ * At most this many notices on screen; the oldest non-critical goes first. Display constant.
+ *
+ * @beta
+ */
 export const TOAST_LIMIT = 5;
 
+/** @public */
 export interface AlertToasterProps {
   /** Every alert the app shows (a store snapshot's values). */
   alerts: readonly AlertView[];
@@ -153,6 +160,7 @@ const BORDER = {
   info: "border-severity-info",
 } as const;
 
+/** @public */
 export function AlertToaster(props: AlertToasterProps) {
   const { alerts, critical, className } = props;
   const t = useT();

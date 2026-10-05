@@ -2,6 +2,7 @@
 // (CLAUDE.md rule 9, LESSONS E-09, E-10); WP-8's status components read
 // these.
 
+/** @beta */
 export type LayerCounter =
   /** Data handed to a layer that a newer value replaced in the same frame. */
   | "update_superseded"
@@ -48,16 +49,25 @@ const counts: Record<LayerCounter, number> = {
   draw_vertex_refused: 0,
 };
 
+/** @beta */
 export function countLayer(counter: LayerCounter): void {
   counts[counter] += 1;
 }
 
-/** A snapshot of the layer counters since the page loaded. */
+/**
+ * A snapshot of the layer counters since the page loaded.
+ *
+ * @beta
+ */
 export function layerCounters(): Readonly<Record<LayerCounter, number>> {
   return { ...counts };
 }
 
-/** Tests only: start the counters again from zero (LESSONS E-11). */
+/**
+ * Tests only: start the counters again from zero (LESSONS E-11).
+ *
+ * @beta
+ */
 export function resetLayerCountersForTests(): void {
   for (const k of Object.keys(counts) as LayerCounter[]) counts[k] = 0;
 }

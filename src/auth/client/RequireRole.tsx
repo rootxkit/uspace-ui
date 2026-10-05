@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import { useSession } from "./SessionProvider.js";
 
+/** @public */
 export interface RequireRoleProps {
   /** Shown when the session holds at least one of these roles. */
   anyOf: string[];
@@ -18,6 +19,8 @@ export interface RequireRoleProps {
  * out. A courtesy to the layout, not a control: it hides a menu, it
  * grants nothing. The roles are decoded without verification, and the
  * API decides every request whatever this shows.
+ *
+ * @public
  */
 export function RequireRole(props: RequireRoleProps): ReactNode {
   const { session } = useSession();

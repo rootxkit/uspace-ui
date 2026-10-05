@@ -24,7 +24,11 @@ import {
   type Obj,
 } from "./result.js";
 
-/** The three times of a frame's envelope (04 §2), as TrackView holds them. */
+/**
+ * The three times of a frame's envelope (04 §2), as TrackView holds them.
+ *
+ * @beta
+ */
 export function timesOf(f: ConsoleFrame): Times {
   return {
     ts: f.ts,
@@ -70,7 +74,11 @@ function position(b: Obj): { lat: number; lng: number } | null {
   return lat === null || lng === null ? null : { lat, lng };
 }
 
-/** `track/telemetry/v1` to a TrackView (the store stamps receivedAtMs). */
+/**
+ * `track/telemetry/v1` to a TrackView (the store stamps receivedAtMs).
+ *
+ * @beta
+ */
 export function adaptTelemetry(
   f: ConsoleFrame,
 ): Adapted<Omit<TrackView, "receivedAtMs">> {
@@ -123,6 +131,8 @@ export function adaptTelemetry(
  * when it has one, else the ICAO 24-bit address (the ANSP's key).
  * `trust` and `anomaly` are optional (PLAN §14 Q20): absent, MannedLayer
  * draws the aircraft as broadcast, never as surveillance.
+ *
+ * @beta
  */
 export function adaptManned(
   f: ConsoleFrame,

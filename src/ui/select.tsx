@@ -5,24 +5,28 @@ import { cn } from "./cn.js"
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react"
 import { Select as SelectPrimitive } from "radix-ui"
 
+/** @public */
 function Select({
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Root>) {
   return <SelectPrimitive.Root data-slot="select" {...props} />
 }
 
+/** @public */
 function SelectGroup({
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Group>) {
   return <SelectPrimitive.Group data-slot="select-group" {...props} />
 }
 
+/** @public */
 function SelectValue({
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Value>) {
   return <SelectPrimitive.Value data-slot="select-value" {...props} />
 }
 
+/** @public */
 function SelectTrigger({
   className,
   size = "default",
@@ -49,6 +53,7 @@ function SelectTrigger({
   )
 }
 
+/** @public */
 function SelectContent({
   className,
   children,
@@ -86,6 +91,7 @@ function SelectContent({
   )
 }
 
+/** @public */
 function SelectLabel({
   className,
   ...props
@@ -99,6 +105,7 @@ function SelectLabel({
   )
 }
 
+/** @public */
 function SelectItem({
   className,
   children,
@@ -126,6 +133,7 @@ function SelectItem({
   )
 }
 
+/** @public */
 function SelectSeparator({
   className,
   ...props
@@ -139,6 +147,7 @@ function SelectSeparator({
   )
 }
 
+/** @public */
 function SelectScrollUpButton({
   className,
   ...props
@@ -157,6 +166,7 @@ function SelectScrollUpButton({
   )
 }
 
+/** @public */
 function SelectScrollDownButton({
   className,
   ...props

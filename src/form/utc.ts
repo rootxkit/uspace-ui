@@ -9,12 +9,20 @@ const LOCAL =
 const ZONED =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2})$/i;
 
-/** True for an RFC 3339 date-time with a zone designator. */
+/**
+ * True for an RFC 3339 date-time with a zone designator.
+ *
+ * @beta
+ */
 export function isRfc3339(v: string): boolean {
   return ZONED.test(v);
 }
 
-/** True for an RFC 3339 date-time in UTC (`Z`). */
+/**
+ * True for an RFC 3339 date-time in UTC (`Z`).
+ *
+ * @beta
+ */
 export function isRfc3339Utc(v: string): boolean {
   return ZONED.test(v) && /z$/i.test(v);
 }
@@ -25,6 +33,8 @@ const two = (n: number): string => String(n).padStart(2, "0");
  * The box's text for an RFC 3339 time: its UTC wall clock to the minute,
  * with seconds when they are not zero. "" for null and for a string that
  * is not an RFC 3339 time with a zone (a time without one has no instant).
+ *
+ * @beta
  */
 export function utcToInput(iso: string | null): string {
   if (iso === null || !isRfc3339(iso.trim())) return "";
@@ -39,6 +49,8 @@ export function utcToInput(iso: string | null): string {
 /**
  * The RFC 3339 UTC time for the box's text ("2026-03-29T00:30" ->
  * "2026-03-29T00:30:00Z"); null for an empty or partial box.
+ *
+ * @beta
  */
 export function inputToUtc(local: string): string | null {
   const m = LOCAL.exec(local.trim());

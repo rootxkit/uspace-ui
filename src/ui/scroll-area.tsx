@@ -5,6 +5,7 @@ import { cn } from "./cn.js"
 import { useCspNonce } from "./extra/CspNonce.js"
 import { ScrollArea as ScrollAreaPrimitive } from "radix-ui"
 
+/** @public */
 function ScrollArea({
   className,
   children,
@@ -30,6 +31,7 @@ function ScrollArea({
   )
 }
 
+/** @public */
 function ScrollBar({
   className,
   orientation = "vertical",

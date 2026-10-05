@@ -455,7 +455,8 @@ describe("the stores take the lab-derived views (WP-14)", () => {
 
   it("hold every lab alert with its state and clear reason", () => {
     const store = createAlertStore();
-    for (const a of lab.alerts) store.apply(omit(a, "receivedAtMs", "acknowledged"));
+    for (const a of lab.alerts)
+      store.apply(omit(a, "receivedAtMs", "acknowledged"));
     for (const a of lab.alerts) {
       const held = store.get(a.alertId);
       expect(held?.state, a.alertId).toBe(a.state);

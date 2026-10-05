@@ -40,6 +40,7 @@ import {
   type Viewport,
 } from "./viewport.js";
 
+/** @public */
 export interface MapViewProps {
   basemap: BasemapConfig;
   /** The first camera; the app's configuration, never a kit default. */
@@ -57,6 +58,7 @@ export interface MapViewProps {
 
 type Applied = { info: BasemapInfo | null; lang: Lang; scheme: MapScheme };
 
+/** @public */
 export function MapView(props: MapViewProps): ReactNode {
   const { basemap, initial, lang, scheme, children, className } = props;
   const t = useTFor(lang);

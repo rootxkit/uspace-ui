@@ -20,12 +20,15 @@ import { cn } from "../ui/cn.js";
  * A restriction (reason DAR, spec 02 F2) as a zone view plus the times the
  * API spelled `starts_at` and `ends_at`. They are optional so a plain
  * `ZoneView[]` is accepted; an absent time shows as a dash.
+ *
+ * @public
  */
 export interface RestrictionView extends ZoneView {
   startsAt?: string | null;
   endsAt?: string | null;
 }
 
+/** @beta */
 export interface ZoneCardProps {
   zone: RestrictionView;
   lang: Lang;
@@ -43,6 +46,7 @@ function Row(props: { label: string; children: ReactNode; field: string }) {
   );
 }
 
+/** @beta */
 export function ZoneCard(props: ZoneCardProps) {
   const { zone, lang, restriction = false, className } = props;
   const t = useTFor(lang);

@@ -5,6 +5,7 @@ import { cn } from "./cn.js"
 import { CircleIcon } from "lucide-react"
 import { RadioGroup as RadioGroupPrimitive } from "radix-ui"
 
+/** @public */
 function RadioGroup({
   className,
   ...props
@@ -18,6 +19,7 @@ function RadioGroup({
   )
 }
 
+/** @public */
 function RadioGroupItem({
   className,
   ...props

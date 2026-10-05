@@ -51,7 +51,11 @@ function limit(
   return adapted({ m, ref });
 }
 
-/** One ED-318 feature to a ZoneView; `applies` is the app's (Q3). */
+/**
+ * One ED-318 feature to a ZoneView; `applies` is the app's (Q3).
+ *
+ * @beta
+ */
 export function adaptEd318Feature(
   feature: unknown,
   applies: boolean | null = null,
@@ -109,7 +113,11 @@ export function adaptEd318Feature(
   });
 }
 
-/** Every feature of an ED-318 collection, or the first it cannot map. */
+/**
+ * Every feature of an ED-318 collection, or the first it cannot map.
+ *
+ * @beta
+ */
 export function adaptEd318Collection(doc: unknown): Adapted<ZoneView[]> {
   const features = obj(doc)["features"];
   if (!Array.isArray(features))
@@ -123,7 +131,11 @@ export function adaptEd318Collection(doc: unknown): Adapted<ZoneView[]> {
   return adapted(out);
 }
 
-/** The applicability of `zone/applicable/v1` as ZoneView.applies (Q3). */
+/**
+ * The applicability of `zone/applicable/v1` as ZoneView.applies (Q3).
+ *
+ * @beta
+ */
 export function adaptApplicability(
   f: ConsoleFrame,
 ): Adapted<{ identifier: string; applies: boolean | null }> {
@@ -151,14 +163,22 @@ export function adaptApplicability(
   return adapted({ identifier, applies });
 }
 
-/** A CIS change as a console words it: "zones updated to version V at T". */
+/**
+ * A CIS change as a console words it: "zones updated to version V at T".
+ *
+ * @beta
+ */
 export interface CisChange {
   dataset: string;
   version: string;
   at: string;
 }
 
-/** `cis/change/v1` to the change a console announces (PLAN §6.3). */
+/**
+ * `cis/change/v1` to the change a console announces (PLAN §6.3).
+ *
+ * @beta
+ */
 export function adaptCisChange(f: ConsoleFrame): Adapted<CisChange> {
   if (f.schema !== "cis/change/v1")
     return refused("schema", f.schema, "not cis/change/v1");

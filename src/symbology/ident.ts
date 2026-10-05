@@ -15,10 +15,18 @@ import type {
 } from "../model/index.js";
 import { tokens } from "../theme/tokens.js";
 
-/** An identification status, or `none`: the track carries no block. */
+/**
+ * An identification status, or `none`: the track carries no block.
+ *
+ * @public
+ */
 export type IdentKey = IdentStatus | "none";
 
-/** The CSS variable of a status's colour; `none` is the grey of no block. */
+/**
+ * The CSS variable of a status's colour; `none` is the grey of no block.
+ *
+ * @public
+ */
 export function identToken(s: IdentStatus | null): string {
   if (s === null) return tokens.identNone;
   switch (s) {
@@ -36,6 +44,8 @@ export function identToken(s: IdentStatus | null): string {
  * Legend order: the expected status first, then the ones that need
  * someone's attention, then no identification at all (predecessor
  * `identification.ts`). A display-only constant.
+ *
+ * @beta
  */
 export const IDENT_ORDER: readonly IdentKey[] = Object.freeze([
   "registered",
@@ -45,6 +55,7 @@ export const IDENT_ORDER: readonly IdentKey[] = Object.freeze([
   "none",
 ] satisfies IdentKey[]);
 
+/** @public */
 export function identOrder(): readonly IdentKey[] {
   return IDENT_ORDER;
 }
@@ -54,6 +65,8 @@ export function identOrder(): readonly IdentKey[] {
  * aircraft in a PROHIBITED or REQ_AUTHORISATION zone raises
  * `identification` (core `IdentStatus.IncidentStatus`). The server raises
  * it; the kit uses this only to order and annotate the legend.
+ *
+ * @public
  */
 export function needsAttention(s: IdentStatus | null): boolean {
   if (s === null) return false;
@@ -76,6 +89,8 @@ export function needsAttention(s: IdentStatus | null): boolean {
  * should never send that pair, and if it does the map must not show the
  * registered colour on it (CLAUDE.md rule 6, never upgrade). Every other
  * status is drawn as given.
+ *
+ * @beta
  */
 export function identDrawn(ident: Identification | null): IdentKey {
   if (ident === null) return "none";
@@ -90,6 +105,8 @@ export function identDrawn(ident: Identification | null): IdentKey {
  * deficiency, PLAN §3.2, but colour is never the only cue). `registered`
  * is the one status with no mark. The glyphs are in the basemap's Latin
  * glyph ranges (U+0000-00FF, U+2000-206F). Display-only constants.
+ *
+ * @beta
  */
 export function identMark(s: IdentKey): string {
   switch (s) {
@@ -108,7 +125,11 @@ export function identMark(s: IdentKey): string {
   }
 }
 
-/** The catalogue key of a status's name; `none` for no identification. */
+/**
+ * The catalogue key of a status's name; `none` for no identification.
+ *
+ * @beta
+ */
 export const IDENT_STATUS_KEYS: Readonly<Record<IdentKey, Key>> = Object.freeze(
   {
     registered: "ident.status.registered",
@@ -119,7 +140,11 @@ export const IDENT_STATUS_KEYS: Readonly<Record<IdentKey, Key>> = Object.freeze(
   },
 );
 
-/** The catalogue key of what a status means (the legend's hint). */
+/**
+ * The catalogue key of what a status means (the legend's hint).
+ *
+ * @beta
+ */
 export const IDENT_STATUS_HINT_KEYS: Readonly<Record<IdentKey, Key>> =
   Object.freeze({
     registered: "ident.hint.registered",
@@ -129,7 +154,11 @@ export const IDENT_STATUS_HINT_KEYS: Readonly<Record<IdentKey, Key>> =
     none: "ident.hint.none",
   });
 
-/** The catalogue key of a reason code (04 §3.2), for the detail. */
+/**
+ * The catalogue key of a reason code (04 §3.2), for the detail.
+ *
+ * @beta
+ */
 export const IDENT_REASON_KEYS: Readonly<Record<IdentReason, Key>> =
   Object.freeze({
     matched: "ident.reason.matched",
@@ -149,7 +178,11 @@ export const IDENT_REASON_KEYS: Readonly<Record<IdentReason, Key>> =
     registry_unavailable: "ident.reason.registry_unavailable",
   });
 
-/** The catalogue key of a basis's name (WP-2 keys). */
+/**
+ * The catalogue key of a basis's name (WP-2 keys).
+ *
+ * @beta
+ */
 export const IDENT_BASIS_KEYS: Readonly<Record<IdentBasis, Key>> =
   Object.freeze({
     authenticated: "ident.basis.authenticated",
@@ -157,7 +190,11 @@ export const IDENT_BASIS_KEYS: Readonly<Record<IdentBasis, Key>> =
     provider: "ident.basis.provider",
   });
 
-/** The lines of an identification's detail text, as catalogue keys. */
+/**
+ * The lines of an identification's detail text, as catalogue keys.
+ *
+ * @beta
+ */
 export interface IdentHint {
   /** What the status means. */
   status: Key;
@@ -198,6 +235,8 @@ function caveatKey(status: IdentStatus, basis: IdentBasis): Key | null {
  * The detail text of an identification (TrackDetail, WP-12, renders it):
  * the status hint, the reason, the basis caveat and the mismatch line.
  * Total over every status, reason and basis.
+ *
+ * @beta
  */
 export function identHintKey(
   status: IdentStatus,

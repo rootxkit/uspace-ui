@@ -8,6 +8,8 @@
  * Asomtavruli and Mkhedruli (U+10A0-10FF), Mtavruli (U+1C90-1CBF),
  * Nuskhuri (U+2D00-2D2F): every Georgian block, so Georgian text falls to
  * the Georgian face and Latin text never downloads it.
+ *
+ * @beta
  */
 export const GEORGIAN_UNICODE_RANGE = "U+10A0-10FF, U+1C90-1CBF, U+2D00-2D2F";
 
@@ -15,11 +17,17 @@ export const GEORGIAN_UNICODE_RANGE = "U+10A0-10FF, U+1C90-1CBF, U+2D00-2D2F";
  * What NotoSans-*.woff2 is subset to (scripts/subset-fonts.sh): Latin with
  * Latin-1, Extended-A and the region's Extended-B letters, Greek,
  * Cyrillic, punctuation, currency signs and arrows.
+ *
+ * @beta
  */
 export const LATIN_UNICODE_RANGE =
   "U+0000-017F, U+018F, U+0192, U+0218-021B, U+0237, U+0259, U+02BB-02BC, U+02C6-02DD, U+0300-0304, U+0306-0308, U+030A-030C, U+0327-0328, U+0370-03FF, U+0400-04FF, U+1E9E, U+2000-206F, U+20AC, U+20B8, U+20BD, U+20BE, U+2116, U+2122, U+2190-2193, U+2212";
 
-/** The CSS variables the loaders define (`fontClassName` sets both). */
+/**
+ * The CSS variables the loaders define (`fontClassName` sets both).
+ *
+ * @beta
+ */
 export const FONT_VARIABLES = {
   latin: "--us-font-latin",
   georgian: "--us-font-georgian",
@@ -30,6 +38,8 @@ export const FONT_VARIABLES = {
  * Georgian), then Latin, then the platform. Without the loaders' classes
  * (the browser tests, a non-Next app) the variables fall back to the families
  * `fonts/fonts.css` declares over the same files.
+ *
+ * @beta
  */
 export const fontFamily = `var(${FONT_VARIABLES.georgian}, "Noto Sans Georgian"), var(${FONT_VARIABLES.latin}, "Noto Sans"), ui-sans-serif, system-ui, sans-serif`;
 
@@ -38,9 +48,12 @@ export const fontFamily = `var(${FONT_VARIABLES.georgian}, "Noto Sans Georgian")
  * basemap bundle is built with, Latin and Georgian ranges included
  * (PLAN §6.3, §14 Q4; lab WP-L3). A layer writes
  * `"text-font": [mapFontstack]`.
+ *
+ * @public
  */
 export const mapFontstack = "Noto Sans Regular";
 
+/** @beta */
 export interface FontFile {
   file: string;
   family: "Noto Sans" | "Noto Sans Georgian";
@@ -48,7 +61,11 @@ export interface FontFile {
   unicodeRange: string;
 }
 
-/** The four committed files, as `fonts/` holds them. */
+/**
+ * The four committed files, as `fonts/` holds them.
+ *
+ * @beta
+ */
 export const FONT_FILES: readonly FontFile[] = [
   {
     file: "NotoSans-Regular.woff2",

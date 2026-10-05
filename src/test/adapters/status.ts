@@ -16,6 +16,8 @@ import { adapted, refused, type Adapted } from "./result.js";
  * A source as SourceView, its last record placed on the server's clock
  * (`at`, the frame's server time, minus the source's age), never on the
  * browser's.
+ *
+ * @beta
  */
 export function adaptSource(raw: unknown, at: string): Adapted<SourceView> {
   const s = parseStatusSource(raw);
@@ -37,7 +39,11 @@ export function adaptSource(raw: unknown, at: string): Adapted<SourceView> {
   });
 }
 
-/** A `source/status/v1` frame to a SourceView. */
+/**
+ * A `source/status/v1` frame to a SourceView.
+ *
+ * @beta
+ */
 export function adaptSourceFrame(f: ConsoleFrame): Adapted<SourceView> {
   if (f.schema !== "source/status/v1")
     return refused("schema", f.schema, "not source/status/v1");
@@ -47,6 +53,8 @@ export function adaptSourceFrame(f: ConsoleFrame): Adapted<SourceView> {
 /**
  * A `console/status/v1` frame to the FeedStatus a live feed would hold
  * after it (`connection` live, since the browser clock `receivedAtMs`).
+ *
+ * @beta
  */
 export function adaptStatus(
   f: ConsoleFrame,

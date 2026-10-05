@@ -21,6 +21,7 @@ import {
 } from "./cookies.js";
 import { countAuth } from "./counters.js";
 
+/** @public */
 export interface ForwardOptions {
   /** The cookie options: the session cookie is read, and cleared on a 401. */
   session: SessionCookieOptions;
@@ -52,6 +53,8 @@ export interface ForwardOptions {
  * API deduplicates (the ANSP's `POST /v1/restrictions` requires one,
  * uspace-ansp PLAN row 49): without it a retried submission could not be
  * recognised as the same one.
+ *
+ * @beta
  */
 export const FORWARDED_REQUEST_HEADERS: readonly string[] = [
   "accept",
@@ -71,6 +74,8 @@ export const FORWARDED_REQUEST_HEADERS: readonly string[] = [
  * S5). Every `Access-Control-*` header is dropped too (`downstreamHeaders`):
  * one the API wrote for its own origin must not be replayed on the
  * console's.
+ *
+ * @beta
  */
 export const DROPPED_RESPONSE_HEADERS: readonly string[] = [
   "connection",
@@ -150,6 +155,8 @@ export function checkTrustedProxyHops(hops: number | undefined): void {
  * chain shorter than `hops`, or for an entry that is not an IP address
  * (counted). Sound only when Next.js is reachable through those proxies
  * alone.
+ *
+ * @beta
  */
 export function clientAddress(
   req: NextRequest,
@@ -345,6 +352,8 @@ export function isPlainPath(pathname: string): boolean {
  * an unsafe method without a matching CSRF pair a 403 problem. The answer
  * is the API's own status, body and headers (minus the dropped set); on a
  * 401 the BFF also clears both cookies (the session is gone).
+ *
+ * @public
  */
 export async function forward(
   req: NextRequest,

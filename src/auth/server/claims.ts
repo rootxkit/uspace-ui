@@ -7,7 +7,11 @@ import type { SessionDisplay } from "../../model/index.js";
 
 import { countAuth } from "./counters.js";
 
-/** The claims the console shows, decoded without verification. */
+/**
+ * The claims the console shows, decoded without verification.
+ *
+ * @public
+ */
 export interface UnverifiedSessionClaims {
   sub: string | null;
   /** Always an array: `[]` when the claim is absent or not an array. */
@@ -37,6 +41,8 @@ function decodeSegment(segment: string): unknown {
  * that is absent or not an array gives `[]` (and a non-array is
  * counted), never a guess from `scope`. `null` for a token that is not
  * three segments with a JSON-object payload.
+ *
+ * @public
  */
 export function sessionClaimsUnverified(
   jwt: string,
@@ -77,6 +83,8 @@ export function sessionClaimsUnverified(
  * only). `null` for no token, a malformed token, or one without the
  * `sub`, `exp` or `realm` the contract requires (counted): the console
  * then shows the signed-out layout and the API still decides.
+ *
+ * @public
  */
 export function sessionDisplay(jwt: string | null): SessionDisplay | null {
   if (jwt === null) return null;

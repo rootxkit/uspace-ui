@@ -13,6 +13,7 @@ import type { DatasetAge } from "../live/frame.js";
 import { cn } from "../ui/cn.js";
 import { degradedLabel } from "./words.js";
 
+/** @public */
 export interface DegradedBannerProps {
   /** The status frame's `degraded[]`. */
   degraded: readonly string[];
@@ -33,6 +34,7 @@ export interface DegradedBannerProps {
 const known = (v: number | null | undefined): v is number =>
   v !== null && v !== undefined && Number.isFinite(v);
 
+/** @public */
 export function DegradedBanner(props: DegradedBannerProps) {
   const {
     degraded,

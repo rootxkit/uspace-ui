@@ -2,7 +2,11 @@
 // (pinned in its VERSION); never edited by hand. Run
 // scripts/sync-fixtures.sh to move a pin.
 
-/** The uspace-lab commit the common examples were copied at. */
+/**
+ * The uspace-lab commit the common examples were copied at.
+ *
+ * @public
+ */
 export const LAB_COMMIT = "18d6f321a12f897f96e24ef842f4ce9d5a6bde33";
 
 /** Every vendored example, by its path under src/test/fixtures/. */

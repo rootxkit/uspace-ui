@@ -62,13 +62,25 @@ import { countTable } from "./counters.js";
 import { nextGridPos, type GridPos } from "./keyboard.js";
 import { PAGE_SIZES, initialTableState, type TableState } from "./state.js";
 
-/** Above this many rows the table virtualises (PLAN §8). */
+/**
+ * Above this many rows the table virtualises (PLAN §8).
+ *
+ * @beta
+ */
 export const VIRTUALIZE_ABOVE_ROWS = 200;
 
-/** Height of the scrolling viewport when virtualised. Display-only. */
+/**
+ * Height of the scrolling viewport when virtualised. Display-only.
+ *
+ * @beta
+ */
 export const VIRTUAL_VIEWPORT_PX = 480;
 
-/** Pixels Alt+Left/Right resizes a column by. Display-only. */
+/**
+ * Pixels Alt+Left/Right resizes a column by. Display-only.
+ *
+ * @beta
+ */
 export const RESIZE_STEP_PX = 16;
 
 /** Skeleton rows while the first load runs. Display-only. */
@@ -80,6 +92,7 @@ const OVERSCAN_ROWS = 8;
 // Estimated row heights for the virtualiser; measured rows replace them.
 const ROW_PX = { dense: 33, normal: 41 } as const;
 
+/** @public */
 export interface DataTableProps<Row> {
   columns: readonly TableColumn<Row>[];
   rows: readonly Row[];
@@ -440,6 +453,7 @@ function HeaderCell<Row>(props: {
   );
 }
 
+/** @public */
 export function DataTable<Row>(props: DataTableProps<Row>) {
   const {
     rows,

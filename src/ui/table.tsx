@@ -3,6 +3,7 @@
 import * as React from "react"
 import { cn } from "./cn.js"
 
+/** @public */
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
     <div
@@ -18,6 +19,7 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
   )
 }
 
+/** @public */
 function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
   return (
     <thead
@@ -28,6 +30,7 @@ function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
   )
 }
 
+/** @public */
 function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
   return (
     <tbody
@@ -38,6 +41,7 @@ function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
   )
 }
 
+/** @public */
 function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
   return (
     <tfoot
@@ -51,6 +55,7 @@ function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
   )
 }
 
+/** @public */
 function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
   return (
     <tr
@@ -64,6 +69,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
   )
 }
 
+/** @public */
 function TableHead({ className, ...props }: React.ComponentProps<"th">) {
   return (
     <th
@@ -77,6 +83,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
   )
 }
 
+/** @public */
 function TableCell({ className, ...props }: React.ComponentProps<"td">) {
   return (
     <td
@@ -90,6 +97,7 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
   )
 }
 
+/** @public */
 function TableCaption({
   className,
   ...props

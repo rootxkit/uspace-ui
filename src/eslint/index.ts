@@ -15,6 +15,7 @@ import {
   noServerClientsInWeb,
 } from "./rules/index.js";
 
+/** @public */
 export const rules = {
   noGeometryImports,
   noServerClientsInWeb,
@@ -22,7 +23,11 @@ export const rules = {
   noHandWrittenApiTypes,
 };
 
-/** The plugin the config registers under the `uspace-ui/` prefix. */
+/**
+ * The plugin the config registers under the `uspace-ui/` prefix.
+ *
+ * @beta
+ */
 export const plugin: ESLint.Plugin = {
   meta: { name: "@rootxkit/uspace-ui/eslint" },
   rules: {
@@ -33,6 +38,7 @@ export const plugin: ESLint.Plugin = {
   },
 };
 
+/** @public */
 const config: Linter.Config[] = [
   ...(tseslint.configs.strict as Linter.Config[]),
   reactHooks.configs.flat.recommended as Linter.Config,

@@ -13,7 +13,11 @@ import {
 } from "../../model/index.js";
 import { adapted, obj, refused, str, type Adapted } from "./result.js";
 
-/** `alert/v1` or `violation/v1` to an AlertInput. */
+/**
+ * `alert/v1` or `violation/v1` to an AlertInput.
+ *
+ * @beta
+ */
 export function adaptAlert(f: ConsoleFrame): Adapted<AlertInput> {
   if (f.schema !== "alert/v1" && f.schema !== "violation/v1")
     return refused("schema", f.schema, "not alert/v1 or violation/v1");

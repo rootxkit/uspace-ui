@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from "./dialog.js"
 
+/** @public */
 function Command({
   className,
   ...props
@@ -29,6 +30,7 @@ function Command({
   )
 }
 
+/** @public */
 function CommandDialog({
   title = "Command Palette",
   description = "Search for a command to run...",
@@ -60,6 +62,7 @@ function CommandDialog({
   )
 }
 
+/** @public */
 function CommandInput({
   className,
   ...props
@@ -82,6 +85,7 @@ function CommandInput({
   )
 }
 
+/** @public */
 function CommandList({
   className,
   ...props
@@ -98,6 +102,7 @@ function CommandList({
   )
 }
 
+/** @public */
 function CommandEmpty({
   ...props
 }: React.ComponentProps<typeof CommandPrimitive.Empty>) {
@@ -110,6 +115,7 @@ function CommandEmpty({
   )
 }
 
+/** @public */
 function CommandGroup({
   className,
   ...props
@@ -126,6 +132,7 @@ function CommandGroup({
   )
 }
 
+/** @public */
 function CommandSeparator({
   className,
   ...props
@@ -139,6 +146,7 @@ function CommandSeparator({
   )
 }
 
+/** @public */
 function CommandItem({
   className,
   ...props
@@ -155,6 +163,7 @@ function CommandItem({
   )
 }
 
+/** @public */
 function CommandShortcut({
   className,
   ...props

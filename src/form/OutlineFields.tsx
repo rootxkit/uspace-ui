@@ -26,11 +26,20 @@ import { Input } from "../ui/input.js";
 import { Label } from "../ui/label.js";
 import { formatLocaleNumber, parseLocaleNumber } from "./number.js";
 
-/** The two outline kinds, in the order the choice lists them. */
+/**
+ * The two outline kinds, in the order the choice lists them.
+ *
+ * @public
+ */
 export const OUTLINE_KINDS = ["polygon", "circle"] as const;
+/** @public */
 export type OutlineKind = (typeof OUTLINE_KINDS)[number];
 
-/** An empty outline of `kind`. */
+/**
+ * An empty outline of `kind`.
+ *
+ * @public
+ */
 export function emptyOutline(kind: OutlineKind): DrawOutline {
   return kind === "polygon"
     ? { kind: "polygon", vertices: [] }
@@ -43,6 +52,7 @@ const RANGES = {
   lng: { min: -180, max: 180 },
 } as const;
 
+/** @public */
 export interface OutlineFieldsProps {
   outline: DrawOutline;
   onChange(next: DrawOutline): void;
@@ -150,6 +160,7 @@ function PointInputs(props: {
   );
 }
 
+/** @public */
 export function OutlineFields(props: OutlineFieldsProps): ReactNode {
   const {
     outline,

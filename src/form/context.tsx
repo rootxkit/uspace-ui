@@ -9,6 +9,7 @@ import { en } from "../i18n/en.js";
 import { useOptionalI18n } from "../i18n/I18nProvider.js";
 import type { Translate } from "../i18n/translate.js";
 
+/** @beta */
 export interface RegisteredField {
   id: string;
   label: string;
@@ -30,6 +31,7 @@ export function useFormKit(): FormKit {
   return kit;
 }
 
+/** @beta */
 export interface FieldControl {
   name: string;
   id: string;
@@ -44,6 +46,8 @@ export const FieldContext = createContext<FieldControl | null>(null);
 /**
  * The accessibility attributes of the control inside a `Field`, for a
  * control the app writes itself.
+ *
+ * @beta
  */
 export function useFieldControl(): {
   id: string;
@@ -64,7 +68,11 @@ export function useFieldControl(): {
   };
 }
 
-/** An error as react-hook-form holds it. */
+/**
+ * An error as react-hook-form holds it.
+ *
+ * @beta
+ */
 export interface HeldError {
   type?: string | number;
   message?: string;
@@ -75,6 +83,8 @@ export interface HeldError {
  * shown as the API wrote it; a message that is a catalogue key (the kit's
  * error map, an app's key) is translated; any other message is the app's
  * own text and is shown as written.
+ *
+ * @beta
  */
 export function errorText(
   err: HeldError,

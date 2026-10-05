@@ -13,10 +13,18 @@ import type {
 import { Emitter } from "./emitter.js";
 import { compareCapturedAt } from "./time.js";
 
-/** Why a track left the store: the server's reason, or the store's bound. */
+/**
+ * Why a track left the store: the server's reason, or the store's bound.
+ *
+ * @public
+ */
 export type RemovedReason = ClearReason | "evicted";
 
-/** One entry of the "recently removed" ring. */
+/**
+ * One entry of the "recently removed" ring.
+ *
+ * @public
+ */
 export interface RemovedTrack {
   trackId: string;
   reason: RemovedReason;
@@ -26,8 +34,10 @@ export interface RemovedTrack {
 
 // A display bound, not a threshold: how many removals the status panel can
 // list. Older entries leave the ring and are counted.
+/** @beta */
 export const RECENTLY_REMOVED_LIMIT = 50;
 
+/** @public */
 export type TrackStoreCounter =
   /** A track pushed out by `maxTracks`, oldest update first (E-10). */
   | "track_evicted"
@@ -54,6 +64,7 @@ const ZERO: Readonly<Record<TrackStoreCounter, number>> = {
   remove_unknown: 0,
 };
 
+/** @public */
 export interface TrackStoreOptions {
   /** Trail points kept per track; 0 keeps none. A display bound. */
   trailPoints: number;
@@ -63,7 +74,11 @@ export interface TrackStoreOptions {
   now?: () => number;
 }
 
-/** A store of positioned views keyed by `trackId`. */
+/**
+ * A store of positioned views keyed by `trackId`.
+ *
+ * @public
+ */
 export interface PositionStore<V extends Positioned> {
   /** Adds or replaces a sample; stamps `receivedAtMs` on the browser clock. */
   upsert(t: Omit<V, "receivedAtMs">): void;
@@ -85,7 +100,9 @@ export interface PositionStore<V extends Positioned> {
   counters(): Readonly<Record<TrackStoreCounter, number>>;
 }
 
+/** @public */
 export type TrackStore = PositionStore<TrackView>;
+/** @public */
 export type MannedStore = PositionStore<MannedView>;
 
 interface Positioned {
@@ -222,12 +239,18 @@ function createPositionStore<V extends Positioned>(
  * The track store (PLAN §3.11): bounded at `maxTracks` with the least
  * recently updated evicted and counted, `receivedAtMs` stamped on every
  * applied sample, trails bounded at `trailPoints`.
+ *
+ * @public
  */
 export function createTrackStore(opts: TrackStoreOptions): TrackStore {
   return createPositionStore<TrackView>(opts);
 }
 
-/** The same store for manned traffic (`console/snapshot/v1` `manned[]`). */
+/**
+ * The same store for manned traffic (`console/snapshot/v1` `manned[]`).
+ *
+ * @beta
+ */
 export function createMannedStore(opts: TrackStoreOptions): MannedStore {
   return createPositionStore<MannedView>(opts);
 }

@@ -8,10 +8,16 @@ import { I18nProvider } from "../i18n/I18nProvider.js";
 // options as attributes so a test can see them, until ThemeProvider
 // replaces it without changing a caller.
 
+/** @public */
 export type KitLang = "ka" | "en";
+/** @public */
 export type KitScheme = "light" | "dark" | "system";
 
-/** The shape of theme's `Brand` (PLAN §3.2). */
+/**
+ * The shape of theme's `Brand` (PLAN §3.2).
+ *
+ * @public
+ */
 export interface KitBrand {
   name: string;
   shortName: string;
@@ -20,6 +26,7 @@ export interface KitBrand {
   accent: string | null;
 }
 
+/** @public */
 export interface RenderWithKitOptions {
   lang?: KitLang;
   scheme?: KitScheme;
@@ -29,6 +36,7 @@ export interface RenderWithKitOptions {
 }
 
 // The role, never an organisation (PLAN §3.2 brandFromEnv, §14 Q10).
+/** @beta */
 export const TEST_BRAND: KitBrand = {
   name: "U-space",
   shortName: "U-space",
@@ -42,6 +50,8 @@ export const TEST_BRAND: KitBrand = {
  * scheme (`system` resolves to light: tests have no colour preference),
  * the role brand. It starts no timer and reads no clock, so it is safe
  * under fake timers; `now` is passed to the providers, not to the timers.
+ *
+ * @public
  */
 export function renderWithKit(
   ui: ReactNode,

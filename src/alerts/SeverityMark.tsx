@@ -19,11 +19,13 @@ const POINTS: Readonly<Record<Exclude<SeverityGlyph, "circle">, string>> = {
   triangle: "8,1 15,14 1,14",
 };
 
+/** @beta */
 export interface SeverityMarkProps {
   severity: Severity;
   className?: string;
 }
 
+/** @beta */
 export function SeverityMark(props: SeverityMarkProps) {
   const { severity, className } = props;
   const t = useT();

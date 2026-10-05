@@ -5,6 +5,7 @@
 // (lost) only for a recorded gap.
 import type { Key } from "./en.js";
 
+/** @public */
 export const ka: Readonly<Record<Key, string>> = {
   // WP-2: common words
   "common.dash": "—",

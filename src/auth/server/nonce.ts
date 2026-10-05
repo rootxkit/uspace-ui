@@ -10,10 +10,18 @@
 // the client; the root layout reads it and wraps the page in the kit's
 // `CspNonceProvider` (`@rootxkit/uspace-ui/ui`), which ScrollArea reads.
 
-/** The request header the middleware passes the nonce to the layout in. */
+/**
+ * The request header the middleware passes the nonce to the layout in.
+ *
+ * @public
+ */
 export const CSP_NONCE_HEADER = "x-nonce";
 
-/** A fresh nonce: 16 random bytes, base64 (CSP3 `base64-value`). */
+/**
+ * A fresh nonce: 16 random bytes, base64 (CSP3 `base64-value`).
+ *
+ * @public
+ */
 export function issueCspNonce(): string {
   let bin = "";
   for (const b of crypto.getRandomValues(new Uint8Array(16)))

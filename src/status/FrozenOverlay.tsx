@@ -14,6 +14,7 @@ import { cn } from "../ui/cn.js";
 import type { FeedStatusInput } from "./FeedStatusBar.js";
 import { CONNECTION_KEYS } from "./words.js";
 
+/** @public */
 export interface FrozenOverlayProps {
   status: FeedStatusInput;
   /** The app's clock tick (`useNowMs`). */
@@ -21,6 +22,7 @@ export interface FrozenOverlayProps {
   className?: string;
 }
 
+/** @public */
 export function FrozenOverlay(props: FrozenOverlayProps) {
   const { status, nowMs, className } = props;
   const t = useT();

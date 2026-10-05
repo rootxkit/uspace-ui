@@ -12,7 +12,11 @@ import {
 import { FeedClient, type FeedOptions, type LiveStatus } from "./client.js";
 import type { SubscribeFrame } from "./frame.js";
 
-/** What `useFeed` returns: the status, and the subscribe sender. */
+/**
+ * What `useFeed` returns: the status, and the subscribe sender.
+ *
+ * @public
+ */
 export interface LiveFeed extends LiveStatus {
   /** Sends a `console/subscribe/v1`, and again on every reconnect. */
   send(frame: SubscribeFrame): void;
@@ -31,6 +35,8 @@ const useIsoLayoutEffect =
  * `connecting` and never throws. The socket is reopened when a string
  * `url` changes; a function `url` is read on every attempt, so its
  * identity may change between renders.
+ *
+ * @public
  */
 export function useFeed(opts: FeedOptions): LiveFeed {
   const [client] = useState(() => new FeedClient(opts));
@@ -58,13 +64,21 @@ export function useFeed(opts: FeedOptions): LiveFeed {
   return feed;
 }
 
-/** Any store with `subscribe` and a `snapshot` stable between changes. */
+/**
+ * Any store with `subscribe` and a `snapshot` stable between changes.
+ *
+ * @public
+ */
 export interface ExternalStore<T> {
   subscribe(fn: () => void): () => void;
   snapshot(): T;
 }
 
-/** The store's snapshot, re-rendering on change (`useSyncExternalStore`). */
+/**
+ * The store's snapshot, re-rendering on change (`useSyncExternalStore`).
+ *
+ * @public
+ */
 export function useStore<T>(store: ExternalStore<T>): T {
   return useSyncExternalStore(
     store.subscribe,
@@ -78,6 +92,8 @@ export function useStore<T>(store: ExternalStore<T>): T {
  * threshold: how often ages are redrawn; PLAN §3.9 suggests 1 s). The
  * value an app passes as `nowMs` to the status components and the track
  * layer, so every age on the page counts on the same tick.
+ *
+ * @beta
  */
 export function useNowMs(
   periodMs: number,

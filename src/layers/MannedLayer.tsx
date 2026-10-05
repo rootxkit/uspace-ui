@@ -45,9 +45,14 @@ import { HoverPortal } from "./HoverPortal.js";
 import { resolveColour, useLayer } from "./useLayer.js";
 import { useFeaturePointer } from "./zoneFeatures.js";
 
-/** The default source id; pass `id` to draw two manned layers on one map. */
+/**
+ * The default source id; pass `id` to draw two manned layers on one map.
+ *
+ * @beta
+ */
 export const MANNED_LAYER_ID = "us-manned";
 
+/** @beta */
 export interface MannedLayerIds {
   source: string;
   selected: string;
@@ -56,6 +61,7 @@ export interface MannedLayerIds {
   label: string;
 }
 
+/** @beta */
 export function mannedLayerIds(id: string): MannedLayerIds {
   return {
     source: id,
@@ -66,7 +72,11 @@ export function mannedLayerIds(id: string): MannedLayerIds {
   };
 }
 
-/** The manned colours resolved on the map's element, in its scheme. */
+/**
+ * The manned colours resolved on the map's element, in its scheme.
+ *
+ * @beta
+ */
 export function resolveMannedColours(map: MapLibreMap): MannedColours {
   const trust = {} as Record<Trust, string>;
   for (const t of TRUSTS) trust[t] = resolveColour(map, mannedToken(t));
@@ -78,7 +88,11 @@ export function resolveMannedColours(map: MapLibreMap): MannedColours {
   };
 }
 
-/** Puts the twelve manned SDF icons on the map, once per style. */
+/**
+ * Puts the twelve manned SDF icons on the map, once per style.
+ *
+ * @beta
+ */
 export function putMannedIcons(map: MapLibreMap): void {
   for (const { id, trust, directional } of MANNED_ICON_IDS) {
     if (map.hasImage(id)) continue;
@@ -89,6 +103,7 @@ export function putMannedIcons(map: MapLibreMap): void {
   }
 }
 
+/** @beta */
 export type MannedFeatureCollection = GeoJSON.FeatureCollection<
   GeoJSON.Point,
   MannedFeatureProperties
@@ -103,6 +118,8 @@ const EMPTY: MannedFeatureCollection = {
  * The age bucket a manned track draws with: the thirds rule on the age
  * since this console received it, except that a backlog sample is history
  * and draws as `stale` whatever its age (T-04: never drawn as live).
+ *
+ * @beta
  */
 export function mannedAge(
   m: MannedTrack,
@@ -118,6 +135,8 @@ export function mannedAge(
  * address"; then what must not be lost when the label is read alone: the
  * broadcast or provider caveat (R-05, Q18), a trust class the API did not
  * send, an emergency, and an age that is stale, history or not known.
+ *
+ * @beta
  */
 export function mannedLabel(
   m: MannedTrack,
@@ -145,6 +164,7 @@ export function mannedLabel(
   return lines.join("\n");
 }
 
+/** @beta */
 export interface MannedFeatureOptions {
   nowMs: number;
   staleAfterS: number;
@@ -152,7 +172,11 @@ export interface MannedFeatureOptions {
   t: Translate;
 }
 
-/** One point per manned track, in the order given; positions as sent. */
+/**
+ * One point per manned track, in the order given; positions as sent.
+ *
+ * @beta
+ */
 export function mannedFeatureCollection(
   tracks: readonly MannedTrack[],
   opts: MannedFeatureOptions,
@@ -258,6 +282,7 @@ function buildMannedLayers(map: MapLibreMap, id: string): readonly string[] {
   return [ids.selected, ids.emergency, ids.icon, ids.label];
 }
 
+/** @public */
 export interface MannedLayerProps {
   /** Every manned track the app shows (a manned store snapshot). */
   tracks: Iterable<MannedTrack>;
@@ -290,6 +315,7 @@ function listOf(tracks: Iterable<MannedTrack>): readonly MannedTrack[] {
   return list;
 }
 
+/** @public */
 export function MannedLayer(props: MannedLayerProps) {
   const {
     tracks,

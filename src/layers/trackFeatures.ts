@@ -45,6 +45,8 @@ interface Held {
  * The per-id state of one TrackLayer. `apply` takes every track the app
  * shows, each time it changes; an id the app no longer passes is dropped
  * with its trail (the store removed it, with its reason, WP-8).
+ *
+ * @beta
  */
 export class TrackHold {
   private readonly held = new Map<string, Held>();
@@ -137,14 +139,17 @@ export class TrackHold {
   }
 }
 
+/** @beta */
 export type TrackFeature = GeoJSON.Feature<
   GeoJSON.Point,
   TrackFeatureProperties
 >;
+/** @beta */
 export type TrailFeature = GeoJSON.Feature<
   GeoJSON.LineString,
   TrailFeatureProperties
 >;
+/** @beta */
 export type TrackFeatureCollection = GeoJSON.FeatureCollection<
   GeoJSON.Point | GeoJSON.LineString,
   TrackFeatureProperties | TrailFeatureProperties
@@ -156,6 +161,8 @@ export type TrackFeatureCollection = GeoJSON.FeatureCollection<
  * stamped by the live track store, and the app's `nowMs` tick), never the
  * server's times (04 §2: an age counts from receipt or from capture, never
  * a mix). Kept for WP-7's callers; new code calls `ageS` from `/live`.
+ *
+ * @beta
  */
 export function receivedAgeS(t: TrackView, nowMs: number): number | null {
   return ageS(t, nowMs, "received");
@@ -168,6 +175,8 @@ export function receivedAgeS(t: TrackView, nowMs: number): number | null {
  * be lost when the label is read alone: a status that is not registered,
  * a mismatch (G-02), the broadcast or provider caveat (R-05, PLAN §14
  * Q18) and an emergency.
+ *
+ * @beta
  */
 export function trackLabel(
   t: TrackView,
@@ -197,6 +206,7 @@ export function trackLabel(
   return lines.join("\n");
 }
 
+/** @beta */
 export interface FeatureOptions {
   nowMs: number;
   staleAfterS: number;
@@ -208,6 +218,8 @@ export interface FeatureOptions {
  * One point per track with a live sample and one line per trail of two
  * points or more. A track that has only sent backlog has a trail and no
  * point (T-04), and its trail draws as `stale`: it is history.
+ *
+ * @beta
  */
 export function trackFeatureCollection(
   hold: TrackHold,

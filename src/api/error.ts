@@ -17,6 +17,8 @@ const HTTP_DATE = /^[A-Za-z]{3,9},? /;
  * they are, an HTTP-date as the whole seconds from `nowMs` to it (0 when it
  * has passed). `null` when the header is absent; `null` and a count when it
  * is neither form.
+ *
+ * @beta
  */
 export function retryAfterSOf(
   value: string | null,
@@ -33,6 +35,7 @@ export function retryAfterSOf(
   return Math.max(0, Math.ceil((atMs - nowMs) / 1000));
 }
 
+/** @public */
 export interface ApiErrorInit {
   status: number;
   problem: Problem | null;
@@ -41,7 +44,11 @@ export interface ApiErrorInit {
   sunset: string | null;
 }
 
-/** A non-2xx answer from an API, with what it said about itself. */
+/**
+ * A non-2xx answer from an API, with what it said about itself.
+ *
+ * @public
+ */
 export class ApiError extends Error {
   override readonly name = "ApiError";
   /** The HTTP status of the answer. */
@@ -75,6 +82,8 @@ export class ApiError extends Error {
 /**
  * The field errors of a problem, for the form kit (WP-10): from an
  * `ApiError` carrying a problem, `[]` for anything else.
+ *
+ * @public
  */
 export function fieldErrorsOf(err: unknown): FieldError[] {
   if (err instanceof ApiError && err.problem !== null)

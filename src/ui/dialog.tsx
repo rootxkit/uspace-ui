@@ -7,30 +7,35 @@ import { Dialog as DialogPrimitive } from "radix-ui"
 
 import { Button } from "./button.js"
 
+/** @public */
 function Dialog({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Root>) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />
 }
 
+/** @public */
 function DialogTrigger({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
   return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
 }
 
+/** @public */
 function DialogPortal({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Portal>) {
   return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
 }
 
+/** @public */
 function DialogClose({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Close>) {
   return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
 }
 
+/** @public */
 function DialogOverlay({
   className,
   ...props
@@ -47,6 +52,7 @@ function DialogOverlay({
   )
 }
 
+/** @public */
 function DialogContent({
   className,
   children,
@@ -81,6 +87,7 @@ function DialogContent({
   )
 }
 
+/** @public */
 function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -91,6 +98,7 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+/** @public */
 function DialogFooter({
   className,
   showCloseButton = false,
@@ -118,6 +126,7 @@ function DialogFooter({
   )
 }
 
+/** @public */
 function DialogTitle({
   className,
   ...props
@@ -131,6 +140,7 @@ function DialogTitle({
   )
 }
 
+/** @public */
 function DialogDescription({
   className,
   ...props

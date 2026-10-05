@@ -25,7 +25,11 @@ import { cn } from "../ui/cn.js";
 const SWATCH_W = 28;
 const SWATCH_H = 18;
 
-/** The map's swatch of a zone type, in its token's colour. */
+/**
+ * The map's swatch of a zone type, in its token's colour.
+ *
+ * @beta
+ */
 export function ZoneSwatch(props: { type: ZoneType }) {
   const { type } = props;
   // A fragment id usable in `url(#...)` whatever React's id format.
@@ -79,6 +83,7 @@ export function ZoneSwatch(props: { type: ZoneType }) {
   );
 }
 
+/** @public */
 export interface ZoneLegendProps {
   /**
    * Zones per type, as the app counted what it shows. When given, a type
@@ -90,6 +95,7 @@ export interface ZoneLegendProps {
   className?: string;
 }
 
+/** @public */
 export function ZoneLegend(props: ZoneLegendProps) {
   const { counts, defaultCollapsed = false, className } = props;
   const t = useT();

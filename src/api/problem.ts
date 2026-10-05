@@ -9,7 +9,11 @@ import type { FieldError, Problem } from "../model/index.js";
 
 import { countApi } from "./counters.js";
 
-/** The namespace every problem `type` lives under (M28). */
+/**
+ * The namespace every problem `type` lives under (M28).
+ *
+ * @beta
+ */
 export const PROBLEM_TYPE_PREFIX = "https://schemas.uspace.ge/problems/";
 
 const SLUG = /^[a-z][a-z0-9_]*$/;
@@ -19,6 +23,8 @@ const PROBLEM_MEDIA_TYPE = "application/problem+json";
  * The refusal name off a problem `type` (`cis_stale`, `unauthenticated`,
  * ...), so a status component can label it by key. `null` for a `type`
  * outside the problems namespace: the component shows the `title`.
+ *
+ * @beta
  */
 export function problemSlug(type: string): string | null {
   if (!type.startsWith(PROBLEM_TYPE_PREFIX)) return null;
@@ -88,6 +94,8 @@ export function toProblem(body: unknown, status: number): Problem | null {
  * Reads an `application/problem+json` body (§14 Q2). `null` for any other
  * content type; `null` and a count for a problem body that does not parse.
  * Consumes the body: pass a `clone()` when the caller still needs it.
+ *
+ * @public
  */
 export async function parseProblem(res: Response): Promise<Problem | null> {
   if (!isProblemResponse(res)) return null;

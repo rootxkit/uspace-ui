@@ -15,6 +15,8 @@ const UTC = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d{1,9}))?Z$/;
  * the seconds part compares as text, the fraction padded to nanoseconds.
  * Negative when `a` is older, 0 when equal, positive when newer; null when
  * either is not RFC 3339 UTC, so the two cannot be ordered.
+ *
+ * @beta
  */
 export function compareCapturedAt(a: string, b: string): number | null {
   const ma = UTC.exec(a);
@@ -32,6 +34,8 @@ export function compareCapturedAt(a: string, b: string): number | null {
  * Milliseconds since the epoch of an RFC 3339 UTC time (`Z` only, 02 §1);
  * null for anything else, so a time without a zone is never read as the
  * browser's local time.
+ *
+ * @beta
  */
 export function utcMs(iso: string | null | undefined): number | null {
   if (typeof iso !== "string" || !UTC.test(iso)) return null;
@@ -39,7 +43,11 @@ export function utcMs(iso: string | null | undefined): number | null {
   return Number.isFinite(ms) ? ms : null;
 }
 
-/** Which clock an age counts on (04 §2). */
+/**
+ * Which clock an age counts on (04 §2).
+ *
+ * @public
+ */
 export type AgeBasis = "received" | "captured";
 
 /**
@@ -55,6 +63,8 @@ export type AgeBasis = "received" | "captured";
  *   on one clock is not guessed.
  *
  * Null as well for a non-finite result. Never a zero for an unknown.
+ *
+ * @public
  */
 export function ageS(
   t: { receivedAtMs: number } | { times: Times },

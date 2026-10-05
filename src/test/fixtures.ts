@@ -40,6 +40,7 @@ import type {
   ZoneView,
 } from "../model/types.js";
 
+/** @public */
 export interface Fixtures {
   tracks: TrackView[];
   zones: ZoneView[];
@@ -258,7 +259,11 @@ function sources(): SourceView[] {
   return out;
 }
 
-/** Which set `fixtures` builds (WP-14). */
+/**
+ * Which set `fixtures` builds (WP-14).
+ *
+ * @public
+ */
 export interface FixturesOptions {
   /**
    * `synthetic` (default): generated from the `model` arrays, every
@@ -272,6 +277,8 @@ export interface FixturesOptions {
 /**
  * The fixtures: synthetic by default, covering every enumeration value at
  * least once; the lab-derived set with `{ source: "lab" }`.
+ *
+ * @public
  */
 export function fixtures(opts: FixturesOptions = {}): Fixtures {
   if (opts.source === "lab") return labFixtures();

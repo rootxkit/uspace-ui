@@ -17,6 +17,8 @@ import { cn } from "../ui/cn.js";
  * The words for the thresholds the kit knows by name (the USSP's traffic
  * stream, uspace-ussp `trafficws.ThresholdsBody`). Display order is this
  * order, then any other name alphabetically (a display-only order).
+ *
+ * @beta
  */
 export const THRESHOLD_KEYS: Readonly<Record<string, Key>> = {
   cpa_tcpa_max_s: "thresholds.cpa_tcpa_max_s",
@@ -27,6 +29,7 @@ export const THRESHOLD_KEYS: Readonly<Record<string, Key>> = {
   traffic_radius_m: "thresholds.traffic_radius_m",
 };
 
+/** @public */
 export interface ThresholdsPanelProps {
   /** `LiveStatus.extras.thresholds`; null: the frame carries none. */
   thresholds: Readonly<Record<string, number>> | null;
@@ -45,6 +48,7 @@ function order(names: string[]): string[] {
   return [...known, ...other];
 }
 
+/** @public */
 export function ThresholdsPanel(props: ThresholdsPanelProps) {
   const { thresholds, evaluationPeriodS, policyVersion, className } = props;
   const t = useT();

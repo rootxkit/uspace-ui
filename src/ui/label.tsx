@@ -4,6 +4,7 @@ import * as React from "react"
 import { cn } from "./cn.js"
 import { Label as LabelPrimitive } from "radix-ui"
 
+/** @public */
 function Label({
   className,
   ...props

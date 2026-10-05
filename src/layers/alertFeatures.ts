@@ -11,6 +11,7 @@ import { alertPeer } from "../alerts/summary.js";
 import type { AlertView, Severity, TrackView } from "../model/index.js";
 import { countLayer } from "./counters.js";
 
+/** @beta */
 export interface AlertFeatureProperties {
   alertId: string;
   kind: AlertView["kind"];
@@ -21,11 +22,13 @@ export interface AlertFeatureProperties {
   trackId?: string;
 }
 
+/** @beta */
 export type AlertFeature = GeoJSON.Feature<
   GeoJSON.LineString | GeoJSON.Point,
   AlertFeatureProperties
 >;
 
+/** @beta */
 export type AlertFeatureCollection = GeoJSON.FeatureCollection<
   GeoJSON.LineString | GeoJSON.Point,
   AlertFeatureProperties
@@ -35,6 +38,8 @@ export type AlertFeatureCollection = GeoJSON.FeatureCollection<
  * The ids of the alerts currently counted as missing a party, so each is
  * counted once while it stays so (CLAUDE.md rule 9) and not on every
  * frame.
+ *
+ * @beta
  */
 export class AlertGaps {
   readonly peer = new Set<string>();
@@ -70,6 +75,7 @@ function parties(a: AlertView): string[] {
   return out;
 }
 
+/** @beta */
 export function alertFeatureCollection(
   alerts: Iterable<AlertView>,
   tracks: ReadonlyMap<string, TrackView>,

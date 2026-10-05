@@ -7,17 +7,27 @@ import { en } from "./en.js";
 import { ka } from "./ka.js";
 import { LOCALES, type Lang } from "./lang.js";
 
-/** Keys are the kit's or the app's; values are the display text. */
+/**
+ * Keys are the kit's or the app's; values are the display text.
+ *
+ * @public
+ */
 export type Catalogue = Readonly<Record<string, string>>;
+/** @public */
 export type Catalogues = Partial<Record<Lang, Catalogue>>;
+/** @public */
 export type Vars = Readonly<Record<string, string | number>>;
+/** @public */
 export type Translate = (key: string, vars?: Vars) => string;
 
+/** @beta */
 export const KIT_CATALOGUES: Readonly<Record<Lang, Catalogue>> = { en, ka };
 
 /**
  * `template` with each `{name}` replaced by `vars[name]`. A placeholder
  * without a value stays as written, so the gap is visible.
+ *
+ * @beta
  */
 export function interpolate(template: string, vars?: Vars): string {
   if (vars === undefined) return template;
@@ -42,6 +52,8 @@ function pluralForm(lang: Lang, count: number): string {
  * `catalogues` (the app wins on a duplicate key). A key missing in `ka`
  * shows the `en` text, and a key missing in both shows the key; both are
  * counted (`missingKeys()`).
+ *
+ * @beta
  */
 export function createTranslator(
   lang: Lang,

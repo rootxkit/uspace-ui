@@ -2,6 +2,7 @@ import axe from "axe-core";
 
 // WCAG 2.2 AA: the success criteria of levels A and AA up to 2.2 (PLAN §8
 // accessibility row, §14 Q11 default).
+/** @beta */
 export const WCAG_22_AA_TAGS: readonly string[] = [
   "wcag2a",
   "wcag2aa",
@@ -33,6 +34,8 @@ export function formatViolations(violations: readonly axe.Result[]): string {
 /**
  * Runs axe on `container` and rejects on any WCAG 2.2 AA violation, with
  * the violations listed in the error. Resolves with nothing otherwise.
+ *
+ * @public
  */
 export async function axeCheck(container: HTMLElement): Promise<void> {
   const result = await axe.run(container, {

@@ -17,6 +17,7 @@ import {
   type TableState,
 } from "./state.js";
 
+/** @public */
 export interface TableUrlStateOptions {
   /** Rows per page when the URL says nothing. */
   pageSize?: number;
@@ -32,6 +33,8 @@ function currentParams(): URLSearchParams | null {
  * written back on every change. Malformed URL state is ignored and
  * counted, never thrown; a filter on a PII column is never written, and
  * one found in a URL is never applied.
+ *
+ * @public
  */
 export function useTableUrlState(
   key: string,

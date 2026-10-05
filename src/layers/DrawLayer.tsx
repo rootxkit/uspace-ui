@@ -31,14 +31,25 @@ import type { DrawOutline, DrawPoint } from "../model/index.js";
 import { countLayer } from "./counters.js";
 import { resolveColour, useLayer } from "./useLayer.js";
 
-/** The default source id and layer id prefix. */
+/**
+ * The default source id and layer id prefix.
+ *
+ * @beta
+ */
 export const DRAW_LAYER_ID = "uspace-draw";
 
-/** Display-only constants: the drawn line and the point marks. */
+/**
+ * Display-only constants: the drawn line and the point marks.
+ *
+ * @beta
+ */
 export const DRAW_LINE_WIDTH_PX = 2;
+/** @beta */
 export const DRAW_POINT_RADIUS_PX = 6;
+/** @beta */
 export const DRAW_FILL_OPACITY = 0.12;
 
+/** @beta */
 export interface DrawLayerIds {
   source: string;
   fill: string;
@@ -48,6 +59,7 @@ export interface DrawLayerIds {
   labels: string;
 }
 
+/** @beta */
 export function drawLayerIds(id: string): DrawLayerIds {
   return {
     source: id,
@@ -59,9 +71,14 @@ export function drawLayerIds(id: string): DrawLayerIds {
   };
 }
 
-/** What a feature of the draw source is, as its `role` property says. */
+/**
+ * What a feature of the draw source is, as its `role` property says.
+ *
+ * @beta
+ */
 export type DrawRole = "area" | "edge" | "vertex" | "center" | "circle";
 
+/** @beta */
 export type DrawFeatureCollection = GeoJSON.FeatureCollection<
   GeoJSON.Geometry,
   { role: DrawRole; index: number; label: string }
@@ -74,6 +91,8 @@ const position = (p: DrawPoint): GeoJSON.Position => [p.lng, p.lat];
  * given), the edges and, from three vertices, the area, both closed by a
  * copy of the first vertex; for a circle its centre and, when the app has
  * one, the server's outline untouched.
+ *
+ * @beta
  */
 export function drawFeatureCollection(
   outline: DrawOutline,
@@ -129,6 +148,8 @@ export function drawFeatureCollection(
 /**
  * The outline after a click at `p`: a vertex appended (refused at
  * `maxVertices`, returning null) or the circle's centre placed.
+ *
+ * @beta
  */
 export function outlineWithClick(
   outline: DrawOutline,
@@ -140,7 +161,11 @@ export function outlineWithClick(
   return { kind: "polygon", vertices: [...outline.vertices, p] };
 }
 
-/** The outline with point `index` (a vertex, or 0 for the centre) at `p`. */
+/**
+ * The outline with point `index` (a vertex, or 0 for the centre) at `p`.
+ *
+ * @beta
+ */
 export function outlineWithMove(
   outline: DrawOutline,
   index: number,
@@ -221,6 +246,7 @@ function buildDrawLayers(map: MapLibreMap, id: string): readonly string[] {
   return [ids.fill, ids.line, ids.circle, ids.points, ids.labels];
 }
 
+/** @public */
 export interface DrawLayerProps {
   /** The outline as the app holds it (controlled). */
   outline: DrawOutline;
@@ -250,6 +276,7 @@ const pointOf = (e: MapMouseEvent): DrawPoint => ({
   lng: e.lngLat.lng,
 });
 
+/** @public */
 export function DrawLayer(props: DrawLayerProps) {
   const {
     outline,

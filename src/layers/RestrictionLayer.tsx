@@ -27,17 +27,24 @@ import {
 } from "./zoneFeatures.js";
 import { useLayer } from "./useLayer.js";
 
+/** @beta */
 export const RESTRICTION_LAYER_ID = "us-restrictions";
 
-/** Fill opacity of a restriction before dimming. Display-only constant. */
+/**
+ * Fill opacity of a restriction before dimming. Display-only constant.
+ *
+ * @beta
+ */
 export const RESTRICTION_FILL_OPACITY = 0.15;
 
+/** @beta */
 export interface RestrictionLayerIds {
   source: string;
   fill: string;
   lines: Readonly<Record<RestrictionLineKey, string>>;
 }
 
+/** @beta */
 export function restrictionLayerIds(id: string): RestrictionLayerIds {
   const lines = {} as Record<RestrictionLineKey, string>;
   for (const k of RESTRICTION_LINE_KEYS) lines[k] = `${id}-line-${k}`;
@@ -87,6 +94,7 @@ function buildRestrictionLayers(
   return added;
 }
 
+/** @public */
 export interface RestrictionLayerProps {
   restrictions: readonly RestrictionView[];
   /** Default true. */
@@ -97,6 +105,7 @@ export interface RestrictionLayerProps {
   id?: string;
 }
 
+/** @public */
 export function RestrictionLayer(props: RestrictionLayerProps) {
   const {
     restrictions,

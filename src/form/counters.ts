@@ -3,6 +3,7 @@
 // dropped), submissions the API refused, and submissions that failed
 // without an API answer.
 
+/** @beta */
 export type FormCounter =
   /** An API field error whose path matched no registered field. */
   | "field_error_unmapped"
@@ -21,12 +22,20 @@ export function countForm(counter: FormCounter, by = 1): void {
   counts[counter] += by;
 }
 
-/** A snapshot of the form counters since the page loaded. */
+/**
+ * A snapshot of the form counters since the page loaded.
+ *
+ * @beta
+ */
 export function formCounters(): Readonly<Record<FormCounter, number>> {
   return { ...counts };
 }
 
-/** Sets every counter back to zero; for tests (E-11). */
+/**
+ * Sets every counter back to zero; for tests (E-11).
+ *
+ * @beta
+ */
 export function resetFormCountersForTests(): void {
   for (const k of Object.keys(counts) as FormCounter[]) counts[k] = 0;
 }

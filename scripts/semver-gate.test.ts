@@ -396,15 +396,30 @@ describe("rule 3: the symbology", () => {
 });
 
 describe("the command on this repository", () => {
-  it("passes against HEAD itself: nothing changed, every rule not fired", () => {
-    const out = execFileSync(
-      process.execPath,
-      ["scripts/semver-gate.mjs", "--base", "HEAD", "--labels", "[]"],
-      { encoding: "utf8" },
+  it("runs against HEAD: every rule printed, the verdict matching the exit status", () => {
+    // The working tree is the head: clean in CI (every rule not fired),
+    // whatever is uncommitted on a developer's machine.
+    let status = 0;
+    let out = "";
+    try {
+      out = execFileSync(
+        process.execPath,
+        ["scripts/semver-gate.mjs", "--base", "HEAD", "--labels", "[]"],
+        { encoding: "utf8" },
+      );
+    } catch (e) {
+      const err = e as { status: number; stdout: string };
+      status = err.status;
+      out = err.stdout;
+    }
+    expect(out).toMatch(/^semver gate against HEAD, labels: \[\]$/m);
+    expect(out).toMatch(/^rule 1 \(API report, PLAN §12\): (not fired|FIRED)/m);
+    expect(out).toMatch(/^rule 2 \(legend, PLAN §12\): (not fired|FIRED)/m);
+    const verdict = out.trim().split(/\r?\n/).at(-1);
+    expect(verdict).toBe(
+      status === 0 ? "semver gate: pass" : "semver gate: FAIL",
     );
-    expect(out).toMatch(/rule 1 .*not fired/);
-    expect(out).toMatch(/rule 2 .*not fired/);
-    expect(out.trim().split("\n").at(-1)).toBe("semver gate: pass");
+    expect([0, 1]).toContain(status);
   });
 
   it("refuses a run without --base, and labels that are not a JSON array (exit 2)", () => {

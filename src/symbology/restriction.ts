@@ -15,6 +15,8 @@ import { zoneOpacity } from "./zone.js";
  * no palette of its own: it reads as text, strong while it is planned or
  * active and muted once it is over, beside the dash pattern that carries
  * it on the map.
+ *
+ * @public
  */
 export function restrictionStateToken(s: RestrictionState): string {
   switch (s) {
@@ -29,7 +31,11 @@ export function restrictionStateToken(s: RestrictionState): string {
   }
 }
 
-/** The catalogue key of a state's name; `unstated` for a null state. */
+/**
+ * The catalogue key of a state's name; `unstated` for a null state.
+ *
+ * @beta
+ */
 export const RESTRICTION_STATE_KEYS: Readonly<
   Record<RestrictionState | "unstated", Key>
 > = Object.freeze({
@@ -40,7 +46,11 @@ export const RESTRICTION_STATE_KEYS: Readonly<
   unstated: "restriction.state.unstated",
 });
 
-/** A restriction outline: width in CSS pixels, dash in line widths. */
+/**
+ * A restriction outline: width in CSS pixels, dash in line widths.
+ *
+ * @beta
+ */
 export interface RestrictionLine {
   widthPx: number;
   /** MapLibre `line-dasharray`; null for a solid line. */
@@ -54,6 +64,8 @@ export interface RestrictionLine {
  * display-only constants; the opacity is `zoneOpacity`'s, so a restriction
  * dims exactly when a zone in the same state would (the layer's expression
  * also dims on `applies: false`).
+ *
+ * @beta
  */
 export function restrictionLine(s: RestrictionState | null): RestrictionLine {
   const opacity = zoneOpacity({ applies: null, restrictionState: s });
@@ -72,13 +84,22 @@ export function restrictionLine(s: RestrictionState | null): RestrictionLine {
   }
 }
 
-/** A line layer key: a state, or `unstated` for `restrictionState: null`. */
+/**
+ * A line layer key: a state, or `unstated` for `restrictionState: null`.
+ *
+ * @beta
+ */
 export type RestrictionLineKey = RestrictionState | "unstated";
 
+/** @beta */
 export const RESTRICTION_LINE_KEYS: readonly RestrictionLineKey[] =
   Object.freeze([...RESTRICTION_STATES, "unstated"]);
 
-/** The features one restriction line layer draws. */
+/**
+ * The features one restriction line layer draws.
+ *
+ * @beta
+ */
 export function restrictionLineFilter(
   k: RestrictionLineKey,
 ): FilterSpecification {

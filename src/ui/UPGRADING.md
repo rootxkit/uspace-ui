@@ -1,7 +1,7 @@
 # Upgrading the vendored shadcn/ui components
 
 `src/ui/*.tsx` is the output of the shadcn CLI, committed as the CLI
-wrote it except for the import paths and the two patches listed below
+wrote it except for the import paths and the patches listed below
 (docs/PLAN.md D5, §3.3). The kit's own files sit beside it and are not
 CLI output: `cn.ts`, `next-themes.ts`, `index.ts`, `extra/` and this
 file. Additions go into `extra/`, never into a vendored file.
@@ -112,6 +112,13 @@ Each is one inserted line, re-applied by hand after step 3:
   element and takes a `nonce` prop for it; this passes the request's CSP
   nonce from `CspNonceProvider` (PLAN §7). Without a provider nothing
   changes.
+
+- Every exported declaration (WP-14, the API freeze): a `/** @public */`
+  line above it, or ` * @public` at the end of an upstream doc comment.
+  api-extractor refuses an untagged export (`scripts/api-extractor.json`),
+  so a component the CLI adds or renames fails `pnpm check` until it is
+  tagged; `node scripts/release-tags.mjs` lists what is untagged and
+  `--write` adds the tags (the vendored set is public whole, PLAN §3.3).
 
 Outside the files: `.prettierignore` leaves `src/ui/*.tsx` as the CLI
 formatted it, and `eslint.config.js` turns off

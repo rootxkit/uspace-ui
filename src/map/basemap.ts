@@ -8,6 +8,7 @@ import { countMap } from "./counters.js";
 import type { Lang } from "../i18n/lang.js";
 import { createTranslator } from "../i18n/translate.js";
 
+/** @public */
 export interface BasemapConfig {
   /** Absolute origin (and base path) the paths below are appended to. */
   baseUrl: string;
@@ -21,16 +22,25 @@ export interface BasemapConfig {
   sourceInfoPath?: string;
 }
 
-/** From SOURCE.json: an offline map has no other way to say it is stale. */
+/**
+ * From SOURCE.json: an offline map has no other way to say it is stale.
+ *
+ * @public
+ */
 export interface BasemapInfo {
   /** [[minLng, minLat], [maxLng, maxLat]], WGS84 degrees. */
   bounds: [[number, number], [number, number]];
   osmDataAsOf: string | null;
 }
 
+/** @public */
 export type MapScheme = "light" | "dark";
 
-/** The bundle layout of PLAN §6.3, relative to `baseUrl`. */
+/**
+ * The bundle layout of PLAN §6.3, relative to `baseUrl`.
+ *
+ * @beta
+ */
 export const BASEMAP_DEFAULT_PATHS = {
   pmtilesPath: "/basemap/basemap.pmtiles",
   glyphsPath: "/basemap/fonts/{fontstack}/{range}.pbf",
@@ -38,12 +48,20 @@ export const BASEMAP_DEFAULT_PATHS = {
   sourceInfoPath: "/basemap/SOURCE.json",
 } as const;
 
-/** The protomaps source id; layer WPs place their layers above it. */
+/**
+ * The protomaps source id; layer WPs place their layers above it.
+ *
+ * @beta
+ */
 export const BASEMAP_SOURCE_ID = "protomaps";
 
 type PathKey = keyof typeof BASEMAP_DEFAULT_PATHS;
 
-/** `baseUrl` joined with the configured (or default) path. */
+/**
+ * `baseUrl` joined with the configured (or default) path.
+ *
+ * @beta
+ */
 export function basemapUrl(cfg: BasemapConfig, key: PathKey): string {
   const path = cfg[key] ?? BASEMAP_DEFAULT_PATHS[key];
   return cfg.baseUrl.replace(/\/+$/, "") + path;
@@ -64,7 +82,11 @@ function osmDate(asOf: string): string {
   return /^\d{4}-\d{2}-\d{2}/.test(asOf) ? asOf.slice(0, 10) : asOf;
 }
 
-/** The attribution of the basemap source, with the extract's OSM date. */
+/**
+ * The attribution of the basemap source, with the extract's OSM date.
+ *
+ * @beta
+ */
 export function basemapAttribution(
   info: BasemapInfo | null,
   lang: Lang,
@@ -106,6 +128,8 @@ function georgianLabels(layer: LayerSpecification): LayerSpecification {
  * The basemap style. With `info === null` (no SOURCE.json) a plain
  * background whose attribution says "no base map"; `MapView` renders the
  * visible notice beside it.
+ *
+ * @public
  */
 export function basemapStyle(
   cfg: BasemapConfig,
@@ -161,6 +185,8 @@ function isNumber(v: unknown): v is number {
  * Reads a SOURCE.json body (PLAN §6.3: `bounds`, `osm_data_as_of`).
  * `bounds` is `[minLng, minLat, maxLng, maxLat]`, the TileJSON order.
  * Anything else is null and counted as malformed.
+ *
+ * @beta
  */
 export function parseSourceInfo(body: unknown): BasemapInfo | null {
   const src = (typeof body === "object" && body !== null ? body : {}) as {
@@ -196,6 +222,8 @@ export function parseSourceInfo(body: unknown): BasemapInfo | null {
 /**
  * Network timeout of the SOURCE.json fetch. Display-only constant: it
  * decides how long the map shows "loading" before "no base map".
+ *
+ * @beta
  */
 export const SOURCE_INFO_TIMEOUT_MS = 5000;
 
@@ -203,6 +231,8 @@ export const SOURCE_INFO_TIMEOUT_MS = 5000;
  * Fetches SOURCE.json. Absent, refused, timed out or malformed is `null`
  * and counted as `basemap_missing`; an abort by `signal` (the caller went
  * away) is `null` and not counted.
+ *
+ * @beta
  */
 export async function loadBasemapInfo(
   cfg: BasemapConfig,

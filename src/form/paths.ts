@@ -9,7 +9,11 @@
 const BRACKET_INDEX = /\[(\d+)\]/g;
 const BRACKET_KEY = /\[(?:"([^"]*)"|'([^']*)')\]/g;
 
-/** A JSON path or pointer as a react-hook-form field name. */
+/**
+ * A JSON path or pointer as a react-hook-form field name.
+ *
+ * @beta
+ */
 export function toFieldName(path: string): string {
   let p = path.trim();
   if (p.startsWith("/")) {
@@ -29,7 +33,11 @@ export function toFieldName(path: string): string {
   return p.replace(/^\.+/, "");
 }
 
-/** A field name as the API's JSON path: numeric segments in brackets. */
+/**
+ * A field name as the API's JSON path: numeric segments in brackets.
+ *
+ * @beta
+ */
 export function toJsonPath(name: string): string {
   return name
     .split(".")

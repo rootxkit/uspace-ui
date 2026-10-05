@@ -22,7 +22,11 @@ const GLYPH_POINTS: Readonly<Record<Exclude<SeverityGlyph, "circle">, string>> =
     triangle: "9,1 17,16 1,16",
   };
 
-/** The severity's glyph in its colour. */
+/**
+ * The severity's glyph in its colour.
+ *
+ * @beta
+ */
 export function SeveritySwatch(props: { severity: Severity }) {
   const glyph = severityGlyph(props.severity);
   const fill = `var(${severityToken(props.severity)})`;
@@ -44,11 +48,13 @@ export function SeveritySwatch(props: { severity: Severity }) {
   );
 }
 
+/** @public */
 export interface SeverityLegendProps {
   defaultCollapsed?: boolean;
   className?: string;
 }
 
+/** @public */
 export function SeverityLegend(props: SeverityLegendProps = {}) {
   const { defaultCollapsed, className } = props;
   const t = useT();

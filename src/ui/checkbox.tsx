@@ -5,6 +5,7 @@ import { cn } from "./cn.js"
 import { CheckIcon } from "lucide-react"
 import { Checkbox as CheckboxPrimitive } from "radix-ui"
 
+/** @public */
 function Checkbox({
   className,
   ...props

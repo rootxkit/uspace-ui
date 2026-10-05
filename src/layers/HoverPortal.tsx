@@ -9,6 +9,7 @@ import { createPortal } from "react-dom";
 import { HOVER_OFFSET_PX } from "./ZoneLayer.js";
 import type { PointerHover } from "./zoneFeatures.js";
 
+/** @beta */
 export function HoverPortal(props: {
   map: MapLibreMap;
   hover: PointerHover;

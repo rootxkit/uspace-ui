@@ -1,6 +1,7 @@
 import * as React from "react"
 import { cn } from "./cn.js"
 
+/** @public */
 function Card({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -14,6 +15,7 @@ function Card({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+/** @public */
 function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -27,6 +29,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+/** @public */
 function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -37,6 +40,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+/** @public */
 function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -47,6 +51,7 @@ function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+/** @public */
 function CardAction({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -60,6 +65,7 @@ function CardAction({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+/** @public */
 function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -70,6 +76,7 @@ function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+/** @public */
 function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div

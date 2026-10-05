@@ -38,6 +38,7 @@ import type { LoginResult } from "../contract.js";
 /** Display-only constant: the countdown's tick. */
 const TICK_MS = 1000;
 
+/** @public */
 export interface LoginFormProps {
   /** The BFF's login route, e.g. `/_bff/login`. */
   action: string;
@@ -59,6 +60,7 @@ function isLoginResult(v: unknown): v is LoginResult {
   return status === "signed_in" || status === "mfa_required";
 }
 
+/** @public */
 export function LoginForm(props: LoginFormProps): ReactNode {
   const { action, onSuccess } = props;
   const t = useT();

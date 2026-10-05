@@ -24,6 +24,8 @@ import { utcMs } from "./time.js";
  * A `SourceView` with the age the server gave and when this console
  * received it, so the age keeps climbing between status frames without
  * comparing the two clocks (predecessor sources.ts).
+ *
+ * @public
  */
 export interface LiveSourceView extends SourceView {
   /** Seconds since the newest record, on the server's clock, as sent. */
@@ -36,8 +38,10 @@ export interface LiveSourceView extends SourceView {
 }
 
 // A display bound: sources listed in one panel. Past it, counted.
+/** @beta */
 export const SOURCE_STORE_LIMIT = 1000;
 
+/** @public */
 export type SourceStoreCounter =
   /** A source past `SOURCE_STORE_LIMIT` in one status frame (E-10). */
   | "source_dropped_over_limit"
@@ -52,7 +56,11 @@ const ZERO: Readonly<Record<SourceStoreCounter, number>> = {
   source_state_unknown: 0,
 };
 
-/** The kit's state for one wire source (the precedence above). */
+/**
+ * The kit's state for one wire source (the precedence above).
+ *
+ * @beta
+ */
 export function sourceStateOf(s: StatusSource): SourceState {
   if (s.state === "disabled" || s.disabledBy !== null) return "disabled";
   if (s.ageS === null) return "never_heard";
@@ -73,6 +81,8 @@ export function sourceStateOf(s: StatusSource): SourceState {
  * The display age of a source at `nowMs`: the server's age when the frame
  * was sent plus the time this console has held it, each on its own clock.
  * Null when the source has never been heard.
+ *
+ * @beta
  */
 export function sourceAgeS(
   s: Pick<LiveSourceView, "ageS" | "ageAtMs">,
@@ -83,6 +93,7 @@ export function sourceAgeS(
   return Number.isFinite(age) ? age : null;
 }
 
+/** @public */
 export interface SourceStore {
   /**
    * Replaces the sources with a status frame's `sources[]`, received at
@@ -103,6 +114,7 @@ export interface SourceStore {
 const keyOf = (s: { sourceType: string; instanceId: string | null }): string =>
   `${s.sourceType}\u0000${s.instanceId ?? ""}`;
 
+/** @public */
 export function createSourceStore(
   opts: { maxSources?: number } = {},
 ): SourceStore {

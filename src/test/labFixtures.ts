@@ -32,7 +32,11 @@ import {
 
 export { LAB_COMMIT };
 
-/** What one example (or one item of a snapshot) decoded to. */
+/**
+ * What one example (or one item of a snapshot) decoded to.
+ *
+ * @public
+ */
 export interface LabDecoding {
   /** The example's path under src/test/fixtures/, with `#tracks[0]` for a snapshot item. */
   example: string;
@@ -94,7 +98,11 @@ function decode(example: string, raw: unknown): LabDecoding[] {
   }
 }
 
-/** Every vendored example, decoded; the ED-318 documents last. */
+/**
+ * Every vendored example, decoded; the ED-318 documents last.
+ *
+ * @public
+ */
 export function labDecodings(): LabDecoding[] {
   const out: LabDecoding[] = [];
   for (const [path, raw] of Object.entries(LAB_EXAMPLES))
@@ -131,7 +139,11 @@ function byId<T>(xs: readonly T[], id: (x: T) => string): T[] {
   });
 }
 
-/** The Fixtures shape built from the lab's examples (deterministic). */
+/**
+ * The Fixtures shape built from the lab's examples (deterministic).
+ *
+ * @public
+ */
 export function labFixtures(): Fixtures {
   const snapshotItems = (key: "tracks" | "alerts" | "manned") =>
     frames("lab/console/snapshot/").flatMap((s) => {

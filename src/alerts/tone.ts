@@ -15,9 +15,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { countAlert } from "./counters.js";
 
-/** Where the tone stands, each a visible state in the toaster. */
+/**
+ * Where the tone stands, each a visible state in the toaster.
+ *
+ * @public
+ */
 export type AlertToneState = "needs_gesture" | "on" | "muted" | "unavailable";
 
+/** @public */
 export interface AlertTone {
   state: AlertToneState;
   /** True while the tone is repeating (on, active, a valid period). */
@@ -30,8 +35,11 @@ export interface AlertTone {
 
 // Display constants of the tone itself, not thresholds: its pitch, its
 // length and its loudness.
+/** @beta */
 export const TONE_HZ = 880;
+/** @beta */
 export const TONE_S = 0.25;
+/** @beta */
 export const TONE_GAIN = 0.2;
 
 type AudioCtor = new () => AudioContext;
@@ -44,7 +52,11 @@ function audioConstructor(): AudioCtor | null {
   return g.AudioContext ?? g.webkitAudioContext ?? null;
 }
 
-/** One tone on `ctx`: a sine with a short fade in and out. */
+/**
+ * One tone on `ctx`: a sine with a short fade in and out.
+ *
+ * @beta
+ */
 export function playTone(ctx: AudioContext): void {
   try {
     if (ctx.state === "suspended") void ctx.resume();
@@ -65,7 +77,11 @@ export function playTone(ctx: AudioContext): void {
   }
 }
 
-/** True for a usable repeat period: a positive finite number of ms. */
+/**
+ * True for a usable repeat period: a positive finite number of ms.
+ *
+ * @beta
+ */
 export function validRepeatMs(repeatMs: number): boolean {
   return Number.isFinite(repeatMs) && repeatMs > 0;
 }
@@ -74,6 +90,8 @@ export function validRepeatMs(repeatMs: number): boolean {
  * Sounds while `active`, every `repeatMs`, once audio has been enabled by
  * a gesture and while not muted. `cue` restarts the period with a tone at
  * once when it changes (pass the ids of the sounding alerts).
+ *
+ * @public
  */
 export function useAlertTone(
   active: boolean,

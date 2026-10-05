@@ -11,6 +11,7 @@ import {
   type Viewport,
 } from "./viewport.js";
 
+/** @public */
 export interface ViewportState {
   viewport: Viewport;
   /** The visible bbox; before load (or with no WebGL), the initial view's. */
@@ -19,7 +20,11 @@ export interface ViewportState {
   flyTo(v: Partial<Viewport>): void;
 }
 
-/** The camera of the enclosing MapView, updated on every `moveend`. */
+/**
+ * The camera of the enclosing MapView, updated on every `moveend`.
+ *
+ * @public
+ */
 export function useViewport(): ViewportState {
   const { map, initial, initialBBox } = useMapContext();
   const [moved, setMoved] = useState<{ viewport: Viewport; bbox: BBox } | null>(
@@ -62,6 +67,7 @@ export function useViewport(): ViewportState {
   };
 }
 
+/** @public */
 export interface BBoxSubscriptionOptions {
   /** Padding on every side, as a fraction of the view's width and height. */
   marginFraction: number;
@@ -87,6 +93,8 @@ function sameBBox(a: BBox | null, b: BBox): boolean {
  * plus a margin. Calls `onChange` with the padded, quantised bbox once on
  * load and then after each settled move that changes it; a move inside
  * the quantum calls nothing.
+ *
+ * @public
  */
 export function useBBoxSubscription(opts: BBoxSubscriptionOptions): void {
   const { marginFraction, debounceMs, quantizeDeg } = opts;

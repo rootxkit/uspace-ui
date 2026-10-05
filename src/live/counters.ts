@@ -4,6 +4,7 @@
 // the status components show them (`FeedStatusBar`, `LiveStatus`). The
 // stores count their own bounds (`TrackStore.counters()` and the rest).
 
+/** @beta */
 export type LiveCounter =
   /** A message that arrived on a feed socket, whatever it held. */
   | "frames_received"
@@ -70,16 +71,25 @@ const ZERO: Readonly<Record<LiveCounter, number>> = {
 
 const counts: Record<LiveCounter, number> = { ...ZERO };
 
+/** @beta */
 export function countLive(counter: LiveCounter, by = 1): void {
   counts[counter] += by;
 }
 
-/** A snapshot of the feed counters since the page loaded. */
+/**
+ * A snapshot of the feed counters since the page loaded.
+ *
+ * @beta
+ */
 export function liveCounters(): Readonly<Record<LiveCounter, number>> {
   return { ...counts };
 }
 
-/** Tests only: start the counters again from zero (LESSONS E-11). */
+/**
+ * Tests only: start the counters again from zero (LESSONS E-11).
+ *
+ * @beta
+ */
 export function resetLiveCountersForTests(): void {
   Object.assign(counts, ZERO);
 }

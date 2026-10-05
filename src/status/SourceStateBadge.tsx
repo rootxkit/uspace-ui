@@ -15,12 +15,17 @@ import { sourceAgeS } from "../live/sourceStore.js";
 import { cn } from "../ui/cn.js";
 import { DISABLED_BY_KEYS, SOURCE_STATE_KEYS } from "./words.js";
 
-/** A `SourceView`, with the age the live source store adds when present. */
+/**
+ * A `SourceView`, with the age the live source store adds when present.
+ *
+ * @public
+ */
 export type SourceInput = SourceView & {
   ageS?: number | null;
   ageAtMs?: number;
 };
 
+/** @public */
 export interface SourceStateBadgeProps {
   source: SourceInput;
   /** The app's clock tick (`useNowMs`). */
@@ -37,7 +42,11 @@ const BORDER: Readonly<Record<SourceState, string>> = {
   never_heard: "border-border border-dotted",
 };
 
-/** The display age of a source, or null (never heard, or no age given). */
+/**
+ * The display age of a source, or null (never heard, or no age given).
+ *
+ * @beta
+ */
 export function sourceDisplayAgeS(
   s: SourceInput,
   nowMs: number,
@@ -57,6 +66,8 @@ export function useSourceDetail(s: SourceInput, nowMs: number): string[] {
  * The same lines without a provider, for a caller that has its own
  * translator (ReceiverLayer's hover card, WP-12): `ageS` is the source's
  * display age, or null.
+ *
+ * @beta
  */
 export function sourceDetailLines(
   s: Pick<
@@ -101,6 +112,7 @@ export function sourceDetailLines(
   return lines;
 }
 
+/** @public */
 export function SourceStateBadge(props: SourceStateBadgeProps) {
   const { source, nowMs, className } = props;
   const t = useT();

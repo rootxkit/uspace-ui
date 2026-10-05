@@ -8,15 +8,22 @@
 import type { AlertView } from "../model/index.js";
 import { Emitter } from "./emitter.js";
 
-/** An alert as the app's adapter makes it; the store adds the rest. */
+/**
+ * An alert as the app's adapter makes it; the store adds the rest.
+ *
+ * @public
+ */
 export type AlertInput = Omit<AlertView, "receivedAtMs" | "acknowledged">;
 
 // Display constants, not thresholds (CLAUDE.md rule 3): how long a cleared
 // alert stays on screen with its clear numbers, and how many alerts are
 // held (PLAN §8: alert hold <= 500).
+/** @beta */
 export const DEFAULT_CLEARED_HOLD_MS = 30_000;
+/** @beta */
 export const ALERT_STORE_LIMIT = 500;
 
+/** @public */
 export type AlertStoreCounter =
   /** An alert pushed out by `maxAlerts`, cleared ones first (E-10). */
   | "alert_evicted"
@@ -34,6 +41,7 @@ const ZERO: Readonly<Record<AlertStoreCounter, number>> = {
   acknowledge_unknown: 0,
 };
 
+/** @public */
 export interface AlertStoreOptions {
   /** How long a cleared alert is held; `DEFAULT_CLEARED_HOLD_MS`. */
   clearedHoldMs?: number;
@@ -43,6 +51,7 @@ export interface AlertStoreOptions {
   now?: () => number;
 }
 
+/** @public */
 export interface AlertStore {
   /** Applies a raise, an update or a clear (by `state`). */
   apply(a: AlertInput): void;
@@ -59,6 +68,7 @@ export interface AlertStore {
   dispose(): void;
 }
 
+/** @public */
 export function createAlertStore(opts: AlertStoreOptions = {}): AlertStore {
   const holdMs = opts.clearedHoldMs ?? DEFAULT_CLEARED_HOLD_MS;
   const maxAlerts = opts.maxAlerts ?? ALERT_STORE_LIMIT;

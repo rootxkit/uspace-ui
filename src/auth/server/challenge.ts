@@ -13,13 +13,25 @@
 // on the edge runtime.
 import { base64url } from "./cookies.js";
 
-/** The BFF-internal challenge cookie; no API or WS process reads it. */
+/**
+ * The BFF-internal challenge cookie; no API or WS process reads it.
+ *
+ * @beta
+ */
 export const MFA_CHALLENGE_COOKIE = "uspace_mfa";
 
-/** The cookie's path: the BFF's routes only, never a page. */
+/**
+ * The cookie's path: the BFF's routes only, never a page.
+ *
+ * @beta
+ */
 export const MFA_CHALLENGE_PATH = "/_bff";
 
-/** The shortest BFF secret accepted, in bytes (256 bits). */
+/**
+ * The shortest BFF secret accepted, in bytes (256 bits).
+ *
+ * @beta
+ */
 export const MIN_CHALLENGE_SECRET_BYTES = 32;
 
 const INFO = new TextEncoder().encode("uspace-ui bff mfa challenge v1");
