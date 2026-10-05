@@ -6,6 +6,7 @@ import { execFileSync } from "node:child_process";
 import {
   mkdirSync,
   mkdtempSync,
+  readdirSync,
   readFileSync,
   rmSync,
   writeFileSync,
@@ -181,6 +182,10 @@ describe("check-enums.sh against a local uspace-core", () => {
     const r = check(join(work, "core"), join(work, "enums.tsv"));
     expect(r.output).toMatch(/\| core\.Trust \| 6 \| 6 \| same \|/);
     expect(r.status).toBe(0);
+    // The header is one line, and the first constant starts the next.
+    const lines = readFileSync(join(work, "enums.tsv"), "utf8").split("\n");
+    expect(lines[0]).toMatch(/^# uspace-core v\d+\.\d+\.\d+\S* [0-9a-f]{40}$/);
+    expect(lines[1]).not.toMatch(/^#|^$/);
   }, 120_000);
 
   it("fails a copy with one Trust value edited, and names it in the table", () => {
@@ -194,4 +199,29 @@ describe("check-enums.sh against a local uspace-core", () => {
     );
     expect(r.status).not.toBe(0);
   }, 120_000);
+});
+
+describe("the shell scripts' printf formats", () => {
+  // A format written with a newline inside its quotes instead of `\n`
+  // prints the same today and is what a tool that eats `\n` leaves
+  // behind (check-enums.sh's header was one): every format is one line.
+  const formats = (src: string): string[] =>
+    [...src.matchAll(/\bprintf\s+'([^']*)'/g)].map((m) => m[1] ?? "");
+
+  it("finds a format with a newline inside its quotes", () => {
+    expect(formats("printf '# a %s\n' \"$x\"\nprintf '%s\\n' y\n")).toEqual([
+      "# a %s\n",
+      "%s\\n",
+    ]);
+  });
+
+  it("writes every format of scripts/*.sh on one line, with \\n", () => {
+    const broken: string[] = [];
+    const scripts = readdirSync("scripts").filter((f) => f.endsWith(".sh"));
+    expect(scripts).toContain("check-enums.sh");
+    for (const f of scripts)
+      for (const fmt of formats(readFileSync(join("scripts", f), "utf8")))
+        if (fmt.includes("\n")) broken.push(`${f}: ${JSON.stringify(fmt)}`);
+    expect(broken).toEqual([]);
+  });
 });

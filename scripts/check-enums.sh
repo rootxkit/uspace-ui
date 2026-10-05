@@ -37,8 +37,7 @@ commit=$(git -C "$work/core" rev-parse HEAD)
 
 out=${CORE_ENUMS_OUT:-.cache/core-enums.tsv}
 mkdir -p "$(dirname "$out")"
-printf '# uspace-core %s %s
-' "$tag" "$commit" > "$out"
+printf '# uspace-core %s %s\n' "$tag" "$commit" > "$out"
 # shellcheck disable=SC2086
 node scripts/go-consts.mjs "$work/core" $packages >> "$out"
 
