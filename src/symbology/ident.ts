@@ -193,7 +193,7 @@ export const IDENT_BASIS_KEYS: Readonly<Record<IdentBasis, Key>> =
 /**
  * The lines of an identification's detail text, as catalogue keys.
  *
- * @beta
+ * @public
  */
 export interface IdentHint {
   /** What the status means. */
@@ -236,7 +236,7 @@ function caveatKey(status: IdentStatus, basis: IdentBasis): Key | null {
  * the status hint, the reason, the basis caveat and the mismatch line.
  * Total over every status, reason and basis.
  *
- * @beta
+ * @public
  */
 export function identHintKey(
   status: IdentStatus,

@@ -185,11 +185,18 @@ below: `BFF_API_PREFIX`, `BffHandlers`, `CSP_NONCE_HEADER`, `CSRF_COOKIE`,
 `IDENT_REASON_KEYS`, `IDENT_STATUS_KEYS`, `IdentKey`, `SEVERITY_KEYS`,
 `TRUST_KEYS`, `identDrawn`, `identHintKey`, `trackIconId`,
 `trackIconParts`, `SeverityMark`, `alertSummary`, `detailNumber`,
-`kindName`; and every type a public signature reaches. Everything else is
+`kindName`, and `form`'s `shapes.utcTime` (imported by the authority and
+the ANSP at their `main` of 2026-10-05); and every type a public
+signature reaches. Everything else is
 beta, as are a name that says it is for tests (`...ForTests`) and the
 reference adapters of `test` (§3.18). `scripts/release-tags.mjs` applies
 the rule and lists an untagged export; `docs/api/uspace-ui.api.md` shows
-each declaration's tag.
+each declaration's tag. What the four consoles' `web/` import from the
+kit is pinned, with each console's commit, in
+`scripts/consumer-imports.json`; `pnpm check` (`check:consumers`) fails
+when one of those imports is not a `@public` export, and
+`node scripts/consumer-imports.mjs --update <repo>...` re-pins the list
+from each console's `origin/main`.
 
 ### 3.1 `model` (frozen, WP-0)
 

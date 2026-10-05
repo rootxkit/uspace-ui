@@ -74,7 +74,9 @@ export function exportedDeclarations() {
   const checker = prog.getTypeChecker();
   const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
   const out = [];
-  const visit = (entry, sym, name, seen) => {
+  // `ns` is the name of the `export * as ns` a declaration is reached
+  // through, if any (`form`'s `shapes`).
+  const visit = (entry, sym, name, seen, ns) => {
     let s = sym;
     if (s.flags & ts.SymbolFlags.Alias) s = checker.getAliasedSymbol(s);
     if (seen.has(s)) return;
@@ -86,11 +88,11 @@ export function exportedDeclarations() {
       if (ts.isSourceFile(d)) {
         // `export * as ns`: the module's own exports.
         for (const inner of checker.getExportsOfModule(s))
-          visit(entry, inner, inner.getName(), seen);
+          visit(entry, inner, inner.getName(), seen, name);
         continue;
       }
       const st = statementOf(d);
-      if (st !== null) out.push({ entry, name, file, node: st, sf });
+      if (st !== null) out.push({ entry, name, file, node: st, sf, ns });
     }
   };
   for (const [key, target] of Object.entries(pkg.exports)) {

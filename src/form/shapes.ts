@@ -17,7 +17,7 @@ export type BBoxValue = [number, number, number, number];
 /**
  * An RFC 3339 time in UTC with `Z` (spec 02 §1).
  *
- * @beta
+ * @public
  */
 export function utcTime() {
   return z.string().refine(isRfc3339Utc, { message: "form.error.not_utc" });

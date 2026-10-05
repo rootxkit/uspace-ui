@@ -2156,7 +2156,7 @@ type IdentBasis = (typeof IDENT_BASES)[number];
 // @public
 function identDrawn(ident: Identification | null): IdentKey;
 
-// @beta
+// @public
 interface IdentHint {
     caveat: Key | null;
     mismatch: Key | null;
@@ -2164,7 +2164,7 @@ interface IdentHint {
     status: Key;
 }
 
-// @beta
+// @public
 function identHintKey(status: IdentStatus, reason: IdentReason, basis: IdentBasis, mismatch?: boolean): IdentHint;
 
 // @public (undocumented)
@@ -4404,7 +4404,7 @@ interface SubscribeFrame {
     schema: typeof SUBSCRIBE_SCHEMA;
 }
 
-// @beta
+// @public
 function subscribeFrame(bbox: BBox_2, layers: readonly SubscribeLayer[]): SubscribeFrame;
 
 // @public
@@ -5469,7 +5469,7 @@ interface UTCDateTimeFieldProps extends FieldBaseProps {
 // @public
 function utcMs(iso: string | null | undefined): number | null;
 
-// @beta
+// @public
 function utcTime(): z.ZodString;
 
 // @beta

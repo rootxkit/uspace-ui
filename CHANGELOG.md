@@ -55,10 +55,11 @@ Why this is a major and not a minor: the release tags, and the few
 lines that changed rather than grew. A console that builds with 0.1.0
 builds with 1.0.0 unless it does one of these:
 
-- It uses an export now tagged `@beta` (366 declarations: counters,
+- It uses an export now tagged `@beta` (362 declarations: counters,
   `...ForTests` helpers, layer ids and feature builders, the reference
   adapters, and the like): it still works, but a minor may change it.
-  Every export the four consoles imported at their pins is `@public`
+  Every export the four consoles import is `@public`, checked by
+  `pnpm check` against the list pinned in `scripts/consumer-imports.json`
   (PLAN §3, "The 1.0.0 freeze").
 - It switches exhaustively over `LayerCounter` or `LiveCounter`: add
   `draw_vertex_refused` and `status_extra_ignored`.

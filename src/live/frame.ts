@@ -486,7 +486,7 @@ export interface SubscribeFrame {
 /**
  * A subscribe frame for `bbox` (as the map gave it) and `layers`.
  *
- * @beta
+ * @public
  */
 export function subscribeFrame(
   bbox: BBox,
