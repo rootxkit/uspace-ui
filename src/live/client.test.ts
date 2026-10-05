@@ -98,7 +98,10 @@ describe("the success path (E-02)", () => {
       dpState: "polling",
       nats: "connected",
       resyncSince: null,
+      thresholds: null,
+      evaluationPeriodS: null,
     });
+    expect(liveCounters().status_extra_ignored).toBe(0);
     const views = sources.snapshot();
     expect(views.map((v) => [v.sourceType, v.instanceId, v.state])).toEqual([
       ["direct_rid", "rx-tbs-01", "healthy"],
@@ -490,6 +493,58 @@ describe("frames", () => {
     });
     expect(s.droppedFrames).toBe(3);
     expect(s.degraded).toEqual(["publisher_stale"]);
+  });
+});
+
+describe("the thresholds in force (1.0.0; uspace-ussp Q28 gap 2)", () => {
+  const withThresholds = (thresholds: unknown, period?: unknown) => {
+    const raw = labExample(STATUS);
+    const body = {
+      ...(raw["body"] as Record<string, unknown>),
+      thresholds,
+      ...(period === undefined ? {} : { evaluation_period_s: period }),
+    };
+    return { ...raw, body };
+  };
+
+  it("exposes the thresholds and the evaluation period of the last status frame", () => {
+    const { client: c } = start();
+    server.accept();
+    server.send(
+      withThresholds(
+        {
+          cpa_tcpa_max_s: 60,
+          cpa_horizontal_min_m: 60,
+          cpa_vertical_min_m: 20,
+        },
+        0.5,
+      ),
+    );
+    const s = c.getStatus();
+    expect(s.connection).toBe("live");
+    expect(s.extras.thresholds).toEqual({
+      cpa_tcpa_max_s: 60,
+      cpa_horizontal_min_m: 60,
+      cpa_vertical_min_m: 20,
+    });
+    expect(s.extras.evaluationPeriodS).toBe(0.5);
+    expect(liveCounters().status_extra_ignored).toBe(0);
+    // The next frame without them: gone, not kept from before.
+    server.send(labExample(STATUS));
+    expect(c.getStatus().extras.thresholds).toBeNull();
+    expect(c.getStatus().extras.evaluationPeriodS).toBeNull();
+  });
+
+  it("counts a malformed threshold, leaves it out, and stays live", () => {
+    const { client: c } = start();
+    server.accept();
+    server.send(withThresholds({ cpa_tcpa_max_s: 60, cpa_window: 3 }, -1));
+    const s = c.getStatus();
+    expect(s.connection).toBe("live");
+    expect(s.framesMalformed).toBe(0);
+    expect(s.extras.thresholds).toEqual({ cpa_tcpa_max_s: 60 });
+    expect(s.extras.evaluationPeriodS).toBeNull();
+    expect(liveCounters().status_extra_ignored).toBe(2);
   });
 });
 

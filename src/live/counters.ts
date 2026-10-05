@@ -16,6 +16,12 @@ export type LiveCounter =
   | "frames_unhandled"
   /** A `console/status/v1` whose body broke the schema: not applied. */
   | "status_malformed"
+  /**
+   * A malformed extra of an applied status frame that the lab schema does
+   * not name (`thresholds`, `evaluation_period_s`): left out, one count
+   * per member.
+   */
+  | "status_extra_ignored"
   /** A `console/snapshot/v1` whose body broke the schema: not applied. */
   | "snapshot_malformed"
   /** One item of a snapshot that was not a frame: skipped. */
@@ -49,6 +55,7 @@ const ZERO: Readonly<Record<LiveCounter, number>> = {
   frames_malformed: 0,
   frames_unhandled: 0,
   status_malformed: 0,
+  status_extra_ignored: 0,
   snapshot_malformed: 0,
   snapshot_item_malformed: 0,
   snapshot_item_unadapted: 0,

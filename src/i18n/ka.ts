@@ -323,6 +323,24 @@ export const ka: Readonly<Record<Key, string>> = {
   "degraded.dataset_age": "{dataset}, ვერსია {version}: ასაკი {age}",
   "degraded.projection_age": "რეესტრის პროექციის ასაკი: {age}",
 
+  // WP-14: the thresholds a system's status frame carries (1.0.0).
+  "thresholds.title": "მოქმედი ზღვრები",
+  "thresholds.policy": "პოლიტიკის ვერსია {version}",
+  "thresholds.no_policy": "პოლიტიკის ვერსია ჯერ არ მიღებულა",
+  "thresholds.none":
+    "სისტემა სტატუსში ზღვრებს არ აგზავნის; არცერთი არ არის ნავარაუდევი.",
+  "thresholds.caption":
+    "როგორც სისტემა აგზავნის; ეს კონსოლი მათით არაფერს აფასებს.",
+  "thresholds.cpa_tcpa_max_s": "უახლოეს მიახლოებამდე წინასწარ განხილული დრო",
+  "thresholds.cpa_horizontal_min_m": "ჰორიზონტალური განცალკევების მინიმუმი",
+  "thresholds.cpa_vertical_min_m": "ვერტიკალური განცალკევების მინიმუმი",
+  "thresholds.cpa_neighbour_radius_m": "მეზობლების ძიების რადიუსი",
+  "thresholds.cpa_clear_after_s": "მიახლოების გაფრთხილება იხსნება",
+  "thresholds.traffic_radius_m": "მოძრაობის ინფორმაციის რადიუსი",
+  "thresholds.evaluation_period_s":
+    "მიახლოების შეფასების პერიოდი (უახლესი მიახლოების გაფრთხილება)",
+  "thresholds.unlabelled": "{name} (როგორც სისტემა უწოდებს)",
+
   // WP-8: the sources panel and the switch
   "source.panel.title": "წყაროები",
   "source.panel.empty": "სერვერს წყაროები არ მოუწოდებია",

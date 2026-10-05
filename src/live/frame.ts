@@ -142,7 +142,20 @@ export interface DatasetAge {
   ageS: number;
 }
 
-/** The optional per-system extras of a status frame (PLAN §6.3, M29). */
+/**
+ * The optional per-system extras of a status frame (PLAN §6.3, M29).
+ *
+ * `thresholds` and `evaluationPeriodS` (1.0.0): the thresholds a system's
+ * monitor judges with, as the status frame carries them (the USSP's
+ * traffic stream: `thresholds{cpa_tcpa_max_s, cpa_horizontal_min_m, ...}`
+ * and `evaluation_period_s`; uspace-ussp `internal/app/trafficws`). Not
+ * named in the lab's `console/status/v1` yet (PLAN §14 Q21), so the kit
+ * reads them leniently: a member whose name does not end in its unit
+ * (`_s`, `_m`) or whose value is not a finite number >= 0 is left out
+ * and named in `ignored`, and the rest of the frame still applies. The
+ * kit shows them (`status/ThresholdsPanel`); it never defaults one and
+ * never judges with one (INV-03).
+ */
 export interface StatusExtras {
   datasets: Readonly<Record<string, DatasetAge>> | null;
   cisVersion: string | null;
@@ -151,6 +164,10 @@ export interface StatusExtras {
   dpState: string | null;
   nats: string | null;
   resyncSince: string | null;
+  /** Threshold name (wire spelling, unit suffix) to value; null: none sent. */
+  thresholds: Readonly<Record<string, number>> | null;
+  /** The CPA evaluation period the system reports; null: not sent. */
+  evaluationPeriodS: number | null;
 }
 
 export const NO_EXTRAS: StatusExtras = Object.freeze({
@@ -161,7 +178,18 @@ export const NO_EXTRAS: StatusExtras = Object.freeze({
   dpState: null,
   nats: null,
   resyncSince: null,
+  thresholds: null,
+  evaluationPeriodS: null,
 });
+
+/** A threshold's name: a snake_case slug that ends in its unit. */
+const THRESHOLD_NAME = /^[a-z][a-z0-9_]*_(s|m)$/;
+
+/** The unit a threshold's name ends in (`_s` seconds, `_m` metres). */
+export function thresholdUnit(name: string): "s" | "m" | null {
+  const m = THRESHOLD_NAME.exec(name);
+  return m === null ? null : (m[1] as "s" | "m");
+}
 
 /** A `console/status/v1` body (lab schema), every required member checked. */
 export interface StatusBody extends StatusExtras {
@@ -173,6 +201,11 @@ export interface StatusBody extends StatusExtras {
   droppedFrames: number;
   degraded: string[];
   sources: StatusSource[];
+  /**
+   * Extras left out because they were malformed (`thresholds`,
+   * `thresholds.<name>`, `evaluation_period_s`); the client counts them.
+   */
+  ignored: readonly string[];
 }
 
 function parseSource(raw: unknown): StatusSource | null {
@@ -281,6 +314,26 @@ export function parseStatusBody(raw: unknown): StatusBody | null {
     resyncSince === undefined
   )
     return null;
+  const ignored: string[] = [];
+  let thresholds: Record<string, number> | null = null;
+  if (Object.hasOwn(raw, "thresholds")) {
+    const th = raw["thresholds"];
+    if (!isObj(th)) {
+      ignored.push("thresholds");
+    } else {
+      thresholds = {};
+      for (const [name, v] of Object.entries(th)) {
+        if (thresholdUnit(name) !== null && isNonNegative(v))
+          thresholds[name] = v;
+        else ignored.push(`thresholds.${name}`);
+      }
+    }
+  }
+  let evaluationPeriodS = optional(raw, "evaluation_period_s", isNonNegative);
+  if (evaluationPeriodS === undefined) {
+    ignored.push("evaluation_period_s");
+    evaluationPeriodS = null;
+  }
   return {
     connectionId: connection_id,
     serverTs: server_ts,
@@ -297,6 +350,9 @@ export function parseStatusBody(raw: unknown): StatusBody | null {
     dpState,
     nats,
     resyncSince,
+    thresholds,
+    evaluationPeriodS,
+    ignored,
   };
 }
 

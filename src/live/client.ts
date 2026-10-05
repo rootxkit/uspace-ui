@@ -435,6 +435,8 @@ export class FeedClient {
       });
       return;
     }
+    if (body.ignored.length > 0)
+      countLive("status_extra_ignored", body.ignored.length);
     const serverMs = utcMs(body.serverTs);
     this.opts.stores?.sources?.applyStatus(body.sources, body.serverTs, nowMs);
     if (this.status.connection !== "live") {
@@ -463,6 +465,8 @@ export class FeedClient {
         dpState: body.dpState,
         nats: body.nats,
         resyncSince: body.resyncSince,
+        thresholds: body.thresholds,
+        evaluationPeriodS: body.evaluationPeriodS,
       },
     });
     // The CISP's resync goes to the app as a status frame (PLAN §6.3).

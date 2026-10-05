@@ -14,6 +14,7 @@ import {
   parseSnapshotBody,
   parseStatusBody,
   subscribeFrame,
+  thresholdUnit,
 } from "./frame.js";
 import { ageS, utcMs } from "./time.js";
 import { FIXTURES, labCommit, labExample } from "./test/mock-server.js";
@@ -168,6 +169,82 @@ describe("parseStatusBody (console/status/v1)", () => {
     expect(p?.cisAgeS).toBeNull();
     expect(p?.nats).toBeNull();
     expect(p?.datasets).toBeNull();
+  });
+});
+
+describe("parseStatusBody: the thresholds in force (1.0.0, PLAN §14 Q21)", () => {
+  const base = (): Record<string, unknown> =>
+    labExample("console/status/v1/examples/authority-picture.json")[
+      "body"
+    ] as Record<string, unknown>;
+  // The USSP's traffic stream as uspace-ussp internal/app/trafficws sends
+  // it: ThresholdsBody and evaluation_period_s.
+  const USSP = {
+    cpa_tcpa_max_s: 60,
+    cpa_horizontal_min_m: 60,
+    cpa_vertical_min_m: 20,
+    cpa_neighbour_radius_m: 800,
+    cpa_clear_after_s: 10,
+    traffic_radius_m: 5000,
+  };
+
+  it("reads every threshold and the evaluation period as sent", () => {
+    const p = parseStatusBody({
+      ...base(),
+      thresholds: USSP,
+      evaluation_period_s: 0.4,
+    });
+    expect(p?.thresholds).toEqual(USSP);
+    expect(p?.evaluationPeriodS).toBe(0.4);
+    expect(p?.ignored).toEqual([]);
+  });
+
+  it("has none when the frame sends none (the twin): null, never a default", () => {
+    const p = parseStatusBody(base());
+    expect(p).not.toBeNull();
+    expect(p?.thresholds).toBeNull();
+    expect(p?.evaluationPeriodS).toBeNull();
+    expect(p?.ignored).toEqual([]);
+  });
+
+  it("leaves out a malformed member and names it, and still applies the frame", () => {
+    const p = parseStatusBody({
+      ...base(),
+      thresholds: {
+        ...USSP,
+        cpa_horizontal_min_m: -1,
+        cpa_window: 60,
+        cpa_vertical_min_m: "20",
+      },
+      evaluation_period_s: "fast",
+    });
+    expect(p).not.toBeNull();
+    expect(p?.thresholds).toEqual({
+      cpa_tcpa_max_s: 60,
+      cpa_neighbour_radius_m: 800,
+      cpa_clear_after_s: 10,
+      traffic_radius_m: 5000,
+    });
+    expect(p?.evaluationPeriodS).toBeNull();
+    expect(p?.ignored).toEqual([
+      "thresholds.cpa_horizontal_min_m",
+      "thresholds.cpa_vertical_min_m",
+      "thresholds.cpa_window",
+      "evaluation_period_s",
+    ]);
+  });
+
+  it("ignores a thresholds member that is not an object", () => {
+    const p = parseStatusBody({ ...base(), thresholds: [60, 60] });
+    expect(p?.thresholds).toBeNull();
+    expect(p?.ignored).toEqual(["thresholds"]);
+  });
+
+  it("thresholdUnit reads the unit off the name, or refuses a name without one", () => {
+    expect(thresholdUnit("cpa_tcpa_max_s")).toBe("s");
+    expect(thresholdUnit("traffic_radius_m")).toBe("m");
+    expect(thresholdUnit("cpa_window")).toBeNull();
+    expect(thresholdUnit("Cpa_m")).toBeNull();
   });
 });
 

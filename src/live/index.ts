@@ -43,6 +43,7 @@ export {
   parseSnapshotBody,
   parseStatusBody,
   subscribeFrame,
+  thresholdUnit,
   type BBox,
   type ConsoleFrame,
   type DatasetAge,

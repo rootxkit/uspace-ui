@@ -338,6 +338,25 @@ const catalogue = {
   "degraded.dataset_age": "{dataset}, version {version}: {age} old",
   "degraded.projection_age": "Registry projection {age} old",
 
+  // WP-14: the thresholds a system's status frame carries (1.0.0; INV-03:
+  // shown as sent, never defaulted, never judged with).
+  "thresholds.title": "Thresholds in force",
+  "thresholds.policy": "Policy version {version}",
+  "thresholds.no_policy": "No policy version received yet",
+  "thresholds.none":
+    "The system sends no thresholds in its status; none is assumed.",
+  "thresholds.caption":
+    "As the system sends them; this console judges nothing with them.",
+  "thresholds.cpa_tcpa_max_s": "Look-ahead to the closest approach",
+  "thresholds.cpa_horizontal_min_m": "Horizontal separation minimum",
+  "thresholds.cpa_vertical_min_m": "Vertical separation minimum",
+  "thresholds.cpa_neighbour_radius_m": "Radius searched for neighbours",
+  "thresholds.cpa_clear_after_s": "A proximity alert clears after",
+  "thresholds.traffic_radius_m": "Traffic information radius",
+  "thresholds.evaluation_period_s":
+    "Proximity evaluation period (newest proximity alert)",
+  "thresholds.unlabelled": "{name} (as the system names it)",
+
   // WP-8: the sources panel and the switch (B-09, B-11: a switch needs a
   // reason; disabled by a person never reads like silent).
   "source.panel.title": "Sources",
