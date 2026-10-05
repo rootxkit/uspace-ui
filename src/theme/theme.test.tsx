@@ -16,6 +16,7 @@ import {
   ThemeProvider,
   brandFromEnv,
   parseScheme,
+  schemeAttribute,
   schemeFromCookie,
   tokens,
   useOptionalTheme,
@@ -387,6 +388,17 @@ describe("the scheme cookie", () => {
     expect(parseScheme("")).toBeNull();
     expect(parseScheme(null)).toBeNull();
     expect(parseScheme(undefined)).toBeNull();
+  });
+
+  it("renders an explicit scheme as data-theme on the server (A5)", () => {
+    expect(schemeAttribute("dark")).toBe("dark");
+    expect(schemeAttribute("light")).toBe("light");
+  });
+
+  it("renders no data-theme for system or no choice, so CSS follows the preference (the twin)", () => {
+    expect(schemeAttribute("system")).toBeUndefined();
+    expect(schemeAttribute(null)).toBeUndefined();
+    expect(schemeAttribute(undefined)).toBeUndefined();
   });
 
   it("finds uspace_scheme among other cookies", () => {

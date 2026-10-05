@@ -1,5 +1,7 @@
 // Compares src/model with the string constants scripts/check-enums.sh
-// extracted from uspace-core/core at the tag in docs/CORE_VERSION.
+// extracted from uspace-core at the tag in docs/CORE_VERSION (core/,
+// alerting/, sources/; scripts/go-consts.mjs), every enumeration the kit
+// mirrors, and prints the comparison as a table (WP-14).
 //
 // Without the extraction file (any run other than the script) every test
 // here is skipped with a printed reason, so the skip is visible in the
@@ -13,18 +15,39 @@ import type { FieldError } from "./index.js";
 const file = process.env["CORE_ENUMS_FILE"] ?? ".cache/core-enums.tsv";
 const present = existsSync(file);
 
-// core type name -> the kit's array
-const MIRRORED: Record<string, readonly string[]> = {
-  VerticalRef: model.VERTICAL_REFS,
-  AltSource: model.ALT_SOURCES,
-  TimeSource: model.TIME_SOURCES,
-  Trust: model.TRUSTS,
-  Severity: model.SEVERITIES,
-  ZoneType: model.ZONE_TYPES,
-  IdentStatus: model.IDENT_STATUSES,
-  IdentReason: model.IDENT_REASONS,
-  IdentBasis: model.IDENT_BASES,
+// uspace-core package.Type -> the kit's array
+export const MIRRORED: Record<string, readonly string[]> = {
+  "core.VerticalRef": model.VERTICAL_REFS,
+  "core.AltSource": model.ALT_SOURCES,
+  "core.TimeSource": model.TIME_SOURCES,
+  "core.Trust": model.TRUSTS,
+  "core.Severity": model.SEVERITIES,
+  "core.ZoneType": model.ZONE_TYPES,
+  "core.IdentStatus": model.IDENT_STATUSES,
+  "core.IdentReason": model.IDENT_REASONS,
+  "core.IdentBasis": model.IDENT_BASES,
+  "alerting.ClearReason": model.CLEAR_REASONS,
+  "sources.Why": model.DISABLED_BYS,
 };
+
+/** One row per enumeration: core's count, the kit's, and what differs. */
+export function table(
+  rows: readonly { type: string; core: number; kit: number; c: Comparison }[],
+): string {
+  const head = ["| enumeration | core | kit | status |", "|---|---|---|---|"];
+  const body = rows.map(({ type, core, kit, c }) => {
+    const diff = [
+      ...c.missingInKit.map((v) => `missing in kit: ${v}`),
+      ...c.missingInCore.map((v) => `absent from core: ${v}`),
+      ...c.staleSkips.map((v) => `stale skip: ${v}`),
+      ...c.skipped.map((v) => `skipped: ${v}`),
+    ];
+    const bad =
+      c.missingInKit.length + c.missingInCore.length + c.staleSkips.length;
+    return `| ${type} | ${core} | ${kit} | ${bad > 0 ? "DIFFERS" : "same"}${diff.length > 0 ? ` (${diff.join("; ")})` : ""} |`;
+  });
+  return [...head, ...body].join("\n");
+}
 
 // core.FieldError has no JSON tags; the wire names are its field names in
 // lower case, which is what model.FieldError carries.
@@ -166,6 +189,21 @@ describe.skipIf(!present)(title, () => {
   it("names the tag and commit it was extracted from", () => {
     expect(extraction.header).toMatch(/^uspace-core \S+ [0-9a-f]{40}$/);
     console.log(`enums.core: comparing with ${extraction.header}`);
+  });
+
+  it("prints every enumeration as a table", () => {
+    const rows = Object.entries(MIRRORED).map(([type, kit]) => {
+      const core = extraction.byType.get(type) ?? [];
+      return {
+        type,
+        core: core.length,
+        kit: kit.length,
+        c: compare(type, core, kit, skips),
+      };
+    });
+    console.log(`enums.core:
+${table(rows)}`);
+    expect(rows).toHaveLength(Object.keys(MIRRORED).length);
   });
 
   it.each(Object.keys(MIRRORED))("%s mirrors core", (type) => {

@@ -5,16 +5,19 @@ import { cn } from "./cn.js"
 import { XIcon } from "lucide-react"
 import { Dialog as SheetPrimitive } from "radix-ui"
 
+/** @public */
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />
 }
 
+/** @public */
 function SheetTrigger({
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Trigger>) {
   return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...props} />
 }
 
+/** @public */
 function SheetClose({
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Close>) {
@@ -43,6 +46,7 @@ function SheetOverlay({
   )
 }
 
+/** @public */
 function SheetContent({
   className,
   children,
@@ -84,6 +88,7 @@ function SheetContent({
   )
 }
 
+/** @public */
 function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -94,6 +99,7 @@ function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+/** @public */
 function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -104,6 +110,7 @@ function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+/** @public */
 function SheetTitle({
   className,
   ...props
@@ -117,6 +124,7 @@ function SheetTitle({
   )
 }
 
+/** @public */
 function SheetDescription({
   className,
   ...props

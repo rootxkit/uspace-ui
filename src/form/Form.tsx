@@ -54,6 +54,7 @@ import { toFieldName, toJsonPath } from "./paths.js";
 /** Seconds between countdown ticks. A display-only constant. */
 const TICK_MS = 1000;
 
+/** @public */
 export interface FormProps<Schema extends z.ZodType> {
   /** The app's schema; shape only (required, number, enum, bbox order, RFC 3339). */
   schema: Schema;
@@ -110,6 +111,7 @@ function leaves(errors: unknown, prefix = "", out: Leaf[] = []): Leaf[] {
   return out;
 }
 
+/** @public */
 export function Form<Schema extends z.ZodType>(props: FormProps<Schema>) {
   const {
     schema,

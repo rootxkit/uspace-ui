@@ -43,19 +43,27 @@ import type { PatternImage } from "./zone.js";
  * `broadcast` from the USSP's own receiver) and `anomaly` (LESSONS I-04:
  * two identities on one address, counted by the server; shown when sent).
  * Both optional, so a `MannedStore` snapshot is accepted as it is.
+ *
+ * @public
  */
 export type MannedTrack = MannedView & {
   trust?: Trust | null;
   anomaly?: string | null;
 };
 
-/** How a manned symbol is filled. */
+/**
+ * How a manned symbol is filled.
+ *
+ * @beta
+ */
 export type MannedFill = "solid" | "hollow";
 
 /**
  * `hollow` for a broadcast position (ADS-B or ADS-L heard by the USSP's
  * own receiver, R-05) and for simulated lab traffic; `solid` for every
  * class a system vouches for. Total over `Trust`.
+ *
+ * @beta
  */
 export function mannedFill(t: Trust): MannedFill {
   switch (t) {
@@ -72,7 +80,11 @@ export function mannedFill(t: Trust): MannedFill {
   }
 }
 
-/** The CSS variable of a manned symbol's colour: its trust class's. */
+/**
+ * The CSS variable of a manned symbol's colour: its trust class's.
+ *
+ * @beta
+ */
 export function mannedToken(t: Trust): string {
   switch (t) {
     case "authenticated":
@@ -93,17 +105,27 @@ export function mannedToken(t: Trust): string {
  * §3.1) carries no `trust` although 04 §2 puts one on every track-like
  * message (WP-12 spec gap); an absent class is never drawn as vouched for
  * (CLAUDE.md rule 6: never upgrade), and the label says it was absent.
+ *
+ * @beta
  */
 export function mannedTrustDrawn(t: unknown): Trust {
   return isTrust(t) ? t : "broadcast";
 }
 
-/** The map image name of a manned icon, with or without a course. */
+/**
+ * The map image name of a manned icon, with or without a course.
+ *
+ * @beta
+ */
 export function mannedIconId(t: Trust, directional: boolean): string {
   return directional ? `us-manned-${t}-dir` : `us-manned-${t}`;
 }
 
-/** Every icon the manned layer adds to the map, once per style. */
+/**
+ * Every icon the manned layer adds to the map, once per style.
+ *
+ * @beta
+ */
 export const MANNED_ICON_IDS: readonly {
   id: string;
   trust: Trust;
@@ -152,7 +174,11 @@ const NO_COURSE_RING_W = 2;
 
 const abs = (v: number): number => (v < 0 ? -v : v);
 
-/** Signed distance of point `p` (icon pixels) to a manned icon. */
+/**
+ * Signed distance of point `p` (icon pixels) to a manned icon.
+ *
+ * @beta
+ */
 export function mannedIconDistance(
   t: Trust,
   directional: boolean,
@@ -168,12 +194,18 @@ export function mannedIconDistance(
 /**
  * The icon as an SDF bitmap for `map.addImage(id, image, { sdf: true,
  * pixelRatio: TRACK_ICON_PIXEL_RATIO })`, tinted by `icon-color`.
+ *
+ * @beta
  */
 export function mannedIconSdf(t: Trust, directional: boolean): PatternImage {
   return sdfBitmap((p) => mannedIconDistance(t, directional, p));
 }
 
-/** The icon's SVG parts in the TRACK_ICON_PX viewBox (legends, the DOM). */
+/**
+ * The icon's SVG parts in the TRACK_ICON_PX viewBox (legends, the DOM).
+ *
+ * @beta
+ */
 export function mannedIconParts(t: Trust, directional: boolean): IconPart[] {
   const parts: IconPart[] = [
     mannedFill(t) === "solid"
@@ -191,7 +223,11 @@ export function mannedIconParts(t: Trust, directional: boolean): IconPart[] {
   return parts;
 }
 
-/** The side of the icon's viewBox, for a consumer drawing `mannedIconParts`. */
+/**
+ * The side of the icon's viewBox, for a consumer drawing `mannedIconParts`.
+ *
+ * @beta
+ */
 export const MANNED_ICON_PX = TRACK_ICON_PX;
 
 // --- words -------------------------------------------------------------------
@@ -199,6 +235,8 @@ export const MANNED_ICON_PX = TRACK_ICON_PX;
 /**
  * The source classes 02 F4 names, with a word each; any other value is
  * shown as the server sent it (`manned.source_class.other`).
+ *
+ * @beta
  */
 export const MANNED_SOURCE_CLASS_KEYS: Readonly<Record<string, Key>> =
   Object.freeze({
@@ -211,7 +249,11 @@ export const MANNED_SOURCE_CLASS_KEYS: Readonly<Record<string, Key>> =
 
 // --- MapLibre expressions ----------------------------------------------------
 
-/** The `properties` of a manned aircraft's point feature (MannedLayer). */
+/**
+ * The `properties` of a manned aircraft's point feature (MannedLayer).
+ *
+ * @beta
+ */
 export interface MannedFeatureProperties {
   kind: "manned";
   /** The track id. */
@@ -229,7 +271,11 @@ export interface MannedFeatureProperties {
   label: string;
 }
 
-/** The colours the manned layers paint with, resolved per scheme. */
+/**
+ * The colours the manned layers paint with, resolved per scheme.
+ *
+ * @beta
+ */
 export interface MannedColours {
   trust: Readonly<Record<Trust, string>>;
   emergency: string;
@@ -237,9 +283,14 @@ export interface MannedColours {
   halo: string;
 }
 
-/** The tokens of the rings and halo: the track layer's. */
+/**
+ * The tokens of the rings and halo: the track layer's.
+ *
+ * @beta
+ */
 export const MANNED_COLOUR_TOKENS = TRACK_COLOUR_TOKENS;
 
+/** @beta */
 export interface MannedStyle {
   emergencyFilter: FilterSpecification;
   selectedFilter: FilterSpecification;
@@ -294,6 +345,8 @@ const byZoom = (low: number, high: number): ExpressionSpecification => [
  * The paint and layout values of the manned layers, keyed on
  * `MannedFeatureProperties`; `colours` are the tokens resolved in the
  * map's scheme.
+ *
+ * @beta
  */
 export function mannedStyle(colours: MannedColours): MannedStyle {
   return {

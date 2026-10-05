@@ -26,12 +26,14 @@ import { Button } from "../ui/button.js";
 import { Label } from "../ui/label.js";
 import { Textarea } from "../ui/textarea.js";
 
+/** @public */
 export interface ConfirmReason {
   required: true;
   /** The minimum length the caller's policy sets; no default. */
   minLength: number;
 }
 
+/** @public */
 export interface ConfirmDialogProps {
   titleKey: string;
   bodyKey: string;
@@ -54,6 +56,7 @@ export interface ConfirmDialogProps {
   trigger?: ReactNode;
 }
 
+/** @public */
 export function ConfirmDialog(props: ConfirmDialogProps) {
   const {
     titleKey,

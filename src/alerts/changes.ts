@@ -20,7 +20,11 @@ const GRAVITY: Readonly<Record<Severity, number>> = {
   critical: 2,
 };
 
-/** The alerts with one entry per `alertId`, the later entry winning. */
+/**
+ * The alerts with one entry per `alertId`, the later entry winning.
+ *
+ * @beta
+ */
 export function uniqueById(alerts: readonly AlertView[]): AlertView[] {
   const byId = new Map<string, AlertView>();
   for (const a of alerts) {
@@ -38,6 +42,8 @@ export function uniqueById(alerts: readonly AlertView[]): AlertView[] {
  * recently raised first (`raisedAt`, the server's time, so a replayed
  * alert keeps its place, C-08). An unreadable `raisedAt` goes last; ties
  * by id, so the order is stable.
+ *
+ * @beta
  */
 export function sortAlerts(alerts: readonly AlertView[]): AlertView[] {
   const at = new Map(alerts.map((a) => [a.alertId, utcMs(a.raisedAt)]));
@@ -55,13 +61,21 @@ export function sortAlerts(alerts: readonly AlertView[]): AlertView[] {
   });
 }
 
-/** What the page last showed of an alert. */
+/**
+ * What the page last showed of an alert.
+ *
+ * @beta
+ */
 export interface Seen {
   severity: Severity;
   state: AlertState;
 }
 
-/** An alert the page shows as new, and why. */
+/**
+ * An alert the page shows as new, and why.
+ *
+ * @beta
+ */
 export interface AlertChange {
   alert: AlertView;
   /** `new`: not shown before, or raised again after a clear. `rose`: a graver severity. */
@@ -73,6 +87,8 @@ export interface AlertChange {
  * the alerts to announce and the next `seen`. A cleared alert is never
  * announced; an id no longer passed is forgotten, so its next raise is
  * new.
+ *
+ * @beta
  */
 export function alertChanges(
   seen: ReadonlyMap<string, Seen>,
@@ -96,6 +112,8 @@ export function alertChanges(
 /**
  * The alerts that keep the tone going: critical, not cleared, not
  * acknowledged on this console (PLAN §14 Q15).
+ *
+ * @beta
  */
 export function soundingAlerts(alerts: readonly AlertView[]): AlertView[] {
   return alerts.filter(

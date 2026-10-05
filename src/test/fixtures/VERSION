@@ -1,0 +1,32 @@
+# Pinned sources of the lab-derived fixtures (WP-14, PLAN §6.4, §9, §14
+# Q16). scripts/sync-fixtures.sh copies the valid examples (never the
+# invalid/ ones) of each source into the directory named first, writes
+# SHA256SUMS and docs/LAB_VERSION, and regenerates
+# src/test/labExamples.generated.ts. Edit a commit here, then run it;
+# never edit a copied file. scripts/check-fixtures.sh checks the
+# checksums offline and, online, every file against its source at the
+# pinned commit.
+#
+# The lab mirrors uspace-lab/schemas/common/ and knowledge/vectors/. The
+# per-system schemas are not mirrored by the lab yet (its
+# schemas/<system>/SOURCE names no commit), so until they are, those
+# examples come from the owning repository at a pinned commit (decision
+# record M11); each moves to the lab's mirror when it is pinned there.
+uspace_lab_repo = https://github.com/rootxkit/uspace-lab.git
+uspace_lab_commit = 18d6f321a12f897f96e24ef842f4ce9d5a6bde33
+synced_at = 2026-10-05
+# source = <dir> <repository> <commit> <path in the repository>
+source = lab/track/telemetry/v1 https://github.com/rootxkit/uspace-lab.git 18d6f321a12f897f96e24ef842f4ce9d5a6bde33 schemas/common/track/telemetry/v1/examples
+source = lab/source/status/v1 https://github.com/rootxkit/uspace-lab.git 18d6f321a12f897f96e24ef842f4ce9d5a6bde33 schemas/common/source/status/v1/examples
+source = lab/console/status/v1 https://github.com/rootxkit/uspace-lab.git 18d6f321a12f897f96e24ef842f4ce9d5a6bde33 schemas/common/console/status/v1/examples
+source = lab/console/snapshot/v1 https://github.com/rootxkit/uspace-lab.git 18d6f321a12f897f96e24ef842f4ce9d5a6bde33 schemas/common/console/snapshot/v1/examples
+source = lab/envelope/v1 https://github.com/rootxkit/uspace-lab.git 18d6f321a12f897f96e24ef842f4ce9d5a6bde33 schemas/common/envelope/v1/examples
+source = lab/zone/applicable/v1 https://github.com/rootxkit/uspace-lab.git 18d6f321a12f897f96e24ef842f4ce9d5a6bde33 schemas/common/zone/applicable/v1/examples
+source = lab/vectors https://github.com/rootxkit/uspace-lab.git 18d6f321a12f897f96e24ef842f4ce9d5a6bde33 knowledge/vectors/ed318_roundtrip.json
+source = ussp/alert/v1 https://github.com/rootxkit/uspace-ussp.git 39fac6db6fae669a08ea6d4c10ec89c82534e045 schemas/alert/v1/examples
+source = ansp/track/manned/v1 https://github.com/rootxkit/uspace-ansp.git 08731a35ca83af6aa1d7a3bee20e3fdd2e4c1fac schemas/examples/track/manned/v1
+# Not vendored, and why (fixtures.lab.test.ts lists them as missing):
+# violation/v1: uspace-authority schemas/violation/v1.json has no examples.
+# cis/change/v1 from uspace-cisp: every example's pull_url carries the
+#   production hostname (spec 06 §4 keeps it out of this repository);
+#   the lab's envelope/v1 cis-change-frame.json stands in.

@@ -8,6 +8,7 @@ import { useId, useState, type ReactNode } from "react";
 import { useT } from "../i18n/I18nProvider.js";
 import { cn } from "../ui/cn.js";
 
+/** @beta */
 export interface LegendSectionProps {
   /** The region's name and the toggle's text, already translated. */
   title: string;
@@ -18,6 +19,7 @@ export interface LegendSectionProps {
   children: ReactNode;
 }
 
+/** @beta */
 export function LegendSection(props: LegendSectionProps) {
   const { title, kind, defaultCollapsed = false, className, children } = props;
   const [open, setOpen] = useState(!defaultCollapsed);
@@ -52,6 +54,8 @@ export function LegendSection(props: LegendSectionProps) {
 /**
  * A row's count: the app's number through `format`, or a dash with "not
  * provided" when the app passed counts but none for this row.
+ *
+ * @beta
  */
 export function LegendCount(props: {
   counts: Readonly<Record<string, number | undefined>> | undefined;
@@ -81,7 +85,11 @@ export function LegendCount(props: {
   );
 }
 
-/** A note under a legend's list. */
+/**
+ * A note under a legend's list.
+ *
+ * @beta
+ */
 export function LegendNote(props: { note: string; children: ReactNode }) {
   return (
     <p

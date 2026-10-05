@@ -39,9 +39,14 @@ import {
 } from "./trackFeatures.js";
 import { resolveColour, useLayer } from "./useLayer.js";
 
-/** The default source id; pass `id` to draw two track layers on one map. */
+/**
+ * The default source id; pass `id` to draw two track layers on one map.
+ *
+ * @beta
+ */
 export const TRACK_LAYER_ID = "us-tracks";
 
+/** @beta */
 export interface TrackLayerIds {
   source: string;
   trail: string;
@@ -52,6 +57,7 @@ export interface TrackLayerIds {
   label: string;
 }
 
+/** @beta */
 export function trackLayerIds(id: string): TrackLayerIds {
   return {
     source: id,
@@ -64,7 +70,11 @@ export function trackLayerIds(id: string): TrackLayerIds {
   };
 }
 
-/** The track colours resolved on the map's element, in its scheme. */
+/**
+ * The track colours resolved on the map's element, in its scheme.
+ *
+ * @beta
+ */
 export function resolveTrackColours(map: MapLibreMap): TrackColours {
   const ident = {} as Record<IdentKey, string>;
   for (const s of IDENT_ORDER) {
@@ -82,6 +92,8 @@ export function resolveTrackColours(map: MapLibreMap): TrackColours {
  * Puts the twelve SDF icons (six trust classes, plain and with the arrow)
  * on the map, once per style; a style re-apply drops them and the layer
  * puts them back.
+ *
+ * @public
  */
 export function putTrackIcons(map: MapLibreMap): void {
   for (const { id, trust, directional } of TRACK_ICON_IDS) {
@@ -218,6 +230,7 @@ function buildTrackLayers(map: MapLibreMap, id: string): readonly string[] {
   ];
 }
 
+/** @public */
 export interface TrackLayerProps {
   /** Every track the app shows (a store snapshot); read once per change. */
   tracks: Iterable<TrackView>;
@@ -252,6 +265,7 @@ function listOf(tracks: Iterable<TrackView>): readonly TrackView[] {
   return list;
 }
 
+/** @public */
 export function TrackLayer(props: TrackLayerProps) {
   const {
     tracks,

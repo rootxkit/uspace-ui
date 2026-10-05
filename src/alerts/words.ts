@@ -10,7 +10,11 @@ import type {
   ViolationKind,
 } from "../model/index.js";
 
-/** The name of each alert and violation kind (`zone_incursion` is both). */
+/**
+ * The name of each alert and violation kind (`zone_incursion` is both).
+ *
+ * @beta
+ */
 export const ALERT_KIND_KEYS: Readonly<Record<AlertKind | ViolationKind, Key>> =
   Object.freeze({
     proximity: "alert.kind.proximity",
@@ -28,6 +32,7 @@ export const ALERT_KIND_KEYS: Readonly<Record<AlertKind | ViolationKind, Key>> =
     rid_absent: "alert.kind.rid_absent",
   });
 
+/** @beta */
 export const ALERT_STATE_KEYS: Readonly<Record<AlertState, Key>> =
   Object.freeze({
     raised: "alert.state.raised",
@@ -35,6 +40,7 @@ export const ALERT_STATE_KEYS: Readonly<Record<AlertState, Key>> =
     cleared: "alert.state.cleared",
   });
 
+/** @beta */
 export const CLEAR_REASON_KEYS: Readonly<Record<ClearReason, Key>> =
   Object.freeze({
     resolved: "alert.clear_reason.resolved",
@@ -48,6 +54,8 @@ export const CLEAR_REASON_KEYS: Readonly<Record<ClearReason, Key>> =
 /**
  * The `nonconformance` reasons spec 04 §3.3 names. Any other value the
  * API sends is shown as sent, never mapped to one of these.
+ *
+ * @beta
  */
 export const NONCONFORMANCE_REASON_KEYS: Readonly<Record<string, Key>> =
   Object.freeze({
@@ -55,7 +63,11 @@ export const NONCONFORMANCE_REASON_KEYS: Readonly<Record<string, Key>> =
     constraint_breached: "alert.reason.constraint_breached",
   });
 
-/** The one-line summary of each kind (summary.ts). */
+/**
+ * The one-line summary of each kind (summary.ts).
+ *
+ * @beta
+ */
 export const ALERT_SUMMARY_KEYS: Readonly<
   Record<AlertKind | ViolationKind, Key>
 > = Object.freeze({

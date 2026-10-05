@@ -5,6 +5,7 @@
 // (lost) only for a recorded gap.
 import type { Key } from "./en.js";
 
+/** @public */
 export const ka: Readonly<Record<Key, string>> = {
   // WP-2: common words
   "common.dash": "—",
@@ -322,6 +323,52 @@ export const ka: Readonly<Record<Key, string>> = {
     "CIS მონაცემების ასაკი: {age}, ზღვარი {bound} გადაჭარბებულია",
   "degraded.dataset_age": "{dataset}, ვერსია {version}: ასაკი {age}",
   "degraded.projection_age": "რეესტრის პროექციის ასაკი: {age}",
+
+  // WP-14: the thresholds a system's status frame carries (1.0.0).
+  "thresholds.title": "მოქმედი ზღვრები",
+  "thresholds.policy": "პოლიტიკის ვერსია {version}",
+  "thresholds.no_policy": "პოლიტიკის ვერსია ჯერ არ მიღებულა",
+  "thresholds.none":
+    "სისტემა სტატუსში ზღვრებს არ აგზავნის; არცერთი არ არის ნავარაუდევი.",
+  "thresholds.caption":
+    "როგორც სისტემა აგზავნის; ეს კონსოლი მათით არაფერს აფასებს.",
+  "thresholds.cpa_tcpa_max_s": "უახლოეს მიახლოებამდე წინასწარ განხილული დრო",
+  "thresholds.cpa_horizontal_min_m": "ჰორიზონტალური განცალკევების მინიმუმი",
+  "thresholds.cpa_vertical_min_m": "ვერტიკალური განცალკევების მინიმუმი",
+  "thresholds.cpa_neighbour_radius_m": "მეზობლების ძიების რადიუსი",
+  "thresholds.cpa_clear_after_s": "მიახლოების გაფრთხილება იხსნება",
+  "thresholds.traffic_radius_m": "მოძრაობის ინფორმაციის რადიუსი",
+  "thresholds.evaluation_period_s":
+    "მიახლოების შეფასების პერიოდი (უახლესი მიახლოების გაფრთხილება)",
+  "thresholds.unlabelled": "{name} (როგორც სისტემა უწოდებს)",
+
+  // WP-14: the drawing tool's fields (1.0.0).
+  "outline.legend": "კონტური",
+  "outline.hint":
+    "დააწკაპუნეთ რუკაზე წერტილის დასამატებლად, გადაათრიეთ წერტილი მის გადასაადგილებლად, ან აკრიფეთ წერტილები აქ. ისინი იგზავნება როგორც შეყვანილია; კონტურს სისტემა ამოწმებს.",
+  "outline.kind": "კონტურის ფორმა",
+  "outline.polygon": "მრავალკუთხედი",
+  "outline.circle": "წრე",
+  "outline.point": "წერტილი {n}",
+  "outline.new_point": "ახალი წერტილი {n}",
+  "outline.center": "ცენტრი",
+  "outline.latitude": "{point}: განედი (გრადუსი, WGS84)",
+  "outline.longitude": "{point}: გრძედი (გრადუსი, WGS84)",
+  "outline.radius": "რადიუსი (მ)",
+  "outline.add": "წერტილის დამატება",
+  "outline.remove": "წერტილის {n} წაშლა",
+  "outline.remove_short": "წაშლა",
+  "outline.clear": "კონტურის გასუფთავება",
+  "outline.count": "{count} წერტილი, მაქსიმუმ {max}",
+  "outline.full":
+    "ეს კონტური იღებს მაქსიმუმ {max} წერტილს: ახლის დასამატებლად წაშალეთ ერთი.",
+  "outline.circle_words":
+    "წრე: ცენტრი {lat}, {lng} (გრადუსი, WGS84); რადიუსი {radius} მ",
+  "outline.circle_drawn": "წრე რუკაზე არის სისტემის მიერ დახატული კონტური.",
+  "outline.circle_not_drawn":
+    "წრის კონტურს სისტემა ხატავს; მანამდე რუკა მხოლოდ მის ცენტრს აჩვენებს.",
+  "outline.error.range": "არ არის {min}-დან {max} გრადუსამდე",
+  "outline.error.positive": "უნდა იყოს ნულზე მეტი",
 
   // WP-8: the sources panel and the switch
   "source.panel.title": "წყაროები",

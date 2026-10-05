@@ -26,6 +26,7 @@ import { Label } from "../ui/label.js";
 import { Textarea } from "../ui/textarea.js";
 import { SourceStateBadge, type SourceInput } from "./SourceStateBadge.js";
 
+/** @public */
 export interface SourcesPanelProps {
   sources: readonly SourceInput[];
   /** The app's clock tick (`useNowMs`). */
@@ -182,6 +183,7 @@ function SourceRow(props: {
   );
 }
 
+/** @public */
 export function SourcesPanel(props: SourcesPanelProps) {
   const { sources, nowMs, onSwitch, canSwitch, className } = props;
   const t = useT();

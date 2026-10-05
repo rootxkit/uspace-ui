@@ -4,11 +4,13 @@
 // header row; rows 1..rows-1 are the body rows the grid can reach (the
 // page, or every row when virtualised).
 
+/** @beta */
 export interface GridPos {
   row: number;
   col: number;
 }
 
+/** @beta */
 export interface GridSize {
   /** Rows including the header row. */
   rows: number;
@@ -18,9 +20,12 @@ export interface GridSize {
 /**
  * Rows moved by PageUp and PageDown. A display-only constant (APG: "an
  * author-determined number of rows").
+ *
+ * @beta
  */
 export const PAGE_STEP_ROWS = 10;
 
+/** @beta */
 export interface GridKey {
   key: string;
   ctrlKey: boolean;
@@ -35,6 +40,8 @@ const clamp = (v: number, lo: number, hi: number): number =>
  * movement key (the event is then left alone). Movement stops at the
  * edges; it never wraps. PageUp and PageDown stay within the body rows
  * when they start there.
+ *
+ * @beta
  */
 export function nextGridPos(
   k: GridKey,

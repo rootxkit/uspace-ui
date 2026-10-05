@@ -14,6 +14,7 @@ import { useMapContext } from "../map/context.js";
 import { parseHexColour, type PatternImage } from "../symbology/zone.js";
 import { countLayer } from "./counters.js";
 
+/** @public */
 export interface UseLayerOptions<D> {
   /** The GeoJSON source id; unique per map. */
   id: string;
@@ -71,6 +72,8 @@ function removeAll(
  * and keeps them there; returns the map after its load (null before load
  * and with no WebGL). Data handed over twice in one frame is applied
  * once, with the newer value; the older one is counted as superseded.
+ *
+ * @public
  */
 export function useLayer<D>(opts: UseLayerOptions<D>): MapLibreMap | null {
   const { map: ctxMap, onStyleLoad } = useMapContext();
@@ -145,7 +148,11 @@ export function useLayer<D>(opts: UseLayerOptions<D>): MapLibreMap | null {
   return ctxMap;
 }
 
-/** The fallback for a token that did not resolve. Display-only constant. */
+/**
+ * The fallback for a token that did not resolve. Display-only constant.
+ *
+ * @beta
+ */
 export const UNRESOLVED_COLOUR = "#808080";
 
 /**
@@ -153,6 +160,8 @@ export const UNRESOLVED_COLOUR = "#808080";
  * the map's scheme (MapView sets `data-theme`). MapLibre paints with
  * colours, not variables. A token that does not resolve to `#rrggbb` is
  * counted and drawn in a neutral grey, never left out.
+ *
+ * @public
  */
 export function resolveColour(map: MapLibreMap, token: string): string {
   const v = getComputedStyle(map.getContainer()).getPropertyValue(token).trim();
@@ -163,7 +172,11 @@ export function resolveColour(map: MapLibreMap, token: string): string {
   return v;
 }
 
-/** Adds a generated image, or replaces it when the style already has one. */
+/**
+ * Adds a generated image, or replaces it when the style already has one.
+ *
+ * @beta
+ */
 export function putImage(
   map: MapLibreMap,
   name: string,

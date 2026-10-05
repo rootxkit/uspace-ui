@@ -10,6 +10,7 @@ import {
 import { useTheme } from "./next-themes.js"
 import { Toaster as Sonner, type ToasterProps } from "sonner"
 
+/** @public */
 const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = "system" } = useTheme()
 

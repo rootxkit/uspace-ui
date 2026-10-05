@@ -28,6 +28,8 @@ const SWATCH_PX = 24;
  * The map's symbol of a trust class, in the current text colour (on the
  * map the colour is the identification status's). `directional` adds the
  * arrow the map rotates by the track's course.
+ *
+ * @beta
  */
 export function TrackSwatch(props: {
   trust: Trust;
@@ -63,6 +65,7 @@ export function TrackSwatch(props: {
   );
 }
 
+/** @public */
 export interface TrackLegendProps {
   /**
    * Tracks per trust class, as the app counted what it shows. When given,
@@ -73,6 +76,7 @@ export interface TrackLegendProps {
   className?: string;
 }
 
+/** @public */
 export function TrackLegend(props: TrackLegendProps) {
   const { counts, defaultCollapsed, className } = props;
   const t = useT();

@@ -26,6 +26,7 @@ import { tokens } from "./tokens.js";
 /** On <html> while ThemeProvider changes the scheme (styles/tokens.css). */
 const SCHEME_CHANGING_ATTR = "data-scheme-changing";
 
+/** @public */
 export interface ThemeContextValue {
   scheme: ColorScheme;
   resolved: ResolvedScheme;
@@ -35,6 +36,7 @@ export interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
+/** @public */
 export interface ThemeProviderProps {
   brand: Brand;
   /**
@@ -99,6 +101,7 @@ function initialScheme(prop: ColorScheme | undefined): ColorScheme {
   return schemeFromCookie(document.cookie) ?? "system";
 }
 
+/** @public */
 export function ThemeProvider(props: ThemeProviderProps): ReactNode {
   const { brand, onSchemeChange, children } = props;
   const [scheme, setState] = useState<ColorScheme>(() =>
@@ -155,7 +158,11 @@ export function ThemeProvider(props: ThemeProviderProps): ReactNode {
   );
 }
 
-/** The theme of the enclosing ThemeProvider; throws outside one. */
+/**
+ * The theme of the enclosing ThemeProvider; throws outside one.
+ *
+ * @public
+ */
 export function useTheme(): ThemeContextValue {
   const ctx = useContext(ThemeContext);
   if (ctx === null) {
@@ -164,7 +171,11 @@ export function useTheme(): ThemeContextValue {
   return ctx;
 }
 
-/** Like `useTheme`, but null outside a ThemeProvider. */
+/**
+ * Like `useTheme`, but null outside a ThemeProvider.
+ *
+ * @beta
+ */
 export function useOptionalTheme(): ThemeContextValue | null {
   return useContext(ThemeContext);
 }

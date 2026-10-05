@@ -112,6 +112,23 @@ it, any account with push rights can cut a release of a commit on
 `main`. Check it is still there before the first release after a change
 of collaborators.
 
+## Cutting `v1.0.0` (WP-14) and later majors
+
+`v1.0.0` freezes the API (PLAN §12, D12). The release PR prepares it
+(version, CHANGELOG section, README, the API report with every export
+tagged); the owner then:
+
+1. Reads `docs/api/uspace-ui.api.md`: every `// @public` declaration is
+   a promise for the major; a name that should not be one is retagged
+   `@beta` in a PR before the tag, not after.
+2. Adds the `semver-gate` and `fixtures` checks to the `main` ruleset
+   beside the others (PLAN §10), and keeps the labels `breaking` and
+   `legend-change` the gate reads.
+3. Merges, and tags `v1.0.0` on `main` as for any release (above).
+4. For a later major `N+1`: before tagging it, cuts `release/vN` from
+   the last `vN.x.y` tag (CLAUDE.md "Release branches"), so `vN` keeps
+   its six months of fixes.
+
 ## Proving the release path without releasing
 
 CI's `pack` job runs on every pull request and on `main`. Its summary

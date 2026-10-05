@@ -6,7 +6,7 @@ is shown working in [`examples/next-app/`](../examples/next-app/), which
 CI builds against the kit's current source and smokes in Chromium on
 every pull request. The rules behind the steps are `docs/PLAN.md` §6.3
 (the contracts), §7 (security) and §11 (consumption). This guide is for
-`0.1.0`.
+`1.0.0`.
 
 ## 1. Install the release tarball with pnpm
 
@@ -22,7 +22,7 @@ install --frozen-lockfile`.
 {
   "packageManager": "pnpm@11.9.0",
   "dependencies": {
-    "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v0.1.0/rootxkit-uspace-ui-0.1.0.tgz",
+    "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.0.0/rootxkit-uspace-ui-1.0.0.tgz",
     "maplibre-gl": "5.24.0",
     "next": "16.3.8",
     "react": "19.3.0",
@@ -45,8 +45,8 @@ install --frozen-lockfile`.
 - Before pinning, check the asset's signed build provenance:
 
   ```sh
-  gh release download v0.1.0 --repo rootxkit/uspace-ui --pattern 'rootxkit-uspace-ui-0.1.0.tgz'
-  gh attestation verify rootxkit-uspace-ui-0.1.0.tgz --repo rootxkit/uspace-ui \
+  gh release download v1.0.0 --repo rootxkit/uspace-ui --pattern 'rootxkit-uspace-ui-1.0.0.tgz'
+  gh attestation verify rootxkit-uspace-ui-1.0.0.tgz --repo rootxkit/uspace-ui \
     --signer-workflow rootxkit/uspace-ui/.github/workflows/release.yml
   ```
 
@@ -83,7 +83,7 @@ import { cookies, headers } from "next/headers";
 import { CSP_NONCE_HEADER, readSessionToken, sessionDisplay } from "@rootxkit/uspace-ui/auth/server";
 import { fontClassName } from "@rootxkit/uspace-ui/fonts";
 import { LANG_COOKIE, negotiateLang } from "@rootxkit/uspace-ui/i18n";
-import { brandFromEnv } from "@rootxkit/uspace-ui/theme";
+import { SCHEME_COOKIE, brandFromEnv, parseScheme, schemeAttribute } from "@rootxkit/uspace-ui/theme";
 
 export const dynamic = "force-dynamic"; // the nonce, the language and the session are per request
 
@@ -93,8 +93,9 @@ export default async function RootLayout({ children }) {
   const lang = negotiateLang(h.get("accept-language"), jar.get(LANG_COOKIE)?.value ?? null);
   const session = sessionDisplay(readSessionToken(jar)); // display only, decoded unverified
   const nonce = h.get(CSP_NONCE_HEADER) ?? undefined;
+  const scheme = schemeAttribute(parseScheme(jar.get(SCHEME_COOKIE)?.value)); // 1.0.0: no first-paint flash
   return (
-    <html lang={lang} className={fontClassName}>
+    <html lang={lang} className={fontClassName} data-theme={scheme} suppressHydrationWarning>
       <body className="font-sans antialiased">
         {/* a client component: CspNonceProvider > ThemeProvider brand={brandFromEnv(process.env)}
             > I18nProvider lang catalogues onLangChange > SessionProvider session */}
@@ -107,6 +108,13 @@ export default async function RootLayout({ children }) {
 - **Fonts**: `fontClassName` on `<html>` loads Noto Sans and Noto Sans
   Georgian through `next/font/local` from the package. No Google Fonts,
   no font request off your origin (D7).
+- **Colour scheme** (1.0.0): render `data-theme` on `<html>` with
+  `schemeAttribute` from the `uspace_scheme` cookie, so an explicit
+  scheme is painted from the first byte. For `system` (or no cookie) it
+  renders nothing, and `tokens.css` follows `prefers-color-scheme` until
+  `ThemeProvider` sets `data-theme`: a dark preference no longer paints
+  light first and turns dark after hydration. `suppressHydrationWarning`
+  because `ThemeProvider` sets the attribute on the client.
 - **Branding** is configuration: `UI_BRAND_NAME`, `UI_BRAND_SHORT_NAME`,
   `UI_BRAND_LOGO_URL`, `UI_BRAND_CONTACT`, `UI_BRAND_ACCENT`, read at
   request time with `brandFromEnv(process.env)`.
@@ -315,6 +323,17 @@ another.
 From `0.1.0-rc.1` to `0.1.0`: the `alerts` stub export `ENTRY` is gone,
 and a secure `bffHandlers` needs `trustedProxyHops` or `noTrustedProxy:
 true`.
+
+From `0.1.0` to `1.0.0` (the API freeze): replace the asset URL and
+commit the lockfile. The `CHANGELOG.md` section "What a consumer on 0.1.0
+does" lists the four cases that need an edit (a `@beta` export, an
+exhaustive switch over a counter union, a hand-built status body, a page
+without `data-theme`); every export the four consoles imported at their
+pins is `@public`. New in `1.0.0` and worth taking: `schemeAttribute` on
+`<html>` (§3), `ThresholdsPanel` over `LiveStatus.extras.thresholds`,
+and `DrawLayer` with `OutlineFields` where a page lets a person draw an
+outline (a circle's outline is your API's to draw, with uspace-core's
+geodesy, and to hand back as `circleOutline`).
 
 ## Minimum version per consumer
 

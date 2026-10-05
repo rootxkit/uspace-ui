@@ -49,6 +49,13 @@ export {
 } from "./fields.js";
 export { Form, type FormProps } from "./Form.js";
 export { kitErrorMap } from "./messages.js";
+export {
+  OUTLINE_KINDS,
+  OutlineFields,
+  emptyOutline,
+  type OutlineFieldsProps,
+  type OutlineKind,
+} from "./OutlineFields.js";
 export { formatLocaleNumber, parseLocaleNumber } from "./number.js";
 export { toFieldName, toJsonPath } from "./paths.js";
 export * as shapes from "./shapes.js";

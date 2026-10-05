@@ -3,6 +3,7 @@
 // only default is the role word "U-space", and every other field is null
 // until a deployment sets it.
 
+/** @public */
 export interface Brand {
   name: string;
   shortName: string;
@@ -12,9 +13,14 @@ export interface Brand {
   accent: string | null;
 }
 
-/** The fallback name: the role, not an organisation (PLAN §14 Q10). */
+/**
+ * The fallback name: the role, not an organisation (PLAN §14 Q10).
+ *
+ * @beta
+ */
 export const BRAND_FALLBACK_NAME = "U-space";
 
+/** @beta */
 export const BRAND_ENV_PREFIX = "UI_BRAND_";
 
 // #rgb, #rgba, #rrggbb or #rrggbbaa. Anything else is refused rather than
@@ -35,6 +41,8 @@ function value(
  * that is not a hex colour throws, naming the variable: a misconfigured
  * deployment fails at start rather than rendering an unbranded console
  * that looks configured.
+ *
+ * @public
  */
 export function brandFromEnv(
   env: Record<string, string | undefined>,

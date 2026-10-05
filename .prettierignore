@@ -7,7 +7,8 @@ docs/
 CLAUDE.md
 README.md
 # Kept line for line identical to docs/PLAN.md §3.1 so a reviewer can diff
-# the two (WP-0 done-when).
+# the two (WP-0 done-when), apart from the `/** @public */` release tag
+# above each declaration (WP-14, the API freeze).
 src/model/types.ts
 # Vendored shadcn/ui output, kept as the CLI wrote it so an upgrade is a
 # plain diff (src/ui/UPGRADING.md). The kit's own files there are checked.
@@ -21,6 +22,11 @@ src/api/test/generated/
 # The lab's schema examples, copied unchanged at the commit in
 # src/live/test/fixtures/lab/LAB_COMMIT (WP-8; WP-14 re-pins them).
 src/live/test/fixtures/lab/
+# The lab-derived fixtures, copied unchanged by scripts/sync-fixtures.sh
+# and checked byte for byte (SHA256SUMS), and the module generated from
+# them (WP-14).
+src/test/fixtures/
+src/test/labExamples.generated.ts
 # The example app's build output and the types it generates (WP-13).
 examples/next-app/.next/
 examples/next-app/src/api/generated/

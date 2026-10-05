@@ -25,7 +25,11 @@ import {
 
 export { trustFill, trustShape, type Shape, type ShapeFill };
 
-/** The CSS variable of a trust class's colour (badges, tables, legends). */
+/**
+ * The CSS variable of a trust class's colour (badges, tables, legends).
+ *
+ * @public
+ */
 export function trustToken(t: Trust): string {
   switch (t) {
     case "authenticated":
@@ -40,7 +44,11 @@ export function trustToken(t: Trust): string {
   }
 }
 
-/** The catalogue key of a trust class's name. */
+/**
+ * The catalogue key of a trust class's name.
+ *
+ * @public
+ */
 export const TRUST_KEYS: Readonly<Record<Trust, Key>> = Object.freeze({
   authenticated: "trust.authenticated",
   provider: "trust.provider",
@@ -50,7 +58,11 @@ export const TRUST_KEYS: Readonly<Record<Trust, Key>> = Object.freeze({
   simulated: "trust.simulated",
 });
 
-/** The catalogue key of a trust class's one-line meaning (04 §2). */
+/**
+ * The catalogue key of a trust class's one-line meaning (04 §2).
+ *
+ * @beta
+ */
 export const TRUST_MEANING_KEYS: Readonly<Record<Trust, Key>> = Object.freeze({
   authenticated: "trust.authenticated.meaning",
   provider: "trust.provider.meaning",
@@ -70,19 +82,30 @@ export const TRUST_FILL_KEYS: Readonly<Record<ShapeFill, Key>> = Object.freeze({
 /**
  * Legend order: the order of 04 §2's table, most to least accountable
  * sender, then the lab's. A display-only constant.
+ *
+ * @beta
  */
 export const TRUST_ORDER: readonly Trust[] = Object.freeze([...TRUSTS]);
 
+/** @beta */
 export function trustOrder(): readonly Trust[] {
   return TRUST_ORDER;
 }
 
-/** The map image name of a trust class's icon, plain or with the arrow. */
+/**
+ * The map image name of a trust class's icon, plain or with the arrow.
+ *
+ * @public
+ */
 export function trackIconId(t: Trust, directional: boolean): string {
   return directional ? `us-track-${t}-dir` : `us-track-${t}`;
 }
 
-/** Every icon the track layer adds to the map, once per style. */
+/**
+ * Every icon the track layer adds to the map, once per style.
+ *
+ * @beta
+ */
 export const TRACK_ICON_IDS: readonly {
   id: string;
   trust: Trust;
@@ -97,7 +120,11 @@ export const TRACK_ICON_IDS: readonly {
   ),
 );
 
-/** The `properties` of a track's point feature (TrackLayer). */
+/**
+ * The `properties` of a track's point feature (TrackLayer).
+ *
+ * @beta
+ */
 export interface TrackFeatureProperties {
   kind: "track";
   /** The track id. */
@@ -116,7 +143,11 @@ export interface TrackFeatureProperties {
   label: string;
 }
 
-/** The `properties` of a track's trail (TrackLayer). */
+/**
+ * The `properties` of a track's trail (TrackLayer).
+ *
+ * @beta
+ */
 export interface TrailFeatureProperties {
   kind: "trail";
   identifier: string;
@@ -124,7 +155,11 @@ export interface TrailFeatureProperties {
   age: AgeBucket;
 }
 
-/** The colours the track layers paint with, resolved per scheme. */
+/**
+ * The colours the track layers paint with, resolved per scheme.
+ *
+ * @public
+ */
 export interface TrackColours {
   ident: Readonly<Record<IdentKey, string>>;
   /** The emergency ring: the critical severity's colour. */
@@ -135,7 +170,11 @@ export interface TrackColours {
   halo: string;
 }
 
-/** The token each `TrackColours` field resolves from. */
+/**
+ * The token each `TrackColours` field resolves from.
+ *
+ * @beta
+ */
 export const TRACK_COLOUR_TOKENS = Object.freeze({
   emergency: tokens.severity.critical,
   selected: "--us-text",
@@ -153,6 +192,8 @@ function byIdent(colours: TrackColours): ExpressionSpecification {
 /**
  * The opacity of a feature by its age bucket, the same numbers as
  * `ageOpacity`. A feature without a known bucket draws in full.
+ *
+ * @beta
  */
 export function ageOpacityExpression(): ExpressionSpecification {
   const arms = AGE_BUCKETS.flatMap((b) => [b, ageOpacity(b)]);
@@ -193,6 +234,7 @@ function iconImage(): ExpressionSpecification {
 const ZOOM_LOW = 8;
 const ZOOM_HIGH = 16;
 
+/** @public */
 export interface TrackStyle {
   pointFilter: FilterSpecification;
   trailFilter: FilterSpecification;
@@ -218,6 +260,8 @@ export interface TrackStyle {
  * properties of `TrackFeatureProperties` and `TrailFeatureProperties`.
  * `colours` are the tokens resolved in the map's scheme (MapLibre cannot
  * read a CSS variable).
+ *
+ * @public
  */
 export function trackStyle(colours: TrackColours): TrackStyle {
   const isPoint: FilterSpecification = ["==", ["geometry-type"], "Point"];

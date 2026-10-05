@@ -338,6 +338,55 @@ const catalogue = {
   "degraded.dataset_age": "{dataset}, version {version}: {age} old",
   "degraded.projection_age": "Registry projection {age} old",
 
+  // WP-14: the thresholds a system's status frame carries (1.0.0; INV-03:
+  // shown as sent, never defaulted, never judged with).
+  "thresholds.title": "Thresholds in force",
+  "thresholds.policy": "Policy version {version}",
+  "thresholds.no_policy": "No policy version received yet",
+  "thresholds.none":
+    "The system sends no thresholds in its status; none is assumed.",
+  "thresholds.caption":
+    "As the system sends them; this console judges nothing with them.",
+  "thresholds.cpa_tcpa_max_s": "Look-ahead to the closest approach",
+  "thresholds.cpa_horizontal_min_m": "Horizontal separation minimum",
+  "thresholds.cpa_vertical_min_m": "Vertical separation minimum",
+  "thresholds.cpa_neighbour_radius_m": "Radius searched for neighbours",
+  "thresholds.cpa_clear_after_s": "A proximity alert clears after",
+  "thresholds.traffic_radius_m": "Traffic information radius",
+  "thresholds.evaluation_period_s":
+    "Proximity evaluation period (newest proximity alert)",
+  "thresholds.unlabelled": "{name} (as the system names it)",
+
+  // WP-14: the drawing tool's fields (1.0.0; uspace-ussp Q28 gap 1). Points
+  // are sent as entered; the API judges the outline and draws a circle.
+  "outline.legend": "Outline",
+  "outline.hint":
+    "Click the map to add a point, drag a point to move it, or type the points here. They are sent as entered; the system checks the outline.",
+  "outline.kind": "Shape of the outline",
+  "outline.polygon": "Polygon",
+  "outline.circle": "Circle",
+  "outline.point": "Point {n}",
+  "outline.new_point": "New point {n}",
+  "outline.center": "Centre",
+  "outline.latitude": "{point}: latitude (degrees, WGS84)",
+  "outline.longitude": "{point}: longitude (degrees, WGS84)",
+  "outline.radius": "Radius (m)",
+  "outline.add": "Add point",
+  "outline.remove": "Remove point {n}",
+  "outline.remove_short": "Remove",
+  "outline.clear": "Clear the outline",
+  "outline.count": "{count} of at most {max} points",
+  "outline.full":
+    "This outline takes at most {max} points: remove one to add another.",
+  "outline.circle_words":
+    "Circle: centre {lat}, {lng} (degrees, WGS84); radius {radius} m",
+  "outline.circle_drawn":
+    "The circle on the map is the outline the system drew.",
+  "outline.circle_not_drawn":
+    "The system draws a circle's outline; until it has, the map shows its centre only.",
+  "outline.error.range": "Not between {min} and {max} degrees",
+  "outline.error.positive": "Must be more than zero",
+
   // WP-8: the sources panel and the switch (B-09, B-11: a switch needs a
   // reason; disabled by a person never reads like silent).
   "source.panel.title": "Sources",
@@ -646,7 +695,12 @@ const catalogue = {
   "detail.intent": "Intent",
 } as const;
 
-/** A key of the kit's own catalogue. Apps add keys of their own. */
+/**
+ * A key of the kit's own catalogue. Apps add keys of their own.
+ *
+ * @public
+ */
 export type Key = keyof typeof catalogue;
 
+/** @public */
 export const en: Readonly<Record<Key, string>> = catalogue;

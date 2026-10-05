@@ -18,6 +18,8 @@ import type { PatternImage, Rgb } from "./zone.js";
  * The ASTM F3548-21 operational intent states, string for string as
  * uspace-core v1.3.0 `f3548.OperationalIntentState` spells them
  * (f3548/types.gen.go: Accepted, Activated, Contingent, Nonconforming).
+ *
+ * @beta
  */
 export const DSS_STATES = [
   "Accepted",
@@ -25,15 +27,22 @@ export const DSS_STATES = [
   "Nonconforming",
   "Contingent",
 ] as const;
+/** @beta */
 export type DssState = (typeof DSS_STATES)[number];
 
+/** @beta */
 export function isDssState(v: unknown): v is DssState {
   return typeof v === "string" && (DSS_STATES as readonly string[]).includes(v);
 }
 
-/** A DSS state as drawn: one of the four, or `unstated`. */
+/**
+ * A DSS state as drawn: one of the four, or `unstated`.
+ *
+ * @beta
+ */
 export type IntentStateKey = DssState | "unstated";
 
+/** @beta */
 export const INTENT_STATE_KEYS_ORDER: readonly IntentStateKey[] = Object.freeze(
   [...DSS_STATES, "unstated"],
 );
@@ -42,15 +51,25 @@ export const INTENT_STATE_KEYS_ORDER: readonly IntentStateKey[] = Object.freeze(
  * The state an intent is drawn with: the API's `dssState` when it is one
  * of the four, else `unstated` (null, or a value the kit does not know,
  * which the card shows as sent).
+ *
+ * @beta
  */
 export function intentStateDrawn(dssState: string | null): IntentStateKey {
   return isDssState(dssState) ? dssState : "unstated";
 }
 
-/** The five looks the symbology is total over: four states and `peer`. */
+/**
+ * The five looks the symbology is total over: four states and `peer`.
+ *
+ * @beta
+ */
 export type IntentKey = DssState | "peer";
 
-/** How one look draws. Widths in CSS pixels, dashes in line widths. */
+/**
+ * How one look draws. Widths in CSS pixels, dashes in line widths.
+ *
+ * @beta
+ */
 export interface IntentLook {
   /** The CSS variable of the outline and fill (or pattern) colour. */
   token: string;
@@ -66,6 +85,8 @@ export interface IntentLook {
  * drawn with its state's outline and fill, and the diamond pattern in the
  * provider colour on top (its footprint is a peer's claim through the
  * DSS, PLAN §14 Q18). Display-only constants.
+ *
+ * @beta
  */
 export function intentLook(k: IntentKey | "unstated"): IntentLook {
   switch (k) {
@@ -122,16 +143,27 @@ export function intentLook(k: IntentKey | "unstated"): IntentLook {
   }
 }
 
-/** Added to the outline of the selected intent. Display-only constant. */
+/**
+ * Added to the outline of the selected intent. Display-only constant.
+ *
+ * @beta
+ */
 export const INTENT_SELECTED_EXTRA_WIDTH_PX = 2;
 /**
  * Added to the outline, and to the fill opacity, of an intent the app
  * lists in `activeIds` (what the API says is current). Display-only.
+ *
+ * @beta
  */
 export const INTENT_ACTIVE_EXTRA_WIDTH_PX = 1.5;
+/** @beta */
 export const INTENT_ACTIVE_EXTRA_FILL = 0.12;
 
-/** The catalogue key of a state's name. */
+/**
+ * The catalogue key of a state's name.
+ *
+ * @beta
+ */
 export const INTENT_STATE_KEYS: Readonly<Record<IntentStateKey, Key>> =
   Object.freeze({
     Accepted: "intent.state.Accepted",
@@ -141,7 +173,11 @@ export const INTENT_STATE_KEYS: Readonly<Record<IntentStateKey, Key>> =
     unstated: "intent.state.unstated",
   });
 
-/** The `properties` of one intent volume's feature (IntentLayer). */
+/**
+ * The `properties` of one intent volume's feature (IntentLayer).
+ *
+ * @beta
+ */
 export interface IntentFeatureProperties {
   /** The intent id; every volume of one intent carries it. */
   identifier: string;
@@ -156,20 +192,34 @@ export interface IntentFeatureProperties {
   label: string;
 }
 
-/** The features one state's outline layer draws. */
+/**
+ * The features one state's outline layer draws.
+ *
+ * @beta
+ */
 export function intentStateFilter(k: IntentStateKey): FilterSpecification {
   return ["==", ["get", "state"], k];
 }
 
-/** The peer pattern's image name. */
+/**
+ * The peer pattern's image name.
+ *
+ * @beta
+ */
 export const INTENT_PEER_PATTERN_ID = "us-intent-peer";
 
-/** Side of the peer pattern tile, in pixels. Display-only constant. */
+/**
+ * Side of the peer pattern tile, in pixels. Display-only constant.
+ *
+ * @beta
+ */
 export const INTENT_PATTERN_TILE_PX = 12;
 
 /**
  * The diamond lattice tile of a peer intent, in `rgb`: the outline of a
  * diamond touching the tile's edge midpoints, so tiles join into a net.
+ *
+ * @beta
  */
 export function intentPeerPatternImage(rgb: Rgb): PatternImage {
   const size = INTENT_PATTERN_TILE_PX;

@@ -157,6 +157,29 @@ describe("LoginForm", () => {
     expect(onSuccess).not.toHaveBeenCalled();
   });
 
+  it("puts the focus on the cleared password after a refusal (A4)", async () => {
+    const s = stub(answer(401, refusal(401, "TEST: refused")));
+    renderForm(s.fetch);
+    fill(/username/i, USER);
+    fill(/^password$/i, PASSWORD);
+    (document.activeElement as HTMLElement | null)?.blur();
+    await submit();
+    expect(screen.getByRole("alert").textContent).toBe("TEST: refused");
+    expect(document.activeElement).toBe(password());
+  });
+
+  it("leaves the focus alone when the sign-in succeeds (the A4 twin)", async () => {
+    const s = stub(answer(200, { status: "signed_in" }));
+    const onSuccess = renderForm(s.fetch);
+    fill(/username/i, USER);
+    fill(/^password$/i, PASSWORD);
+    (document.activeElement as HTMLElement | null)?.blur();
+    await submit();
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+    expect(document.activeElement).not.toBe(password());
+    expect(document.activeElement).toBe(document.body);
+  });
+
   it("says the status when the refusal has no problem body", async () => {
     const s = stub(new Response("nope", { status: 500 }));
     renderForm(s.fetch);
@@ -300,6 +323,9 @@ describe("LoginForm", () => {
     expect(
       (screen.getByLabelText(/one-time code/i) as HTMLInputElement).value,
     ).toBe("");
+    expect(document.activeElement).toBe(
+      screen.getByLabelText(/one-time code/i),
+    );
     expect(screen.queryByLabelText(/^password$/i)).toBeNull();
   });
 
@@ -319,6 +345,7 @@ describe("LoginForm", () => {
     await submit();
     expect(screen.getByRole("alert").textContent).toBe("TEST: sign in again");
     expect(password().value).toBe("");
+    expect(document.activeElement).toBe(password());
     expect(screen.queryByLabelText(/one-time code/i)).toBeNull();
   });
 

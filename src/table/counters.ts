@@ -3,6 +3,7 @@
 // parse, a PII filter found in a URL, a state entry naming a column the
 // table does not have. Nothing here throws on input it did not write.
 
+/** @beta */
 export type TableCounter =
   /** A `<key>.*` search parameter that did not parse; it was ignored. */
   | "url_state_malformed"
@@ -24,12 +25,20 @@ export function countTable(counter: TableCounter, by = 1): void {
   counts[counter] += by;
 }
 
-/** A snapshot of the table counters since the page loaded. */
+/**
+ * A snapshot of the table counters since the page loaded.
+ *
+ * @beta
+ */
 export function tableCounters(): Readonly<Record<TableCounter, number>> {
   return { ...counts };
 }
 
-/** Sets every counter back to zero; for tests (E-11). */
+/**
+ * Sets every counter back to zero; for tests (E-11).
+ *
+ * @beta
+ */
 export function resetTableCountersForTests(): void {
   for (const k of Object.keys(counts) as TableCounter[]) counts[k] = 0;
 }

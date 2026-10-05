@@ -10,6 +10,7 @@ import { createContext, useContext, type ReactNode } from "react";
 
 const CspNonceContext = createContext<string | undefined>(undefined);
 
+/** @public */
 export function CspNonceProvider(props: {
   nonce: string | undefined;
   children?: ReactNode;
@@ -21,7 +22,11 @@ export function CspNonceProvider(props: {
   );
 }
 
-/** The nonce of the nearest `CspNonceProvider`, or `undefined`. */
+/**
+ * The nonce of the nearest `CspNonceProvider`, or `undefined`.
+ *
+ * @beta
+ */
 export function useCspNonce(): string | undefined {
   return useContext(CspNonceContext);
 }

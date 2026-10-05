@@ -2,6 +2,7 @@
 // handled (CLAUDE.md rule 9, LESSONS E-09). Server side only: the app
 // exposes them on its own health page if it wants them.
 
+/** @public */
 export type AuthCounter =
   /** A session token whose payload did not decode to a JSON object. */
   | "claims_malformed"
@@ -52,12 +53,20 @@ export function countAuth(counter: AuthCounter): void {
   counts[counter] += 1;
 }
 
-/** A snapshot of the BFF counters since the process started. */
+/**
+ * A snapshot of the BFF counters since the process started.
+ *
+ * @public
+ */
 export function authCounters(): Readonly<Record<AuthCounter, number>> {
   return { ...counts };
 }
 
-/** Sets every counter back to zero; for tests (E-11). */
+/**
+ * Sets every counter back to zero; for tests (E-11).
+ *
+ * @beta
+ */
 export function resetAuthCountersForTests(): void {
   Object.assign(counts, ZERO);
 }

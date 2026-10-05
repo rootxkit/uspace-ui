@@ -9,6 +9,7 @@ import { useLang, useT } from "../i18n/I18nProvider.js";
 import { AGE_BUCKET_KEYS, ageBucket } from "../symbology/age.js";
 import { cn } from "../ui/cn.js";
 
+/** @public */
 export interface AgeChipProps {
   /** The age in seconds (`ageS`, `sourceAgeS`); null when unknown. */
   ageS: number | null;
@@ -24,6 +25,7 @@ const BORDER: Readonly<Record<string, string>> = {
   unknown: "border-border",
 };
 
+/** @public */
 export function AgeChip(props: AgeChipProps) {
   const { ageS, staleAfterS, className } = props;
   const t = useT();

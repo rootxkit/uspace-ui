@@ -15,6 +15,8 @@ import type { AgeBucket } from "../theme/tokens.js";
  * without a bucket). A negative age (the browser clock stepped back
  * between receipt and now) is below every threshold, so `live`; the
  * layer's tick moves it on.
+ *
+ * @public
  */
 export function ageBucket(ageS: number | null, staleAfterS: number): AgeBucket {
   if (!Number.isFinite(staleAfterS) || staleAfterS <= 0) return "unknown";
@@ -27,6 +29,8 @@ export function ageBucket(ageS: number | null, staleAfterS: number): AgeBucket {
 /**
  * The CSS variable of a bucket's colour (styles/tokens.css; the same names
  * as `tokens.age`, in `AGE_BUCKETS` order, which age.test.ts pins).
+ *
+ * @beta
  */
 export function ageToken(b: AgeBucket): string {
   switch (b) {
@@ -45,6 +49,8 @@ export function ageToken(b: AgeBucket): string {
  * needs no colour. Display-only constants. `unknown` is drawn in full: an
  * unknown is never dimmed as if it were known to be old (CLAUDE.md rule
  * 6); the legend says so.
+ *
+ * @beta
  */
 export function ageOpacity(b: AgeBucket): number {
   switch (b) {
@@ -61,7 +67,11 @@ export function ageOpacity(b: AgeBucket): number {
   }
 }
 
-/** The catalogue key of a bucket's name. */
+/**
+ * The catalogue key of a bucket's name.
+ *
+ * @beta
+ */
 export const AGE_BUCKET_KEYS: Readonly<Record<AgeBucket, Key>> = Object.freeze({
   live: "age.bucket.live",
   aging: "age.bucket.aging",

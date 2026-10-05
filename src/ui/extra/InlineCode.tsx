@@ -2,7 +2,11 @@ import type { ComponentProps, ReactNode } from "react";
 
 import { cn } from "../cn.js";
 
-/** An identifier or a value shown verbatim inside running text. */
+/**
+ * An identifier or a value shown verbatim inside running text.
+ *
+ * @beta
+ */
 export function InlineCode({
   className,
   ...props

@@ -4,6 +4,7 @@
 // the status components show them (`FeedStatusBar`, `LiveStatus`). The
 // stores count their own bounds (`TrackStore.counters()` and the rest).
 
+/** @beta */
 export type LiveCounter =
   /** A message that arrived on a feed socket, whatever it held. */
   | "frames_received"
@@ -16,6 +17,12 @@ export type LiveCounter =
   | "frames_unhandled"
   /** A `console/status/v1` whose body broke the schema: not applied. */
   | "status_malformed"
+  /**
+   * A malformed extra of an applied status frame that the lab schema does
+   * not name (`thresholds`, `evaluation_period_s`): left out, one count
+   * per member.
+   */
+  | "status_extra_ignored"
   /** A `console/snapshot/v1` whose body broke the schema: not applied. */
   | "snapshot_malformed"
   /** One item of a snapshot that was not a frame: skipped. */
@@ -49,6 +56,7 @@ const ZERO: Readonly<Record<LiveCounter, number>> = {
   frames_malformed: 0,
   frames_unhandled: 0,
   status_malformed: 0,
+  status_extra_ignored: 0,
   snapshot_malformed: 0,
   snapshot_item_malformed: 0,
   snapshot_item_unadapted: 0,
@@ -63,16 +71,25 @@ const ZERO: Readonly<Record<LiveCounter, number>> = {
 
 const counts: Record<LiveCounter, number> = { ...ZERO };
 
+/** @beta */
 export function countLive(counter: LiveCounter, by = 1): void {
   counts[counter] += by;
 }
 
-/** A snapshot of the feed counters since the page loaded. */
+/**
+ * A snapshot of the feed counters since the page loaded.
+ *
+ * @beta
+ */
 export function liveCounters(): Readonly<Record<LiveCounter, number>> {
   return { ...counts };
 }
 
-/** Tests only: start the counters again from zero (LESSONS E-11). */
+/**
+ * Tests only: start the counters again from zero (LESSONS E-11).
+ *
+ * @beta
+ */
 export function resetLiveCountersForTests(): void {
   Object.assign(counts, ZERO);
 }

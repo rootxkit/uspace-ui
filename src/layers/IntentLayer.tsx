@@ -50,17 +50,25 @@ import { useFeaturePointer } from "./zoneFeatures.js";
  * and `peer` when the API says it is another USSP's intent seen through
  * the DSS (02 F6: peer flights as `provider`). `IntentView` is accepted as
  * it is.
+ *
+ * @public
  */
 export type IntentInput = Omit<IntentView, "volumes"> & {
   volumes: readonly (GeoJSON.Polygon | GeoJSON.MultiPolygon)[];
   peer?: boolean;
 };
 
+/** @beta */
 export const INTENT_LAYER_ID = "us-intents";
 
-/** Label size in CSS pixels. Display-only constant. */
+/**
+ * Label size in CSS pixels. Display-only constant.
+ *
+ * @beta
+ */
 export const INTENT_LABEL_SIZE_PX = 12;
 
+/** @beta */
 export interface IntentLayerIds {
   source: string;
   fill: string;
@@ -69,6 +77,7 @@ export interface IntentLayerIds {
   label: string;
 }
 
+/** @beta */
 export function intentLayerIds(id: string): IntentLayerIds {
   const lines = {} as Record<IntentStateKey, string>;
   for (const k of INTENT_STATE_KEYS_ORDER) lines[k] = `${id}-line-${k}`;
@@ -81,6 +90,7 @@ export function intentLayerIds(id: string): IntentLayerIds {
   };
 }
 
+/** @beta */
 export type IntentFeatureCollection = GeoJSON.FeatureCollection<
   GeoJSON.Polygon | GeoJSON.MultiPolygon,
   IntentFeatureProperties
@@ -91,7 +101,11 @@ const EMPTY: IntentFeatureCollection = {
   features: [],
 };
 
-/** The label: the authorisation number, else the intent id, and the state. */
+/**
+ * The label: the authorisation number, else the intent id, and the state.
+ *
+ * @beta
+ */
 export function intentLabel(i: IntentInput, t: Translate): string {
   const name = i.authorisationNumber?.trim() ?? "";
   return [
@@ -103,6 +117,8 @@ export function intentLabel(i: IntentInput, t: Translate): string {
 /**
  * One feature per volume, in the API's order; `geometry` is the volume
  * object itself, untouched.
+ *
+ * @beta
  */
 export function intentFeatureCollection(
   intents: readonly IntentInput[],
@@ -232,6 +248,7 @@ function Row(props: { field: string; label: string; children: ReactNode }) {
   );
 }
 
+/** @beta */
 export interface IntentCardProps {
   intent: IntentInput;
   /** Listed in the app's `activeIds`. */
@@ -240,7 +257,11 @@ export interface IntentCardProps {
   className?: string;
 }
 
-/** What the API said about an intent, with its time window in UTC. */
+/**
+ * What the API said about an intent, with its time window in UTC.
+ *
+ * @beta
+ */
 export function IntentCard(props: IntentCardProps) {
   const { intent, active, lang, className } = props;
   const t = useTFor(lang);
@@ -300,6 +321,7 @@ export function IntentCard(props: IntentCardProps) {
   );
 }
 
+/** @public */
 export interface IntentLayerProps {
   intents: readonly IntentInput[];
   /**
@@ -320,6 +342,7 @@ export interface IntentLayerProps {
 
 const NONE: readonly string[] = [];
 
+/** @public */
 export function IntentLayer(props: IntentLayerProps) {
   const {
     intents,

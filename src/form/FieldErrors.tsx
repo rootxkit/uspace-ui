@@ -7,6 +7,7 @@ import { useT } from "../i18n/I18nProvider.js";
 import type { FieldError } from "../model/index.js";
 import { cn } from "../ui/cn.js";
 
+/** @public */
 export interface FieldErrorsProps {
   errors: readonly FieldError[];
   /** The API cut the list (`Problem.truncated`). */
@@ -14,6 +15,7 @@ export interface FieldErrorsProps {
   className?: string;
 }
 
+/** @public */
 export function FieldErrors(props: FieldErrorsProps) {
   const { errors, truncated = false, className } = props;
   const t = useT();

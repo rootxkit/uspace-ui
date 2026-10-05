@@ -21,6 +21,7 @@ import {
   isUnsafeMethod,
 } from "../contract.js";
 
+/** @public */
 export interface SessionCookieOptions {
   /** The session cookie's name; `uspace_session` by default. */
   name?: string;
@@ -40,7 +41,11 @@ export interface SessionCookieOptions {
   maxAgeS: number;
 }
 
-/** Anything that reads request cookies: `NextRequest.cookies` or `cookies()`. */
+/**
+ * Anything that reads request cookies: `NextRequest.cookies` or `cookies()`.
+ *
+ * @public
+ */
 export interface CookieReader {
   get(name: string): { value: string } | undefined;
 }
@@ -71,6 +76,8 @@ function attributes(opts: SessionCookieOptions, maxAgeS: number) {
 /**
  * Stores the API-issued session JWT in the `HttpOnly` session cookie. It
  * never decodes or verifies the token (06 §3: the BFF never verifies).
+ *
+ * @public
  */
 export function setSession(
   res: NextResponse,
@@ -83,7 +90,11 @@ export function setSession(
   });
 }
 
-/** Expires both cookies, with the attributes they were set with. */
+/**
+ * Expires both cookies, with the attributes they were set with.
+ *
+ * @public
+ */
 export function clearSession(
   res: NextResponse,
   opts: SessionCookieOptions,
@@ -100,7 +111,11 @@ function isRequest(src: NextRequest | CookieReader): src is NextRequest {
   return "cookies" in src;
 }
 
-/** The session JWT from the request's cookie, or `null` when there is none. */
+/**
+ * The session JWT from the request's cookie, or `null` when there is none.
+ *
+ * @public
+ */
 export function readSessionToken(
   src: NextRequest | CookieReader,
   opts?: Pick<SessionCookieOptions, "name">,
@@ -121,6 +136,8 @@ export function base64url(bytes: Uint8Array): string {
  * Chooses a new CSRF value (32 random bytes, base64url) and sets it in
  * the CSRF cookie: same attributes as the session cookie but not
  * `HttpOnly`, so the page can read it and send it back. Returns it.
+ *
+ * @public
  */
 export function issueCsrf(
   res: NextResponse,
@@ -147,6 +164,8 @@ export function constantTimeEqual(a: string, b: string): boolean {
  * an unsafe method, the CSRF cookie and the `X-CSRF-Token` header must
  * both be present, non-empty and equal (compared in constant time). A
  * safe method (GET, HEAD, OPTIONS) passes.
+ *
+ * @public
  */
 export function checkCsrf(
   req: NextRequest,

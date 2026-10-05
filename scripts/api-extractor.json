@@ -32,7 +32,14 @@
     "compilerMessageReporting": { "default": { "logLevel": "error" } },
     "extractorMessageReporting": {
       "default": { "logLevel": "error" },
-      "ae-missing-release-tag": { "logLevel": "none" },
+      "ae-missing-release-tag": {
+        "logLevel": "error",
+        "addToApiReportFile": false
+      },
+      "ae-incompatible-release-tags": {
+        "logLevel": "error",
+        "addToApiReportFile": false
+      },
       "ae-unresolved-link": { "logLevel": "none" }
     },
     "tsdocMessageReporting": { "default": { "logLevel": "none" } }

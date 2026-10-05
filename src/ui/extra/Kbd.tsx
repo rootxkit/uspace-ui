@@ -2,7 +2,11 @@ import type { ComponentProps, ReactNode } from "react";
 
 import { cn } from "../cn.js";
 
-/** A key or key combination, as in "press Esc to close". */
+/**
+ * A key or key combination, as in "press Esc to close".
+ *
+ * @beta
+ */
 export function Kbd({ className, ...props }: ComponentProps<"kbd">): ReactNode {
   return (
     <kbd

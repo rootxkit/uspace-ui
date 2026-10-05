@@ -2,6 +2,7 @@
 // (CLAUDE.md rule 9): WP-8's status components read these, and the
 // browser tests assert `missingKeys()` is 0 for the kit's own components.
 
+/** @beta */
 export type I18nCounter =
   /** A `ka` lookup that found nothing in `ka` and showed the `en` text. */
   | "missing_ka"
@@ -23,17 +24,29 @@ export function countI18n(counter: I18nCounter): void {
   counts[counter] += 1;
 }
 
-/** A snapshot of the i18n counters since the page loaded. */
+/**
+ * A snapshot of the i18n counters since the page loaded.
+ *
+ * @beta
+ */
 export function i18nCounters(): Readonly<Record<I18nCounter, number>> {
   return { ...counts };
 }
 
-/** Lookups that fell back, to `en` or to the key, since the page loaded. */
+/**
+ * Lookups that fell back, to `en` or to the key, since the page loaded.
+ *
+ * @beta
+ */
 export function missingKeys(): number {
   return counts.missing_ka + counts.missing_key;
 }
 
-/** Sets every counter back to 0. For tests (they restore global state). */
+/**
+ * Sets every counter back to 0. For tests (they restore global state).
+ *
+ * @beta
+ */
 export function resetI18nCounters(): void {
   for (const k of Object.keys(counts) as I18nCounter[]) counts[k] = 0;
 }

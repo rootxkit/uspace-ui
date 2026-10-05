@@ -4,6 +4,7 @@ import type { LngLatBounds, Map as MapLibreMap } from "maplibre-gl";
 
 import { maplibre } from "./maplibre.js";
 
+/** @public */
 export interface Viewport {
   /** [lng, lat], WGS84 degrees. */
   center: [number, number];
@@ -12,7 +13,11 @@ export interface Viewport {
   pitch: number;
 }
 
-/** WGS84 degrees. */
+/**
+ * WGS84 degrees.
+ *
+ * @public
+ */
 export interface BBox {
   minLng: number;
   minLat: number;
@@ -99,6 +104,8 @@ function onGrid(n: number, quantum: number): number {
  * its width and height on every side, then widened outwards to multiples
  * of `quantizeDeg` so a small pan gives the same box. Clamped to the WGS84
  * range.
+ *
+ * @public
  */
 export function subscriptionBBox(
   b: BBox,

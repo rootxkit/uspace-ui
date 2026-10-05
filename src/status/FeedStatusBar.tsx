@@ -16,6 +16,8 @@ import { CONNECTION_KEYS, degradedLabel } from "./words.js";
 /**
  * `FeedStatus`, and what `useFeed` adds when the app passes its result:
  * the last frame's time, the ignored frames, a 4401 close.
+ *
+ * @public
  */
 export type FeedStatusInput = FeedStatus & {
   lastFrameAtMs?: number | null;
@@ -23,6 +25,7 @@ export type FeedStatusInput = FeedStatus & {
   unauthorized?: boolean;
 };
 
+/** @public */
 export interface FeedStatusBarProps {
   status: FeedStatusInput;
   /** The app's clock tick (`useNowMs`). */
@@ -48,6 +51,7 @@ function Part(props: {
   );
 }
 
+/** @public */
 export function FeedStatusBar(props: FeedStatusBarProps) {
   const { status, nowMs, className } = props;
   const t = useT();

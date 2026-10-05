@@ -2,6 +2,7 @@
 // (CLAUDE.md rule 9, LESSONS E-09, E-10); WP-8's status components read
 // these.
 
+/** @beta */
 export type LayerCounter =
   /** Data handed to a layer that a newer value replaced in the same frame. */
   | "update_superseded"
@@ -30,7 +31,12 @@ export type LayerCounter =
    * can be drawn for it on the map; the list still shows it. Counted once
    * per alert while it stays so.
    */
-  | "alert_aircraft_missing";
+  | "alert_aircraft_missing"
+  /**
+   * A click that would add a vertex past DrawLayer's `maxVertices` (the
+   * app's bound from its API): nothing added (1.0.0).
+   */
+  | "draw_vertex_refused";
 
 const counts: Record<LayerCounter, number> = {
   update_superseded: 0,
@@ -40,18 +46,28 @@ const counts: Record<LayerCounter, number> = {
   trail_point_evicted: 0,
   alert_peer_missing: 0,
   alert_aircraft_missing: 0,
+  draw_vertex_refused: 0,
 };
 
+/** @beta */
 export function countLayer(counter: LayerCounter): void {
   counts[counter] += 1;
 }
 
-/** A snapshot of the layer counters since the page loaded. */
+/**
+ * A snapshot of the layer counters since the page loaded.
+ *
+ * @beta
+ */
 export function layerCounters(): Readonly<Record<LayerCounter, number>> {
   return { ...counts };
 }
 
-/** Tests only: start the counters again from zero (LESSONS E-11). */
+/**
+ * Tests only: start the counters again from zero (LESSONS E-11).
+ *
+ * @beta
+ */
 export function resetLayerCountersForTests(): void {
   for (const k of Object.keys(counts) as LayerCounter[]) counts[k] = 0;
 }

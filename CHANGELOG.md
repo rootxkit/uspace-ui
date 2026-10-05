@@ -7,9 +7,162 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
-- Fixed: ThemeProvider changes the scheme with CSS transitions off, so a
+## 1.0.0
+
+U-M4: the API is frozen (PLAN §12, D12). Prepared on `main`, not tagged:
+the owner reads `docs/api/uspace-ui.api.md`, tags `v1.0.0`, and the
+release is a GitHub Release asset as before (docs/RELEASING.md). Pin it
+exactly:
+
+```jsonc
+"@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.0.0/rootxkit-uspace-ui-1.0.0.tgz"
+```
+
+### Compatibility policy (PLAN §12)
+
+- Within a major only additive changes: new exports, new optional props,
+  new catalogue keys, new enumeration values rendered because `model`
+  gained them.
+- A major: removing or renaming an export or a prop; changing what a
+  colour, shape or pattern means (operators are trained on the legend);
+  changing a wording rule (R-05, C-12, B-11); changing a cookie name or
+  the BFF route set; changing the console frame; dropping a `next`,
+  `react` or `maplibre-gl` major. A palette change that keeps every
+  meaning, and a new translation, are a minor.
+- Two majors are maintained for six months, on `release/v<N>` branches
+  (CLAUDE.md "Release branches").
+- The contract is what `docs/api/uspace-ui.api.md` tags `@public`;
+  `@beta` exports may change in a minor, with a line here. The semver
+  gate (`scripts/semver-gate.mjs`, CI `semver-gate`) holds a pull
+  request that removes or changes a public line to the label `breaking`
+  and a new major heading, and one that changes a legend token or
+  symbology mapping to the label `legend-change` and a line citing the
+  lesson or spec row.
+
+### Entry points that ship
+
+`model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api` (with the
+`uspace-ui-gen-api` bin), `auth/server`, `auth/client`, `symbology`,
+`layers` (now with `DrawLayer`), `legend`, `live`, `status` (now with
+`ThresholdsPanel`), `alerts`, `table`, `form` (now with
+`OutlineFields`), `eslint`, `test` (now with the lab-derived fixtures),
+and `styles/tokens.css`, `styles/map.css`, `fonts/fonts.css` with the
+woff2 files.
+
+### What a consumer on 0.1.0 does
+
+Why this is a major and not a minor: the release tags, and the few
+lines that changed rather than grew. A console that builds with 0.1.0
+builds with 1.0.0 unless it does one of these:
+
+- It uses an export now tagged `@beta` (362 declarations: counters,
+  `...ForTests` helpers, layer ids and feature builders, the reference
+  adapters, and the like): it still works, but a minor may change it.
+  Every export the four consoles import is `@public`, checked by
+  `pnpm check` against the list pinned in `scripts/consumer-imports.json`
+  (PLAN §3, "The 1.0.0 freeze").
+- It switches exhaustively over `LayerCounter` or `LiveCounter`: add
+  `draw_vertex_refused` and `status_extra_ignored`.
+- It builds a `StatusExtras` or `StatusBody` itself (a test double, say):
+  add `thresholds`, `evaluationPeriodS` and, on `StatusBody`, `ignored`.
+- It relies on a page without `data-theme` painting light under a dark
+  preference: `tokens.css` now paints it dark (A5, below).
+
+### Added
+
+- `layers`: `DrawLayer`, the drawing tool the USSP operator portal had
+  to do without in 0.1.0 (uspace-ussp PLAN Q28 gap 1). A click adds a
+  polygon vertex or places a circle's centre, a drag moves a point, each
+  point as MapLibre reports it. A circle's outline needs geodesy, which
+  lives once in Go (PLAN §1.1; uspace-core `geodesy`), so the layer draws
+  the app's `circleOutline` as its API drew it and otherwise only the
+  centre. `maxVertices` is required; a click past it is refused and
+  counted (`draw_vertex_refused`). `model` gains `DrawPoint` and
+  `DrawOutline` (additive).
+- `form`: `OutlineFields`, the typed and keyboard path to the same
+  outline (WCAG 2.5.7): vertices added, edited and removed, a circle's
+  centre and radius said in words, WGS84 ranges and a radius above zero
+  as the only checks; the API judges the outline. `emptyOutline`.
+- `live`, `status`: the thresholds in force (uspace-ussp PLAN Q28 gap 2).
+  `StatusExtras` gains `thresholds` and `evaluationPeriodS`, read from a
+  status frame's `thresholds{}` and `evaluation_period_s`; the lab
+  schema does not name them yet (PLAN §14 Q21), so a malformed member is
+  left out, counted (`status_extra_ignored`) and the frame still applies.
+  `ThresholdsPanel` shows them with units and the policy version, and
+  says when a frame carries none; nothing is defaulted (INV-03).
+- `theme`: `schemeAttribute(scheme)`, the `data-theme` a server renders
+  on `<html>` for an explicit scheme (docs/CONSUMING.md §3).
+- `test`: `fixtures({ source: "lab" })`, `labFixtures()`,
+  `labDecodings()`, `LAB_COMMIT`, and the reference adapters (`@beta`,
+  examples of what a `web/` writes): the lab's schema examples at the
+  commits in `src/test/fixtures/VERSION` (`docs/LAB_VERSION`), decoded
+  the way a console would.
+- `live`: `parseStatusSource` (`@beta`), the `source/status/v1` reader
+  the status frame already used.
+
+### Fixed
+
+- `ThemeProvider` changes the scheme with CSS transitions off, so a
   control no longer fades from the old scheme's text colour (near-black
-  on a dark field) after mounting in dark (WP-1).
+  on a dark field) after mounting in dark (WP-1; merged after 0.1.0).
+- `LoginForm` returns the focus to the field to fill again after a
+  refused sign-in (the cleared password, or the code); it fell to
+  `<body>` because the submit button is disabled during the request
+  (docs/ACCESSIBILITY.md A4, WCAG 2.4.3).
+- No first-paint flash: `tokens.css` gives a page without `data-theme`
+  the dark values under `prefers-color-scheme: dark`, and `dark:`
+  utilities follow, so a dark preference no longer paints light and turns
+  dark after hydration (A5). An explicit scheme from the cookie is
+  rendered on the server with `schemeAttribute`.
+- `auth/server`: the BFF proxy forwards the client's `Idempotency-Key`,
+  which the ANSP's `POST /v1/restrictions` requires (uspace-ansp PLAN row
+  49, item 1); a request without one still sends none.
+
+### Contract changes
+
+Each is additive or a bug fix; none changes a wire format, a cookie, a
+route or a meaning.
+
+- Console frame (`console/status/v1`): the kit now reads the optional
+  `thresholds{}` and `evaluation_period_s` the USSP's traffic stream
+  sends; a frame without them reads as before. Additive; the lab schema
+  should name them (PLAN §14 Q21).
+- BFF forwarding: `Idempotency-Key` joins the forwarded request headers
+  (`FORWARDED_REQUEST_HEADERS`). A bug fix: an idempotent API refused
+  every console request without it.
+- `tokens.css`: the dark values under `prefers-color-scheme` before
+  `data-theme` is set. A bug fix (A5); no value changed, no meaning.
+- API report: every declaration tagged `@public` or `@beta`. The gate's
+  label `breaking` is on this change for that reason.
+
+### The v1 gate (WP-14)
+
+- CI `semver-gate` (its own workflow, every pull request and label
+  change), `fixtures` (the lab fixtures offline and online, required
+  online on `main`), and the hardened `enums` job: `scripts/check-enums.sh`
+  reads uspace-core with a Go tokenizer (`scripts/go-consts.mjs`), covers
+  `alerting.ClearReason` and `sources.Why` beside `core`, prints a
+  table, and fails on any difference (one listed skip:
+  `acknowledged_timeout`, which core does not raise).
+- api-extractor fails on an untagged export and on a public signature
+  that reaches a beta type.
+
+### Not yet
+
+- The owner reads `docs/api/uspace-ui.api.md`, makes `semver-gate` and
+  `fixtures` required checks on `main`, and tags `v1.0.0`.
+- Lab coverage (`src/test/fixtures.lab.test.ts`, visible skips): 42
+  enumeration values appear in no lab example; three examples leave out
+  a member their schema requires (the lab snapshot's violation and
+  manned items, the envelope's manned frame); `violation/v1` has no
+  examples (uspace-authority); the CISP's `cis/change/v1` examples carry
+  the production hostname and are not vendored; the authority's
+  `violation/v1` names clear reasons `reconfigured` and `authorised`
+  that `model.ClearReason` lacks (PLAN §14 Q22).
+- uspace-ansp row 49 items 2 (a QR code of the enrolment URI) and 5 (the
+  snapshot's `restrictions` extras) stay open for the kit.
+- No screen reader pass (docs/ACCESSIBILITY.md). The target, WCAG 2.2 AA,
+  is pending GCAA.
 
 ## 0.1.0
 

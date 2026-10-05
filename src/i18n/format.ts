@@ -9,8 +9,10 @@ import type { Key } from "./en.js";
 import { LOCALES, type Lang } from "./lang.js";
 import { createTranslator, type Translate } from "./translate.js";
 
+/** @public */
 export const DASH = "—";
 
+/** @public */
 export type HeightRef = "TakeoffLocation" | "GroundLevel";
 
 const translators = new Map<Lang, Translate>();
@@ -34,6 +36,8 @@ function known(v: number | null | undefined): v is number {
  * `v` with `digits` decimals and an optional unit; a dash for null, NaN or
  * Infinity. With `lang`, grouped and punctuated as `ka-GE` or `en-GB`;
  * without, plain digits.
+ *
+ * @public
  */
 export function fmtNum(
   v: number | null | undefined,
@@ -64,6 +68,8 @@ export function fmtNum(
  * The catalogue key each datum or altitude source renders with. `geodetic`
  * is AMSL through the geoid (core/vertical.go); `pressure` is a pressure
  * altitude and never says AMSL (R-09); `none` has no altitude.
+ *
+ * @beta
  */
 export const ALTITUDE_KEYS: Readonly<
   Record<VerticalRef | AltSource, Key | null>
@@ -81,6 +87,8 @@ export const ALTITUDE_KEYS: Readonly<
  * "550 m AMSL", "120 m AGL", "600 m pressure altitude". A dash when the
  * value is unknown, when the source is `none`, and when no datum is given:
  * bare metres are never shown.
+ *
+ * @public
  */
 export function fmtAltitude(
   v: number | null,
@@ -94,7 +102,11 @@ export function fmtAltitude(
   return t(key, { v: fmtNum(v, 0, undefined, lang) });
 }
 
-/** The catalogue key each broadcast height reference renders with (R-12). */
+/**
+ * The catalogue key each broadcast height reference renders with (R-12).
+ *
+ * @beta
+ */
 export const HEIGHT_KEYS: Readonly<Record<HeightRef, Key>> = {
   TakeoffLocation: "height.takeoff",
   GroundLevel: "height.ground",
@@ -103,6 +115,8 @@ export const HEIGHT_KEYS: Readonly<Record<HeightRef, Key>> = {
 /**
  * A broadcast height: "40 m above take-off" or "40 m above ground", never
  * one for the other (R-12); a dash without a value or a reference.
+ *
+ * @public
  */
 export function fmtHeight(
   v: number | null,
@@ -117,6 +131,8 @@ export function fmtHeight(
 /**
  * "3 s", "2 min", "5 h", "3 d" (whole units, truncated). The caller says
  * which age it is (since capture or since receipt, 04 §2).
+ *
+ * @public
  */
 export function fmtAge(ageS: number | null, lang: Lang): string {
   if (!known(ageS)) return DASH;
@@ -150,6 +166,8 @@ const two = (n: number): string => String(n).padStart(2, "0");
  * "2026-10-02 14:03 UTC" (seconds on request), the same layout in both
  * languages and always saying UTC. A dash for null and for a string that
  * is not an RFC 3339 time with a zone (counted).
+ *
+ * @public
  */
 export function fmtTimeUTC(
   iso: string | null,
@@ -169,6 +187,8 @@ export function fmtTimeUTC(
  * "2026-10-02 18:03 Asia/Tbilisi": the time in the IANA zone `tz`, which
  * is the app's (the kit has no default zone), followed by the zone's name.
  * An unknown zone throws: it is a configuration error, not a display state.
+ *
+ * @public
  */
 export function fmtTimeLocal(
   iso: string | null,
@@ -194,21 +214,33 @@ export function fmtTimeLocal(
   return t("time.local", { time, zone: tz });
 }
 
-/** "12.3 m/s" ("12,3 მ/წმ"); a dash when unknown. */
+/**
+ * "12.3 m/s" ("12,3 მ/წმ"); a dash when unknown.
+ *
+ * @public
+ */
 export function fmtSpeed(ms: number | null, lang: Lang): string {
   if (!known(ms)) return DASH;
   const t = kitT(lang);
   return t("unit.speed", { v: fmtNum(ms, 1, undefined, lang) });
 }
 
-/** "045°", whole degrees 000-359; a dash when unknown. */
+/**
+ * "045°", whole degrees 000-359; a dash when unknown.
+ *
+ * @public
+ */
 export function fmtHeading(deg: number | null): string {
   if (!known(deg)) return DASH;
   const d = ((Math.round(deg) % 360) + 360) % 360;
   return `${String(d).padStart(3, "0")}°`;
 }
 
-/** "1 250 m": always metres (the kit converts no unit); a dash when unknown. */
+/**
+ * "1 250 m": always metres (the kit converts no unit); a dash when unknown.
+ *
+ * @beta
+ */
 export function fmtDistance(m: number | null, lang: Lang): string {
   if (!known(m)) return DASH;
   const t = kitT(lang);
@@ -226,6 +258,8 @@ const SECRET_SUFFIX = /^([A-Za-z0-9]+)-[A-Za-z0-9]{3}$/;
  * The public part as given. A value ending in a secret part shows only
  * what precedes the hyphen, and the refusal is counted: the API never
  * sends a secret part, so one reaching the kit is a defect upstream.
+ *
+ * @public
  */
 export function fmtRegistrationNumber(publicPart: string | null): string {
   if (publicPart === null) return DASH;

@@ -36,6 +36,8 @@ type Detail = Readonly<Record<string, unknown>>;
  * The first of `keys` the detail carries: its value when a finite
  * number, else null. A key that is present but null (a vertical the
  * server could not judge, R-09) is not replaced by a later alias.
+ *
+ * @public
  */
 export function detailNumber(d: Detail, ...keys: string[]): number | null {
   for (const k of keys) {
@@ -46,7 +48,11 @@ export function detailNumber(d: Detail, ...keys: string[]): number | null {
   return null;
 }
 
-/** The first of `keys` the detail carries, when a non-empty string. */
+/**
+ * The first of `keys` the detail carries, when a non-empty string.
+ *
+ * @beta
+ */
 export function detailString(d: Detail, ...keys: string[]): string | null {
   for (const k of keys) {
     if (!Object.hasOwn(d, k)) continue;
@@ -56,20 +62,32 @@ export function detailString(d: Detail, ...keys: string[]): string | null {
   return null;
 }
 
-/** `true` or `false` as sent; null when absent or not a boolean. */
+/**
+ * `true` or `false` as sent; null when absent or not a boolean.
+ *
+ * @beta
+ */
 export function detailFlag(d: Detail, key: string): boolean | null {
   const v = Object.hasOwn(d, key) ? d[key] : undefined;
   return typeof v === "boolean" ? v : null;
 }
 
-/** The strings of an array field; non-strings are left out. */
+/**
+ * The strings of an array field; non-strings are left out.
+ *
+ * @beta
+ */
 export function detailStrings(d: Detail, key: string): string[] {
   const v = Object.hasOwn(d, key) ? d[key] : undefined;
   if (!Array.isArray(v)) return [];
   return v.filter((x): x is string => typeof x === "string" && x !== "");
 }
 
-/** The other party of a `proximity` alert, as `detail.peer` names it. */
+/**
+ * The other party of a `proximity` alert, as `detail.peer` names it.
+ *
+ * @beta
+ */
 export interface AlertPeer {
   trackId: string | null;
   trust: string | null;
@@ -78,6 +96,8 @@ export interface AlertPeer {
 /**
  * `detail.peer {track_id, trust}` (spec 04 §3.3); the alert's
  * `peerTrackId` when the detail names no id.
+ *
+ * @beta
  */
 export function alertPeer(alert: AlertView): AlertPeer {
   const raw = Object.hasOwn(alert.detail, "peer")
@@ -188,12 +208,20 @@ function zoneName(t: Translate, d: Detail): { zone: string; type: string } {
   };
 }
 
-/** True for a kind this kit has words for. */
+/**
+ * True for a kind this kit has words for.
+ *
+ * @beta
+ */
 export function isKnownKind(kind: string): kind is AlertView["kind"] {
   return Object.hasOwn(ALERT_SUMMARY_KEYS, kind);
 }
 
-/** The name of a kind; a kind this kit does not know is shown as sent. */
+/**
+ * The name of a kind; a kind this kit does not know is shown as sent.
+ *
+ * @public
+ */
 export function kindName(t: Translate, kind: string): string {
   return isKnownKind(kind) ? t(ALERT_KIND_KEYS[kind]) : kind;
 }
@@ -282,6 +310,8 @@ function clearedSummary(alert: AlertView, t: Translate, lang: Lang): string {
 /**
  * The one-line summary of `alert` in the language of `t`. Pure: the list
  * calls it with the provider's translator, so an app's catalogue applies.
+ *
+ * @public
  */
 export function alertSummary(
   alert: AlertView,
@@ -293,6 +323,7 @@ export function alertSummary(
     : activeSummary(alert, t, lang);
 }
 
+/** @public */
 export interface AlertSummaryProps {
   alert: AlertView;
   lang: Lang;
@@ -304,6 +335,8 @@ export interface AlertSummaryProps {
  * The one-line summary as a string (PLAN §3.13): usable as a function
  * (`AlertSummary({ alert, lang })`, for a notification or a title) and
  * as an element (`<AlertSummary alert={a} lang="ka" />`).
+ *
+ * @public
  */
 export function AlertSummary(props: AlertSummaryProps): string {
   const { alert, lang, catalogues } = props;

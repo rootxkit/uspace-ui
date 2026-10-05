@@ -11,7 +11,11 @@ import { AGE_BUCKETS, type AgeBucket } from "../theme/tokens.js";
 import { AGE_BUCKET_KEYS, ageBucket, ageOpacity } from "../symbology/age.js";
 import { LegendNote, LegendSection } from "./LegendSection.js";
 
-/** A disc at the opacity the map draws a track of `bucket` with. */
+/**
+ * A disc at the opacity the map draws a track of `bucket` with.
+ *
+ * @beta
+ */
 export function AgeSwatch(props: { bucket: AgeBucket }) {
   return (
     <svg
@@ -33,6 +37,7 @@ export function AgeSwatch(props: { bucket: AgeBucket }) {
   );
 }
 
+/** @public */
 export interface AgeLegendProps {
   /** The feed's `stale_after_s` (PLAN §6.3). Required: no default. */
   staleAfterS: number;
@@ -40,6 +45,7 @@ export interface AgeLegendProps {
   className?: string;
 }
 
+/** @public */
 export function AgeLegend(props: AgeLegendProps) {
   const { staleAfterS, defaultCollapsed, className } = props;
   const t = useT();

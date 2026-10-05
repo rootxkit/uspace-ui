@@ -2,21 +2,33 @@
 // §6.3). The app's server action writes `uspace_lang`; the kit only reads
 // it. Nothing goes to localStorage.
 
+/** @public */
 export type Lang = "ka" | "en";
 
+/** @public */
 export const LANGS: readonly Lang[] = ["ka", "en"];
 
-/** The language when neither the cookie nor Accept-Language names one. */
+/**
+ * The language when neither the cookie nor Accept-Language names one.
+ *
+ * @beta
+ */
 export const DEFAULT_LANG: Lang = "ka";
 
+/** @public */
 export const LANG_COOKIE = "uspace_lang";
 
-/** The `Intl` locale each language formats numbers and dates with. */
+/**
+ * The `Intl` locale each language formats numbers and dates with.
+ *
+ * @public
+ */
 export const LOCALES: Readonly<Record<Lang, string>> = {
   ka: "ka-GE",
   en: "en-GB",
 };
 
+/** @beta */
 export function parseLang(v: string | null | undefined): Lang | null {
   return v === "ka" || v === "en" ? v : null;
 }
@@ -24,6 +36,8 @@ export function parseLang(v: string | null | undefined): Lang | null {
 /**
  * The language in a `Cookie` header or `document.cookie`, or null when the
  * cookie is absent or holds anything but a language.
+ *
+ * @beta
  */
 export function langFromCookie(cookie: string | null | undefined): Lang | null {
   if (cookie === null || cookie === undefined) return null;
@@ -40,6 +54,8 @@ export function langFromCookie(cookie: string | null | undefined): Lang | null {
  * The first of `ka`/`en` an `Accept-Language` header prefers, by q-value
  * and then by order; a region (`en-US`, `ka-GE`) matches its language.
  * `*`, `q=0` and malformed entries choose nothing.
+ *
+ * @beta
  */
 export function langFromAcceptLanguage(
   header: string | null | undefined,
@@ -67,6 +83,8 @@ export function langFromAcceptLanguage(
  * The language of a request: the `uspace_lang` cookie wins, then
  * `Accept-Language`, then `ka`. `cookie` is either the cookie's value or a
  * whole `Cookie` header.
+ *
+ * @public
  */
 export function negotiateLang(
   acceptLanguage: string | null,

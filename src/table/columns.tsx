@@ -36,21 +36,35 @@ import { cn } from "../ui/cn.js";
  * is invariant in the value type, so columns of different value types
  * cannot share one array without erasing it; `tableColumn` does that for
  * a column the app writes itself, and every helper here returns one.
+ *
+ * @public
  */
 export type TableColumn<Row> = ColumnDef<Row, unknown>;
 
-/** Erases a column's value type so it can join a `TableColumn[]`. */
+/**
+ * Erases a column's value type so it can join a `TableColumn[]`.
+ *
+ * @public
+ */
 export function tableColumn<Row, V>(def: ColumnDef<Row, V>): TableColumn<Row> {
   return def as unknown as TableColumn<Row>;
 }
 
-/** One option of an enumeration filter, with its catalogue key. */
+/**
+ * One option of an enumeration filter, with its catalogue key.
+ *
+ * @beta
+ */
 export interface FilterOption {
   value: string;
   labelKey: string;
 }
 
-/** The filter a column offers in the table's filter bar. */
+/**
+ * The filter a column offers in the table's filter bar.
+ *
+ * @beta
+ */
 export type ColumnFilterKind =
   { kind: "text" } | { kind: "enum"; options: readonly FilterOption[] };
 
@@ -58,6 +72,8 @@ export type ColumnFilterKind =
  * What the kit knows about a column: how to name it and how to filter it.
  * Set by the helpers under `meta.uspace`; a column the app writes may set
  * it too (`kitColumnMeta`).
+ *
+ * @beta
  */
 export interface KitColumnMeta {
   /** The catalogue key of the column's name (the app's or the kit's). */
@@ -73,12 +89,20 @@ export interface KitColumnMeta {
   select?: boolean;
 }
 
-/** `meta` for a column the app writes, so the kit can name and filter it. */
+/**
+ * `meta` for a column the app writes, so the kit can name and filter it.
+ *
+ * @beta
+ */
 export function kitColumnMeta(meta: KitColumnMeta): { uspace: KitColumnMeta } {
   return { uspace: meta };
 }
 
-/** The kit's meta of a column, when it has one. */
+/**
+ * The kit's meta of a column, when it has one.
+ *
+ * @beta
+ */
 export function kitMetaOf<Row>(
   column: Column<Row, unknown>,
 ): KitColumnMeta | undefined {
@@ -90,6 +114,8 @@ export function kitMetaOf<Row>(
  * The column's name as text, with its unit or "UTC" when it has one
  * ("Speed (m/s)", "Raised (UTC)"); the column id for a column the kit
  * cannot name (a string header is used as given).
+ *
+ * @beta
  */
 export function columnLabel<Row>(
   column: Column<Row, unknown>,
@@ -110,6 +136,8 @@ export function columnLabel<Row>(
 /**
  * Unit and datum symbols for `columns.num` headers. An altitude names its
  * datum (D-01, E-13); height over take-off is not "above ground" (R-12).
+ *
+ * @beta
  */
 export const UNIT_KEYS = Object.freeze({
   m: "unit.symbol.m",
@@ -126,12 +154,17 @@ export const UNIT_KEYS = Object.freeze({
   wh: "unit.symbol.wh",
 } as const satisfies Record<string, Key>);
 
-/** The keys of `Row` whose values are assignable to `V`. */
+/**
+ * The keys of `Row` whose values are assignable to `V`.
+ *
+ * @public
+ */
 export type KeyOf<Row, V> = {
   [K in keyof Row]-?: Row[K] extends V ? K : never;
 }[keyof Row] &
   string;
 
+/** @public */
 export interface ColumnOptions {
   /** The column id; the field key by default. */
   id?: string;
@@ -346,6 +379,7 @@ function utc<Row>(
   });
 }
 
+/** @public */
 export interface AgeColumnOptions<Row> extends ColumnOptions {
   /** The row's display age at `nowMs`, in seconds; null when unknown. */
   ageS(row: Row, nowMs: number): number | null;
@@ -563,7 +597,11 @@ function select<Row>(opts: { id?: string } = {}): TableColumn<Row> {
   });
 }
 
-/** The column helpers, each generic in the row type. */
+/**
+ * The column helpers, each generic in the row type.
+ *
+ * @public
+ */
 export const columns = Object.freeze({
   num,
   utc,
@@ -576,7 +614,11 @@ export const columns = Object.freeze({
   select,
 });
 
-/** The helpers with `Row` fixed once: `const c = columnsFor<Registration>()`. */
+/**
+ * The helpers with `Row` fixed once: `const c = columnsFor<Registration>()`.
+ *
+ * @public
+ */
 export function columnsFor<Row>() {
   return {
     num: (

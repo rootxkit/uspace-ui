@@ -1,6 +1,7 @@
 // What the API adapter met and could not use is counted as well as handled
 // (CLAUDE.md rule 9, LESSONS E-09); WP-8's status components read these.
 
+/** @beta */
 export type ApiCounter =
   /** A response that carried a `Sunset` header: its API major is deprecated. */
   | "sunset_seen"
@@ -28,12 +29,20 @@ export function countApi(counter: ApiCounter, by = 1): void {
   counts[counter] += by;
 }
 
-/** A snapshot of the API counters since the page loaded. */
+/**
+ * A snapshot of the API counters since the page loaded.
+ *
+ * @beta
+ */
 export function apiCounters(): Readonly<Record<ApiCounter, number>> {
   return { ...counts };
 }
 
-/** A deprecated API major, noticed through its `Sunset` header (00 §7). */
+/**
+ * A deprecated API major, noticed through its `Sunset` header (00 §7).
+ *
+ * @beta
+ */
 export interface SunsetNotice {
   /** The `Sunset` header as the API sent it (an HTTP-date, RFC 8594). */
   sunset: string;
@@ -43,6 +52,7 @@ export interface SunsetNotice {
 
 // A store bound, not a threshold: an app talks to one API, which has at
 // most a few majors in sunset at once.
+/** @beta */
 export const SUNSET_NOTICE_LIMIT = 16;
 
 const notices = new Map<string, SunsetNotice>();
@@ -62,12 +72,20 @@ export function noteSunset(sunset: string, schemaPath: string): boolean {
   return true;
 }
 
-/** The distinct `Sunset` values seen since the page loaded, oldest first. */
+/**
+ * The distinct `Sunset` values seen since the page loaded, oldest first.
+ *
+ * @beta
+ */
 export function sunsetNotices(): readonly SunsetNotice[] {
   return [...notices.values()];
 }
 
-/** Tests only: start the counters and notices again (LESSONS E-11). */
+/**
+ * Tests only: start the counters and notices again (LESSONS E-11).
+ *
+ * @beta
+ */
 export function resetApiCountersForTests(): void {
   for (const k of Object.keys(counts) as ApiCounter[]) counts[k] = 0;
   notices.clear();

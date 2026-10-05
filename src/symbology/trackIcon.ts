@@ -13,7 +13,11 @@
 import type { Trust } from "../model/index.js";
 import type { PatternImage } from "./zone.js";
 
-/** The six symbol shapes (PLAN §3.8). */
+/**
+ * The six symbol shapes (PLAN §3.8).
+ *
+ * @public
+ */
 export type Shape =
   "triangle" | "diamond" | "square" | "circle" | "hexagon" | "cross";
 
@@ -22,12 +26,16 @@ export type Shape =
  * (broadcast only, R-05: anyone can transmit it, so it never looks as
  * solid as an authenticated track); `dashed`, a small solid core inside a
  * dashed ring (simulated only, lab traffic).
+ *
+ * @beta
  */
 export type ShapeFill = "solid" | "hollow" | "dashed";
 
 /**
  * authenticated triangle, provider diamond, surveillance square, broadcast
  * hexagon (hollow), sensor cross, simulated circle (dashed).
+ *
+ * @public
  */
 export function trustShape(t: Trust): Shape {
   switch (t) {
@@ -48,6 +56,7 @@ export function trustShape(t: Trust): Shape {
   }
 }
 
+/** @beta */
 export function trustFill(t: Trust): ShapeFill {
   switch (t) {
     case "broadcast":
@@ -68,9 +77,17 @@ export function trustFill(t: Trust): ShapeFill {
 // Display-only constants: the bitmap's side, the shape's radius, the
 // outline width of a hollow or dashed shape, and the arrow's size.
 
-/** Side of an icon bitmap and of the SVG viewBox, in icon pixels. */
+/**
+ * Side of an icon bitmap and of the SVG viewBox, in icon pixels.
+ *
+ * @beta
+ */
 export const TRACK_ICON_PX = 56;
-/** Icon pixels per CSS pixel: the icon draws 28 CSS pixels wide at size 1. */
+/**
+ * Icon pixels per CSS pixel: the icon draws 28 CSS pixels wide at size 1.
+ *
+ * @beta
+ */
 export const TRACK_ICON_PIXEL_RATIO = 2;
 const C = TRACK_ICON_PX / 2;
 const R = 12;
@@ -83,7 +100,11 @@ const ARROW_HALF = 5;
 const SDF_RADIUS = 8;
 const SDF_CUTOFF = 0.25;
 
-/** A point in icon pixels, origin at the icon's centre, y down. */
+/**
+ * A point in icon pixels, origin at the icon's centre, y down.
+ *
+ * @beta
+ */
 export type IconPoint = readonly [number, number];
 type Pt = IconPoint;
 
@@ -143,7 +164,11 @@ const ARROW: readonly Pt[] = [
 
 // --- SVG ----------------------------------------------------------------------
 
-/** One SVG path of an icon: filled, or stroked with an optional dash. */
+/**
+ * One SVG path of an icon: filled, or stroked with an optional dash.
+ *
+ * @public
+ */
 export interface IconPart {
   d: string;
   fill: boolean;
@@ -174,6 +199,8 @@ function outlinePath(o: Outline): string {
  * The parts of a trust class's icon, in the TRACK_ICON_PX viewBox: the
  * shape as its fill says, and the arrow when `directional`. The arrow
  * points up (north); the map rotates it by `trackDeg`.
+ *
+ * @public
  */
 export function trackIconParts(t: Trust, directional: boolean): IconPart[] {
   const o = outline(trustShape(t));
@@ -215,7 +242,11 @@ export function trackIconParts(t: Trust, directional: boolean): IconPart[] {
   return parts;
 }
 
-/** The icon as a standalone SVG document, drawn in `colour`. */
+/**
+ * The icon as a standalone SVG document, drawn in `colour`.
+ *
+ * @beta
+ */
 export function trackIconSvg(
   t: Trust,
   directional: boolean,
@@ -286,7 +317,11 @@ function sdDashedRing(p: Pt, r: number, w: number): number {
   return Math.hypot(Math.max(ring, 0), gap);
 }
 
-/** Signed distance of point `p` (icon pixels, centre origin) to the icon. */
+/**
+ * Signed distance of point `p` (icon pixels, centre origin) to the icon.
+ *
+ * @beta
+ */
 export function trackIconDistance(
   t: Trust,
   directional: boolean,
@@ -310,6 +345,8 @@ export function trackIconDistance(
  * The icon as an SDF bitmap for `map.addImage(id, image, { sdf: true,
  * pixelRatio: TRACK_ICON_PIXEL_RATIO })`: the alpha channel holds the
  * distance to the shape's edge, 192 on the edge, more inside.
+ *
+ * @beta
  */
 export function trackIconSdf(t: Trust, directional: boolean): PatternImage {
   return sdfBitmap((p) => trackIconDistance(t, directional, p));

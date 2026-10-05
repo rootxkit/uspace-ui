@@ -51,12 +51,17 @@ import {
 import { TRUST_KEYS, TRUST_MEANING_KEYS } from "../symbology/track.js";
 import { cn } from "../ui/cn.js";
 
-/** A link the app may render for an id it knows how to open. */
+/**
+ * A link the app may render for an id it knows how to open.
+ *
+ * @public
+ */
 export interface DetailLink {
   kind: "flight" | "intent";
   id: string;
 }
 
+/** @public */
 export interface TrackDetailProps {
   /** The selected aircraft: unmanned (`TrackView`) or manned. */
   track: TrackView | MannedTrack;
@@ -79,12 +84,20 @@ export interface TrackDetailProps {
   className?: string;
 }
 
-/** True for a manned track (the one view with `sourceClass`). */
+/**
+ * True for a manned track (the one view with `sourceClass`).
+ *
+ * @beta
+ */
 export function isMannedTrack(v: TrackView | MannedTrack): v is MannedTrack {
   return "sourceClass" in v;
 }
 
-/** The catalogue key of an altitude source's line (R-09). */
+/**
+ * The catalogue key of an altitude source's line (R-09).
+ *
+ * @beta
+ */
 export const ALT_SOURCE_KEYS: Readonly<Record<AltSource, Key>> = Object.freeze({
   geodetic: "detail.alt_source.geodetic",
   pressure: "detail.alt_source.pressure",
@@ -92,7 +105,11 @@ export const ALT_SOURCE_KEYS: Readonly<Record<AltSource, Key>> = Object.freeze({
   none: "detail.alt_source.none",
 });
 
-/** The catalogue key of who placed `capturedAt` (04 §2 `time_source`). */
+/**
+ * The catalogue key of who placed `capturedAt` (04 §2 `time_source`).
+ *
+ * @beta
+ */
 export const TIME_SOURCE_KEYS: Readonly<Record<TimeSource, Key>> =
   Object.freeze({
     source_clock: "detail.time_source.source_clock",
@@ -102,7 +119,11 @@ export const TIME_SOURCE_KEYS: Readonly<Record<TimeSource, Key>> =
     system: "detail.time_source.system",
   });
 
-/** The words of a manned source class: ours for 02 F4's, else as sent. */
+/**
+ * The words of a manned source class: ours for 02 F4's, else as sent.
+ *
+ * @beta
+ */
 export function sourceClassLabel(value: string, t: Translate): string {
   const key = Object.hasOwn(MANNED_SOURCE_CLASS_KEYS, value)
     ? MANNED_SOURCE_CLASS_KEYS[value]
@@ -401,6 +422,7 @@ function timesSection(
   );
 }
 
+/** @public */
 export function TrackDetail(props: TrackDetailProps) {
   const {
     track,

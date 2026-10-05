@@ -17,6 +17,7 @@ import type { SessionDisplay } from "../../model/index.js";
 import { BFF_LOGOUT_PATH, CSRF_HEADER } from "../contract.js";
 import { csrfToken } from "./csrf.js";
 
+/** @public */
 export interface SessionContextValue {
   /** The signed-in session's display claims, or `null` when signed out. */
   session: SessionDisplay | null;
@@ -30,6 +31,7 @@ export interface SessionContextValue {
 
 const SessionContext = createContext<SessionContextValue | null>(null);
 
+/** @public */
 export interface SessionProviderProps {
   session: SessionDisplay | null;
   /** The BFF's logout route; `/_bff/logout` (the contract's) by default. */
@@ -39,6 +41,7 @@ export interface SessionProviderProps {
   children?: ReactNode;
 }
 
+/** @public */
 export function SessionProvider(props: SessionProviderProps): ReactNode {
   const { logoutAction = BFF_LOGOUT_PATH, children } = props;
   const fetchImpl = props.fetch;
@@ -62,7 +65,11 @@ export function SessionProvider(props: SessionProviderProps): ReactNode {
   );
 }
 
-/** The session and `signOut`; needs a `SessionProvider`. */
+/**
+ * The session and `signOut`; needs a `SessionProvider`.
+ *
+ * @public
+ */
 export function useSession(): SessionContextValue {
   const ctx = useContext(SessionContext);
   if (ctx === null) throw new Error("useSession() needs a <SessionProvider>");

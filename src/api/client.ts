@@ -24,11 +24,14 @@ import { parseProblem } from "./problem.js";
  * A display-only constant, not a threshold: how long a console waits for
  * one answer before it gives up and shows the failure. An app overrides it
  * with `timeoutMs`.
+ *
+ * @beta
  */
 export const DEFAULT_TIMEOUT_MS = 30_000;
 
 const UNSAFE_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
+/** @public */
 export interface ClientOptions {
   /** Where the API is, as the browser sees it (the BFF: `/_bff/api`). */
   baseUrl: string;
@@ -46,7 +49,11 @@ export interface ClientOptions {
   now?: () => number;
 }
 
-/** The client: openapi-fetch's, typed by the app's generated `paths`. */
+/**
+ * The client: openapi-fetch's, typed by the app's generated `paths`.
+ *
+ * @public
+ */
 // `Paths extends {}` is openapi-fetch's own constraint (PLAN §3.7).
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export type Client<Paths extends {}> = FetchClient<Paths>;
@@ -56,6 +63,8 @@ export type Client<Paths extends {}> = FetchClient<Paths>;
  * with `uspace-ui-gen-api` from the system's `api/openapi.yaml`; never
  * written by hand (CLAUDE.md rule 8). A non-2xx answer rejects with an
  * `ApiError`; a 2xx resolves with `{ data, response }`.
+ *
+ * @public
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export function createClient<Paths extends {}>(

@@ -21,7 +21,11 @@ import { LegendCount, LegendNote, LegendSection } from "./LegendSection.js";
 /** Swatch size in CSS pixels. Display-only constant. */
 const SWATCH_PX = 18;
 
-/** The status's colour as a disc, with its mark beside it as the map draws it. */
+/**
+ * The status's colour as a disc, with its mark beside it as the map draws it.
+ *
+ * @beta
+ */
 export function IdentSwatch(props: { status: IdentKey }) {
   const { status } = props;
   const mark = identMark(status);
@@ -52,6 +56,7 @@ export function IdentSwatch(props: { status: IdentKey }) {
   );
 }
 
+/** @public */
 export interface IdentificationLegendProps {
   /**
    * Tracks per status (`none`: no identification block), as the app
@@ -63,6 +68,7 @@ export interface IdentificationLegendProps {
   className?: string;
 }
 
+/** @public */
 export function IdentificationLegend(props: IdentificationLegendProps) {
   const { counts, defaultCollapsed, className } = props;
   const t = useT();

@@ -14,6 +14,8 @@ const empty = (v: unknown): boolean =>
 /**
  * The zod error map of the form kit: every issue becomes a kit key.
  * Display words only; the checks are the schema's.
+ *
+ * @beta
  */
 export const kitErrorMap: $ZodErrorMap = (issue) => {
   const key = ((): Key => {

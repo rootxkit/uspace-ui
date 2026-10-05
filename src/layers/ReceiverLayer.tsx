@@ -31,6 +31,8 @@ import { useFeaturePointer } from "./zoneFeatures.js";
  * One receiver as the layer takes it: PLAN §3.9's `{ id, lat, lng,
  * state }`, plus the `SourceView` fields its hover card words when the
  * app has them (`disabledBy`, `disabledByWho`, `lastSeenAt`, `lagS`).
+ *
+ * @public
  */
 export interface ReceiverInput {
   id: string;
@@ -43,7 +45,11 @@ export interface ReceiverInput {
   lagS?: number | null;
 }
 
-/** The CSS variable of a receiver's colour per state. Total. */
+/**
+ * The CSS variable of a receiver's colour per state. Total.
+ *
+ * @beta
+ */
 export function receiverToken(s: SourceState): string {
   switch (s) {
     case "healthy":
@@ -66,6 +72,8 @@ export function receiverToken(s: SourceState): string {
 /**
  * The mark beside a receiver, so its state reads without colour; healthy
  * has none. In the basemap's Latin glyph ranges. Display-only constants.
+ *
+ * @beta
  */
 export function receiverMark(s: SourceState): string {
   switch (s) {
@@ -86,8 +94,10 @@ export function receiverMark(s: SourceState): string {
   }
 }
 
+/** @beta */
 export const RECEIVER_LAYER_ID = "us-receivers";
 
+/** @beta */
 export interface ReceiverLayerIds {
   source: string;
   circle: string;
@@ -95,6 +105,7 @@ export interface ReceiverLayerIds {
   label: string;
 }
 
+/** @beta */
 export function receiverLayerIds(id: string): ReceiverLayerIds {
   return {
     source: id,
@@ -104,6 +115,7 @@ export function receiverLayerIds(id: string): ReceiverLayerIds {
   };
 }
 
+/** @beta */
 export interface ReceiverFeatureProperties {
   identifier: string;
   state: SourceState;
@@ -113,6 +125,7 @@ export interface ReceiverFeatureProperties {
   label: string;
 }
 
+/** @beta */
 export type ReceiverFeatureCollection = GeoJSON.FeatureCollection<
   GeoJSON.Point,
   ReceiverFeatureProperties
@@ -123,6 +136,7 @@ const EMPTY: ReceiverFeatureCollection = {
   features: [],
 };
 
+/** @beta */
 export function receiverFeatureCollection(
   receivers: readonly ReceiverInput[],
   selectedId: string | null,
@@ -218,6 +232,7 @@ function buildReceiverLayers(map: MapLibreMap, id: string): readonly string[] {
   return [ids.circle, ids.mark, ids.label];
 }
 
+/** @public */
 export interface ReceiverLayerProps {
   receivers: readonly ReceiverInput[];
   selectedId?: string | null;
@@ -231,6 +246,7 @@ export interface ReceiverLayerProps {
   id?: string;
 }
 
+/** @public */
 export function ReceiverLayer(props: ReceiverLayerProps) {
   const {
     receivers,

@@ -8,6 +8,8 @@ import { CSRF_COOKIE } from "../contract.js";
  * The `uspace_csrf` cookie's value, or `null` when it is absent (signed
  * out) or there is no document (server rendering). Pass it to
  * `createClient({ csrfToken })`.
+ *
+ * @public
  */
 export function csrfToken(name: string = CSRF_COOKIE): string | null {
   if (typeof document === "undefined") return null;

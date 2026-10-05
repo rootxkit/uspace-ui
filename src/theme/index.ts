@@ -11,6 +11,7 @@ export {
   DARK_QUERY,
   SCHEME_COOKIE,
   parseScheme,
+  schemeAttribute,
   schemeFromCookie,
   type ColorScheme,
   type ResolvedScheme,

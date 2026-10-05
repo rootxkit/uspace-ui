@@ -2,6 +2,7 @@ import { within } from "@testing-library/react";
 import { expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
+import { ThresholdsPanel } from "../../src/status/index.js";
 import { EN_LIGHT, KA_DARK, renderKit } from "../kit.js";
 import {
   Degraded,
@@ -85,4 +86,47 @@ it("frozen over the map (en light)", async () => {
 
 it("frozen over the map (ka dark)", async () => {
   await checkFrozen(renderKit(<FrozenMap scheme="dark" />, KA_DARK).container);
+});
+
+// 1.0.0: the thresholds a status frame carries (uspace-ussp Q28 gap 2),
+// with the frame that carries none beside it.
+const THRESHOLDS = {
+  cpa_tcpa_max_s: 60,
+  cpa_horizontal_min_m: 60,
+  cpa_vertical_min_m: 20,
+  cpa_neighbour_radius_m: 800,
+  cpa_clear_after_s: 10,
+  traffic_radius_m: 5000,
+};
+
+function Thresholds() {
+  return (
+    <div className="flex flex-col gap-2">
+      <ThresholdsPanel
+        thresholds={THRESHOLDS}
+        evaluationPeriodS={0.4}
+        policyVersion="7"
+      />
+      <ThresholdsPanel thresholds={null} policyVersion={null} />
+    </div>
+  );
+}
+
+function checkThresholds(container: HTMLElement): void {
+  const panels = container.querySelectorAll("[data-panel='thresholds']");
+  expect(panels).toHaveLength(2);
+  expect(panels[0]?.querySelectorAll("[data-threshold]")).toHaveLength(7);
+  expect(panels[1]?.querySelector("[data-thresholds-none]")).toBeVisible();
+}
+
+it("thresholds (en light)", () => {
+  const { container } = renderKit(<Thresholds />, EN_LIGHT);
+  checkThresholds(container);
+  expect(within(container).getByText("5,000 m")).toBeVisible();
+});
+
+it("thresholds (ka dark)", () => {
+  const { container } = renderKit(<Thresholds />, KA_DARK);
+  checkThresholds(container);
+  expect(within(container).getAllByText("მოქმედი ზღვრები")).toHaveLength(2);
 });

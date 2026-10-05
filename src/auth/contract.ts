@@ -4,18 +4,36 @@
 // `auth/server` and `auth/client`, so it holds names only, no secret and
 // no server code.
 
-/** The cookie holding the API-issued session JWT (`HttpOnly`). */
+/**
+ * The cookie holding the API-issued session JWT (`HttpOnly`).
+ *
+ * @public
+ */
 export const SESSION_COOKIE = "uspace_session";
 
-/** The double-submit CSRF cookie, readable by the page. */
+/**
+ * The double-submit CSRF cookie, readable by the page.
+ *
+ * @public
+ */
 export const CSRF_COOKIE = "uspace_csrf";
 
-/** The header an unsafe request carries the CSRF cookie's value in. */
+/**
+ * The header an unsafe request carries the CSRF cookie's value in.
+ *
+ * @public
+ */
 export const CSRF_HEADER = "X-CSRF-Token";
 
-/** The three BFF routes every `web/` mounts (02 §3); no ticket route (M22). */
+/**
+ * The three BFF routes every `web/` mounts (02 §3); no ticket route (M22).
+ *
+ * @public
+ */
 export const BFF_LOGIN_PATH = "/_bff/login";
+/** @beta */
 export const BFF_LOGOUT_PATH = "/_bff/logout";
+/** @public */
 export const BFF_API_PREFIX = "/_bff/api";
 
 /** Methods that change nothing; every other method needs the CSRF pair. */
@@ -25,7 +43,11 @@ export const SAFE_METHODS: ReadonlySet<string> = new Set([
   "OPTIONS",
 ]);
 
-/** True for a method that needs the CSRF pair (anything but GET, HEAD, OPTIONS). */
+/**
+ * True for a method that needs the CSRF pair (anything but GET, HEAD, OPTIONS).
+ *
+ * @beta
+ */
 export function isUnsafeMethod(method: string): boolean {
   return !SAFE_METHODS.has(method.toUpperCase());
 }
@@ -41,6 +63,8 @@ export function isUnsafeMethod(method: string): boolean {
  *   challenge in the sealed `HttpOnly` `uspace_mfa` cookie (`Path=/_bff`)
  *   until then, so the password is sent once. `enrolment` is present
  *   while the account has no confirmed authenticator.
+ *
+ * @public
  */
 export type LoginResult =
   | { status: "signed_in"; recoveryCodes?: string[] }

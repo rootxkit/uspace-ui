@@ -21,6 +21,11 @@ export {
 } from "./SourceStateBadge.js";
 export { SourcesPanel, type SourcesPanelProps } from "./SourcesPanel.js";
 export {
+  THRESHOLD_KEYS,
+  ThresholdsPanel,
+  type ThresholdsPanelProps,
+} from "./ThresholdsPanel.js";
+export {
   ALT_SOURCE_KEYS,
   TIME_SOURCE_KEYS,
   TrackDetail,

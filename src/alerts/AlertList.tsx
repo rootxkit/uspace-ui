@@ -27,6 +27,7 @@ import { SeverityMark } from "./SeverityMark.js";
 import { alertPeer, alertSummary, kindName } from "./summary.js";
 import { ALERT_STATE_KEYS } from "./words.js";
 
+/** @public */
 export interface AlertListProps {
   /** Every alert to show (a store snapshot's values). */
   alerts: readonly AlertView[];
@@ -97,6 +98,7 @@ function announce(
   };
 }
 
+/** @public */
 export function AlertList(props: AlertListProps) {
   const {
     alerts,

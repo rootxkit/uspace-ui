@@ -6,3 +6,7 @@ v1.3.0
 # reports as a visible skip instead of a failure. Anything else absent on
 # either side fails. A listed value that core has gained fails too, so the
 # line is removed when the tag is bumped.
+#
+# Types are named as package.Type (core.Trust, alerting.ClearReason,
+# sources.Why); a skip line is: skip <package.Type> <value> <why>.
+skip alerting.ClearReason acknowledged_timeout spec 04 §3.3 names it; core's alerting raises no acknowledgement timeout (the kit renders it when an app's API sends it)

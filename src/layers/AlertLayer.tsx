@@ -27,9 +27,14 @@ import {
 } from "./alertFeatures.js";
 import { resolveColour, useLayer } from "./useLayer.js";
 
-/** The default source id; pass `id` to draw two alert layers on one map. */
+/**
+ * The default source id; pass `id` to draw two alert layers on one map.
+ *
+ * @beta
+ */
 export const ALERT_LAYER_ID = "us-alerts";
 
+/** @beta */
 export interface AlertLayerIds {
   source: string;
   line: string;
@@ -37,6 +42,7 @@ export interface AlertLayerIds {
   ring: string;
 }
 
+/** @beta */
 export function alertLayerIds(id: string): AlertLayerIds {
   return {
     source: id,
@@ -48,12 +54,15 @@ export function alertLayerIds(id: string): AlertLayerIds {
 
 // Display-only constants: widths and the ring's radius in CSS pixels, the
 // dash pattern in line widths.
+/** @beta */
 export const ALERT_WIDTH_PX: Readonly<Record<Severity, number>> = {
   critical: 5,
   warning: 3.5,
   info: 2,
 };
+/** @beta */
 export const ALERT_RING_RADIUS_PX = 20;
+/** @beta */
 export const ALERT_DASH: [number, number] = [2, 1.5];
 
 /** A `match` on the feature's severity. */
@@ -71,7 +80,11 @@ function bySeverity(
   ] as ExpressionSpecification;
 }
 
-/** The severity colours resolved on the map's element, in its scheme. */
+/**
+ * The severity colours resolved on the map's element, in its scheme.
+ *
+ * @beta
+ */
 export function resolveSeverityColours(
   map: MapLibreMap,
 ): Record<Severity, string> {
@@ -132,6 +145,7 @@ function buildAlertLayers(map: MapLibreMap, id: string): readonly string[] {
   return [ids.line, ids.lineDashed, ids.ring];
 }
 
+/** @public */
 export interface AlertLayerProps {
   /** Every alert the app shows (a store snapshot's values). */
   alerts: Iterable<AlertView>;
@@ -143,6 +157,7 @@ export interface AlertLayerProps {
   id?: string;
 }
 
+/** @public */
 export function AlertLayer(props: AlertLayerProps) {
   const { alerts, tracks, visible = true, id = ALERT_LAYER_ID } = props;
   const [gaps] = useState(() => new AlertGaps());

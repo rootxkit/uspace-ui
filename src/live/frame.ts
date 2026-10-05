@@ -12,15 +12,23 @@ import {
   type TimeSource,
 } from "../model/index.js";
 
-/** The frame schemas the kit itself understands (PLAN §6.3). */
+/**
+ * The frame schemas the kit itself understands (PLAN §6.3).
+ *
+ * @beta
+ */
 export const STATUS_SCHEMA = "console/status/v1";
+/** @beta */
 export const SNAPSHOT_SCHEMA = "console/snapshot/v1";
+/** @public */
 export const SUBSCRIBE_SCHEMA = "console/subscribe/v1";
 
 /**
  * One frame from a system's WebSocket: the 04 §2 envelope in camel case
  * plus the untouched `body` (`envelope/v1`). `ts` is null when the record
  * carried no source clock (T-12).
+ *
+ * @public
  */
 export interface ConsoleFrame {
   schema: string;
@@ -53,6 +61,8 @@ const isCount = (v: unknown): v is number =>
  * `rx_ts` strings; `ts` a string, null or absent; `captured_at` a string
  * or null; `time_source` one of `core.TimeSource`; `backlog` a boolean;
  * `body` an object. Null when any of them fails: the frame is malformed.
+ *
+ * @public
  */
 export function parseFrame(raw: unknown): ConsoleFrame | null {
   if (!isObj(raw)) return null;
@@ -88,7 +98,11 @@ export function parseFrame(raw: unknown): ConsoleFrame | null {
   };
 }
 
-/** A WebSocket message's data as a frame: text holding JSON, then parseFrame. */
+/**
+ * A WebSocket message's data as a frame: text holding JSON, then parseFrame.
+ *
+ * @public
+ */
 export function parseFrameText(data: unknown): ConsoleFrame | null {
   if (typeof data !== "string") return null;
   let raw: unknown;
@@ -102,7 +116,11 @@ export function parseFrameText(data: unknown): ConsoleFrame | null {
 
 // --- console/status/v1 -----------------------------------------------------
 
-/** `source/status/v1` `state` (lab schema): the wire's words, not the kit's. */
+/**
+ * `source/status/v1` `state` (lab schema): the wire's words, not the kit's.
+ *
+ * @public
+ */
 export type WireSourceState =
   "live" | "stale" | "disabled" | "down" | "unknown";
 
@@ -114,7 +132,11 @@ const WIRE_SOURCE_STATES: ReadonlySet<string> = new Set([
   "unknown",
 ]);
 
-/** One item of `sources[]`: a `source/status/v1` body (04 §3.6). */
+/**
+ * One item of `sources[]`: a `source/status/v1` body (04 §3.6).
+ *
+ * @public
+ */
 export interface StatusSource {
   source: string;
   /** Null for the status of the adapter type as a whole. */
@@ -136,13 +158,32 @@ export interface StatusSource {
   lagS: number | null;
 }
 
-/** A CISP dataset's version and age (`datasets{}`). */
+/**
+ * A CISP dataset's version and age (`datasets{}`).
+ *
+ * @public
+ */
 export interface DatasetAge {
   version: string;
   ageS: number;
 }
 
-/** The optional per-system extras of a status frame (PLAN §6.3, M29). */
+/**
+ * The optional per-system extras of a status frame (PLAN §6.3, M29).
+ *
+ * `thresholds` and `evaluationPeriodS` (1.0.0): the thresholds a system's
+ * monitor judges with, as the status frame carries them (the USSP's
+ * traffic stream: `thresholds{cpa_tcpa_max_s, cpa_horizontal_min_m, ...}`
+ * and `evaluation_period_s`; uspace-ussp `internal/app/trafficws`). Not
+ * named in the lab's `console/status/v1` yet (PLAN §14 Q21), so the kit
+ * reads them leniently: a member whose name does not end in its unit
+ * (`_s`, `_m`) or whose value is not a finite number >= 0 is left out
+ * and named in `ignored`, and the rest of the frame still applies. The
+ * kit shows them (`status/ThresholdsPanel`); it never defaults one and
+ * never judges with one (INV-03).
+ *
+ * @public
+ */
 export interface StatusExtras {
   datasets: Readonly<Record<string, DatasetAge>> | null;
   cisVersion: string | null;
@@ -151,8 +192,13 @@ export interface StatusExtras {
   dpState: string | null;
   nats: string | null;
   resyncSince: string | null;
+  /** Threshold name (wire spelling, unit suffix) to value; null: none sent. */
+  thresholds: Readonly<Record<string, number>> | null;
+  /** The CPA evaluation period the system reports; null: not sent. */
+  evaluationPeriodS: number | null;
 }
 
+/** @beta */
 export const NO_EXTRAS: StatusExtras = Object.freeze({
   datasets: null,
   cisVersion: null,
@@ -161,9 +207,28 @@ export const NO_EXTRAS: StatusExtras = Object.freeze({
   dpState: null,
   nats: null,
   resyncSince: null,
+  thresholds: null,
+  evaluationPeriodS: null,
 });
 
-/** A `console/status/v1` body (lab schema), every required member checked. */
+/** A threshold's name: a snake_case slug that ends in its unit. */
+const THRESHOLD_NAME = /^[a-z][a-z0-9_]*_(s|m)$/;
+
+/**
+ * The unit a threshold's name ends in (`_s` seconds, `_m` metres).
+ *
+ * @beta
+ */
+export function thresholdUnit(name: string): "s" | "m" | null {
+  const m = THRESHOLD_NAME.exec(name);
+  return m === null ? null : (m[1] as "s" | "m");
+}
+
+/**
+ * A `console/status/v1` body (lab schema), every required member checked.
+ *
+ * @public
+ */
 export interface StatusBody extends StatusExtras {
   connectionId: string;
   serverTs: string;
@@ -173,9 +238,20 @@ export interface StatusBody extends StatusExtras {
   droppedFrames: number;
   degraded: string[];
   sources: StatusSource[];
+  /**
+   * Extras left out because they were malformed (`thresholds`,
+   * `thresholds.<name>`, `evaluation_period_s`); the client counts them.
+   */
+  ignored: readonly string[];
 }
 
-function parseSource(raw: unknown): StatusSource | null {
+/**
+ * One `source/status/v1` body (04 §3.6), on its own or as an item of a
+ * status frame's `sources[]`; null when it breaks the lab schema.
+ *
+ * @beta
+ */
+export function parseStatusSource(raw: unknown): StatusSource | null {
   if (!isObj(raw)) return null;
   const { source, source_instance, state, since, age_s, counters } = raw;
   if (!isNonEmpty(source)) return null;
@@ -230,6 +306,8 @@ const isSlug = (v: unknown): v is string =>
  * positive (LESSONS E-15: zero is refused), a negative count, a source
  * without a state, a dataset without an age. A refused status frame is
  * not applied at all: the kit never fills in a threshold.
+ *
+ * @public
  */
 export function parseStatusBody(raw: unknown): StatusBody | null {
   if (!isObj(raw)) return null;
@@ -251,7 +329,7 @@ export function parseStatusBody(raw: unknown): StatusBody | null {
   if (!Array.isArray(sources)) return null;
   const parsed: StatusSource[] = [];
   for (const s of sources) {
-    const p = parseSource(s);
+    const p = parseStatusSource(s);
     if (p === null) return null;
     parsed.push(p);
   }
@@ -281,6 +359,26 @@ export function parseStatusBody(raw: unknown): StatusBody | null {
     resyncSince === undefined
   )
     return null;
+  const ignored: string[] = [];
+  let thresholds: Record<string, number> | null = null;
+  if (Object.hasOwn(raw, "thresholds")) {
+    const th = raw["thresholds"];
+    if (!isObj(th)) {
+      ignored.push("thresholds");
+    } else {
+      thresholds = {};
+      for (const [name, v] of Object.entries(th)) {
+        if (thresholdUnit(name) !== null && isNonNegative(v))
+          thresholds[name] = v;
+        else ignored.push(`thresholds.${name}`);
+      }
+    }
+  }
+  let evaluationPeriodS = optional(raw, "evaluation_period_s", isNonNegative);
+  if (evaluationPeriodS === undefined) {
+    ignored.push("evaluation_period_s");
+    evaluationPeriodS = null;
+  }
   return {
     connectionId: connection_id,
     serverTs: server_ts,
@@ -297,6 +395,9 @@ export function parseStatusBody(raw: unknown): StatusBody | null {
     dpState,
     nats,
     resyncSince,
+    thresholds,
+    evaluationPeriodS,
+    ignored,
   };
 }
 
@@ -305,6 +406,8 @@ export function parseStatusBody(raw: unknown): StatusBody | null {
 /**
  * A `console/snapshot/v1` body: each item a complete frame with its own
  * envelope (the lab schema), so each track keeps its own times.
+ *
+ * @beta
  */
 export interface SnapshotBody {
   tracks: ConsoleFrame[];
@@ -317,6 +420,8 @@ export interface SnapshotBody {
  * A snapshot body, or null when a collection is missing or `zones_version`
  * is neither a string nor null. An item that is not a frame is skipped and
  * counted in `malformedItems`; the rest of the snapshot still applies.
+ *
+ * @beta
  */
 export function parseSnapshotBody(
   raw: unknown,
@@ -354,19 +459,35 @@ export function parseSnapshotBody(
 
 // --- console/subscribe/v1 --------------------------------------------------
 
-/** The snapshot collections a console subscribes to (lab schema). */
+/**
+ * The snapshot collections a console subscribes to (lab schema).
+ *
+ * @public
+ */
 export type SubscribeLayer = "tracks" | "manned" | "alerts" | "zones";
 
-/** `[west, south, east, north]`, WGS84 degrees; `west > east` crosses 180°. */
+/**
+ * `[west, south, east, north]`, WGS84 degrees; `west > east` crosses 180°.
+ *
+ * @public
+ */
 export type BBox = readonly [number, number, number, number];
 
-/** The one client-to-server frame (`console/subscribe/v1`). */
+/**
+ * The one client-to-server frame (`console/subscribe/v1`).
+ *
+ * @public
+ */
 export interface SubscribeFrame {
   schema: typeof SUBSCRIBE_SCHEMA;
   body: { bbox: BBox; layers: readonly SubscribeLayer[] };
 }
 
-/** A subscribe frame for `bbox` (as the map gave it) and `layers`. */
+/**
+ * A subscribe frame for `bbox` (as the map gave it) and `layers`.
+ *
+ * @public
+ */
 export function subscribeFrame(
   bbox: BBox,
   layers: readonly SubscribeLayer[],

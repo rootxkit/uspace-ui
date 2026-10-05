@@ -3,7 +3,11 @@
 // header, and the body fields the app points at. The kit never guesses a
 // field it was not pointed at and never computes an age itself.
 
-/** What an API said about the freshness of one answer. */
+/**
+ * What an API said about the freshness of one answer.
+ *
+ * @public
+ */
 export interface Freshness {
   /** The `ETag` header, as sent (the dataset version, 02 §1). */
   etag: string | null;
@@ -21,6 +25,8 @@ export interface Freshness {
  * Where each freshness field is in the body, as a dotted path
  * (`metadata.issued`). A field without a path is `null`: the kit reads
  * only what it was pointed at.
+ *
+ * @public
  */
 export interface FreshnessPick {
   version?: string;
@@ -32,6 +38,8 @@ export interface FreshnessPick {
 /**
  * The CISP's top-level members (02 F3, F5 as reconciled, M15). An app
  * reading the authority's export points `updatedAt` at `metadata.issued`.
+ *
+ * @beta
  */
 export const DEFAULT_FRESHNESS_PICK: Readonly<Required<FreshnessPick>> = {
   version: "cis_version",
@@ -56,6 +64,8 @@ function at(body: unknown, path: string | undefined): unknown {
  * The freshness of one answer: `etag` from the header, the rest from the
  * body fields `pick` points at (the CISP's by default). A field that is
  * absent or of the wrong type is `null`, never `0` or `""`.
+ *
+ * @public
  */
 export function freshnessOf(
   res: Response,

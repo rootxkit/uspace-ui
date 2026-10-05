@@ -1,0 +1,4 @@
+18d6f321a12f897f96e24ef842f4ce9d5a6bde33
+# The uspace-lab commit the kit's lab-derived fixtures are copied at
+# (WP-14; PLAN §6.4, §14 Q16). Written by scripts/sync-fixtures.sh from
+# src/test/fixtures/VERSION, which also pins the per-system sources.

@@ -7,10 +7,18 @@ import { z } from "zod";
 
 import { isRfc3339Utc } from "./utc.js";
 
-/** `[minLng, minLat, maxLng, maxLat]`, the GeoJSON bbox order. */
+/**
+ * `[minLng, minLat, maxLng, maxLat]`, the GeoJSON bbox order.
+ *
+ * @beta
+ */
 export type BBoxValue = [number, number, number, number];
 
-/** An RFC 3339 time in UTC with `Z` (spec 02 §1). */
+/**
+ * An RFC 3339 time in UTC with `Z` (spec 02 §1).
+ *
+ * @public
+ */
 export function utcTime() {
   return z.string().refine(isRfc3339Utc, { message: "form.error.not_utc" });
 }
@@ -20,6 +28,8 @@ export function utcTime() {
  * order is shape: a box whose west edge is east of its east edge, or
  * whose south edge is north of its north edge, is refused with an error
  * on the box that names the pair.
+ *
+ * @public
  */
 export function bbox() {
   return z
@@ -36,6 +46,8 @@ export function bbox() {
  * A reason a person gives for an audited act (02 §1 failure rule: "every
  * disable is an audited act by a person"), trimmed, at least `minLength`
  * characters. The length is the caller's; there is no default.
+ *
+ * @public
  */
 export function reason(minLength: number) {
   return z

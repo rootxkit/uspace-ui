@@ -3,6 +3,7 @@
 // not policy thresholds: they decide how often a console knocks, never
 // what it shows.
 
+/** @public */
 export interface Backoff {
   /** The first retry's ceiling, in ms. */
   initialMs: number;
@@ -12,6 +13,7 @@ export interface Backoff {
   factor: number;
 }
 
+/** @public */
 export const DEFAULT_BACKOFF: Readonly<Backoff> = Object.freeze({
   initialMs: 1000,
   maxMs: 30_000,
@@ -22,6 +24,8 @@ export const DEFAULT_BACKOFF: Readonly<Backoff> = Object.freeze({
  * A connection that stayed live this long ends a run of failures: the
  * retry after it starts from `initialMs` again (predecessor feed.ts). A
  * server that accepts and closes at once keeps backing off.
+ *
+ * @public
  */
 export const STABLE_AFTER_MS = 10_000;
 
@@ -30,6 +34,8 @@ export const STABLE_AFTER_MS = 10_000;
  * `min(maxMs, initialMs * factor^attempt)` with "equal jitter", half fixed
  * and half `random` (in [0, 1)), so a room of consoles does not reconnect
  * in step. Never below 1 ms and never NaN, whatever the options.
+ *
+ * @public
  */
 export function reconnectDelayMs(
   attempt: number,

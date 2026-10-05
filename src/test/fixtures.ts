@@ -4,7 +4,8 @@
 // records, so a value added to `model` appears in the fixtures without an
 // edit here, and test/fixtures.test.ts checks that it did. Registration
 // numbers are GEO-TEST-*, serials and callsigns TEST* (spec 06 §4: no real
-// data). WP-14 replaces the inputs with the lab's schema examples.
+// data). WP-14 adds the lab-derived set beside it: fixtures({ source:
+// "lab" }) (labFixtures.ts).
 //
 // The coordinates are display-only sample positions; nothing here is a
 // threshold or a judgement.
@@ -28,6 +29,7 @@ import {
   VIOLATION_KINDS,
   ZONE_TYPES,
 } from "../model/enums.js";
+import { labFixtures } from "./labFixtures.js";
 import type {
   AlertView,
   FeedStatus,
@@ -38,6 +40,7 @@ import type {
   ZoneView,
 } from "../model/types.js";
 
+/** @public */
 export interface Fixtures {
   tracks: TrackView[];
   zones: ZoneView[];
@@ -256,8 +259,29 @@ function sources(): SourceView[] {
   return out;
 }
 
-/** Synthetic fixtures covering every enumeration value at least once. */
-export function fixtures(): Fixtures {
+/**
+ * Which set `fixtures` builds (WP-14).
+ *
+ * @public
+ */
+export interface FixturesOptions {
+  /**
+   * `synthetic` (default): generated from the `model` arrays, every
+   * enumeration value at least once. `lab`: the lab's schema examples at
+   * the pinned commits, decoded through the reference adapters
+   * (`labFixtures`, src/test/fixtures/VERSION).
+   */
+  source?: "synthetic" | "lab";
+}
+
+/**
+ * The fixtures: synthetic by default, covering every enumeration value at
+ * least once; the lab-derived set with `{ source: "lab" }`.
+ *
+ * @public
+ */
+export function fixtures(opts: FixturesOptions = {}): Fixtures {
+  if (opts.source === "lab") return labFixtures();
   const t = tracks();
   return {
     tracks: t,

@@ -20,14 +20,22 @@ import {
   type HeldError,
 } from "./context.js";
 
-/** The catalogue key each vertical reference is named with in a label. */
+/**
+ * The catalogue key each vertical reference is named with in a label.
+ *
+ * @beta
+ */
 export const DATUM_KEYS: Readonly<Record<VerticalRef, Key>> = Object.freeze({
   AMSL: "form.datum.AMSL",
   AGL: "form.datum.AGL",
   WGS84: "form.datum.WGS84",
 });
 
-/** Unit symbols for `Field.unit`; an app may pass its own catalogue key. */
+/**
+ * Unit symbols for `Field.unit`; an app may pass its own catalogue key.
+ *
+ * @beta
+ */
 export const FORM_UNIT_KEYS = Object.freeze({
   m: "form.unit.m",
   ft: "form.unit.ft",
@@ -39,6 +47,7 @@ export const FORM_UNIT_KEYS = Object.freeze({
   pct: "form.unit.pct",
 } as const satisfies Record<string, Key>);
 
+/** @public */
 export interface FieldLabelParts {
   labelKey: string;
   /** The catalogue key of the unit (`FORM_UNIT_KEYS`, or the app's). */
@@ -49,7 +58,11 @@ export interface FieldLabelParts {
   utc?: boolean | undefined;
 }
 
-/** The label text: name, then unit and datum, then UTC for a time. */
+/**
+ * The label text: name, then unit and datum, then UTC for a time.
+ *
+ * @beta
+ */
 export function fieldLabel(t: Translate, p: FieldLabelParts): string {
   const label = t(p.labelKey);
   const unit = p.unit === undefined ? null : t(p.unit);
@@ -63,6 +76,7 @@ export function fieldLabel(t: Translate, p: FieldLabelParts): string {
   return p.utc === true ? t("form.label_utc", { label: text }) : text;
 }
 
+/** @public */
 export interface FieldProps extends FieldLabelParts {
   /** The react-hook-form name; dots for nesting (`features.0.name`). */
   name: string;
@@ -87,6 +101,7 @@ export function heldError(
   return own.type === undefined && own.message === undefined ? undefined : own;
 }
 
+/** @public */
 export function Field(props: FieldProps) {
   const {
     name,

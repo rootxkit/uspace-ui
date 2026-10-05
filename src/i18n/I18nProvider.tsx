@@ -19,6 +19,7 @@ import {
   type Translate,
 } from "./translate.js";
 
+/** @beta */
 export interface I18nContextValue {
   lang: Lang;
   setLang(l: Lang): void;
@@ -29,6 +30,7 @@ export interface I18nContextValue {
 
 const I18nContext = createContext<I18nContextValue | null>(null);
 
+/** @public */
 export interface I18nProviderProps {
   /** The language to show; a change of this prop is followed. */
   lang: Lang;
@@ -41,6 +43,7 @@ export interface I18nProviderProps {
 
 const NO_CATALOGUES: Catalogues = {};
 
+/** @public */
 export function I18nProvider(props: I18nProviderProps) {
   const { onLangChange, children } = props;
   const catalogues = props.catalogues ?? NO_CATALOGUES;
@@ -78,17 +81,26 @@ function useI18n(hook: string): I18nContextValue {
   return ctx;
 }
 
-/** The translator of the enclosing I18nProvider. */
+/**
+ * The translator of the enclosing I18nProvider.
+ *
+ * @public
+ */
 export function useT(): Translate {
   return useI18n("useT").t;
 }
 
+/** @public */
 export function useLang(): { lang: Lang; setLang(l: Lang): void } {
   const { lang, setLang } = useI18n("useLang");
   return { lang, setLang };
 }
 
-/** The enclosing provider's value, or null outside one. */
+/**
+ * The enclosing provider's value, or null outside one.
+ *
+ * @beta
+ */
 export function useOptionalI18n(): I18nContextValue | null {
   return useContext(I18nContext);
 }
@@ -97,6 +109,8 @@ export function useOptionalI18n(): I18nContextValue | null {
  * A translator for an explicit language, with the enclosing provider's
  * app catalogues when there is one. For components that take their own
  * `lang` prop (MapView), so they work with or without a provider.
+ *
+ * @beta
  */
 export function useTFor(lang: Lang): Translate {
   const catalogues = useContext(I18nContext)?.catalogues ?? NO_CATALOGUES;

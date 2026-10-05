@@ -15,6 +15,7 @@ import { useEffect, useRef, useState } from "react";
 import type { ZoneView } from "../model/index.js";
 import type { ZoneFeatureProperties } from "../symbology/zone.js";
 
+/** @beta */
 export type ZoneFeatureCollection = GeoJSON.FeatureCollection<
   GeoJSON.Geometry,
   ZoneFeatureProperties
@@ -26,6 +27,8 @@ export type ZoneFeatureCollection = GeoJSON.FeatureCollection<
  * the API's to send as drawable geometry); `properties` carry the style
  * keys, the identifier, the name and the limits, and nothing else (no
  * `extendedProperties`, no message: the card reads those from the view).
+ *
+ * @beta
  */
 export function zoneFeatureCollection(
   zones: readonly ZoneView[],
@@ -52,7 +55,11 @@ export function zoneFeatureCollection(
   };
 }
 
-/** `update` for useLayer: one `setData` on the layer's GeoJSON source. */
+/**
+ * `update` for useLayer: one `setData` on the layer's GeoJSON source.
+ *
+ * @beta
+ */
 export function setSourceData(
   sourceId: string,
 ): (map: MapLibreMap, data: ZoneFeatureCollection) => void {
@@ -61,7 +68,11 @@ export function setSourceData(
   };
 }
 
-/** The feature under the pointer: its identifier and the pointer's place. */
+/**
+ * The feature under the pointer: its identifier and the pointer's place.
+ *
+ * @beta
+ */
 export interface PointerHover {
   identifier: string;
   /** CSS pixels from the map container's top left corner. */
@@ -84,6 +95,8 @@ function identifierAt(
  * Hover and click on the features of `layerId`: returns the hovered
  * feature, and calls `onSelect` with the identifier of a clicked one (a
  * click beside every feature calls nothing).
+ *
+ * @beta
  */
 export function useFeaturePointer(
   map: MapLibreMap | null,
