@@ -435,3 +435,31 @@ describe("createSourceStore", () => {
     expect(store.snapshot()[0]?.lastSeenAt).toBeNull();
   });
 });
+
+describe("the stores take the lab-derived views (WP-14)", () => {
+  // The same stores, fed what the lab's schema examples decode to through
+  // the reference adapters (src/test/fixtures.lab.test.ts lists them).
+  const lab = fixtures({ source: "lab" });
+
+  it("hold every lab track and manned aircraft, dropping none", () => {
+    const tracks = createTrackStore({ trailPoints: 5, maxTracks: 100 });
+    for (const t of lab.tracks) tracks.upsert(omit(t, "receivedAtMs"));
+    expect([...tracks.snapshot().keys()].sort()).toEqual(
+      lab.tracks.map((t) => t.trackId).sort(),
+    );
+    expect(tracks.counters().track_evicted).toBe(0);
+    const manned = createMannedStore({ trailPoints: 1, maxTracks: 100 });
+    for (const m of lab.manned) manned.upsert(omit(m, "receivedAtMs"));
+    expect(manned.snapshot().size).toBe(lab.manned.length);
+  });
+
+  it("hold every lab alert with its state and clear reason", () => {
+    const store = createAlertStore();
+    for (const a of lab.alerts) store.apply(omit(a, "receivedAtMs", "acknowledged"));
+    for (const a of lab.alerts) {
+      const held = store.get(a.alertId);
+      expect(held?.state, a.alertId).toBe(a.state);
+      expect(held?.clearReason, a.alertId).toBe(a.clearReason);
+    }
+  });
+});

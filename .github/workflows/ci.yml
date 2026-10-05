@@ -13,6 +13,7 @@ on:
       - "!**/*.md"
       - "docs/api/**"
       - "docs/CORE_VERSION"
+      - "docs/LAB_VERSION"
   pull_request:
     paths:
       - "**"
@@ -20,6 +21,7 @@ on:
       - "!**/*.md"
       - "docs/api/**"
       - "docs/CORE_VERSION"
+      - "docs/LAB_VERSION"
   workflow_call:
     outputs:
       tarball-name:
@@ -302,6 +304,25 @@ jobs:
           [ "$n" -gt 0 ] || { echo "empty scan range: $range"; exit 1; }
           echo "gitleaks commits: $range ($n commits)"
           ./gitleaks git --redact --verbose --log-opts="$range" .
+
+  fixtures:
+    # The lab-derived fixtures (WP-14): checksums and the generated module
+    # offline, always; every file against its source at the pinned commit
+    # online. A source that cannot be fetched is "unverified": a failure on
+    # main (REQUIRE_LAB), reported on a pull request. A mismatch fails
+    # everywhere.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+      - env:
+          REQUIRE_LAB: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')) && '1' || '0' }}
+        run: bash scripts/check-fixtures.sh --online
 
   enums:
     # Required on main, best-effort on pull requests (PLAN §10 job 7).

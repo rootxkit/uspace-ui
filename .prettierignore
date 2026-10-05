@@ -21,6 +21,11 @@ src/api/test/generated/
 # The lab's schema examples, copied unchanged at the commit in
 # src/live/test/fixtures/lab/LAB_COMMIT (WP-8; WP-14 re-pins them).
 src/live/test/fixtures/lab/
+# The lab-derived fixtures, copied unchanged by scripts/sync-fixtures.sh
+# and checked byte for byte (SHA256SUMS), and the module generated from
+# them (WP-14).
+src/test/fixtures/
+src/test/labExamples.generated.ts
 # The example app's build output and the types it generates (WP-13).
 examples/next-app/.next/
 examples/next-app/src/api/generated/

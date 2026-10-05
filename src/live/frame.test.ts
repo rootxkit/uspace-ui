@@ -368,13 +368,16 @@ describe("frame conformance against uspace-lab/schemas/common", () => {
     expect(labCommit()).toMatch(/^[0-9a-f]{40}$/);
   });
 
-  // A visible skip, counted in the test summary, until WP-14 pins the lab
-  // in docs/LAB_VERSION and adds the JSON Schema validator (PLAN §6.4,
-  // §14 Q16).
+  // WP-14 pinned the lab in docs/LAB_VERSION (its first line); these
+  // examples are the same commit's (re-pin both with
+  // scripts/sync-fixtures.sh and src/live/test/README.md).
   it.skipIf(!hasLabVersion)(
     "the fixtures are the examples of the pinned lab commit (needs docs/LAB_VERSION)",
     () => {
-      expect(readFileSync(LAB_VERSION, "utf8").trim()).toBe(labCommit());
+      const pinned = readFileSync(LAB_VERSION, "utf8")
+        .split("\n")
+        .find((l) => l.trim() !== "" && !l.startsWith("#"));
+      expect(pinned).toBe(labCommit());
     },
   );
   it.todo(

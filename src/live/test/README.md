@@ -14,8 +14,9 @@ The examples of `uspace-lab/schemas/common/` (`console/status/v1`,
 `fixtures/lab/LAB_COMMIT`. Prettier ignores them so they stay byte for
 byte the lab's. To re-pin: copy the `examples/` directories again from the
 lab at the new commit, write the commit to `LAB_COMMIT`, and run
-`pnpm test`. WP-14 moves the pin to `docs/LAB_VERSION` and validates the
-examples against the schemas.
+`pnpm test`. The commit is the one in `docs/LAB_VERSION` (WP-14), which
+`src/live/frame.test.ts` checks; move both together (`docs/LAB_VERSION`
+is written by `scripts/sync-fixtures.sh`).
 
 ## `fixtures/sequences/`
 

@@ -42,6 +42,7 @@ export {
   parseFrameText,
   parseSnapshotBody,
   parseStatusBody,
+  parseStatusSource,
   subscribeFrame,
   thresholdUnit,
   type BBox,

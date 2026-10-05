@@ -208,7 +208,11 @@ export interface StatusBody extends StatusExtras {
   ignored: readonly string[];
 }
 
-function parseSource(raw: unknown): StatusSource | null {
+/**
+ * One `source/status/v1` body (04 §3.6), on its own or as an item of a
+ * status frame's `sources[]`; null when it breaks the lab schema.
+ */
+export function parseStatusSource(raw: unknown): StatusSource | null {
   if (!isObj(raw)) return null;
   const { source, source_instance, state, since, age_s, counters } = raw;
   if (!isNonEmpty(source)) return null;
@@ -284,7 +288,7 @@ export function parseStatusBody(raw: unknown): StatusBody | null {
   if (!Array.isArray(sources)) return null;
   const parsed: StatusSource[] = [];
   for (const s of sources) {
-    const p = parseSource(s);
+    const p = parseStatusSource(s);
     if (p === null) return null;
     parsed.push(p);
   }
