@@ -28,12 +28,12 @@ export const CSRF_HEADER = "X-CSRF-Token";
 /**
  * The three BFF routes every `web/` mounts (02 §3); no ticket route (M22).
  *
- * @beta
+ * @public
  */
 export const BFF_LOGIN_PATH = "/_bff/login";
 /** @beta */
 export const BFF_LOGOUT_PATH = "/_bff/logout";
-/** @beta */
+/** @public */
 export const BFF_API_PREFIX = "/_bff/api";
 
 /** Methods that change nothing; every other method needs the CSRF pair. */

@@ -7,7 +7,7 @@ import type { Key } from "../i18n/en.js";
 import type { Translate } from "../i18n/translate.js";
 import type { DisabledBy, FeedStatus, SourceState } from "../model/index.js";
 
-/** @beta */
+/** @public */
 export const SOURCE_STATE_KEYS: Readonly<Record<SourceState, Key>> =
   Object.freeze({
     disabled: "source.state.disabled",
@@ -49,7 +49,7 @@ export const CONNECTION_KEYS: Readonly<Record<FeedStatus["connection"], Key>> =
 /**
  * One degraded entry in words: ours for a known key, the server's otherwise.
  *
- * @beta
+ * @public
  */
 export function degradedLabel(slug: string, t: Translate): string {
   const key = Object.hasOwn(DEGRADED_KEYS, slug)

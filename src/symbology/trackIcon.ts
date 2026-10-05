@@ -167,7 +167,7 @@ const ARROW: readonly Pt[] = [
 /**
  * One SVG path of an icon: filled, or stroked with an optional dash.
  *
- * @beta
+ * @public
  */
 export interface IconPart {
   d: string;
@@ -200,7 +200,7 @@ function outlinePath(o: Outline): string {
  * shape as its fill says, and the arrow when `directional`. The arrow
  * points up (north); the map rotates it by `trackDeg`.
  *
- * @beta
+ * @public
  */
 export function trackIconParts(t: Trust, directional: boolean): IconPart[] {
   const o = outline(trustShape(t));

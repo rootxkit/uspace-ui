@@ -13,7 +13,7 @@ export interface Backoff {
   factor: number;
 }
 
-/** @beta */
+/** @public */
 export const DEFAULT_BACKOFF: Readonly<Backoff> = Object.freeze({
   initialMs: 1000,
   maxMs: 30_000,
@@ -25,7 +25,7 @@ export const DEFAULT_BACKOFF: Readonly<Backoff> = Object.freeze({
  * retry after it starts from `initialMs` again (predecessor feed.ts). A
  * server that accepts and closes at once keeps backing off.
  *
- * @beta
+ * @public
  */
 export const STABLE_AFTER_MS = 10_000;
 
@@ -35,7 +35,7 @@ export const STABLE_AFTER_MS = 10_000;
  * and half `random` (in [0, 1)), so a room of consoles does not reconnect
  * in step. Never below 1 ms and never NaN, whatever the options.
  *
- * @beta
+ * @public
  */
 export function reconnectDelayMs(
   attempt: number,

@@ -65,7 +65,7 @@ export function severityOrder(): readonly Severity[] {
 /**
  * The catalogue key of a severity's name.
  *
- * @beta
+ * @public
  */
 export const SEVERITY_KEYS: Readonly<Record<Severity, Key>> = Object.freeze({
   critical: "severity.critical",

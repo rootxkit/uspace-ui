@@ -9,11 +9,11 @@ import type { BBox, Viewport } from "./viewport.js";
 /**
  * Adds a kit layer's sources and layers to a freshly loaded style.
  *
- * @beta
+ * @public
  */
 export type StyleLoadHandler = (map: MapLibreMap) => void;
 
-/** @beta */
+/** @public */
 export interface MapContextValue {
   /** The map after its `load` event; null before, and with no WebGL. */
   map: MapLibreMap | null;
@@ -31,7 +31,7 @@ export const MapContext = createContext<MapContextValue | null>(null);
 /**
  * The context of the enclosing `MapView`; throws outside one.
  *
- * @beta
+ * @public
  */
 export function useMapContext(): MapContextValue {
   const ctx = useContext(MapContext);
@@ -55,7 +55,7 @@ export function useMap(): MapLibreMap | null {
  * re-apply (language or scheme change), which drops every source and
  * layer. Layer components put their sources and layers back here.
  *
- * @beta
+ * @public
  */
 export function useStyleLoad(add: StyleLoadHandler): void {
   const { onStyleLoad } = useMapContext();

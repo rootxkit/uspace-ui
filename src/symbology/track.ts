@@ -47,7 +47,7 @@ export function trustToken(t: Trust): string {
 /**
  * The catalogue key of a trust class's name.
  *
- * @beta
+ * @public
  */
 export const TRUST_KEYS: Readonly<Record<Trust, Key>> = Object.freeze({
   authenticated: "trust.authenticated",
@@ -95,7 +95,7 @@ export function trustOrder(): readonly Trust[] {
 /**
  * The map image name of a trust class's icon, plain or with the arrow.
  *
- * @beta
+ * @public
  */
 export function trackIconId(t: Trust, directional: boolean): string {
   return directional ? `us-track-${t}-dir` : `us-track-${t}`;

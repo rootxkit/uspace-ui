@@ -50,7 +50,7 @@ export function utcToInput(iso: string | null): string {
  * The RFC 3339 UTC time for the box's text ("2026-03-29T00:30" ->
  * "2026-03-29T00:30:00Z"); null for an empty or partial box.
  *
- * @beta
+ * @public
  */
 export function inputToUtc(local: string): string | null {
   const m = LOCAL.exec(local.trim());

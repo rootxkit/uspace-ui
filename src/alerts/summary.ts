@@ -37,7 +37,7 @@ type Detail = Readonly<Record<string, unknown>>;
  * number, else null. A key that is present but null (a vertical the
  * server could not judge, R-09) is not replaced by a later alias.
  *
- * @beta
+ * @public
  */
 export function detailNumber(d: Detail, ...keys: string[]): number | null {
   for (const k of keys) {
@@ -220,7 +220,7 @@ export function isKnownKind(kind: string): kind is AlertView["kind"] {
 /**
  * The name of a kind; a kind this kit does not know is shown as sent.
  *
- * @beta
+ * @public
  */
 export function kindName(t: Translate, kind: string): string {
   return isKnownKind(kind) ? t(ALERT_KIND_KEYS[kind]) : kind;
@@ -311,7 +311,7 @@ function clearedSummary(alert: AlertView, t: Translate, lang: Lang): string {
  * The one-line summary of `alert` in the language of `t`. Pure: the list
  * calls it with the provider's translator, so an app's catalogue applies.
  *
- * @beta
+ * @public
  */
 export function alertSummary(
   alert: AlertView,

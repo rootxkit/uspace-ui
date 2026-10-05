@@ -49,7 +49,7 @@ import type { FeedStatus, MannedView, TrackView } from "../model/index.js";
 /**
  * The close code a system's WS process uses when the session is gone.
  *
- * @beta
+ * @public
  */
 export const CLOSE_UNAUTHORIZED = 4401;
 
@@ -155,7 +155,7 @@ const TOKENISH =
  * URL is refused (`no_page`) rather than accepted unchecked (retro-audit
  * N8).
  *
- * @beta
+ * @public
  */
 export function resolveFeedUrl(
   url: string,

@@ -14,7 +14,7 @@ import { useMapContext } from "../map/context.js";
 import { parseHexColour, type PatternImage } from "../symbology/zone.js";
 import { countLayer } from "./counters.js";
 
-/** @beta */
+/** @public */
 export interface UseLayerOptions<D> {
   /** The GeoJSON source id; unique per map. */
   id: string;
@@ -73,7 +73,7 @@ function removeAll(
  * and with no WebGL). Data handed over twice in one frame is applied
  * once, with the newer value; the older one is counted as superseded.
  *
- * @beta
+ * @public
  */
 export function useLayer<D>(opts: UseLayerOptions<D>): MapLibreMap | null {
   const { map: ctxMap, onStyleLoad } = useMapContext();
@@ -161,7 +161,7 @@ export const UNRESOLVED_COLOUR = "#808080";
  * colours, not variables. A token that does not resolve to `#rrggbb` is
  * counted and drawn in a neutral grey, never left out.
  *
- * @beta
+ * @public
  */
 export function resolveColour(map: MapLibreMap, token: string): string {
   const v = getComputedStyle(map.getContainer()).getPropertyValue(token).trim();

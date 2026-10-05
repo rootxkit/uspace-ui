@@ -27,7 +27,7 @@ export const KIT_CATALOGUES: Readonly<Record<Lang, Catalogue>> = { en, ka };
  * `template` with each `{name}` replaced by `vars[name]`. A placeholder
  * without a value stays as written, so the gap is visible.
  *
- * @beta
+ * @public
  */
 export function interpolate(template: string, vars?: Vars): string {
   if (vars === undefined) return template;
@@ -53,7 +53,7 @@ function pluralForm(lang: Lang, count: number): string {
  * shows the `en` text, and a key missing in both shows the key; both are
  * counted (`missingKeys()`).
  *
- * @beta
+ * @public
  */
 export function createTranslator(
   lang: Lang,

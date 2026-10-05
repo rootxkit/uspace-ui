@@ -24,7 +24,7 @@ const PROBLEM_MEDIA_TYPE = "application/problem+json";
  * ...), so a status component can label it by key. `null` for a `type`
  * outside the problems namespace: the component shows the `title`.
  *
- * @beta
+ * @public
  */
 export function problemSlug(type: string): string | null {
   if (!type.startsWith(PROBLEM_TYPE_PREFIX)) return null;

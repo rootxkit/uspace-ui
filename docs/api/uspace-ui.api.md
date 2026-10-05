@@ -137,7 +137,7 @@ interface AgeChipProps {
     staleAfterS: number | null;
 }
 
-// @beta (undocumented)
+// @public (undocumented)
 interface AgeColumnOptions<Row> extends ColumnOptions {
     ageS(row: Row, nowMs: number): number | null;
     staleAfterS: number | null;
@@ -197,7 +197,7 @@ const ALERT_STATE_KEYS: Readonly<Record<AlertState, Key>>;
 // @public (undocumented)
 const ALERT_STATES: readonly ["raised", "updated", "cleared"];
 
-// @beta (undocumented)
+// @public (undocumented)
 const ALERT_STORE_LIMIT = 500;
 
 // @beta
@@ -452,7 +452,7 @@ interface AlertStoreOptions {
 // @public
 function AlertSummary(props: AlertSummaryProps): string;
 
-// @beta
+// @public
 function alertSummary(alert: AlertView, t: Translate, lang: Lang): string;
 
 // @public (undocumented)
@@ -804,10 +804,10 @@ interface BBoxSubscriptionOptions {
 // @beta
 type BBoxValue = [number, number, number, number];
 
-// @beta (undocumented)
+// @public (undocumented)
 const BFF_API_PREFIX = "/_bff/api";
 
-// @beta
+// @public
 const BFF_LOGIN_PATH = "/_bff/login";
 
 // @beta (undocumented)
@@ -973,7 +973,7 @@ interface ClientOptions {
     timeoutMs?: number;
 }
 
-// @beta
+// @public
 const CLOSE_UNAUTHORIZED = 4401;
 
 // @public (undocumented)
@@ -1005,7 +1005,7 @@ type ColumnFilterKind = {
 // @beta
 function columnLabel<Row>(column: Column<Row, unknown>, t: Translate): string;
 
-// @beta (undocumented)
+// @public (undocumented)
 interface ColumnOptions {
     headerKey?: string;
     id?: string;
@@ -1024,7 +1024,7 @@ const columns: Readonly<{
     select: typeof select;
 }>;
 
-// @beta
+// @public
 function columnsFor<Row>(): {
     num: (key: KeyOf<Row, number | null | undefined>, unitKey: string, digits: number, opts?: ColumnOptions) => TableColumn<Row>;
     utc: (key: KeyOf<Row, string | null | undefined>, opts?: ColumnOptions) => TableColumn<Row>;
@@ -1081,7 +1081,7 @@ function CommandSeparator(input: React_2.ComponentProps<typeof Command_2.Separat
 // @public (undocumented)
 function CommandShortcut(input: React_2.ComponentProps<"span">): React_2.JSX.Element;
 
-// @beta
+// @public
 function compareCapturedAt(a: string, b: string): number | null;
 
 // @public (undocumented)
@@ -1174,7 +1174,7 @@ function createSourceStore(opts?: {
 // @public
 function createTrackStore(opts: TrackStoreOptions): TrackStore;
 
-// @beta
+// @public
 function createTranslator(lang: Lang, catalogues?: Catalogues): Translate;
 
 // @public
@@ -1198,7 +1198,7 @@ function csrfToken(name?: string): string | null;
 // @beta (undocumented)
 const DARK_QUERY = "(prefers-color-scheme: dark)";
 
-// @beta (undocumented)
+// @public (undocumented)
 const DASH = "\u2014";
 
 // @public
@@ -1246,7 +1246,7 @@ interface DataTableProps<Row> {
 // @beta
 const DATUM_KEYS: Readonly<Record<VerticalRef, Key>>;
 
-// @beta (undocumented)
+// @public (undocumented)
 const DEFAULT_BACKOFF: Readonly<Backoff>;
 
 // @beta (undocumented)
@@ -1281,7 +1281,7 @@ interface DegradedBannerProps {
     projectionAgeS?: number | null;
 }
 
-// @beta
+// @public
 function degradedLabel(slug: string, t: Translate): string;
 
 // Warning: (ae-forgotten-export) The symbol "Detail" needs to be exported by the entry point entry.d.ts
@@ -1297,7 +1297,7 @@ interface DetailLink {
     kind: "flight" | "intent";
 }
 
-// @beta
+// @public
 function detailNumber(d: Detail, ...keys: string[]): number | null;
 
 // @beta
@@ -1492,10 +1492,10 @@ type DssState = (typeof DSS_STATES)[number];
 // @public
 function emptyOutline(kind: OutlineKind): DrawOutline;
 
-// @beta
+// @public
 function EmptyState(props: EmptyStateProps): ReactNode;
 
-// @beta (undocumented)
+// @public (undocumented)
 interface EmptyStateProps {
     action?: ReactNode;
     // (undocumented)
@@ -1748,7 +1748,7 @@ function fmtDistance(m: number | null, lang: Lang): string;
 // @public
 function fmtHeading(deg: number | null): string;
 
-// @beta
+// @public
 function fmtHeight(v: number | null, ref: HeightRef | null, lang: Lang): string;
 
 // @public
@@ -1883,7 +1883,7 @@ const FORM_UNIT_KEYS: Readonly<{
     readonly pct: "form.unit.pct";
 }>;
 
-// @beta
+// @public
 function formatLocaleNumber(v: number | null, lang: Lang): string;
 
 // @beta (undocumented)
@@ -1997,7 +1997,7 @@ interface GridSize {
 // @beta
 const HEIGHT_KEYS: Readonly<Record<HeightRef, Key>>;
 
-// @beta (undocumented)
+// @public (undocumented)
 type HeightRef = "TakeoffLocation" | "GroundLevel";
 
 // @beta
@@ -2112,7 +2112,7 @@ interface I18nProviderProps {
     onLangChange?(l: Lang): void;
 }
 
-// @beta
+// @public
 interface IconPart {
     // (undocumented)
     d: string;
@@ -2135,7 +2135,7 @@ const IDENT_BASIS_KEYS: Readonly<Record<IdentBasis, Key>>;
 // @beta
 const IDENT_ORDER: readonly IdentKey[];
 
-// @beta
+// @public
 const IDENT_REASON_KEYS: Readonly<Record<IdentReason, Key>>;
 
 // @public (undocumented)
@@ -2144,7 +2144,7 @@ const IDENT_REASONS: readonly ["matched", "session_binding", "uas_suspended", "u
 // @beta
 const IDENT_STATUS_HINT_KEYS: Readonly<Record<IdentKey, Key>>;
 
-// @beta
+// @public
 const IDENT_STATUS_KEYS: Readonly<Record<IdentKey, Key>>;
 
 // @public (undocumented)
@@ -2153,7 +2153,7 @@ const IDENT_STATUSES: readonly ["registered", "suspended", "unknown_operator", "
 // @public (undocumented)
 type IdentBasis = (typeof IDENT_BASES)[number];
 
-// @beta
+// @public
 function identDrawn(ident: Identification | null): IdentKey;
 
 // @beta
@@ -2229,7 +2229,7 @@ function InlineCode(input: ComponentProps<"code">): ReactNode;
 // @public (undocumented)
 function Input(input: React_2.ComponentProps<"input">): React_2.JSX.Element;
 
-// @beta
+// @public
 function inputToUtc(local: string): string | null;
 
 // @beta (undocumented)
@@ -2389,7 +2389,7 @@ interface IntentView {
     volumes: GeoJSON_2.Polygon[];
 }
 
-// @beta
+// @public
 function interpolate(template: string, vars?: Vars): string;
 
 // @public (undocumented)
@@ -2478,12 +2478,12 @@ function Kbd(input: ComponentProps<"kbd">): ReactNode;
 // @public
 type Key = keyof typeof catalogue;
 
-// @beta
+// @public
 type KeyOf<Row, V> = {
     [K in keyof Row]-?: Row[K] extends V ? K : never;
 }[keyof Row] & string;
 
-// @beta
+// @public
 function kindName(t: Translate, kind: string): string;
 
 // @beta (undocumented)
@@ -2555,7 +2555,7 @@ function labFixtures(): Fixtures;
 // @public (undocumented)
 type Lang = "ka" | "en";
 
-// @beta (undocumented)
+// @public (undocumented)
 const LANG_COOKIE = "uspace_lang";
 
 // @beta
@@ -2957,7 +2957,7 @@ interface LiveStatus extends FeedStatus {
 // @beta
 function loadBasemapInfo(cfg: BasemapConfig, signal: AbortSignal, timeoutMs?: number): Promise<BasemapInfo | null>;
 
-// @beta
+// @public
 const LOCALES: Readonly<Record<Lang, string>>;
 
 // @public (undocumented)
@@ -3222,7 +3222,7 @@ declare namespace map {
     }
 }
 
-// @beta (undocumented)
+// @public (undocumented)
 interface MapContextValue {
     // (undocumented)
     initial: Viewport;
@@ -3299,7 +3299,7 @@ const MFA_CHALLENGE_COOKIE = "uspace_mfa";
 // @beta
 const MFA_CHALLENGE_PATH = "/_bff";
 
-// @beta
+// @public
 const MIN_CHALLENGE_SECRET_BYTES = 32;
 
 // @beta
@@ -3452,10 +3452,10 @@ function PaginationNext(input: React_2.ComponentProps<typeof PaginationLink>): R
 // @public (undocumented)
 function PaginationPrevious(input: React_2.ComponentProps<typeof PaginationLink>): React_2.JSX.Element;
 
-// @beta
+// @public
 function parseFrame(raw: unknown): ConsoleFrame | null;
 
-// @beta
+// @public
 function parseFrameText(data: unknown): ConsoleFrame | null;
 
 // @beta
@@ -3464,7 +3464,7 @@ function parseHexColour(s: string): Rgb | null;
 // @beta (undocumented)
 function parseLang(v: string | null | undefined): Lang | null;
 
-// @beta
+// @public
 function parseLocaleNumber(text: string, lang: Lang): number | null;
 
 // @public
@@ -3482,7 +3482,7 @@ function parseSnapshotBody(raw: unknown): {
 // @beta
 function parseSourceInfo(body: unknown): BasemapInfo | null;
 
-// @beta
+// @public
 function parseStatusBody(raw: unknown): StatusBody | null;
 
 // @beta
@@ -3581,7 +3581,7 @@ interface Problem {
 // @beta
 const PROBLEM_TYPE_PREFIX = "https://schemas.uspace.ge/problems/";
 
-// @beta
+// @public
 function problemSlug(type: string): string | null;
 
 // @beta
@@ -3590,7 +3590,7 @@ function putImage(map: Map_2, name: string, image: PatternImage): void;
 // @beta
 function putMannedIcons(map: Map_2): void;
 
-// @beta
+// @public
 function putTrackIcons(map: Map_2): void;
 
 // @beta
@@ -3711,7 +3711,7 @@ function receiverToken(s: SourceState): string;
 // @beta (undocumented)
 const RECENTLY_REMOVED_LIMIT = 50;
 
-// @beta
+// @public
 function reconnectDelayMs(attempt: number, backoff: Backoff, random: number): number;
 
 // @beta (undocumented)
@@ -3791,13 +3791,13 @@ function resetTableCountersForTests(): void;
 // @beta
 const RESIZE_STEP_PX = 16;
 
-// @beta
+// @public
 function resolveColour(map: Map_2, token: string): string;
 
 // @public (undocumented)
 type ResolvedScheme = "light" | "dark";
 
-// @beta
+// @public
 function resolveFeedUrl(url: string, page: string | undefined): {
     url: string;
 } | {
@@ -3888,7 +3888,7 @@ interface RestrictionView extends ZoneView {
     startsAt?: string | null;
 }
 
-// @beta
+// @public
 function retryAfterSOf(value: string | null, nowMs: number): number | null;
 
 // @beta (undocumented)
@@ -4048,7 +4048,7 @@ type Severity = (typeof SEVERITIES)[number];
 // @beta
 const SEVERITY_HINT_KEYS: Readonly<Record<Severity, Key>>;
 
-// @beta
+// @public
 const SEVERITY_KEYS: Readonly<Record<Severity, Key>>;
 
 // @beta
@@ -4071,10 +4071,10 @@ interface SeverityLegendProps {
     defaultCollapsed?: boolean;
 }
 
-// @beta (undocumented)
+// @public (undocumented)
 function SeverityMark(props: SeverityMarkProps): JSX.Element;
 
-// @beta (undocumented)
+// @public (undocumented)
 interface SeverityMarkProps {
     // (undocumented)
     className?: string;
@@ -4171,7 +4171,7 @@ function soundingAlerts(alerts: readonly AlertView[]): AlertView[];
 // @beta
 const SOURCE_INFO_TIMEOUT_MS = 5000;
 
-// @beta (undocumented)
+// @public (undocumented)
 const SOURCE_STATE_KEYS: Readonly<Record<SourceState, Key>>;
 
 // @public (undocumented)
@@ -4271,7 +4271,7 @@ interface SourceView {
     state: SourceState;
 }
 
-// @beta
+// @public
 const STABLE_AFTER_MS = 10000;
 
 // @beta
@@ -4329,7 +4329,7 @@ declare namespace status_2 {
 // @beta
 const STATUS_SCHEMA = "console/status/v1";
 
-// @beta
+// @public
 interface StatusBody extends StatusExtras {
     // (undocumented)
     connectionId: string;
@@ -4387,7 +4387,7 @@ interface StatusSource {
     state: WireSourceState;
 }
 
-// @beta
+// @public
 type StyleLoadHandler = (map: Map_2) => void;
 
 // @public (undocumented)
@@ -4410,7 +4410,7 @@ function subscribeFrame(bbox: BBox_2, layers: readonly SubscribeLayer[]): Subscr
 // @public
 type SubscribeLayer = "tracks" | "manned" | "alerts" | "zones";
 
-// @beta
+// @public
 function subscriptionBBox(b: BBox, marginFraction: number, quantizeDeg: number): BBox;
 
 // @beta (undocumented)
@@ -4610,7 +4610,7 @@ function TableCell(input: React_2.ComponentProps<"td">): React_2.JSX.Element;
 // @public
 type TableColumn<Row> = ColumnDef<Row, unknown>;
 
-// @beta
+// @public
 function tableColumn<Row, V>(def: ColumnDef<Row, V>): TableColumn<Row>;
 
 // @beta (undocumented)
@@ -4967,10 +4967,10 @@ class TrackHold {
 // @beta
 function trackIconDistance(t: Trust, directional: boolean, p: Pt): number;
 
-// @beta
+// @public
 function trackIconId(t: Trust, directional: boolean): string;
 
-// @beta
+// @public
 function trackIconParts(t: Trust, directional: boolean): IconPart[];
 
 // @beta
@@ -5173,7 +5173,7 @@ type Translate_2 = (key: string) => string;
 // @public (undocumented)
 type Trust = (typeof TRUSTS)[number];
 
-// @beta
+// @public
 const TRUST_KEYS: Readonly<Record<Trust, Key>>;
 
 // @beta
@@ -5391,7 +5391,7 @@ function useFeaturePointer(map: Map_2 | null, layerId: string, onSelect: ((ident
 // @public
 function useFeed(opts: FeedOptions): LiveFeed;
 
-// @beta
+// @public
 function useFieldControl(): {
     id: string;
     "aria-describedby": string | undefined;
@@ -5406,10 +5406,10 @@ function useLang(): {
     setLang(l: Lang): void;
 };
 
-// @beta
+// @public
 function useLayer<D>(opts: UseLayerOptions<D>): Map_2 | null;
 
-// @beta (undocumented)
+// @public (undocumented)
 interface UseLayerOptions<D> {
     build(map: Map_2): readonly string[];
     // (undocumented)
@@ -5422,10 +5422,10 @@ interface UseLayerOptions<D> {
 // @public
 function useMap(): Map_2 | null;
 
-// @beta
+// @public
 function useMapContext(): MapContextValue;
 
-// @beta
+// @public
 function useNowMs(periodMs: number, now?: () => number): number;
 
 // @beta
@@ -5440,7 +5440,7 @@ function useSession(): SessionContextValue;
 // @public
 function useStore<T>(store: ExternalStore<T>): T;
 
-// @beta
+// @public
 function useStyleLoad(add: StyleLoadHandler): void;
 
 // @public
@@ -5466,7 +5466,7 @@ interface UTCDateTimeFieldProps extends FieldBaseProps {
     seconds?: boolean;
 }
 
-// @beta
+// @public
 function utcMs(iso: string | null | undefined): number | null;
 
 // @beta

@@ -158,6 +158,39 @@ change (§12). `null` means "unknown / not provided by the API", never a
 zero; a component shows a dash for it (predecessor `format.ts`: an absent
 number must never read as zero or as a perfect value).
 
+**The 1.0.0 freeze (WP-14).** Every export carries a release tag, and
+api-extractor refuses an untagged one. `@public` is the contract the
+semver gate holds (§12); `@beta` is outside it and may change in a minor,
+with a CHANGELOG line. Public: everything of `model`; the vendored
+shadcn/ui set of `ui` (§3.3); every name in this section; every export the
+four consoles import at their pins when the API was frozen (uspace-authority
+`43ea2e6` and uspace-ussp `39fac6d` on `0.1.0`, uspace-ansp `08731a3` and
+uspace-cisp `d899101` on `0.1.0-rc.1`), which are, beyond the signatures
+below: `BFF_API_PREFIX`, `BffHandlers`, `CSP_NONCE_HEADER`, `CSRF_COOKIE`,
+`CookieReader`, `MIN_CHALLENGE_SECRET_BYTES`, `SessionCookieOptions`,
+`checkCsrf`, `issueCspNonce`, `sessionDisplay`, `BFF_LOGIN_PATH`,
+`LoginResult`, `Catalogues`, `DASH`, `HeightRef`, `LANG_COOKIE`,
+`LOCALES`, `Translate`, `Vars`, `createTranslator`, `fmtHeight`,
+`interpolate`, `RestrictionView`, `putTrackIcons`, `resolveColour`,
+`useLayer`, `problemSlug`, `retryAfterSOf`, `EmptyState`,
+`FieldBaseProps`, `formatLocaleNumber`, `inputToUtc`,
+`parseLocaleNumber`, `useFieldControl`, `TableColumn`, `columnsFor`,
+`tableColumn`, `LayerToggle`, `subscriptionBBox`, `useMapContext`,
+`useStyleLoad`, `ALERT_STORE_LIMIT`, `AlertInput`, `Backoff`,
+`CLOSE_UNAUTHORIZED`, `DEFAULT_BACKOFF`, `LiveFeed`, `STABLE_AFTER_MS`,
+`StatusSource`, `SubscribeFrame`, `WireSourceState`, `compareCapturedAt`,
+`parseFrame`, `parseFrameText`, `parseStatusBody`, `reconnectDelayMs`,
+`resolveFeedUrl`, `subscribeFrame`, `useNowMs`, `utcMs`,
+`FeedStatusInput`, `SOURCE_STATE_KEYS`, `degradedLabel`,
+`IDENT_REASON_KEYS`, `IDENT_STATUS_KEYS`, `IdentKey`, `SEVERITY_KEYS`,
+`TRUST_KEYS`, `identDrawn`, `identHintKey`, `trackIconId`,
+`trackIconParts`, `SeverityMark`, `alertSummary`, `detailNumber`,
+`kindName`; and every type a public signature reaches. Everything else is
+beta, as are a name that says it is for tests (`...ForTests`) and the
+reference adapters of `test` (§3.18). `scripts/release-tags.mjs` applies
+the rule and lists an untagged export; `docs/api/uspace-ui.api.md` shows
+each declaration's tag.
+
 ### 3.1 `model` (frozen, WP-0)
 
 Enumerations mirror `uspace-core/core` string values exactly (`00 §6.3`

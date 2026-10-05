@@ -34,7 +34,7 @@ const escape = (c: string): string => c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
  * The number in `text` as typed in `lang`: `null` for an empty box, `NaN`
  * for text that is not a number in that language.
  *
- * @beta
+ * @public
  */
 export function parseLocaleNumber(text: string, lang: Lang): number | null {
   const raw = text.trim();
@@ -63,7 +63,7 @@ const formats = new Map<Lang, Intl.NumberFormat>();
 /**
  * A stored number as the text the box shows in `lang`; "" for null.
  *
- * @beta
+ * @public
  */
 export function formatLocaleNumber(v: number | null, lang: Lang): string {
   if (v === null || !Number.isFinite(v)) return "";

@@ -16,7 +16,7 @@ const UTC = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d{1,9}))?Z$/;
  * Negative when `a` is older, 0 when equal, positive when newer; null when
  * either is not RFC 3339 UTC, so the two cannot be ordered.
  *
- * @beta
+ * @public
  */
 export function compareCapturedAt(a: string, b: string): number | null {
   const ma = UTC.exec(a);
@@ -35,7 +35,7 @@ export function compareCapturedAt(a: string, b: string): number | null {
  * null for anything else, so a time without a zone is never read as the
  * browser's local time.
  *
- * @beta
+ * @public
  */
 export function utcMs(iso: string | null | undefined): number | null {
   if (typeof iso !== "string" || !UTC.test(iso)) return null;

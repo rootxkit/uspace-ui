@@ -105,7 +105,7 @@ function onGrid(n: number, quantum: number): number {
  * of `quantizeDeg` so a small pan gives the same box. Clamped to the WGS84
  * range.
  *
- * @beta
+ * @public
  */
 export function subscriptionBBox(
   b: BBox,

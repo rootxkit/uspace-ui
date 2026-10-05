@@ -15,13 +15,13 @@ export const LANGS: readonly Lang[] = ["ka", "en"];
  */
 export const DEFAULT_LANG: Lang = "ka";
 
-/** @beta */
+/** @public */
 export const LANG_COOKIE = "uspace_lang";
 
 /**
  * The `Intl` locale each language formats numbers and dates with.
  *
- * @beta
+ * @public
  */
 export const LOCALES: Readonly<Record<Lang, string>> = {
   ka: "ka-GE",

@@ -93,7 +93,7 @@ export function resolveTrackColours(map: MapLibreMap): TrackColours {
  * on the map, once per style; a style re-apply drops them and the layer
  * puts them back.
  *
- * @beta
+ * @public
  */
 export function putTrackIcons(map: MapLibreMap): void {
   for (const { id, trust, directional } of TRACK_ICON_IDS) {

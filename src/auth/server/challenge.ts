@@ -30,7 +30,7 @@ export const MFA_CHALLENGE_PATH = "/_bff";
 /**
  * The shortest BFF secret accepted, in bytes (256 bits).
  *
- * @beta
+ * @public
  */
 export const MIN_CHALLENGE_SECRET_BYTES = 32;
 

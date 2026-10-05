@@ -9,10 +9,10 @@ import type { Key } from "./en.js";
 import { LOCALES, type Lang } from "./lang.js";
 import { createTranslator, type Translate } from "./translate.js";
 
-/** @beta */
+/** @public */
 export const DASH = "—";
 
-/** @beta */
+/** @public */
 export type HeightRef = "TakeoffLocation" | "GroundLevel";
 
 const translators = new Map<Lang, Translate>();
@@ -116,7 +116,7 @@ export const HEIGHT_KEYS: Readonly<Record<HeightRef, Key>> = {
  * A broadcast height: "40 m above take-off" or "40 m above ground", never
  * one for the other (R-12); a dash without a value or a reference.
  *
- * @beta
+ * @public
  */
 export function fmtHeight(
   v: number | null,

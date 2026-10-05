@@ -90,7 +90,7 @@ export function needsAttention(s: IdentStatus | null): boolean {
  * registered colour on it (CLAUDE.md rule 6, never upgrade). Every other
  * status is drawn as given.
  *
- * @beta
+ * @public
  */
 export function identDrawn(ident: Identification | null): IdentKey {
   if (ident === null) return "none";
@@ -128,7 +128,7 @@ export function identMark(s: IdentKey): string {
 /**
  * The catalogue key of a status's name; `none` for no identification.
  *
- * @beta
+ * @public
  */
 export const IDENT_STATUS_KEYS: Readonly<Record<IdentKey, Key>> = Object.freeze(
   {
@@ -157,7 +157,7 @@ export const IDENT_STATUS_HINT_KEYS: Readonly<Record<IdentKey, Key>> =
 /**
  * The catalogue key of a reason code (04 §3.2), for the detail.
  *
- * @beta
+ * @public
  */
 export const IDENT_REASON_KEYS: Readonly<Record<IdentReason, Key>> =
   Object.freeze({

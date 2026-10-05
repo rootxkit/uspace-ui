@@ -93,7 +93,7 @@ export function useStore<T>(store: ExternalStore<T>): T {
  * value an app passes as `nowMs` to the status components and the track
  * layer, so every age on the page counts on the same tick.
  *
- * @beta
+ * @public
  */
 export function useNowMs(
   periodMs: number,

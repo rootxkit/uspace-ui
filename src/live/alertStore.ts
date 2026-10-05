@@ -20,7 +20,7 @@ export type AlertInput = Omit<AlertView, "receivedAtMs" | "acknowledged">;
 // held (PLAN §8: alert hold <= 500).
 /** @beta */
 export const DEFAULT_CLEARED_HOLD_MS = 30_000;
-/** @beta */
+/** @public */
 export const ALERT_STORE_LIMIT = 500;
 
 /** @public */

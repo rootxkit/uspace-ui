@@ -62,7 +62,7 @@ const isCount = (v: unknown): v is number =>
  * or null; `time_source` one of `core.TimeSource`; `backlog` a boolean;
  * `body` an object. Null when any of them fails: the frame is malformed.
  *
- * @beta
+ * @public
  */
 export function parseFrame(raw: unknown): ConsoleFrame | null {
   if (!isObj(raw)) return null;
@@ -101,7 +101,7 @@ export function parseFrame(raw: unknown): ConsoleFrame | null {
 /**
  * A WebSocket message's data as a frame: text holding JSON, then parseFrame.
  *
- * @beta
+ * @public
  */
 export function parseFrameText(data: unknown): ConsoleFrame | null {
   if (typeof data !== "string") return null;
@@ -227,7 +227,7 @@ export function thresholdUnit(name: string): "s" | "m" | null {
 /**
  * A `console/status/v1` body (lab schema), every required member checked.
  *
- * @beta
+ * @public
  */
 export interface StatusBody extends StatusExtras {
   connectionId: string;
@@ -307,7 +307,7 @@ const isSlug = (v: unknown): v is string =>
  * without a state, a dataset without an age. A refused status frame is
  * not applied at all: the kit never fills in a threshold.
  *
- * @beta
+ * @public
  */
 export function parseStatusBody(raw: unknown): StatusBody | null {
   if (!isObj(raw)) return null;

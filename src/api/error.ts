@@ -18,7 +18,7 @@ const HTTP_DATE = /^[A-Za-z]{3,9},? /;
  * has passed). `null` when the header is absent; `null` and a count when it
  * is neither form.
  *
- * @beta
+ * @public
  */
 export function retryAfterSOf(
   value: string | null,

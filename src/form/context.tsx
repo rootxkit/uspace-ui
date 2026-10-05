@@ -47,7 +47,7 @@ export const FieldContext = createContext<FieldControl | null>(null);
  * The accessibility attributes of the control inside a `Field`, for a
  * control the app writes itself.
  *
- * @beta
+ * @public
  */
 export function useFieldControl(): {
   id: string;

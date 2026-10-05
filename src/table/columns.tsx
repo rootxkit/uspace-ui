@@ -44,7 +44,7 @@ export type TableColumn<Row> = ColumnDef<Row, unknown>;
 /**
  * Erases a column's value type so it can join a `TableColumn[]`.
  *
- * @beta
+ * @public
  */
 export function tableColumn<Row, V>(def: ColumnDef<Row, V>): TableColumn<Row> {
   return def as unknown as TableColumn<Row>;
@@ -157,14 +157,14 @@ export const UNIT_KEYS = Object.freeze({
 /**
  * The keys of `Row` whose values are assignable to `V`.
  *
- * @beta
+ * @public
  */
 export type KeyOf<Row, V> = {
   [K in keyof Row]-?: Row[K] extends V ? K : never;
 }[keyof Row] &
   string;
 
-/** @beta */
+/** @public */
 export interface ColumnOptions {
   /** The column id; the field key by default. */
   id?: string;
@@ -379,7 +379,7 @@ function utc<Row>(
   });
 }
 
-/** @beta */
+/** @public */
 export interface AgeColumnOptions<Row> extends ColumnOptions {
   /** The row's display age at `nowMs`, in seconds; null when unknown. */
   ageS(row: Row, nowMs: number): number | null;
@@ -617,7 +617,7 @@ export const columns = Object.freeze({
 /**
  * The helpers with `Row` fixed once: `const c = columnsFor<Registration>()`.
  *
- * @beta
+ * @public
  */
 export function columnsFor<Row>() {
   return {
