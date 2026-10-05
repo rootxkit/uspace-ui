@@ -27,6 +27,21 @@ export {
   resetLayerCountersForTests,
   type LayerCounter,
 } from "./counters.js";
+export {
+  DRAW_FILL_OPACITY,
+  DRAW_LAYER_ID,
+  DRAW_LINE_WIDTH_PX,
+  DRAW_POINT_RADIUS_PX,
+  DrawLayer,
+  drawFeatureCollection,
+  drawLayerIds,
+  outlineWithClick,
+  outlineWithMove,
+  type DrawFeatureCollection,
+  type DrawLayerIds,
+  type DrawLayerProps,
+  type DrawRole,
+} from "./DrawLayer.js";
 export { HoverPortal } from "./HoverPortal.js";
 export {
   INTENT_LABEL_SIZE_PX,

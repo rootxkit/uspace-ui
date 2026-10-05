@@ -54,3 +54,9 @@ export interface FeedStatus { connection: "connecting" | "live" | "down"; sinceM
 export interface FieldError { field: string; reason: string }      // uspace-core core.FieldError (its CLAUDE.md rule 5: an error names the field and the reason)
 export interface Problem { type: string; title: string; status: number; detail: string | null; instance: string | null; errors: FieldError[]; truncated?: boolean }   // §14 Q2 (decided, M28): `type` = https://schemas.uspace.ge/problems/<slug>; `errors` capped at 100 by the server, `truncated: true` when it was cut; the form kit says "and more" on it
 export interface SessionDisplay { sub: string; roles: string[]; realm: string; exp: number }   // the session JWT claims the BFF decodes for display (M20): `roles` is always an array (one element where a system has single-role users); `realm` is `console` (default), `police` (authority) or `portal` (USSP operators)
+
+// 1.0.0 (additive): an outline a person is drawing or typing (layers/DrawLayer, form/OutlineFields), passed to the app as entered. The kit never closes, simplifies, buffers or measures it, and never turns a circle into a polygon: the API judges the outline and, where a circle must be drawn, draws its outline in Go (uspace-core geodesy) and returns it.
+export interface DrawPoint { lat: number; lng: number }   // WGS84 degrees, as clicked (MapLibre's lngLat) or typed
+export type DrawOutline =
+  | { kind: "polygon"; vertices: readonly DrawPoint[] }   // in the order given; the first is not repeated
+  | { kind: "circle"; center: DrawPoint | null; radiusM: number | null };   // radius in metres as typed; null: not yet given

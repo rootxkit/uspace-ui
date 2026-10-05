@@ -30,7 +30,12 @@ export type LayerCounter =
    * can be drawn for it on the map; the list still shows it. Counted once
    * per alert while it stays so.
    */
-  | "alert_aircraft_missing";
+  | "alert_aircraft_missing"
+  /**
+   * A click that would add a vertex past DrawLayer's `maxVertices` (the
+   * app's bound from its API): nothing added (1.0.0).
+   */
+  | "draw_vertex_refused";
 
 const counts: Record<LayerCounter, number> = {
   update_superseded: 0,
@@ -40,6 +45,7 @@ const counts: Record<LayerCounter, number> = {
   trail_point_evicted: 0,
   alert_peer_missing: 0,
   alert_aircraft_missing: 0,
+  draw_vertex_refused: 0,
 };
 
 export function countLayer(counter: LayerCounter): void {
