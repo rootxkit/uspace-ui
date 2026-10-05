@@ -21,7 +21,12 @@ import type {
 import { adaptTelemetry } from "./adapters/track.js";
 import { fixtures } from "./fixtures.js";
 import { LAB_EXAMPLES } from "./labExamples.generated.js";
-import { LAB_COMMIT, labDecodings, type LabDecoding } from "./labFixtures.js";
+import {
+  LAB_COMMIT,
+  labDecodings,
+  labUnhandled,
+  type LabDecoding,
+} from "./labFixtures.js";
 
 const decodings = labDecodings();
 
@@ -98,6 +103,15 @@ describe("every lab example decodes through the reference adapters", () => {
       "ed318",
     ])
       expect(schemas, s).toContain(s);
+  });
+
+  it("counts, and does not report as decoded, a schema no adapter catalogues", () => {
+    // coordination/annex_v/v1 (envelope/v1 `lab-backlog-frame`)
+    // has no view model; the live feed passes it to onFrame and counts it.
+    expect(labUnhandled()).toEqual({ "coordination/annex_v/v1": 1 });
+    expect(decodings.map((d) => d.schema)).not.toContain(
+      "coordination/annex_v/v1",
+    );
   });
 
   it("still refuses each example PLAN §14 Q22 lists, on the field it names", () => {

@@ -4,7 +4,10 @@
 // decoded through the reference adapters a `web/` would write. Every
 // example is decoded; `labDecodings()` reports each one, and
 // `labFixtures()` builds the Fixtures shape from those that decoded, so a
-// component test renders what the bus actually carries.
+// component test renders what the bus actually carries. An example whose
+// schema the reference adapters do not catalogue is not decoded: it is
+// counted by `labUnhandled()`, as the live feed counts such a frame
+// `frames_unhandled`.
 import { parseFrame, type ConsoleFrame } from "../live/frame.js";
 import { utcMs } from "../live/time.js";
 import type {
@@ -46,7 +49,12 @@ export interface LabDecoding {
 
 const rxMs = (f: ConsoleFrame): number => utcMs(f.rxTs) ?? 0;
 
-function decode(example: string, raw: unknown): LabDecoding[] {
+/** Not a decoding: a well-formed frame of a schema no adapter catalogues. */
+interface Unhandled {
+  unhandled: string;
+}
+
+function decode(example: string, raw: unknown): (LabDecoding | Unhandled)[] {
   const f = parseFrame(raw);
   if (f === null)
     return [
@@ -82,7 +90,7 @@ function decode(example: string, raw: unknown): LabDecoding[] {
       return one(adaptCisChange(f));
     case "console/snapshot/v1": {
       const body = f.body as Record<string, unknown>;
-      const out: LabDecoding[] = [];
+      const out: (LabDecoding | Unhandled)[] = [];
       for (const key of ["tracks", "alerts", "manned"] as const) {
         const items = Array.isArray(body[key]) ? (body[key] as unknown[]) : [];
         items.forEach((item, i) => {
@@ -93,9 +101,17 @@ function decode(example: string, raw: unknown): LabDecoding[] {
     }
     default:
       // A schema the reference adapters do not catalogue: the live feed
-      // passes it to onFrame untouched (PLAN §6.3), so it decodes as is.
-      return one({ ok: true, value: f });
+      // passes it to onFrame untouched and counts it (PLAN §6.3), so it
+      // is counted here, never reported as decoded.
+      return [{ unhandled: f.schema }];
   }
+}
+
+function decodeAll(): (LabDecoding | Unhandled)[] {
+  const out: (LabDecoding | Unhandled)[] = [];
+  for (const [path, raw] of Object.entries(LAB_EXAMPLES))
+    out.push(...decode(path, raw));
+  return out;
 }
 
 /**
@@ -104,15 +120,24 @@ function decode(example: string, raw: unknown): LabDecoding[] {
  * @public
  */
 export function labDecodings(): LabDecoding[] {
-  const out: LabDecoding[] = [];
-  for (const [path, raw] of Object.entries(LAB_EXAMPLES))
-    out.push(...decode(path, raw));
+  const out = decodeAll().filter((d): d is LabDecoding => !("unhandled" in d));
   for (const doc of ED318_ACCEPTED)
     out.push({
       example: `lab/vectors/ed318_roundtrip.json#${doc.name}`,
       schema: "ed318",
       result: adaptEd318Collection(doc.document),
     });
+  return out;
+}
+
+/**
+ * How many examples (or snapshot items) carry each schema the reference
+ * adapters do not catalogue; none of them is in `labDecodings()`.
+ */
+export function labUnhandled(): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const d of decodeAll())
+    if ("unhandled" in d) out[d.unhandled] = (out[d.unhandled] ?? 0) + 1;
   return out;
 }
 
