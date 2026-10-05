@@ -190,9 +190,37 @@ describe("a polygon", () => {
     expect(down.preventDefault).toHaveBeenCalledTimes(1);
     act(() => map.fire("mousemove", event(C)));
     act(() => map.fire("mouseup", event(C)));
+    // The same release reaches the document after the map (the twin of
+    // a release outside it): it changes nothing.
+    act(() => {
+      document.body.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+    });
     map.queryRenderedFeatures.mockReturnValue([]);
     click(map, C);
     expect(changes).toEqual([{ kind: "polygon", vertices: [A, C] }]);
+  });
+
+  it("ends a drag released outside the map: no further move, and the next click adds", async () => {
+    const { map, changes } = await mount({ kind: "polygon", vertices: [A, B] });
+    map.queryRenderedFeatures.mockReturnValue([
+      { properties: { index: 1 } },
+    ] as never);
+    act(() => map.fire("mousedown", event(B)));
+    act(() => map.fire("mousemove", event(C)));
+    act(() => flushFrames());
+    // Released over the page: MapLibre fires no map mouseup and no click.
+    act(() => {
+      document.body.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+    });
+    act(() => map.fire("mousemove", event(A)));
+    act(() => flushFrames());
+    expect(changes).toEqual([{ kind: "polygon", vertices: [A, C] }]);
+    map.queryRenderedFeatures.mockReturnValue([]);
+    click(map, B);
+    expect(changes).toEqual([
+      { kind: "polygon", vertices: [A, C] },
+      { kind: "polygon", vertices: [A, C, B] },
+    ]);
   });
 
   it("a mousedown beside every point starts no drag (the twin)", async () => {

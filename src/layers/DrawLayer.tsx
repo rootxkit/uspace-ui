@@ -350,6 +350,16 @@ export function DrawLayer(props: DrawLayerProps) {
       dragging = null;
       map.getCanvas().style.cursor = cursorOf(latest.current);
     };
+    // A button released outside the map fires no map `mouseup` (MapLibre
+    // fires it for its canvas container only) and no click. The document
+    // sees every release after the map has: a drag still held then ended
+    // outside, so it ends here, and the next click places a point again.
+    const doc = map.getContainer().ownerDocument;
+    const onDocUp = (): void => {
+      if (dragging === null) return;
+      dragged = false;
+      onUp();
+    };
     const onClick = (e: MapMouseEvent): void => {
       const p = latest.current;
       // The click that ends a drag places nothing.
@@ -370,11 +380,13 @@ export function DrawLayer(props: DrawLayerProps) {
     map.on("mousemove", onMove);
     map.on("mouseup", onUp);
     map.on("click", onClick);
+    doc.addEventListener("mouseup", onDocUp);
     return () => {
       map.off("mousedown", onDown);
       map.off("mousemove", onMove);
       map.off("mouseup", onUp);
       map.off("click", onClick);
+      doc.removeEventListener("mouseup", onDocUp);
     };
   }, [map, ids.points]);
   // A crosshair while clicks place points; declared after the handlers,
