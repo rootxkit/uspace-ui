@@ -24,8 +24,44 @@ import { LAB_EXAMPLES } from "./labExamples.generated.js";
 import { LAB_COMMIT, labDecodings, type LabDecoding } from "./labFixtures.js";
 
 const decodings = labDecodings();
-const missingMember = (d: LabDecoding): boolean =>
-  !d.result.ok && d.result.value === undefined;
+
+// The examples that leave out a member their schema requires, as PLAN
+// §14 Q22 (2) records them: the only refusals that are a visible skip.
+// Any other refusal fails, a missing member included, and an example
+// listed here that decodes, or refuses another field, fails too.
+const KNOWN_LAB_ISSUES: readonly {
+  example: string;
+  schema: string;
+  field: string;
+}[] = [
+  {
+    example: "lab/console/snapshot/v1/authority-picture.json#alerts[0]",
+    schema: "violation/v1",
+    field: "severity",
+  },
+  {
+    example: "lab/console/snapshot/v1/authority-picture.json#manned[0]",
+    schema: "track/manned/v1",
+    field: "position",
+  },
+  {
+    example: "lab/envelope/v1/manned-frame-without-source-clock.json",
+    schema: "track/manned/v1",
+    field: "position",
+  },
+];
+
+/** A refusal PLAN §14 Q22 lists: a member left out, on the list above. */
+const knownLabIssue = (d: LabDecoding): boolean =>
+  !d.result.ok &&
+  d.result.value === undefined &&
+  KNOWN_LAB_ISSUES.some(
+    (k) =>
+      k.example === d.example &&
+      k.schema === d.schema &&
+      !d.result.ok &&
+      k.field === d.result.field,
+  );
 
 describe("the lab fixtures are pinned", () => {
   it("to the lab commit in docs/LAB_VERSION and in the fixtures' VERSION", () => {
@@ -64,8 +100,39 @@ describe("every lab example decodes through the reference adapters", () => {
       expect(schemas, s).toContain(s);
   });
 
+  it("still refuses each example PLAN §14 Q22 lists, on the field it names", () => {
+    for (const k of KNOWN_LAB_ISSUES) {
+      const d = decodings.filter(
+        (x) => x.example === k.example && x.schema === k.schema,
+      );
+      expect(d, k.example).toHaveLength(1);
+      expect(d[0]?.result, k.example).toEqual({
+        ok: false,
+        field: k.field,
+        value: undefined,
+        reason: expect.any(String) as unknown,
+      });
+    }
+  });
+
+  it("skips only the listed examples: another missing member is a failure", () => {
+    const listed = KNOWN_LAB_ISSUES[0];
+    const refused = (example: string, field: string): LabDecoding => ({
+      example,
+      schema: "violation/v1",
+      result: { ok: false, field, value: undefined, reason: "missing" },
+    });
+    expect(knownLabIssue(refused(listed?.example ?? "", "severity"))).toBe(
+      true,
+    );
+    expect(
+      knownLabIssue(refused("lab/violation/v1/new.json", "severity")),
+    ).toBe(false);
+    expect(knownLabIssue(refused(listed?.example ?? "", "kind"))).toBe(false);
+  });
+
   for (const d of decodings) {
-    if (missingMember(d) && !d.result.ok) {
+    if (knownLabIssue(d) && !d.result.ok) {
       it.skip(`LAB ISSUE: ${d.example} (${d.schema}) has no ${d.result.field}, which its schema requires; ask the lab to complete the example`, () => {});
       continue;
     }
