@@ -659,7 +659,7 @@ frames are not optional for a browser-facing WebSocket.
 | From | What | Status |
 |---|---|---|
 | each system repo | `api/openapi.yaml` (OpenAPI 3.1), from which the app generates `paths` with `openapi-typescript` and passes it to `createClient<Paths>` | the kit never reads a system's spec; it ships the generator wrapper so every app generates the same way (WP-4) |
-| `uspace-lab/schemas/` (KT-2) | `schemas/common/`: `envelope/v1`, `track/telemetry/v1`, `source/status/v1`, `zone/applicable/v1`, `console/status/v1`, `console/snapshot/v1`, `console/subscribe/v1`, `problem/v1` (shapes produced by several systems, M14); mirrored per-system schemas of `track/manned/v1` (ANSP), `alert/v1`, `traffic/product/v1` (USSP), `violation/v1` (authority), `cis/change/v1` (CISP); each with examples | **does not exist yet** at `uspace-lab@2b98ee8`; lab WP-L1 creates it (common schemas first); WP-14 wires the examples into `test/fixtures` when it does; until then the fixtures are synthetic and the enumerations are pinned to spec text (§14 Q16) |
+| `uspace-lab/schemas/` (KT-2) | `schemas/common/`: `envelope/v1`, `track/telemetry/v1`, `source/status/v1`, `zone/applicable/v1`, `console/status/v1`, `console/snapshot/v1`, `console/subscribe/v1`, `problem/v1` (shapes produced by several systems, M14); mirrored per-system schemas of `track/manned/v1` (ANSP), `alert/v1`, `traffic/product/v1` (USSP), `violation/v1` (authority), `cis/change/v1` (CISP); each with examples | **wired (WP-14)** at `uspace-lab@18d6f32` (`docs/LAB_VERSION`): the common examples and the ED-318 round-trip vector. The per-system mirrors are not pinned in the lab yet, so `alert/v1` (uspace-ussp `39fac6d`) and `track/manned/v1` (uspace-ansp `08731a3`) come from the owning repository at a pinned commit (M11), all in `src/test/fixtures/VERSION`; `violation/v1` has no examples, and the CISP's `cis/change/v1` examples are not vendored (§14 Q22) |
 | `uspace-core` | the string values of `core` enumerations (`Trust`, `Severity`, `ZoneType`, `IdentStatus`, `IdentReason`, `IdentBasis`, `AltSource`, `VerticalRef`, `TimeSource`), `core.FieldError` shape, `ed318` field names | mirrored by hand in `model/` with a test; a divergence is a kit bug |
 | the lab | the basemap bundle (D6) | predecessor `utm/infra/basemap/fetch_basemap.sh` is the reference; §14 Q4 |
 | every system's `api` | the session JWT the console login returns, in the reconciled shape (`sub`, `roles[]`, `realm`, `exp`, `scope = "session"`) for display gating | `00 §6.2`; M20 decided; the kit decodes without verifying and says so in the function name |
@@ -776,7 +776,10 @@ github.workflow }}-${{ github.ref }}` with cancel-in-progress; every job
    diffed).
 6. `gitleaks` (`06 §4`).
 7. `enums` (`main` only, required; best-effort on PRs): `scripts/check-enums.sh`
-   against `uspace-core` at the tag in `docs/CORE_VERSION`.
+   against `uspace-core` at the tag in `docs/CORE_VERSION`. WP-14: the
+   constants are read by a Go tokenizer (`scripts/go-consts.mjs`) from
+   `core/`, `alerting/` and `sources/`, and the comparison prints a
+   table of every enumeration.
 
 8. `pack` (WP-13a): `pnpm build`, `pnpm pack` with the pack test (the
    tarball holds exactly `files`, nothing from `src/`, `browser/`,
@@ -787,6 +790,15 @@ github.workflow }}-${{ github.ref }}` with cancel-in-progress; every job
    entry points type-check under `NodeNext` and `Bundler`, the bin runs,
    changed bytes refused by `--frozen-lockfile`). Uploads the tarball as
    the `package` artifact and writes a "would release" line.
+9. `fixtures` (WP-14): `scripts/check-fixtures.sh --online`: the
+   lab-derived fixtures' checksums, `docs/LAB_VERSION` and the generated
+   module offline, then every file against its source at the pinned
+   commit; a source it cannot fetch is "unverified", a failure on `main`
+   and on a tag (`REQUIRE_LAB=1`), reported on a pull request.
+10. `semver-gate` (WP-14; `.github/workflows/semver-gate.yml`, its own
+   workflow so it runs on every pull request and every label change,
+   without a path filter): `scripts/semver-gate.mjs` against the PR's
+   base (§12).
 
 `.github/workflows/release.yml` (written by WP-13a, first run on
 `v0.1.0-rc.1`): on tag `v*`: a `tag` job that fails unless the tag is
@@ -798,7 +810,8 @@ creates the GitHub Release with both files and the CHANGELOG section,
 marked pre-release when the version has a pre-release suffix, and reads
 it back (flag, assets, the downloaded bytes). No registry publish (D10).
 
-Branch protection on `main` requires jobs 1–6 and 8.
+Branch protection on `main` requires jobs 1–6 and 8; from WP-14 also 9
+and 10 (the owner adds them to the ruleset).
 
 Caches: pnpm store (`actions/setup-node` with `cache: pnpm`), Playwright
 browsers, Next.js build cache for the example. No Docker in this repo.
@@ -915,7 +928,16 @@ D10).
   moved and why. The `0.2` and `0.3` minimums of §11 name components
   that are all in `0.1.0`, so a consumer can pin `0.1.0` for them.
 - `v1.0.0` (D12): the API report of §3 declared stable, the semver gate
-  in CI, the lab's schema examples wired, two consoles in use.
+  in CI, the lab's schema examples wired, two consoles in use. *Prepared
+  on 2026-10-05 (WP-14), tagged by the owner:* every entry point of §2,
+  `model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api`, `auth/server`,
+  `auth/client`, `symbology`, `layers` (with `DrawLayer`), `legend`,
+  `live`, `status` (with `ThresholdsPanel`), `alerts`, `table`, `form`
+  (with `OutlineFields`), `eslint` and `test` (with the lab-derived
+  fixtures), every export tagged `@public` or `@beta` (§3, "The 1.0.0
+  freeze"). The consoles: uspace-authority's picture (`TrackLayer`,
+  `TrackDetail`, the alert store) and uspace-ussp's traffic page and
+  console (`TrackLayer`, `alertSummary`, `SeverityMark`), both on `0.1.0`.
 - From `v1`: within a major only additive changes (new exports, new
   optional props, new catalogue keys, new enumeration values *rendered*
   because `model` gained them). The following are a **major**: removing
@@ -1031,8 +1053,10 @@ the default is a proposal, not the answer.
 | Q13 | Tailwind v4 `@source` scanning of a compiled package versus a prebuilt stylesheet. | D4: `@source` (one theme, tree-shaken utilities); the example app proves it. A prebuilt `uspace-ui.css` can be added as an additive export for a non-Tailwind consumer (the lab dashboard?) without changing anything else. | **Decided**: `@source`; a prebuilt stylesheet only if a non-Tailwind consumer appears. |
 | Q14 | Should the kit ship the OpenAPI → TypeScript generation (`openapi-typescript`) as a CLI so all five `web/` generate identically, and check the output is committed and current? | WP-4 ships `uspace-ui-gen-api <openapi.yaml> <out.d.ts>` (a thin wrapper that pins the generator version and writes a header the `noHandWrittenApiTypes` rule recognises) and a CI snippet each `web/` copies. | **Decided**: every `web/` uses it. |
 | Q15 | Acknowledgement persistence: `02 F5` records acknowledgements at the USSP (`POST /v1/alerts/{id}/ack`); the authority's violations have review, not acks; the predecessor's console ack was per console and not recorded (P6-07). | The kit's `acknowledged` flag is per console and the `onAcknowledge` callback is the app's to persist; `AlertToaster` silences the tone on the local flag so an operator is never left with a tone they cannot stop while the API is down (B-10 thinking). | **Decided**: as proposed. |
-| Q16 | `uspace-lab/schemas/` and `uspace-lab/api/` (KT-2) do not exist at `uspace-lab@2b98ee8`, so the schema-example conformance hook cannot be wired now. | Synthetic fixtures until then; WP-14 wires the examples and pins the lab commit in `docs/LAB_VERSION`; the enumeration check against `uspace-core` source runs from WP-0. | **Decided** (M31, lab WP-L1 `contracts-aggregate` starts day 1 with `schemas/common/`): synthetic fixtures until it lands; the kit's `v1.0.0` waits for it. |
+| Q16 | `uspace-lab/schemas/` and `uspace-lab/api/` (KT-2) do not exist at `uspace-lab@2b98ee8`, so the schema-example conformance hook cannot be wired now. | Synthetic fixtures until then; WP-14 wires the examples and pins the lab commit in `docs/LAB_VERSION`; the enumeration check against `uspace-core` source runs from WP-0. | **Decided and done** (M31; WP-14 on 2026-10-05): `fixtures({ source: "lab" })` from `uspace-lab@18d6f32` and the pinned per-system sources, decoded through the reference adapters; `src/test/fixtures.lab.test.ts` is the hook. |
 | Q17 | Public display of network identification (`09`, unverified items: F3411 public-display obfuscation rules) is unverified in the spec; if a public flight map is ever built on the kit, obfuscation is a server rule. | The kit renders what it is given; no public-map-specific component is planned. Recorded so that nobody adds client-side rounding as "privacy". | **Decided**: a server rule; no client-side obfuscation. |
 | Q18 | `IdentBasis` gained `provider` (reconciliation Q-A8: a Display Provider flight is a peer's claim, neither authenticated nor broadcast). Core ships `BasisProvider` in v1.1.0; the authority sends `as_broadcast` until then. | `model.IdentBasis` carries `provider` from WP-0 so the symbology's exhaustive switches and the R-05 wording cover it before any API sends it; the `provider` caveat wording ("reported by a provider, unverified") is in both catalogues; the enum check against core passes once v1.1.0 is in `docs/CORE_VERSION` and is a visible skip before. | **Decided** (Q-A8): additive. |
 | Q19 | Alert `detail` names differ between spec `04 §3.3` and uspace-core v1.3.0 (`d_cpa_h_m`/`d_alt_m` vs `d_cpa_horizontal_m`/`d_alt_at_cpa_m`; `zone_id` vs `identifier`, no `zone_type`), `lost_link` has no named field in the spec, `restriction_activated` names `authorisation_updated` / `withdrawn` without saying whether they are flags, and the spec names no field for a clear's own numbers (C-14). | WP-11 reads the spec's name first and core's when the spec's is absent; `lost_link` reads `silence_s` (the USSP's conformance monitor); `authorisation_updated` and `authorisation_withdrawn` (or `withdrawn`) as booleans; a clear reads only `clearing_<key>` (core `clearingDetail`, the USSP's `clearEvent`), so a clear never shows the raise's numbers, and a number nobody sent is a dash. | **Open**: `alert/v1` in `uspace-lab/schemas/` should fix the names; the summaries follow it. |
 | Q20 | Three fields the traffic layers need are not in the frozen view models (§3.1): `MannedView` has no `trust` although `04 §2` puts a trust class on every track-like message and `02 F4` distinguishes `surveillance` (ANSP) from `broadcast` (own e-conspicuity receiver), and no `anomaly` (LESSONS I-04); `IntentView` has no way to say an intent is another USSP's seen through the DSS (`02 F6` peer flights as `provider`), and its `volumes` are typed `Polygon[]` while a derived volume can be a MultiPolygon. | WP-12 adds them as optional input fields without touching `model`: `MannedTrack = MannedView & { trust?, anomaly? }` (symbology), `IntentInput` with `volumes: (Polygon \| MultiPolygon)[]` and `peer?` (layers). A manned track with no trust class is drawn and labelled as broadcast and unverified, never as surveillance (never upgrade); an intent without `peer` is drawn as the USSP's own. | **Open**: `track/manned/v1` and `intent/state/v1` in `uspace-lab/schemas/` should name `trust`, `anomaly` and the peer flag; `model` adopts them at the next major. |
+| Q21 | The USSP's traffic stream sends the CPA thresholds in force in its status frame (`thresholds{cpa_tcpa_max_s, cpa_horizontal_min_m, cpa_vertical_min_m, cpa_neighbour_radius_m, cpa_clear_after_s, traffic_radius_m}` and `evaluation_period_s`, uspace-ussp `internal/app/trafficws`), and its portal could not show them because the kit's live client exposed no such extras (uspace-ussp PLAN Q28 gap 2). `console/status/v1` in `uspace-lab/schemas/common/` names neither member. | 1.0.0 reads them as optional extras, leniently: a member whose name does not end in its unit (`_s`, `_m`) or whose value is not a finite number >= 0 is left out and counted (`status_extra_ignored`), and the frame still applies (refusing a whole status frame for an extra the schema does not constrain would take a console off live). `ThresholdsPanel` shows them; nothing is defaulted (INV-03). | **Open**: the lab's `console/status/v1` should name `thresholds{}` and `evaluation_period_s`; the kit then reads them as strictly as the other extras. |
+| Q22 | What the lab-derived fixtures found (WP-14). (1) 42 `model` enumeration values appear in no lab example (the visible skips of `fixtures.lab.test.ts`: e.g. trust `provider`, `sensor`, `simulated`; most identification reasons; alert kinds `nonconformance_nearby`, `height_exceedance`, `lost_link`, `emergency_nearby`; every violation kind). (2) Three examples leave out a member their schema requires: the lab's `console/snapshot/v1` `authority-picture` violation item (only `violation_id`, `kind`) and manned item (no position), and `envelope/v1` `manned-frame-without-source-clock` (no position). (3) uspace-authority's `violation/v1` has no examples, and names clear reasons `reconfigured` and `authorised` that `model.ClearReason` (mirroring uspace-core `alerting.ClearReason`) lacks: a violation cleared so would be refused by an adapter and not shown as cleared. (4) Every example of uspace-cisp's `cis/change/v1` carries the production hostname in `pull_url`, so none can be vendored (06 §4); the lab's `envelope/v1` `cis-change-frame` stands in. | The kit reports and does not paper over: (1) and (2) are visible skips naming what the lab should add; (3) is listed, not mapped to a neighbouring reason (never upgrade, never guess); `sync-fixtures.sh` refuses a file with the hostname. | **Open**: (1), (2) for uspace-lab; (3) for uspace-authority with uspace-core (either core's `ClearReason` gains the two and `model` mirrors it at the next minor, or the authority maps them); (4) for uspace-cisp (an example host such as `cisp.example`). |

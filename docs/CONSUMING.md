@@ -6,7 +6,7 @@ is shown working in [`examples/next-app/`](../examples/next-app/), which
 CI builds against the kit's current source and smokes in Chromium on
 every pull request. The rules behind the steps are `docs/PLAN.md` §6.3
 (the contracts), §7 (security) and §11 (consumption). This guide is for
-`0.1.0`.
+`1.0.0`.
 
 ## 1. Install the release tarball with pnpm
 
@@ -22,7 +22,7 @@ install --frozen-lockfile`.
 {
   "packageManager": "pnpm@11.9.0",
   "dependencies": {
-    "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v0.1.0/rootxkit-uspace-ui-0.1.0.tgz",
+    "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.0.0/rootxkit-uspace-ui-1.0.0.tgz",
     "maplibre-gl": "5.24.0",
     "next": "16.3.8",
     "react": "19.3.0",
@@ -45,8 +45,8 @@ install --frozen-lockfile`.
 - Before pinning, check the asset's signed build provenance:
 
   ```sh
-  gh release download v0.1.0 --repo rootxkit/uspace-ui --pattern 'rootxkit-uspace-ui-0.1.0.tgz'
-  gh attestation verify rootxkit-uspace-ui-0.1.0.tgz --repo rootxkit/uspace-ui \
+  gh release download v1.0.0 --repo rootxkit/uspace-ui --pattern 'rootxkit-uspace-ui-1.0.0.tgz'
+  gh attestation verify rootxkit-uspace-ui-1.0.0.tgz --repo rootxkit/uspace-ui \
     --signer-workflow rootxkit/uspace-ui/.github/workflows/release.yml
   ```
 
@@ -323,6 +323,17 @@ another.
 From `0.1.0-rc.1` to `0.1.0`: the `alerts` stub export `ENTRY` is gone,
 and a secure `bffHandlers` needs `trustedProxyHops` or `noTrustedProxy:
 true`.
+
+From `0.1.0` to `1.0.0` (the API freeze): replace the asset URL and
+commit the lockfile. The `CHANGELOG.md` section "What a consumer on 0.1.0
+does" lists the four cases that need an edit (a `@beta` export, an
+exhaustive switch over a counter union, a hand-built status body, a page
+without `data-theme`); every export the four consoles imported at their
+pins is `@public`. New in `1.0.0` and worth taking: `schemeAttribute` on
+`<html>` (§3), `ThresholdsPanel` over `LiveStatus.extras.thresholds`,
+and `DrawLayer` with `OutlineFields` where a page lets a person draw an
+outline (a circle's outline is your API's to draw, with uspace-core's
+geodesy, and to hand back as `circleOutline`).
 
 ## Minimum version per consumer
 

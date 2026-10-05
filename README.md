@@ -20,23 +20,23 @@ kit's view models in an adapter it owns.
 
 ## Status
 
-`0.1.0` is the first stable release (U-M1 of the roadmap, with the
-CISP's C-M1), a GitHub Release asset of this repository (see
-Installing). It ships every entry point: `model`, `theme`, `ui`,
-`i18n`, `fonts`, `map`, `api` (with the `uspace-ui-gen-api` bin),
-`auth/server`, `auth/client`, `symbology`, `layers` (zones,
-restrictions, tracks, alerts, manned traffic, intents and Remote ID
-receivers), `legend`, `live`, `status`, `alerts`, `table`, `form`,
-`eslint` and `test`, with the tokens, the map stylesheet and the
-fonts. `CHANGELOG.md` lists what is in it, what is not yet, and what
-changed since `0.1.0-rc.1`; a consumer on the rc must act on the first
-two of those changes.
+`1.0.0` is the release that freezes the API (U-M4 of the roadmap,
+prepared and tagged by the owner), a GitHub Release asset of this
+repository (see Installing). It ships every entry point: `model`,
+`theme`, `ui`, `i18n`, `fonts`, `map`, `api` (with the
+`uspace-ui-gen-api` bin), `auth/server`, `auth/client`, `symbology`,
+`layers` (zones, restrictions, tracks, alerts, manned traffic, intents,
+Remote ID receivers and the drawing tool), `legend`, `live`, `status`,
+`alerts`, `table`, `form`, `eslint` and `test`, with the tokens, the map
+stylesheet and the fonts. `CHANGELOG.md` lists what is in it, what a
+consumer on `0.1.0` does, and what is not yet.
 
-The API is not frozen before `v1.0.0`: an export may still change in a
-minor, and the CHANGELOG says what moved and why. `v1.0.0` comes when
-two consoles use the track and alert components in production and CI
-has the semver gate (WP-14). Distribution is GitHub Release tarballs;
-every consumer installs with pnpm, pinned to one release asset URL.
+From `1.0.0` the API is additive within a major. The contract is what
+[`docs/api/uspace-ui.api.md`](docs/api/uspace-ui.api.md) tags `@public`;
+`@beta` exports may change in a minor, with a CHANGELOG line. CI's
+semver gate holds every pull request to it (`CLAUDE.md` "The semver
+gate"). Distribution is GitHub Release tarballs; every consumer
+installs with pnpm, pinned to one release asset URL.
 
 ## Links
 
@@ -63,7 +63,7 @@ path for later. Depend on the asset URL of one release, exactly:
 ```jsonc
 // web/package.json
 "dependencies": {
-  "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v0.1.0/rootxkit-uspace-ui-0.1.0.tgz",
+  "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.0.0/rootxkit-uspace-ui-1.0.0.tgz",
   "maplibre-gl": "5.x"
 }
 ```
@@ -78,7 +78,7 @@ depend on a `github:` spec or a branch. From `0.1.0` the tarball carries
 a signed build provenance attestation; check it with `gh attestation
 verify` before pinning (`docs/RELEASING.md`).
 
-## Consuming (`0.1.0`)
+## Consuming (`1.0.0`)
 
 ```css
 /* web/app/globals.css */

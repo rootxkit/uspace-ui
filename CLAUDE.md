@@ -155,7 +155,47 @@ and the lab consumes it at build time, pinned by an exact version. Read
   carries the label `breaking` and a new major heading in
   `CHANGELOG.md`; one that changes a semantic token or a symbology
   mapping carries `legend-change` and cites the lesson or spec row
-  (`docs/PLAN.md §12`; enforced by CI from WP-14).
+  (`docs/PLAN.md §12`; enforced by CI from WP-14, below).
+
+## The semver gate (WP-14)
+
+`.github/workflows/semver-gate.yml` runs `scripts/semver-gate.mjs` on
+every pull request and every label change, against the PR's base. It
+prints each rule, whether it fired, why, and what it found; it is a
+required check on `main`.
+
+1. **API report.** A removed or changed line of a `@public` declaration
+   in `docs/api/uspace-ui.api.md` (an added line is additive; a comment
+   line and a `@beta` declaration are outside the gate) needs the PR
+   label `breaking` and a version heading the base did not have: the
+   next major from `1.0.0` (`## 2.0.0`), the next minor before it. A
+   public declaration demoted to `@beta` is a change of its public line.
+2. **Legend.** A removed or changed `--us-severity-*`, `--us-trust-*`,
+   `--us-ident-*`, `--us-zone-*` or `--us-age-*` value in
+   `styles/tokens.css`, or a removed or changed code line inside a
+   `*Token`, `*Shape` or `*Pattern` function under `src/symbology/` (a
+   comment or a new `case` is not), needs the label `legend-change` and
+   a CHANGELOG line added by the PR that cites a LESSONS id (`R-05`) or
+   a spec row (`04 §3.3`).
+
+Every export carries a release tag (`docs/PLAN.md §3`, "The 1.0.0
+freeze"): `pnpm check` fails on an untagged one (api-extractor), and on
+a public signature that reaches a beta type. Tag a new export `@public`
+when it is part of the contract (and §3 names it), `@beta` otherwise;
+`node scripts/release-tags.mjs` lists what is untagged and the tag the
+rule gives it.
+
+## Release branches
+
+`main` carries the current major. When a major `N+1` is tagged,
+`release/vN` is cut from the last `vN.x.y` tag and maintained for six
+months (`docs/PLAN.md §12`): fixes land on `main` first and are
+cherry-picked to `release/vN` in their own PR, never the other way; a
+`release/vN` PR on which the gate fires rule 1 is not merged there,
+whatever its label (a major never lands on a maintained branch). Tags
+`vN.x.y` on `release/vN` are cut by the owner as on `main`. No feature
+lands on a release branch. When the six months end, the branch is
+frozen, not deleted.
 
 ## Commands
 
@@ -169,7 +209,11 @@ pnpm test:browser   # vitest browser mode: components in Chromium, axe, golden s
 pnpm exec vitest --project browser --browser.headless=false <file>   # watch a browser test render
 pnpm build          # tsc to dist/
 pnpm api-report     # regenerate docs/api/uspace-ui.api.md (commit the result)
-scripts/check-enums.sh   # compare src/model enumerations with uspace-core at docs/CORE_VERSION (online)
+scripts/check-enums.sh   # compare src/model enumerations with uspace-core at docs/CORE_VERSION (online), a table of each
+bash scripts/check-fixtures.sh [--online]   # the lab-derived fixtures: checksums, docs/LAB_VERSION, generated module; online, against their sources
+bash scripts/sync-fixtures.sh   # re-copy the fixtures at the commits in src/test/fixtures/VERSION (then review, test, commit)
+node scripts/semver-gate.mjs --base <commit> --labels '["breaking"]'   # what CI's semver gate says about the working tree
+node scripts/release-tags.mjs   # exports without a release tag, and the tag the rule gives each (--write adds them)
 ```
 
 ## Before you say a work package is done
