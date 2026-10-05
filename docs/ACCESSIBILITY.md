@@ -74,3 +74,28 @@ sign-in fields are labelled, `required`, and carry `autocomplete`
   Georgian.
 - `browser/setup.ts` runs `axe` after every component browser test, as
   before.
+
+## Lab conformance rerun (WP-14, 2026-10-05)
+
+The lab's conformance suite (uspace-lab WP-L7 at `18d6f32`:
+`conformance/axe` over the pages, folded in by `cmd/conformance run
+--axe`) against `examples/next-app` built from `main` (`efda90d`,
+before) and from the WP-14 branch (after), pages `/`, `/login`,
+`/protected`, once in the runner's default light context and once with a
+dark system preference. The kit is a library, so the run used a scratch
+target for the example's standalone server; only A11Y-PUBLIC applies
+and every other requirement is not applicable (an incomplete run,
+accepted with `--allow-incomplete`).
+
+| Requirement | Before (main) | After (WP-14) |
+|---|---|---|
+| A11Y-PUBLIC, light | pass (3 pages, 0 violations) | pass (3 pages, 0 violations) |
+| A11Y-PUBLIC, dark preference | pass (3 pages, 0 violations) | pass (3 pages, 0 violations) |
+
+A4 and A5 are not visible to that run: axe runs once the page has
+loaded, after the focus question and the first paint. Their before and
+after are the kit's own tests, which fail on `main` and pass here: the
+focus tests of `src/auth/client/client.test.tsx` (three fail without
+the fix) and `browser/theme/first-paint.test.tsx` ("paints dark before
+hydration under a dark preference" fails without the `tokens.css`
+block).
