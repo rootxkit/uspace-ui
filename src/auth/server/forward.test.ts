@@ -72,6 +72,39 @@ describe("forward: headers", () => {
     expect(h?.get("x-forwarded-for")).toBeNull();
   });
 
+  it("copies an Idempotency-Key to the API (1.0.0; uspace-ansp row 49)", async () => {
+    const stub = stubFetch(() => json(201, {}));
+    const req = request("/_bff/api/v1/zones", {
+      method: "POST",
+      cookies: signedIn,
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": FIXTURE.csrf,
+        "Idempotency-Key": "TEST-01JAAAAAAAAAAAAAAAAAAAAAAA",
+      },
+      body: "{}",
+    });
+    await forward(req, target("/v1/zones"), opts(stub.fetch));
+    expect(stub.calls[0]?.headers.get("idempotency-key")).toBe(
+      "TEST-01JAAAAAAAAAAAAAAAAAAAAAAA",
+    );
+  });
+
+  it("sends no Idempotency-Key the browser did not send (the twin)", async () => {
+    const stub = stubFetch(() => json(201, {}));
+    const req = request("/_bff/api/v1/zones", {
+      method: "POST",
+      cookies: signedIn,
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": FIXTURE.csrf,
+      },
+      body: "{}",
+    });
+    await forward(req, target("/v1/zones"), opts(stub.fetch));
+    expect(stub.calls[0]?.headers.get("idempotency-key")).toBeNull();
+  });
+
   it("sends no Authorization without a session cookie, not even the browser's", async () => {
     const stub = stubFetch(() => json(401, {}));
     const req = request("/_bff/api/v1/zones", {

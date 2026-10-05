@@ -48,11 +48,16 @@ export interface ForwardOptions {
 /**
  * Request headers copied to the API; everything else is dropped.
  * `X-Forwarded-For` is not copied: the BFF writes its own (`clientAddress`).
+ * `Idempotency-Key` (1.0.0) is the client's key for an unsafe request an
+ * API deduplicates (the ANSP's `POST /v1/restrictions` requires one,
+ * uspace-ansp PLAN row 49): without it a retried submission could not be
+ * recognised as the same one.
  */
 export const FORWARDED_REQUEST_HEADERS: readonly string[] = [
   "accept",
   "accept-language",
   "content-type",
+  "idempotency-key",
   "if-match",
   "if-none-match",
   "user-agent",
