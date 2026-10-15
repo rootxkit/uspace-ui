@@ -7,6 +7,93 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
+## 1.1.0
+
+The console redesign, an additive minor on the API frozen in 1.0.0.
+Prepared on `main`, not tagged: the owner tags `v1.1.0` and the release
+is a GitHub Release asset as before (docs/RELEASING.md). Pin it exactly:
+
+```jsonc
+"@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.1.0/rootxkit-uspace-ui-1.1.0.tgz"
+```
+
+No `@public` line of `docs/api/uspace-ui.api.md` is removed or changed,
+and no `--us-severity-*`, `--us-trust-*`, `--us-ident-*`, `--us-zone-*`
+or `--us-age-*` value: what every colour, shape and pattern means is as
+it was (PLAN §12). A console that builds with 1.0.0 builds with 1.1.0
+and looks new without an edit.
+
+### Entry points that ship
+
+`model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api` (with the
+`uspace-ui-gen-api` bin), `auth/server`, `auth/client`, `symbology`,
+`layers`, `legend`, `live`, `status`, `alerts`, `table`, `form`,
+`eslint`, `test`, and `styles/tokens.css`, `styles/map.css`,
+`fonts/fonts.css` with the woff2 files.
+
+### Added
+
+- `ui`: the console frame, one system in both schemes and both
+  languages. `AppShell`: a collapsible left sidebar with icons,
+  navigation groups and the current page marked (`aria-current`), a
+  sheet on a narrow screen, and a top bar with the system name, the
+  environment badge, the live/stale `StatusPill`, the app's actions, the
+  `LanguageSwitch` (each language named in itself) and the `UserMenu`;
+  a skip link to `<main>`. `PageHeader` with breadcrumbs, meta and
+  actions. `StatTile` and `KpiRow`: value, unit, label, the app's trend
+  (direction in words for screen readers) and a status tone that is
+  always stated in words too; an unknown value is a dash. `Panel`: a
+  section named by its heading, with description, actions and footer.
+  `StatusBadge`. `MapPanel`: the frame around a `MapView`, with its
+  legend laid over the map and foldable; it imports nothing of MapLibre,
+  so the `map` budget is untouched. `LinkRenderer` lets each take the
+  app's router link. The kit stores nothing (the collapsed state is the
+  app's, through `onCollapsedChange`).
+- `theme`: `STATUS_TONES` (`ok`, `info`, `warning`, `critical`,
+  `neutral`), `StatusTone` and `statusTokens`. A tone repeats a status
+  the text states; it is not a legend colour.
+- `styles/tokens.css`: tokens for the frame and the tones in both
+  schemes (`--us-accent-soft`, `--us-accent-text`, `--us-sidebar*`,
+  `--us-topbar`, `--us-panel-header`, `--us-shadow-panel`,
+  `--us-shadow-overlay`, `--us-status-<tone>`, `-soft`, `-border`), a
+  type scale (`--us-font-size-*`, `text-2xs`, `text-kpi`), density
+  (`--us-row-height`, `--us-space-panel`, `[data-density="compact"]`)
+  and the frame's dimensions, each with its Tailwind utility. Text in
+  `ka` gets more leading (Mkhedruli's tall ascenders and descenders) and
+  nothing is set in capitals. `src/theme/tokens.test.ts` checks every
+  new pair at WCAG 2.2 AA and keeps the tones apart under deuteranopia
+  and protanopia, with a presence twin.
+- `i18n`: the frame's keys (`shell.*`, `stat.*`, `panel.legend`,
+  `lang.endonym.*`) in `en` and `ka`.
+- `examples/next-app`: the whole example in `AppShell`, and a
+  `/dashboard` page with every component above, the `AlertList` as the
+  alert feed, the `DataTable` in a `Panel`, the `FeedStatusBar` and an
+  `EmptyState`, over demo data (`TEST-*`, `GEO-TEST-*`). The smoke test
+  checks it in English light and Georgian dark with axe, at 320 CSS px
+  and under the CSP.
+
+### Changed
+
+- The surfaces, borders and text of both schemes are refined for a
+  dark-first operations look (dark: `--us-surface` `#0b0f15`,
+  `--us-surface-raised` `#141a22`); the light surface keeps its value
+  so every legend colour keeps its contrast. The kit's own components
+  (`DataTable`, `AlertList`, `FeedStatusBar`, `SourcesPanel`,
+  `ThresholdsPanel`, `DegradedBanner`, `FrozenOverlay`, the legends,
+  `EmptyState`, `Stat`, the map controls and notices) are restyled to
+  match: no prop, word, order or meaning changes; the golden snapshots
+  change in classes only (and the alert list's `data-part="feed"`).
+  The vendored shadcn/ui files are not edited; they follow the tokens.
+
+### Fixed
+
+- `table`: `DataTable` wrote its column widths as `style` attributes in
+  server-rendered HTML, which the CSP every `web/` sets refuses (PLAN
+  §7, no `'unsafe-inline'` for styles) and hydration never restores. The
+  sizes are now set after hydration, through the CSSOM, which the policy
+  allows; `src/table/ssr.test.ts` pins that the server HTML carries no
+  `style` attribute.
+
 ## 1.0.0
 
 U-M4: the API is frozen (PLAN §12, D12). Prepared on `main`, not tagged:

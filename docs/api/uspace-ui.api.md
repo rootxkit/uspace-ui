@@ -15,7 +15,7 @@ import type { Column } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { ColumnFiltersState } from '@tanstack/react-table';
 import { Command as Command_2 } from 'cmdk';
-import type { ComponentProps } from 'react';
+import { ComponentProps } from 'react';
 import { Dialog as Dialog_2 } from 'radix-ui';
 import { DropdownMenu as DropdownMenu_2 } from 'radix-ui';
 import type { ESLint } from 'eslint';
@@ -606,6 +606,34 @@ interface ApiErrorInit {
     sunset: string | null;
 }
 
+// @public (undocumented)
+function AppShell(props: AppShellProps): ReactNode;
+
+// @public (undocumented)
+interface AppShellProps {
+    actions?: ReactNode;
+    // (undocumented)
+    children?: ReactNode;
+    // (undocumented)
+    className?: string;
+    collapsed?: boolean;
+    defaultCollapsed?: boolean;
+    // (undocumented)
+    environment?: ShellEnvironment;
+    languageSwitch?: boolean;
+    logo?: ReactNode;
+    mainId?: string;
+    // (undocumented)
+    nav: readonly NavGroup[];
+    // (undocumented)
+    onCollapsedChange?(collapsed: boolean): void;
+    renderLink?: LinkRenderer;
+    sidebarFooter?: ReactNode;
+    status?: ReactNode;
+    systemName: ReactNode;
+    user?: ReactNode;
+}
+
 declare namespace auth_client {
     export {
         BFF_API_PREFIX,
@@ -1178,6 +1206,13 @@ function createTrackStore(opts: TrackStoreOptions): TrackStore;
 function createTranslator(lang: Lang, catalogues?: Catalogues): Translate;
 
 // @public
+interface Crumb {
+    href?: string;
+    // (undocumented)
+    label: ReactNode;
+}
+
+// @public
 const CSP_NONCE_HEADER = "x-nonce";
 
 // @public (undocumented)
@@ -1579,6 +1614,9 @@ interface FeedOptions {
     stores?: FeedStores;
     url: string | (() => Promise<string>);
 }
+
+// @public
+type FeedPillState = "live" | "stale" | "connecting" | "down";
 
 // @public (undocumented)
 interface FeedStatus {
@@ -2532,6 +2570,18 @@ function kitMetaOf<Row>(column: Column<Row, unknown>): KitColumnMeta | undefined
 type KitScheme = "light" | "dark" | "system";
 
 // @public
+function KpiRow(props: KpiRowProps): ReactNode;
+
+// @public (undocumented)
+interface KpiRowProps {
+    // (undocumented)
+    children?: ReactNode;
+    // (undocumented)
+    className?: string;
+    label?: string;
+}
+
+// @public
 const LAB_COMMIT = "18d6f321a12f897f96e24ef842f4ce9d5a6bde33";
 
 // @public
@@ -2566,6 +2616,15 @@ function langFromCookie(cookie: string | null | undefined): Lang | null;
 
 // @public (undocumented)
 const LANGS: readonly Lang[];
+
+// @public
+function LanguageSwitch(props: LanguageSwitchProps): ReactNode;
+
+// @public (undocumented)
+interface LanguageSwitchProps {
+    // (undocumented)
+    className?: string;
+}
 
 // @beta
 const LATIN_UNICODE_RANGE = "U+0000-017F, U+018F, U+0192, U+0218-021B, U+0237, U+0259, U+02BB-02BC, U+02C6-02DD, U+0300-0304, U+0306-0308, U+030A-030C, U+0327-0328, U+0370-03FF, U+0400-04FF, U+1E9E, U+2000-206F, U+20AC, U+20B8, U+20BD, U+20BE, U+2116, U+2122, U+2190-2193, U+2212";
@@ -2800,6 +2859,21 @@ interface LegendSectionProps {
     kind: string;
     title: string;
 }
+
+// @public
+interface LinkProps {
+    // (undocumented)
+    "aria-current"?: "page";
+    // (undocumented)
+    children?: ReactNode;
+    // (undocumented)
+    className?: string;
+    // (undocumented)
+    href: string;
+}
+
+// @public (undocumented)
+type LinkRenderer = (props: LinkProps) => ReactNode;
 
 declare namespace live {
     export {
@@ -3266,6 +3340,28 @@ function mapCounters(): Readonly<Record<MapCounter, number>>;
 const mapFontstack = "Noto Sans Regular";
 
 // @public (undocumented)
+function MapPanel(props: MapPanelProps): ReactNode;
+
+// @public (undocumented)
+interface MapPanelProps {
+    // (undocumented)
+    actions?: ReactNode;
+    children?: ReactNode;
+    // (undocumented)
+    className?: string;
+    defaultLegendOpen?: boolean;
+    // (undocumented)
+    description?: ReactNode;
+    // (undocumented)
+    footer?: ReactNode;
+    legend?: ReactNode;
+    legendTitle?: ReactNode;
+    mapClassName?: string;
+    // (undocumented)
+    title?: ReactNode;
+}
+
+// @public (undocumented)
 type MapScheme = "light" | "dark";
 
 // @public (undocumented)
@@ -3372,6 +3468,27 @@ declare namespace model {
     }
 }
 
+// @public (undocumented)
+interface NavGroup {
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    items: readonly NavItem[];
+    label?: ReactNode;
+}
+
+// @public (undocumented)
+interface NavItem {
+    active?: boolean;
+    badge?: ReactNode;
+    // (undocumented)
+    href: string;
+    icon?: ReactNode;
+    id: string;
+    // (undocumented)
+    label: ReactNode;
+}
+
 // @public
 function needsAttention(s: IdentStatus | null): boolean;
 
@@ -3429,6 +3546,24 @@ const PAGE_SIZES: readonly number[];
 // @beta
 const PAGE_STEP_ROWS = 10;
 
+// @public
+function PageHeader(props: PageHeaderProps): ReactNode;
+
+// @public (undocumented)
+interface PageHeaderProps {
+    actions?: ReactNode;
+    // (undocumented)
+    breadcrumbs?: readonly Crumb[];
+    // (undocumented)
+    className?: string;
+    // (undocumented)
+    description?: ReactNode;
+    meta?: ReactNode;
+    renderLink?: LinkRenderer;
+    // (undocumented)
+    title: ReactNode;
+}
+
 // @public (undocumented)
 function Pagination(input: React_2.ComponentProps<"nav">): React_2.JSX.Element;
 
@@ -3451,6 +3586,24 @@ function PaginationNext(input: React_2.ComponentProps<typeof PaginationLink>): R
 
 // @public (undocumented)
 function PaginationPrevious(input: React_2.ComponentProps<typeof PaginationLink>): React_2.JSX.Element;
+
+// @public
+function Panel(props: PanelProps): ReactNode;
+
+// @public (undocumented)
+interface PanelProps extends Omit<ComponentProps<"section">, "title" | "children"> {
+    actions?: ReactNode;
+    bodyClassName?: string;
+    // (undocumented)
+    children?: ReactNode;
+    // (undocumented)
+    description?: ReactNode;
+    // (undocumented)
+    footer?: ReactNode;
+    headingLevel?: 2 | 3 | 4;
+    padding?: "default" | "none";
+    title?: ReactNode;
+}
 
 // @public
 function parseFrame(raw: unknown): ConsoleFrame | null;
@@ -4136,6 +4289,13 @@ function SheetTitle(input: React_2.ComponentProps<typeof Dialog_2.Title>): React
 function SheetTrigger(input: React_2.ComponentProps<typeof Dialog_2.Trigger>): React_2.JSX.Element;
 
 // @public (undocumented)
+interface ShellEnvironment {
+    name: ReactNode;
+    // (undocumented)
+    tone: StatusTone;
+}
+
+// @public (undocumented)
 function Skeleton(input: React.ComponentProps<"div">): JSX.Element;
 
 // @beta (undocumented)
@@ -4290,6 +4450,41 @@ interface StatProps {
     value: ReactNode | null;
 }
 
+// @public
+function StatTile(props: StatTileProps): ReactNode;
+
+// @public (undocumented)
+interface StatTileProps {
+    // (undocumented)
+    className?: string;
+    hint?: ReactNode;
+    // (undocumented)
+    icon?: ReactNode;
+    // (undocumented)
+    label: ReactNode;
+    // (undocumented)
+    status?: StatTileStatus;
+    // (undocumented)
+    trend?: StatTrend;
+    unit?: ReactNode;
+    value: ReactNode | null;
+}
+
+// @public (undocumented)
+interface StatTileStatus {
+    label: ReactNode;
+    // (undocumented)
+    tone: StatusTone;
+}
+
+// @public (undocumented)
+interface StatTrend {
+    // (undocumented)
+    direction: TrendDirection;
+    label: ReactNode;
+    tone?: StatusTone;
+}
+
 declare namespace status_2 {
     export {
         AgeChip,
@@ -4328,6 +4523,21 @@ declare namespace status_2 {
 
 // @beta
 const STATUS_SCHEMA = "console/status/v1";
+
+// @public
+const STATUS_TONES: readonly ["ok", "info", "warning", "critical", "neutral"];
+
+// @public
+function StatusBadge(props: StatusBadgeProps): ReactNode;
+
+// @public (undocumented)
+interface StatusBadgeProps extends Omit<ComponentProps<"span">, "children"> {
+    children: ReactNode;
+    dot?: boolean;
+    // (undocumented)
+    tone: StatusTone;
+    variant?: "soft" | "outline";
+}
 
 // @public
 interface StatusBody extends StatusExtras {
@@ -4371,6 +4581,18 @@ interface StatusExtras {
 }
 
 // @public
+function StatusPill(props: StatusPillProps): ReactNode;
+
+// @public (undocumented)
+interface StatusPillProps {
+    ageS?: number | null;
+    // (undocumented)
+    className?: string;
+    // (undocumented)
+    state: FeedPillState;
+}
+
+// @public
 interface StatusSource {
     ageS: number | null;
     counters: Readonly<Record<string, number>>;
@@ -4385,6 +4607,22 @@ interface StatusSource {
     sourceInstance: string | null;
     // (undocumented)
     state: WireSourceState;
+}
+
+// @public (undocumented)
+const statusTokens: Readonly<Record<StatusTone, StatusToneTokens>>;
+
+// @public (undocumented)
+type StatusTone = (typeof STATUS_TONES)[number];
+
+// @public
+interface StatusToneTokens {
+    // (undocumented)
+    border: string;
+    // (undocumented)
+    fg: string;
+    // (undocumented)
+    soft: string;
 }
 
 // @public
@@ -4749,6 +4987,10 @@ declare namespace theme {
         useTheme,
         ThemeContextValue,
         ThemeProviderProps,
+        STATUS_TONES,
+        statusTokens,
+        StatusTone,
+        StatusToneTokens,
         AGE_BUCKETS,
         tokens,
         AgeBucket,
@@ -5170,6 +5412,9 @@ type Translate = (key: string, vars?: Vars) => string;
 // @public
 type Translate_2 = (key: string) => string;
 
+// @public
+type TrendDirection = "up" | "down" | "flat";
+
 // @public (undocumented)
 type Trust = (typeof TRUSTS)[number];
 
@@ -5329,15 +5574,45 @@ declare namespace ui {
         TooltipContent,
         TooltipProvider,
         TooltipTrigger,
+        AppShell,
+        AppShellProps,
+        NavGroup,
+        NavItem,
+        ShellEnvironment,
         CspNonceProvider,
         useCspNonce,
         EmptyState,
         EmptyStateProps,
         InlineCode,
         Kbd,
+        LanguageSwitch,
+        LanguageSwitchProps,
+        LinkProps,
+        LinkRenderer,
+        MapPanel,
+        MapPanelProps,
+        PageHeader,
+        Crumb,
+        PageHeaderProps,
+        Panel,
+        PanelProps,
         STAT_UNKNOWN,
         Stat,
-        StatProps
+        StatProps,
+        KpiRow,
+        StatTile,
+        KpiRowProps,
+        StatTileProps,
+        StatTileStatus,
+        StatTrend,
+        TrendDirection,
+        StatusBadge,
+        StatusBadgeProps,
+        StatusPill,
+        FeedPillState,
+        StatusPillProps,
+        UserMenu,
+        UserMenuProps
     }
 }
 
@@ -5433,6 +5708,18 @@ function useOptionalI18n(): I18nContextValue | null;
 
 // @beta
 function useOptionalTheme(): ThemeContextValue | null;
+
+// @public
+function UserMenu(props: UserMenuProps): ReactNode;
+
+// @public (undocumented)
+interface UserMenuProps {
+    children?: ReactNode;
+    // (undocumented)
+    className?: string;
+    detail?: ReactNode;
+    name: string;
+}
 
 // @public
 function useSession(): SessionContextValue;

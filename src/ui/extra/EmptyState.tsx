@@ -25,20 +25,25 @@ export function EmptyState(props: EmptyStateProps): ReactNode {
       data-slot="empty-state"
       role="status"
       className={cn(
-        "flex flex-col items-center gap-2 rounded-lg border border-dashed p-6 text-center",
+        "flex flex-col items-center gap-1.5 rounded-panel border border-dashed border-border bg-surface-sunken/40 px-6 py-8 text-center",
         className,
       )}
     >
       {icon !== undefined && (
-        <div aria-hidden="true" className="text-muted-foreground">
+        <div
+          aria-hidden="true"
+          className="mb-1.5 inline-flex size-10 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-panel [&>svg]:size-5"
+        >
           {icon}
         </div>
       )}
-      <p className="m-0 font-medium text-foreground">{title}</p>
+      <p className="m-0 text-sm font-semibold text-foreground">{title}</p>
       {description !== undefined && (
-        <p className="m-0 text-sm text-muted-foreground">{description}</p>
+        <p className="m-0 max-w-sm text-sm text-muted-foreground">
+          {description}
+        </p>
       )}
-      {action !== undefined && <div className="mt-2">{action}</div>}
+      {action !== undefined && <div className="mt-3">{action}</div>}
     </div>
   );
 }

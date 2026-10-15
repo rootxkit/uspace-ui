@@ -110,14 +110,14 @@ export function FeedStatusBar(props: FeedStatusBarProps) {
     <div
       role="status"
       className={cn(
-        "flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-border bg-card px-3 py-1.5 text-sm text-card-foreground",
+        "flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-border bg-card px-3 py-2 text-xs text-card-foreground shadow-panel tabular-nums",
         className,
       )}
       data-connection={status.connection}
     >
       <span
         data-part="connection"
-        className="inline-flex items-center gap-2 font-semibold"
+        className="inline-flex items-center gap-2 text-sm font-semibold"
       >
         <span
           aria-hidden="true"

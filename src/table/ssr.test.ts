@@ -47,3 +47,22 @@ it("renders on the server with the initial state", () => {
     columnVisibility: {},
   });
 });
+
+it("writes no style attribute for the CSP to refuse (PLAN §7)", () => {
+  const c = columnsFor<RegistrationRow>();
+  const html = renderToString(
+    createElement(
+      I18nProvider,
+      { lang: "en" },
+      createElement(DataTable<RegistrationRow>, {
+        caption: "Registered aircraft",
+        columns: [c.text("regNumber"), c.text("serial")],
+        rows: registrationRows(3),
+        getRowId: (r) => r.id,
+        empty: null,
+      }),
+    ),
+  );
+  expect(html).toContain("GEO-TEST-00003");
+  expect(html).not.toMatch(/ style="/);
+});

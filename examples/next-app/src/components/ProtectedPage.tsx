@@ -5,30 +5,30 @@
 // nothing: the API decides every request.
 import { RequireRole, useSession } from "@rootxkit/uspace-ui/auth/client";
 import { useT } from "@rootxkit/uspace-ui/i18n";
+import { PageHeader, Panel } from "@rootxkit/uspace-ui/ui";
 
 export function ProtectedPage() {
   const t = useT();
   const { session } = useSession();
   return (
-    <section
-      aria-labelledby="protected-heading"
-      className="flex flex-col gap-3"
-    >
-      <h1 id="protected-heading" className="text-xl font-bold">
-        {t("example.protected.heading")}
-      </h1>
-      <RequireRole
-        anyOf={["auditor"]}
-        fallback={
-          <p data-testid="protected-fallback">
-            {session === null
-              ? t("example.protected.signed_out")
-              : t("example.protected.denied")}
+    <>
+      <PageHeader title={t("example.protected.heading")} />
+      <Panel className="max-w-2xl">
+        <RequireRole
+          anyOf={["auditor"]}
+          fallback={
+            <p data-testid="protected-fallback" className="m-0">
+              {session === null
+                ? t("example.protected.signed_out")
+                : t("example.protected.denied")}
+            </p>
+          }
+        >
+          <p data-testid="protected-body" className="m-0">
+            {t("example.protected.body")}
           </p>
-        }
-      >
-        <p data-testid="protected-body">{t("example.protected.body")}</p>
-      </RequireRole>
-    </section>
+        </RequireRole>
+      </Panel>
+    </>
   );
 }

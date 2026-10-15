@@ -8,7 +8,9 @@ from `UI_BRAND_*`, `I18nProvider` with the language from the
 three BFF routes on `bffHandlers`, API types generated with
 `uspace-ui-gen-api`, the public zone map (`MapView`, `ZoneLayer`,
 `ZoneLegend`, `MapControls`, with "version V, updated T" from
-`freshnessOf`), a sign-in page with `LoginForm`, a page behind
+`freshnessOf`), every page in the kit's `AppShell` (1.1.0), a
+`/dashboard` page with every component of the console frame over demo
+data (`src/dashboard/demo.ts`), a sign-in page with `LoginForm`, a page behind
 `RequireRole`, the Content Security Policy of PLAN §7 (`proxy.ts`,
 `src/csp.ts`), `output: "standalone"` and a `Dockerfile`.
 

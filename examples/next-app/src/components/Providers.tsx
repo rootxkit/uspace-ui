@@ -9,7 +9,11 @@ import { useRouter } from "next/navigation";
 import { SessionProvider } from "@rootxkit/uspace-ui/auth/client";
 import { I18nProvider, LANG_COOKIE, type Lang } from "@rootxkit/uspace-ui/i18n";
 import type { SessionDisplay } from "@rootxkit/uspace-ui/model";
-import { ThemeProvider, type Brand } from "@rootxkit/uspace-ui/theme";
+import {
+  SCHEME_COOKIE,
+  ThemeProvider,
+  type Brand,
+} from "@rootxkit/uspace-ui/theme";
 import { CspNonceProvider } from "@rootxkit/uspace-ui/ui";
 import { catalogues } from "../i18n/catalogues";
 
@@ -23,7 +27,13 @@ export function Providers(props: {
   const router = useRouter();
   return (
     <CspNonceProvider nonce={props.nonce}>
-      <ThemeProvider brand={props.brand}>
+      <ThemeProvider
+        brand={props.brand}
+        onSchemeChange={(s) => {
+          // As with the language: the kit never writes the cookie.
+          document.cookie = `${SCHEME_COOKIE}=${s}; Path=/; Max-Age=31536000; SameSite=Lax`;
+        }}
+      >
         <I18nProvider
           lang={props.lang}
           catalogues={catalogues}

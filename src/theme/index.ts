@@ -23,4 +23,10 @@ export {
   type ThemeContextValue,
   type ThemeProviderProps,
 } from "./ThemeProvider.js";
+export {
+  STATUS_TONES,
+  statusTokens,
+  type StatusTone,
+  type StatusToneTokens,
+} from "./status.js";
 export { AGE_BUCKETS, tokens, type AgeBucket, type Tokens } from "./tokens.js";

@@ -203,10 +203,11 @@ it("English, dark", async () => {
   const map = await loadedMap(canvasElement);
   expect(map.getStyle().sprite).toContain("/basemap/sprites/v4/dark");
   // The controls take the dark tokens from the map's own data-theme,
-  // although the page around it is light (styles/tokens.css).
+  // although the page around it is light (styles/tokens.css): the dark
+  // --us-surface-raised, #141a22.
   const canvas = within(canvasElement);
   const layers = canvas.getByRole("button", { name: "Layers" });
-  expect(getComputedStyle(layers).backgroundColor).toBe("rgb(27, 31, 38)");
+  expect(getComputedStyle(layers).backgroundColor).toBe("rgb(20, 26, 34)");
   // The layer sheet opens with the toggles; axe runs with it open.
   await userEvent.click(layers);
   const page = within(canvasElement.ownerDocument.body);

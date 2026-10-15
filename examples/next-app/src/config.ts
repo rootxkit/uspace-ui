@@ -2,6 +2,7 @@
 // each the spec's default marked "pending GCAA", and the display-only
 // map camera) and the environment, read at request time so the image is
 // built once and configured at start.
+import { STATUS_TONES, type StatusTone } from "@rootxkit/uspace-ui/theme";
 import example from "../config/example.json";
 
 export interface PolicyValue<T> {
@@ -17,6 +18,11 @@ export const POLICY: {
 } = {
   sessionMaxAgeS: example.policy.session_max_age_s,
   accessibilityTarget: example.policy.accessibility_target,
+};
+
+/** The top bar's environment badge: its tone, from config/example.json. */
+export const ENVIRONMENT: { tone: StatusTone } = {
+  tone: STATUS_TONES.find((t) => t === example.environment.tone) ?? "neutral",
 };
 
 /** The public map's first view: display-only, from config/example.json. */

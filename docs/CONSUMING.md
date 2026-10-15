@@ -6,7 +6,7 @@ is shown working in [`examples/next-app/`](../examples/next-app/), which
 CI builds against the kit's current source and smokes in Chromium on
 every pull request. The rules behind the steps are `docs/PLAN.md` §6.3
 (the contracts), §7 (security) and §11 (consumption). This guide is for
-`1.0.0`.
+`1.1.0`.
 
 ## 1. Install the release tarball with pnpm
 
@@ -22,7 +22,7 @@ install --frozen-lockfile`.
 {
   "packageManager": "pnpm@11.9.0",
   "dependencies": {
-    "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.0.0/rootxkit-uspace-ui-1.0.0.tgz",
+    "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.1.0/rootxkit-uspace-ui-1.1.0.tgz",
     "maplibre-gl": "5.24.0",
     "next": "16.3.8",
     "react": "19.3.0",
@@ -45,8 +45,8 @@ install --frozen-lockfile`.
 - Before pinning, check the asset's signed build provenance:
 
   ```sh
-  gh release download v1.0.0 --repo rootxkit/uspace-ui --pattern 'rootxkit-uspace-ui-1.0.0.tgz'
-  gh attestation verify rootxkit-uspace-ui-1.0.0.tgz --repo rootxkit/uspace-ui \
+  gh release download v1.1.0 --repo rootxkit/uspace-ui --pattern 'rootxkit-uspace-ui-1.1.0.tgz'
+  gh attestation verify rootxkit-uspace-ui-1.1.0.tgz --repo rootxkit/uspace-ui \
     --signer-workflow rootxkit/uspace-ui/.github/workflows/release.yml
   ```
 
@@ -334,6 +334,20 @@ pins is `@public`. New in `1.0.0` and worth taking: `schemeAttribute` on
 and `DrawLayer` with `OutlineFields` where a page lets a person draw an
 outline (a circle's outline is your API's to draw, with uspace-core's
 geodesy, and to hand back as `circleOutline`).
+
+From `1.0.0` to `1.1.0` (the console redesign): replace the asset URL
+and commit the lockfile; nothing needs an edit. Every existing component
+keeps its props and its meanings (no legend colour changed); the
+surfaces, borders and text of both schemes are refined, so a page looks
+new without a change. To take the new frame, wrap the layout in
+`AppShell` (navigation groups with `active` from your router, a
+`renderLink` for `next/link`, the environment from configuration, a
+`StatusPill` fed by your feed's `connection` and the server's `stale`),
+open each page with `PageHeader`, and put lists, tables and maps in
+`Panel` and `MapPanel` (the map's height is a class, never a style, so
+the CSP of §7 holds). `StatTile` and `StatusBadge` take a `StatusTone`
+and always the status in words. `examples/next-app` shows every one of
+them on `/dashboard`.
 
 ## Minimum version per consumer
 
