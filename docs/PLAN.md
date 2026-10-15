@@ -291,6 +291,11 @@ Exported unchanged in name and props from upstream, so the upstream
 documentation applies; `cn()` re-exported. Additions over upstream are
 separate components, never edits inside a vendored file.
 
+1.1.1: `TableHead` and `TableCell` wrap (a class patch of the vendored
+`table.tsx`, listed in `src/ui/UPGRADING.md`), and
+`export const TABLE_NOWRAP: string` is the class that keeps a cell, or
+an element in one, on one line: for ids, timestamps and numbers.
+
 ### 3.4 `i18n` (WP-2)
 
 ```ts
@@ -467,6 +472,7 @@ export function DataTable<Row>(props: { columns: ColumnDef<Row>[]; rows: Row[]; 
 export interface TableState { sorting: SortingState; columnFilters: ColumnFiltersState; pagination: { pageIndex: number; pageSize: number }; columnVisibility: Record<string, boolean> }
 export function useTableUrlState(key: string): [TableState, (s: TableState) => void]   // in the URL search params so a view is shareable; never PII in the URL (safety rules)
 export const columns: { age(nowMs): ColumnDef; severity(): ColumnDef; trust(): ColumnDef; ident(): ColumnDef; utc(key): ColumnDef; num(key, unit, digits): ColumnDef }   // typed helpers with the kit's cells
+export interface ColumnOptions { id?: string; headerKey?: string; nowrap?: boolean }   // 1.1.1: cells wrap; nowrap keeps a column on one line, the default for num, utc, age and a mono text column
 ```
 
 ### 3.15 `form` (WP-10)
@@ -955,6 +961,15 @@ D10).
   `auth/server`, `auth/client`, `symbology`, `layers`, `legend`, `live`,
   `status`, `alerts`, `table`, `form`, `eslint` and `test`. No legend
   value changed (semver gate rule 2 does not fire).
+- `v1.1.1`: a patch, table cells wrap (owner's request of 2026-10-15).
+  *Prepared on `main`, tagged by the owner:* every entry point of §2 as
+  in `v1.1.0`, `model`, `theme`, `ui` (`TableHead` and `TableCell` wrap;
+  `TABLE_NOWRAP` keeps an id, a time or a number on one line), `i18n`,
+  `fonts`, `map`, `api`, `auth/server`, `auth/client`, `symbology`,
+  `layers`, `legend`, `live`, `status`, `alerts`, `table` (`DataTable`
+  cells wrap; `ColumnOptions.nowrap`, on by default for the number, time,
+  age and mono text columns), `form`, `eslint` and `test`. Two `@public`
+  lines added, none removed or changed; no legend value changed.
 - From `v1`: within a major only additive changes (new exports, new
   optional props, new catalogue keys, new enumeration values *rendered*
   because `model` gained them). The following are a **major**: removing
