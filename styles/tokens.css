@@ -357,6 +357,16 @@
     color: var(--us-text);
   }
 
+  /* Native select lists: a browser that ignores `color-scheme` on the
+     popup (or a select painted transparent) would draw the options in
+     the platform's light colours under dark text. Set from the tokens, so
+     they follow the scheme of the nearest data-theme (1.1.2). */
+  option,
+  optgroup {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+
   /* Scrollbars that belong to the scheme instead of the platform's grey. */
   * {
     scrollbar-color: var(--us-border-strong) transparent;

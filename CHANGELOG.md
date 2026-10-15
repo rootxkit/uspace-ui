@@ -7,6 +7,32 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
+## 1.1.2
+
+A patch on 1.1.1: native controls follow the scheme. Prepared on `main`,
+not tagged: the owner tags `v1.1.2` (docs/RELEASING.md). Pin it exactly:
+
+```jsonc
+"@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.1.2/rootxkit-uspace-ui-1.1.2.tgz"
+```
+
+- `styles/tokens.css`: `option` and `optgroup` take `--background` and
+  `--foreground`, so a native `<select>` list is no longer white under
+  light text in dark. `color-scheme` already follows `data-theme` and,
+  before it is set, `prefers-color-scheme`, which also themes the date
+  picker, date inputs and scrollbars; a browser test now asserts it in
+  both schemes (`browser/theme/native-controls.test.tsx`).
+
+No `@public` line of `docs/api/uspace-ui.api.md` changes.
+
+### Entry points that ship
+
+`model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api` (with the
+`uspace-ui-gen-api` bin), `auth/server`, `auth/client`, `symbology`,
+`layers`, `legend`, `live`, `status`, `alerts`, `table`, `form`,
+`eslint`, `test`, and `styles/tokens.css`, `styles/map.css`,
+`fonts/fonts.css` with the woff2 files, as in 1.1.1.
+
 ## 1.1.1
 
 A patch on 1.1.0: table cells wrap. Prepared on `main`, not tagged: the
