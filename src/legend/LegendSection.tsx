@@ -27,7 +27,7 @@ export function LegendSection(props: LegendSectionProps) {
   return (
     <section
       className={cn(
-        "us-legend rounded-md border border-border bg-card p-3 text-sm text-card-foreground",
+        "us-legend rounded-lg border border-border bg-card p-3 text-sm text-card-foreground shadow-panel",
         className,
       )}
       aria-label={title}

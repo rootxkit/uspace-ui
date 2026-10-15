@@ -54,7 +54,7 @@ export function FrozenOverlay(props: FrozenOverlayProps) {
     >
       <div
         role="status"
-        className="pointer-events-auto rounded-md border-2 border-severity-warning bg-card px-4 py-2 text-sm text-card-foreground shadow"
+        className="pointer-events-auto rounded-lg border-2 border-severity-warning bg-card px-4 py-3 text-sm text-card-foreground shadow-overlay"
       >
         <p className="m-0 font-semibold">
           {t(CONNECTION_KEYS[status.connection])}

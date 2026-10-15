@@ -205,7 +205,10 @@ function Filters<Row>(props: {
         };
         return (
           <div key={c.id} className="grid gap-1">
-            <Label htmlFor={id} className="text-xs">
+            <Label
+              htmlFor={id}
+              className="text-xs font-semibold text-muted-foreground"
+            >
               {label}
             </Label>
             {filter?.kind === "enum" ? (
@@ -213,7 +216,7 @@ function Filters<Row>(props: {
                 id={id}
                 value={value}
                 data-filter={c.id}
-                className="h-9 rounded-md border border-input bg-background px-2 text-sm focus-visible:outline-2 focus-visible:outline-ring"
+                className="h-9 rounded-md border border-input bg-card px-2 text-sm focus-visible:outline-2 focus-visible:outline-ring"
                 onChange={(e) => {
                   set(e.target.value);
                 }}
@@ -253,10 +256,10 @@ function ColumnToggles<Row>(props: {
   if (hideable.length < 2) return null;
   return (
     <details className="relative text-sm" data-part="columns">
-      <summary className="cursor-pointer rounded-md border border-input px-3 py-1.5 focus-visible:outline-2 focus-visible:outline-ring">
+      <summary className="cursor-pointer rounded-md border border-input bg-card px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-hover focus-visible:outline-2 focus-visible:outline-ring">
         {t("table.columns")}
       </summary>
-      <fieldset className="absolute z-20 mt-1 grid min-w-48 gap-1 rounded-md border border-border bg-popover p-2 text-popover-foreground shadow-md">
+      <fieldset className="absolute right-0 z-20 mt-1 grid min-w-48 gap-1 rounded-lg border border-border bg-popover p-2 text-popover-foreground shadow-overlay">
         <legend className="sr-only">{t("table.columns_legend")}</legend>
         {hideable.map((c) => (
           <label key={c.id} className="flex items-center gap-2">
@@ -285,7 +288,7 @@ function ErrorNotice(props: {
   return (
     <div
       role="alert"
-      className="grid gap-1 rounded-md border-2 border-severity-critical p-3 text-sm"
+      className="grid gap-1 rounded-lg border-2 border-severity-critical bg-card p-3 text-sm"
       data-part="error"
     >
       <p className="m-0 font-medium">
@@ -405,7 +408,7 @@ function HeaderCell<Row>(props: {
       tabIndex={focusOnCell ? tabIndex : undefined}
       style={hydrated ? { width: header.getSize() } : undefined}
       className={cn(
-        "sticky top-0 z-10 border-b border-border bg-background px-2 text-left align-middle font-medium whitespace-nowrap text-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring",
+        "sticky top-0 z-10 border-b border-border bg-panel-header px-3 text-left align-middle text-xs font-semibold whitespace-nowrap text-muted-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring",
         dense ? "h-8" : "h-10",
         // `sticky` is also the positioning context of the resize handle.
         meta?.align === "end" && "text-right",
@@ -427,7 +430,7 @@ function HeaderCell<Row>(props: {
           data-grid-cell={cellKey}
           tabIndex={tabIndex}
           className={cn(
-            "inline-flex items-center gap-1 rounded-sm font-medium focus-visible:outline-2 focus-visible:outline-ring",
+            "inline-flex items-center gap-1 rounded-sm font-semibold transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring",
             meta?.align === "end" && "flex-row-reverse",
           )}
           onClick={column.getToggleSortingHandler()}
@@ -749,7 +752,7 @@ export function DataTable<Row>(props: DataTableProps<Row>) {
       })
     : pageRows.map((row, i) => ({ row, gridRow: i + 1, index: i }));
   const rowOffset = virtual ? 0 : pageIndex * pageSize;
-  const cellPad = dense ? "px-2 py-1" : "px-2 py-2";
+  const cellPad = dense ? "px-3 py-1" : "px-3 py-2";
   const selectableRows = onSelect !== undefined || selectable;
   const from = total === 0 ? 0 : rowOffset + 1;
   const to = virtual ? total : rowOffset + pageRows.length;
@@ -772,7 +775,7 @@ export function DataTable<Row>(props: DataTableProps<Row>) {
       )}
       <div
         ref={scrollRef}
-        className="relative w-full overflow-auto rounded-md border border-border"
+        className="relative w-full overflow-auto rounded-lg border border-border bg-card text-card-foreground shadow-panel"
         style={
           hydrated && virtual ? { maxHeight: VIRTUAL_VIEWPORT_PX } : undefined
         }
@@ -880,7 +883,7 @@ export function DataTable<Row>(props: DataTableProps<Row>) {
                   aria-selected={selectableRows ? isSelected : undefined}
                   data-state={isSelected ? "selected" : undefined}
                   className={cn(
-                    "border-b border-border transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+                    "border-b border-border transition-colors last:border-b-0 hover:bg-hover data-[state=selected]:bg-muted data-[state=selected]:shadow-[inset_3px_0_0_var(--us-brand-accent)]",
                     onSelect !== undefined && "cursor-pointer",
                   )}
                 >
@@ -1005,7 +1008,7 @@ function Pager(props: {
       <select
         id={sizeId}
         value={pageSize}
-        className="h-8 rounded-md border border-input bg-background px-1 text-foreground"
+        className="h-8 rounded-md border border-input bg-card px-1 text-foreground"
         onChange={(e) => {
           onPageSize(Number(e.target.value));
         }}

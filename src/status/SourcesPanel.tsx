@@ -206,7 +206,7 @@ export function SourcesPanel(props: SourcesPanelProps) {
   return (
     <section
       className={cn(
-        "rounded-md border border-border bg-card p-3 text-sm text-card-foreground",
+        "rounded-panel border border-border bg-card p-4 text-sm text-card-foreground shadow-panel",
         className,
       )}
       aria-label={t("source.panel.title")}

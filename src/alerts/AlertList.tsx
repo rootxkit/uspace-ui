@@ -44,10 +44,12 @@ export interface AlertListProps {
   className?: string;
 }
 
+// The severity's colour on the item's leading edge; the glyph and the
+// word say it too (SeverityMark).
 const BORDER = {
-  critical: "border-severity-critical",
-  warning: "border-severity-warning",
-  info: "border-severity-info",
+  critical: "border-l-severity-critical",
+  warning: "border-l-severity-warning",
+  info: "border-l-severity-info",
 } as const;
 
 /** Every party of an alert: its aircraft and the proximity peer. */
@@ -142,11 +144,14 @@ export function AlertList(props: AlertListProps) {
         {announcer.message}
       </div>
       {sorted.length === 0 ? (
-        <p className="text-sm text-muted-foreground" data-part="empty">
+        <p
+          className="m-0 rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground"
+          data-part="empty"
+        >
           {t("alert.list.empty")}
         </p>
       ) : (
-        <ul className="m-0 grid list-none gap-2 p-0">
+        <ul className="m-0 grid list-none gap-2 p-0" data-part="feed">
           {sorted.map((a) => {
             const kind = kindName(t, a.kind);
             const ids = a.aircraft.join(", ");
@@ -156,7 +161,7 @@ export function AlertList(props: AlertListProps) {
               <li
                 key={a.alertId}
                 className={cn(
-                  "rounded-md border-2 border-l-8 bg-card p-2 text-sm text-card-foreground",
+                  "grid gap-1.5 rounded-lg border border-l-4 border-border bg-card py-2.5 pr-3 pl-3.5 text-sm text-card-foreground shadow-panel",
                   BORDER[a.severity],
                   cleared && "border-dashed",
                 )}
@@ -167,12 +172,12 @@ export function AlertList(props: AlertListProps) {
               >
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                   <SeverityMark severity={a.severity} />
-                  <span className="font-medium" data-part="kind">
+                  <span className="font-semibold" data-part="kind">
                     {kind}
                   </span>
                   <span
                     className={cn(
-                      "rounded-full border px-2 text-xs",
+                      "ml-auto rounded-full border border-border-strong px-2 text-2xs leading-5 font-semibold text-muted-foreground",
                       cleared ? "border-dashed" : "border-solid",
                     )}
                     data-part="state"
@@ -187,16 +192,19 @@ export function AlertList(props: AlertListProps) {
                     </span>
                   </span>
                 </div>
-                <p className="my-1" data-part="summary">
+                <p className="m-0 leading-snug" data-part="summary">
                   {alertSummary(a, t, lang)}
                 </p>
                 {involvesBroadcast(a, tracks) && (
-                  <p className="my-1 text-xs" data-part="caveat">
+                  <p
+                    className="m-0 text-xs font-semibold text-foreground"
+                    data-part="caveat"
+                  >
                     {t("alert.broadcast_caveat")}
                   </p>
                 )}
                 <p
-                  className="my-1 flex flex-wrap gap-x-3 text-xs text-muted-foreground"
+                  className="m-0 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground tabular-nums"
                   data-part="meta"
                 >
                   <span>{t("alert.list.aircraft", { ids })}</span>
@@ -212,14 +220,17 @@ export function AlertList(props: AlertListProps) {
                     {t("alert.list.policy", { version: a.policyVersion })}
                   </span>
                 </p>
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2 pt-0.5">
                   {a.acknowledged ? (
-                    <span className="text-xs" data-part="ack">
+                    <span
+                      className="text-xs text-muted-foreground"
+                      data-part="ack"
+                    >
                       {t("alert.list.acknowledged")}
                     </span>
                   ) : (
                     !cleared && (
-                      <span className="text-xs font-medium" data-part="ack">
+                      <span className="text-xs font-semibold" data-part="ack">
                         {t("alert.list.not_acknowledged")}
                       </span>
                     )
