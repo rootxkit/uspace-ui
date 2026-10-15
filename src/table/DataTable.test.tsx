@@ -813,3 +813,74 @@ describe("column helpers in cells", () => {
     },
   );
 });
+
+describe("wrapping (1.1.1)", () => {
+  const p = columnsFor<PictureRow>();
+  const cellOf = (container: HTMLElement, column: string): HTMLElement => {
+    const td = container.querySelector<HTMLElement>(
+      `tbody td[data-column="${column}"]`,
+    );
+    if (td === null) throw new Error(`no cell ${column}`);
+    return td;
+  };
+  const wraps = (el: HTMLElement): boolean =>
+    el.classList.contains("whitespace-normal") &&
+    el.classList.contains("wrap-anywhere") &&
+    !el.classList.contains("whitespace-nowrap");
+  const kept = (el: HTMLElement): boolean =>
+    el.classList.contains("whitespace-nowrap") &&
+    !el.classList.contains("whitespace-normal");
+
+  it("keeps ids, numbers and times on one line and wraps the rest", () => {
+    const { container } = renderReg();
+    for (const id of ["regNumber", "serial", "massKg", "updatedAt"])
+      expect(kept(cellOf(container, id)), id).toBe(true);
+    for (const id of ["status", "email"])
+      expect(wraps(cellOf(container, id)), id).toBe(true);
+  });
+
+  it("keeps an age on one line; badges and enumerations wrap", () => {
+    const { container } = wrap(
+      <DataTable<PictureRow>
+        caption="Alerts"
+        columns={[
+          p.severity(),
+          p.trust(),
+          p.ident(),
+          p.age(PICTURE_NOW_MS, { ageS: () => 4, staleAfterS: 30 }),
+          p.enum("kind", "pic.kind", { headerKey: "pic.kind" }),
+        ]}
+        rows={pictureRows()}
+        getRowId={(r) => r.id}
+        empty={null}
+      />,
+    );
+    expect(kept(cellOf(container, "age"))).toBe(true);
+    for (const id of ["severity", "trust", "identification", "kind"])
+      expect(wraps(cellOf(container, id)), id).toBe(true);
+  });
+
+  it("lets the app override either default", () => {
+    const { container } = renderReg({
+      columns: [
+        c.text("regNumber", { mono: true, nowrap: false }),
+        c.text("email", { nowrap: true }),
+        c.num("massKg", UNIT_KEYS.kg, 2, { nowrap: false }),
+        c.utc("updatedAt", { nowrap: false }),
+      ],
+    });
+    expect(wraps(cellOf(container, "regNumber"))).toBe(true);
+    expect(kept(cellOf(container, "email"))).toBe(true);
+    expect(wraps(cellOf(container, "massKg"))).toBe(true);
+    expect(wraps(cellOf(container, "updatedAt"))).toBe(true);
+  });
+
+  it("wraps every header between words", () => {
+    renderReg();
+    for (const name of [/^Registration number/, /^Mass/, /^Updated/]) {
+      const header = screen.getByRole("button", { name }).closest("th");
+      expect(header?.classList.contains("whitespace-normal")).toBe(true);
+      expect(header?.classList.contains("wrap-break-word")).toBe(true);
+    }
+  });
+});

@@ -1037,6 +1037,7 @@ function columnLabel<Row>(column: Column<Row, unknown>, t: Translate): string;
 interface ColumnOptions {
     headerKey?: string;
     id?: string;
+    nowrap?: boolean;
 }
 
 // @public
@@ -2547,6 +2548,7 @@ interface KitColumnMeta {
     // (undocumented)
     filter?: ColumnFilterKind;
     headerKey: string;
+    nowrap?: boolean;
     select?: boolean;
     unitKey?: string;
     utc?: boolean;
@@ -6028,15 +6030,15 @@ interface ZoneView {
 
 // Warnings were encountered during analysis:
 //
-// src/table/columns.tsx:605:21 - (ae-forgotten-export) The symbol "num" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:605:21 - (ae-forgotten-export) The symbol "utc" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:605:21 - (ae-forgotten-export) The symbol "age" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:605:21 - (ae-forgotten-export) The symbol "severity" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:605:21 - (ae-forgotten-export) The symbol "trust" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:605:21 - (ae-forgotten-export) The symbol "ident" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:605:21 - (ae-forgotten-export) The symbol "enumColumn" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:605:21 - (ae-forgotten-export) The symbol "text" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:605:21 - (ae-forgotten-export) The symbol "select" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:630:21 - (ae-forgotten-export) The symbol "num" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:630:21 - (ae-forgotten-export) The symbol "utc" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:630:21 - (ae-forgotten-export) The symbol "age" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:630:21 - (ae-forgotten-export) The symbol "severity" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:630:21 - (ae-forgotten-export) The symbol "trust" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:630:21 - (ae-forgotten-export) The symbol "ident" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:630:21 - (ae-forgotten-export) The symbol "enumColumn" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:630:21 - (ae-forgotten-export) The symbol "text" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:630:21 - (ae-forgotten-export) The symbol "select" needs to be exported by the entry point entry.d.ts
 
 // (No @packageDocumentation comment for this package)
 

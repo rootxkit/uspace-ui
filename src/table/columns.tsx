@@ -87,6 +87,11 @@ export interface KitColumnMeta {
   align?: "start" | "end";
   /** The row-selection column (`columns.select`). */
   select?: boolean;
+  /**
+   * The column's cells stay on one line (an id, a time, a number); the
+   * cells of any other column wrap (1.1.1).
+   */
+  nowrap?: boolean;
 }
 
 /**
@@ -170,6 +175,14 @@ export interface ColumnOptions {
   id?: string;
   /** The catalogue key of the header; the field key by default. */
   headerKey?: string;
+  /**
+   * Keep the column's cells on one line. On by default for `num`, `utc`,
+   * `age` and a `mono` `text` column (an id, a time, a number, where a
+   * line break changes how the value reads); off for the others, whose
+   * cells wrap so the table fits its container. Either default can be
+   * overridden.
+   */
+  nowrap?: boolean;
 }
 
 const known = (v: unknown): v is number =>
@@ -344,6 +357,7 @@ function num<Row>(
       headerKey: opts.headerKey ?? key,
       unitKey,
       align: "end",
+      nowrap: opts.nowrap ?? true,
     }),
     cell: (c: CellContext<Row, number | undefined>) => (
       <NumCell v={c.getValue()} digits={digits} />
@@ -371,7 +385,11 @@ function utc<Row>(
     sortUndefined: "last",
     sortingFn: "basic",
     enableColumnFilter: false,
-    meta: kitColumnMeta({ headerKey: opts.headerKey ?? key, utc: true }),
+    meta: kitColumnMeta({
+      headerKey: opts.headerKey ?? key,
+      utc: true,
+      nowrap: opts.nowrap ?? true,
+    }),
     cell: (c: CellContext<Row, number | undefined>) => {
       const v = value(c.row.original, key);
       return <UtcCell iso={typeof v === "string" ? v : null} />;
@@ -404,6 +422,7 @@ function age<Row>(
     meta: kitColumnMeta({
       headerKey: opts.headerKey ?? "table.column.age",
       align: "end",
+      nowrap: opts.nowrap ?? true,
     }),
     cell: (c: CellContext<Row, number | undefined>) => (
       <AgeChip ageS={c.getValue() ?? null} staleAfterS={opts.staleAfterS} />
@@ -436,6 +455,7 @@ function severity<Row>(
     filterFn: equalsFilter as FilterFn<Row>,
     meta: kitColumnMeta({
       headerKey: opts.headerKey ?? "table.column.severity",
+      nowrap: opts.nowrap ?? false,
       filter: { kind: "enum", options: enumOptions(order, SEVERITY_KEYS) },
     }),
     cell: (c: CellContext<Row, string | undefined>) => (
@@ -460,6 +480,7 @@ function trust<Row>(
     filterFn: equalsFilter as FilterFn<Row>,
     meta: kitColumnMeta({
       headerKey: opts.headerKey ?? "table.column.trust",
+      nowrap: opts.nowrap ?? false,
       filter: {
         kind: "enum",
         options: TRUST_ORDER.map((v) => ({
@@ -496,6 +517,7 @@ function ident<Row>(
     filterFn: equalsFilter as FilterFn<Row>,
     meta: kitColumnMeta({
       headerKey: opts.headerKey ?? "table.column.ident",
+      nowrap: opts.nowrap ?? false,
       filter: {
         kind: "enum",
         options: enumOptions(IDENT_ORDER, IDENT_STATUS_KEYS),
@@ -531,6 +553,7 @@ function enumColumn<Row>(
     filterFn: equalsFilter as FilterFn<Row>,
     meta: kitColumnMeta({
       headerKey: opts.headerKey ?? key,
+      nowrap: opts.nowrap ?? false,
       filter:
         opts.values === undefined
           ? { kind: "text" }
@@ -566,6 +589,8 @@ function text<Row>(
     meta: kitColumnMeta({
       headerKey: opts.headerKey ?? key,
       filter: { kind: "text" },
+      // A mono column holds an identifier or a code: one line by default.
+      nowrap: opts.nowrap ?? opts.mono === true,
     }),
     cell: (c: CellContext<Row, string | undefined>) => {
       const v = c.getValue();
