@@ -1,6 +1,7 @@
 # uspace-ui implementation plan
 
-Status: plan for parallel implementation by independent agents. Branch
+Status: plan for parallel implementation by independent agents; WP-0 to
+WP-14 are merged and the latest release is `v1.0.0`. Written on branch
 `plan/initial`. Inputs: the spec at `uspace-lab/docs/spec/` (especially
 `00 §6`, `00 §6.2`, `00 §6.3` (the `rootxkit/uspace-ui` paragraph), `01`
 (users and roles per system), `02 §1` (conventions: time, geometry,
@@ -1031,7 +1032,8 @@ the parity test catches a lost key in a merge), and `browser/golden/`
 Milestones: U-M0 scaffold merged; `v0.1.0-rc.1` released (WP-13a);
 **U-M1** = `v0.1.0` with C-M1 (`07`);
 U-M2 = `v0.2.0` with A-M1/A-M2 and S-M1; U-M3 = `v0.3.0` with S-M2/S-M3
-and N-M1; U-M4 = `v1.0.0`.
+and N-M1 (neither `v0.2.0` nor `v0.3.0` was tagged: WP-7..WP-12 shipped in
+`v0.1.0`, see §12); U-M4 = `v1.0.0`, tagged.
 
 ---
 

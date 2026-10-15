@@ -262,6 +262,6 @@ table,form,eslint,test}`. The full step list for a `web/` app, from
 
 ```
 pnpm install --frozen-lockfile   # Node 22, pnpm via corepack
-pnpm check                       # prettier, eslint, tsc, build, publint, attw, api report
+pnpm check                       # prettier, eslint, tsc, build, publint, attw, pack, api report, consumers, size, hostnames
 pnpm test && pnpm test:browser   # vitest; components in Chromium with axe
 ```
