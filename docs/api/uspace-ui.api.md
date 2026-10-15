@@ -4836,6 +4836,9 @@ declare namespace table {
     }
 }
 
+// @public
+const TABLE_NOWRAP: string;
+
 // @public (undocumented)
 function TableBody(input: React_2.ComponentProps<"tbody">): React_2.JSX.Element;
 
@@ -5611,6 +5614,7 @@ declare namespace ui {
         StatusPill,
         FeedPillState,
         StatusPillProps,
+        TABLE_NOWRAP,
         UserMenu,
         UserMenuProps
     }

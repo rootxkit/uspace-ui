@@ -32,4 +32,5 @@ export {
   type FeedPillState,
   type StatusPillProps,
 } from "./StatusPill.js";
+export { TABLE_NOWRAP } from "./tableNowrap.js";
 export { UserMenu, type UserMenuProps } from "./UserMenu.js";

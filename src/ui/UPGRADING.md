@@ -96,7 +96,7 @@ and installs packages. Run it in a scratch directory and diff.
 
 ## Local patches
 
-Each is one inserted line, re-applied by hand after step 3:
+Each is re-applied by hand after step 3:
 
 - `dropdown-menu.tsx`, before `<DropdownMenuPrimitive.CheckboxItem` in
   `DropdownMenuCheckboxItem`, and `sonner.tsx`, before `<Sonner`:
@@ -112,6 +112,19 @@ Each is one inserted line, re-applied by hand after step 3:
   element and takes a `nonce` prop for it; this passes the request's CSP
   nonce from `CspNonceProvider` (PLAN §7). Without a provider nothing
   changes.
+
+- `table.tsx`, two class changes (1.1.1): in `TableHead`,
+  `whitespace-nowrap` becomes `whitespace-normal wrap-break-word`; in
+  `TableCell`, `whitespace-nowrap` becomes `whitespace-normal
+wrap-anywhere`. Upstream keeps every cell on one line, so a long text
+  cell widens the table past its container; here a header wraps between
+  words and a cell wraps too, a long token (a hash, a path) anywhere.
+  `overflow-wrap: anywhere` rather than `break-words` because only
+  `anywhere` lowers a cell's min-content width, which is what lets an
+  auto-layout table shrink the column. The opt-out for ids, times and
+  numbers is `TABLE_NOWRAP` (`extra/tableNowrap.ts`), a class, so the
+  vendored signatures stay upstream's. `browser/table/wrap.test.tsx`
+  measures both at 1280 CSS px.
 
 - Every exported declaration (WP-14, the API freeze): a `/** @public */`
   line above it, or ` * @public` at the end of an upstream doc comment.
