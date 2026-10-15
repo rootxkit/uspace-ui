@@ -31,17 +31,50 @@
   /* Surfaces, text, borders, focus. */
   --us-surface: #f6f7f9;
   --us-surface-raised: #ffffff;
-  --us-surface-sunken: #eceef2;
-  --us-text: #0b0c0f;
-  --us-text-muted: #4f5561;
-  --us-border: #d5d9e0;
+  --us-surface-sunken: #eef0f4;
+  --us-text: #0c0f14;
+  --us-text-muted: #4b5361;
+  --us-border: #dfe3e9;
   --us-border-strong: #7a818c;
   --us-focus: #1f5fc4;
-  --us-hover: #e8ebf0;
+  --us-hover: #eceff3;
   --us-danger: #b3261e;
   --us-on-danger: #ffffff;
   --us-brand-accent: #1f5fc4;
   --us-on-brand-accent: #ffffff;
+
+  /* Chrome of the console frame (1.1.0): accent tint for the selected
+     item, the sidebar, the top bar, a panel's header strip, elevation. */
+  --us-accent-soft: #e8effc;
+  --us-accent-text: #1a54b0;
+  --us-sidebar: #ffffff;
+  --us-sidebar-text: #2a313c;
+  --us-sidebar-muted: #5a6270;
+  --us-topbar: #ffffff;
+  --us-panel-header: #fafbfc;
+  --us-shadow-panel:
+    0 1px 2px rgb(16 24 40 / 0.05), 0 1px 3px rgb(16 24 40 / 0.07);
+  --us-shadow-overlay:
+    0 4px 12px rgb(16 24 40 / 0.1), 0 2px 4px rgb(16 24 40 / 0.06);
+
+  /* Status tones of a tile, badge or pill (1.1.0). Text always says the
+     status too; the colour only repeats it. Foreground on soft, and on
+     both surfaces, meets 4.5:1 (src/theme/tokens.test.ts). */
+  --us-status-ok: #0b6e5f;
+  --us-status-ok-soft: #e3f4ef;
+  --us-status-ok-border: #a3d9cb;
+  --us-status-info: #1257c4;
+  --us-status-info-soft: #e7effc;
+  --us-status-info-border: #b4cdf4;
+  --us-status-warning: #975a00;
+  --us-status-warning-soft: #fcefdc;
+  --us-status-warning-border: #f0c98f;
+  --us-status-critical: #8a1538;
+  --us-status-critical-soft: #fbe8eb;
+  --us-status-critical-border: #f1b3bf;
+  --us-status-neutral: #4b5361;
+  --us-status-neutral-soft: #eef0f4;
+  --us-status-neutral-border: #cfd4dc;
 
   /* Severity (spec 04 §3.3). */
   --us-severity-info: #1366ea;
@@ -80,19 +113,46 @@
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --us-surface: #111418;
-  --us-surface-raised: #1b1f26;
-  --us-surface-sunken: #232832;
-  --us-text: #eef0f3;
-  --us-text-muted: #a3aab5;
-  --us-border: #2f3540;
-  --us-border-strong: #7d8592;
+  --us-surface: #0b0f15;
+  --us-surface-raised: #141a22;
+  --us-surface-sunken: #1b222c;
+  --us-text: #e8ecf1;
+  --us-text-muted: #9ba6b5;
+  --us-border: #262e3a;
+  --us-border-strong: #6d7889;
   --us-focus: #78a9ff;
-  --us-hover: #2a303b;
+  --us-hover: #1e2631;
   --us-danger: #f0544a;
-  --us-on-danger: #111418;
+  --us-on-danger: #0b0f15;
   --us-brand-accent: #78a9ff;
   --us-on-brand-accent: #0b1220;
+
+  --us-accent-soft: #14243d;
+  --us-accent-text: #a3c4ff;
+  --us-sidebar: #0e131a;
+  --us-sidebar-text: #c9d1dc;
+  --us-sidebar-muted: #8b96a6;
+  --us-topbar: #10151c;
+  --us-panel-header: #171d26;
+  --us-shadow-panel:
+    0 1px 2px rgb(0 0 0 / 0.45), 0 0 0 1px rgb(255 255 255 / 0.02);
+  --us-shadow-overlay: 0 8px 24px rgb(0 0 0 / 0.55), 0 2px 6px rgb(0 0 0 / 0.4);
+
+  --us-status-ok: #3fd6c2;
+  --us-status-ok-soft: #0c2a27;
+  --us-status-ok-border: #1a5a52;
+  --us-status-info: #8cc2f7;
+  --us-status-info-soft: #0f2338;
+  --us-status-info-border: #204a75;
+  --us-status-warning: #f8b84a;
+  --us-status-warning-soft: #2c1f0a;
+  --us-status-warning-border: #6a4812;
+  --us-status-critical: #f0708a;
+  --us-status-critical-soft: #321219;
+  --us-status-critical-border: #6e2533;
+  --us-status-neutral: #b3bcc9;
+  --us-status-neutral-soft: #1b222c;
+  --us-status-neutral-border: #3a4452;
 
   --us-severity-info: #87c0f6;
   --us-severity-warning: #ffba33;
@@ -135,19 +195,47 @@
   :root:not([data-theme]) {
     color-scheme: dark;
 
-    --us-surface: #111418;
-    --us-surface-raised: #1b1f26;
-    --us-surface-sunken: #232832;
-    --us-text: #eef0f3;
-    --us-text-muted: #a3aab5;
-    --us-border: #2f3540;
-    --us-border-strong: #7d8592;
+    --us-surface: #0b0f15;
+    --us-surface-raised: #141a22;
+    --us-surface-sunken: #1b222c;
+    --us-text: #e8ecf1;
+    --us-text-muted: #9ba6b5;
+    --us-border: #262e3a;
+    --us-border-strong: #6d7889;
     --us-focus: #78a9ff;
-    --us-hover: #2a303b;
+    --us-hover: #1e2631;
     --us-danger: #f0544a;
-    --us-on-danger: #111418;
+    --us-on-danger: #0b0f15;
     --us-brand-accent: #78a9ff;
     --us-on-brand-accent: #0b1220;
+
+    --us-accent-soft: #14243d;
+    --us-accent-text: #a3c4ff;
+    --us-sidebar: #0e131a;
+    --us-sidebar-text: #c9d1dc;
+    --us-sidebar-muted: #8b96a6;
+    --us-topbar: #10151c;
+    --us-panel-header: #171d26;
+    --us-shadow-panel:
+      0 1px 2px rgb(0 0 0 / 0.45), 0 0 0 1px rgb(255 255 255 / 0.02);
+    --us-shadow-overlay:
+      0 8px 24px rgb(0 0 0 / 0.55), 0 2px 6px rgb(0 0 0 / 0.4);
+
+    --us-status-ok: #3fd6c2;
+    --us-status-ok-soft: #0c2a27;
+    --us-status-ok-border: #1a5a52;
+    --us-status-info: #8cc2f7;
+    --us-status-info-soft: #0f2338;
+    --us-status-info-border: #204a75;
+    --us-status-warning: #f8b84a;
+    --us-status-warning-soft: #2c1f0a;
+    --us-status-warning-border: #6a4812;
+    --us-status-critical: #f0708a;
+    --us-status-critical-soft: #321219;
+    --us-status-critical-border: #6e2533;
+    --us-status-neutral: #b3bcc9;
+    --us-status-neutral-soft: #1b222c;
+    --us-status-neutral-border: #3a4452;
 
     --us-severity-info: #87c0f6;
     --us-severity-warning: #ffba33;
@@ -205,6 +293,46 @@
   --radius: 0.5rem;
 }
 
+/* Type scale, density and the frame's dimensions (1.1.0). Display values,
+   the same in both schemes. A console tuned for an operations room is
+   dense: 13 px body text in tables and feeds, 14 px elsewhere. Georgian
+   (Mkhedruli) has tall ascenders and descenders and a wider set, so text
+   in `ka` gets more leading; nothing is set in capitals (Mkhedruli has
+   no case, and `text-transform` would turn it into Mtavruli). */
+:root {
+  --us-font-size-2xs: 0.6875rem;
+  --us-font-size-xs: 0.75rem;
+  --us-font-size-sm: 0.8125rem;
+  --us-font-size-base: 0.875rem;
+  --us-font-size-lg: 1rem;
+  --us-font-size-xl: 1.25rem;
+  --us-font-size-2xl: 1.5rem;
+  --us-font-size-kpi: 1.75rem;
+  --us-leading-tight: 1.25;
+  --us-leading-normal: 1.5;
+  --us-tracking-label: 0.01em;
+
+  --us-radius-panel: 0.75rem;
+  --us-radius-control: 0.5rem;
+  --us-sidebar-width: 15rem;
+  --us-sidebar-width-collapsed: 3.75rem;
+  --us-topbar-height: 3.5rem;
+  --us-row-height: 2.5rem;
+  --us-space-panel: 1rem;
+}
+
+/* A dense subtree: tables and panels inside it tighten their rows. */
+[data-density="compact"] {
+  --us-row-height: 2rem;
+  --us-space-panel: 0.75rem;
+}
+
+:lang(ka) {
+  --us-leading-tight: 1.4;
+  --us-leading-normal: 1.65;
+  --us-tracking-label: 0;
+}
+
 @layer base {
   *,
   ::before,
@@ -215,7 +343,43 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
+    line-height: var(--us-leading-normal);
+    font-feature-settings:
+      "kern" 1,
+      "liga" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
+
+  ::selection {
+    background-color: var(--us-accent-soft);
+    color: var(--us-text);
+  }
+
+  /* Scrollbars that belong to the scheme instead of the platform's grey. */
+  * {
+    scrollbar-color: var(--us-border-strong) transparent;
+    scrollbar-width: thin;
+  }
+}
+
+/* A legend laid over a MapPanel's map sits in the overlay's own box, so it
+   drops its border, padding and elevation there; two legends stacked in
+   one overlay are divided by a rule. Unlayered, so it wins over the
+   legend's utilities. */
+[data-map-panel] [data-part="legend"] .us-legend {
+  border-width: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
+[data-map-panel] [data-part="legend"] .us-legend + .us-legend {
+  margin-top: 0.625rem;
+  border-top: 1px solid var(--us-border);
+  padding-top: 0.625rem;
 }
 
 /* While ThemeProvider changes the scheme it sets `data-scheme-changing`
@@ -270,6 +434,43 @@
   --radius-xl: calc(var(--radius) + 4px);
 
   --color-brand-accent: var(--us-brand-accent);
+
+  /* The console frame and the status tones (1.1.0), such as `bg-sidebar`,
+     `text-status-warning`, `bg-status-ok-soft`, `shadow-panel`. */
+  --color-surface: var(--us-surface);
+  --color-surface-raised: var(--us-surface-raised);
+  --color-surface-sunken: var(--us-surface-sunken);
+  --color-border-strong: var(--us-border-strong);
+  --color-hover: var(--us-hover);
+  --color-accent-soft: var(--us-accent-soft);
+  --color-accent-text: var(--us-accent-text);
+  --color-sidebar: var(--us-sidebar);
+  --color-sidebar-text: var(--us-sidebar-text);
+  --color-sidebar-muted: var(--us-sidebar-muted);
+  --color-topbar: var(--us-topbar);
+  --color-panel-header: var(--us-panel-header);
+  --color-status-ok: var(--us-status-ok);
+  --color-status-ok-soft: var(--us-status-ok-soft);
+  --color-status-ok-border: var(--us-status-ok-border);
+  --color-status-info: var(--us-status-info);
+  --color-status-info-soft: var(--us-status-info-soft);
+  --color-status-info-border: var(--us-status-info-border);
+  --color-status-warning: var(--us-status-warning);
+  --color-status-warning-soft: var(--us-status-warning-soft);
+  --color-status-warning-border: var(--us-status-warning-border);
+  --color-status-critical: var(--us-status-critical);
+  --color-status-critical-soft: var(--us-status-critical-soft);
+  --color-status-critical-border: var(--us-status-critical-border);
+  --color-status-neutral: var(--us-status-neutral);
+  --color-status-neutral-soft: var(--us-status-neutral-soft);
+  --color-status-neutral-border: var(--us-status-neutral-border);
+  --shadow-panel: var(--us-shadow-panel);
+  --shadow-overlay: var(--us-shadow-overlay);
+  --radius-panel: var(--us-radius-panel);
+  --text-2xs: var(--us-font-size-2xs);
+  --text-2xs--line-height: 1rem;
+  --text-kpi: var(--us-font-size-kpi);
+  --text-kpi--line-height: 1.15;
 
   --color-severity-info: var(--us-severity-info);
   --color-severity-warning: var(--us-severity-warning);

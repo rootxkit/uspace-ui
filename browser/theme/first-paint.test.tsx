@@ -15,7 +15,7 @@ declare module "vitest/browser" {
   }
 }
 
-const DARK_SURFACE = "#111418";
+const DARK_SURFACE = "#0b0f15";
 const LIGHT_SURFACE = "#f6f7f9";
 
 const surface = (el: Element = document.documentElement): string =>

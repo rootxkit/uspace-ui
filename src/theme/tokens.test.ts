@@ -31,6 +31,7 @@ import {
   TRUSTS,
   ZONE_TYPES,
 } from "../model/index.js";
+import { STATUS_TONES, statusTokens } from "./status.js";
 import { AGE_BUCKETS, tokens } from "./tokens.js";
 
 /** SC 1.4.3: text and images of text. */
@@ -424,6 +425,113 @@ describe.each(Object.entries(SCHEMES))("%s scheme", (_scheme, s) => {
       pick(s, { danger: v("danger") }),
       MIN_CONTRAST_TEXT,
     );
+  });
+});
+
+describe.each(Object.entries(SCHEMES))(
+  "%s scheme: the console frame (1.1.0)",
+  (_scheme, s) => {
+    const surfaces = pick(s, {
+      surface: v("surface"),
+      "surface-raised": v("surface-raised"),
+    });
+
+    it.each(STATUS_TONES)(
+      "status tone %s is legible on its tint and on both surfaces",
+      (tone) => {
+        const names = statusTokens[tone];
+        for (const n of Object.values(names)) {
+          expect(s[n], n).toMatch(/^#[0-9a-f]{6}$/);
+        }
+        const fg = pick(s, { [tone]: names.fg });
+        assertContrast(
+          fg,
+          { ...surfaces, ...pick(s, { soft: names.soft }) },
+          MIN_CONTRAST_TEXT,
+        );
+        // Body text sits on the tint too (a KPI value on a tinted tile).
+        assertContrast(
+          pick(s, { text: v("text") }),
+          pick(s, { soft: names.soft }),
+          MIN_CONTRAST_TEXT,
+        );
+      },
+    );
+
+    it("keeps the tones' tints apart from each other", () => {
+      // The tints are backgrounds, not the carrier of the status, so only
+      // the foregrounds must stay apart, in every vision.
+      assertDistinguishable(
+        Object.fromEntries(
+          STATUS_TONES.filter((t) => t !== "neutral").map((t) => [
+            t,
+            s[statusTokens[t].fg] ?? "",
+          ]),
+        ),
+      );
+    });
+
+    it("keeps the sidebar, top bar and panel header legible", () => {
+      assertContrast(
+        pick(s, {
+          "sidebar-text": v("sidebar-text"),
+          "sidebar-muted": v("sidebar-muted"),
+        }),
+        pick(s, { sidebar: v("sidebar"), hover: v("hover") }),
+        MIN_CONTRAST_TEXT,
+      );
+      // The selected item: accent text on the accent tint, and the
+      // sidebar's muted text beside it.
+      assertContrast(
+        pick(s, {
+          "accent-text": v("accent-text"),
+          "sidebar-muted": v("sidebar-muted"),
+        }),
+        pick(s, { "accent-soft": v("accent-soft") }),
+        MIN_CONTRAST_TEXT,
+      );
+      assertContrast(
+        pick(s, { text: v("text"), "text-muted": v("text-muted") }),
+        pick(s, {
+          topbar: v("topbar"),
+          "panel-header": v("panel-header"),
+          hover: v("hover"),
+        }),
+        MIN_CONTRAST_TEXT,
+      );
+      assertContrast(
+        pick(s, { focus: v("focus"), "border-strong": v("border-strong") }),
+        pick(s, { sidebar: v("sidebar"), topbar: v("topbar") }),
+        MIN_CONTRAST_GRAPHICS,
+      );
+    });
+
+    it("maps every frame and tone colour to a Tailwind utility", () => {
+      const theme = /@theme inline\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
+      const names = [
+        ...STATUS_TONES.flatMap((t) => Object.values(statusTokens[t])),
+        v("sidebar"),
+        v("sidebar-text"),
+        v("sidebar-muted"),
+        v("topbar"),
+        v("panel-header"),
+        v("accent-soft"),
+        v("accent-text"),
+      ];
+      for (const name of names) {
+        expect(theme).toContain(
+          `${name.replace(/^--us-/, "--color-")}: var(${name});`,
+        );
+      }
+    });
+  },
+);
+
+describe("the frame's assertions fail on a bad tone (presence twins)", () => {
+  it("refuses a tone's text that fades into its tint", () => {
+    expect(() =>
+      assertContrast({ ok: "#5fd39a" }, { soft: "#a9e6c4" }, 4.5),
+    ).toThrow(/ok #5fd39a on soft #a9e6c4/);
   });
 });
 
