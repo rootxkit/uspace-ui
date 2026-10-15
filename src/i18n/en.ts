@@ -693,6 +693,30 @@ const catalogue = {
   "detail.age_captured": "Age since captured",
   "detail.flight": "Flight",
   "detail.intent": "Intent",
+
+  // 1.1.0: the console frame (AppShell, PageHeader, StatTile, Panel,
+  // MapPanel). A language is named in its own language on the switch, so
+  // a reader of either finds theirs. The status pill reuses the feed's
+  // words (C-12: down is "feed down, retrying", never "lost").
+  "lang.endonym.en": "English",
+  "lang.endonym.ka": "ქართული",
+  "shell.skip": "Skip to content",
+  "shell.nav": "Main navigation",
+  "shell.collapse": "Collapse the sidebar",
+  "shell.expand": "Expand the sidebar",
+  "shell.open_nav": "Open the navigation",
+  "shell.environment": "Environment:",
+  "shell.account": "Account menu: {user}",
+  "shell.signed_in_as": "Signed in as {user}",
+  "shell.status": "Feed status:",
+  "shell.stale": "Stale",
+  "shell.updated_ago": "updated {age} ago",
+  "shell.no_update_yet": "no update yet",
+  "stat.trend.up": "rising",
+  "stat.trend.down": "falling",
+  "stat.trend.flat": "unchanged",
+  "stat.trend": "Trend: {direction}",
+  "panel.legend": "Legend",
 } as const;
 
 /**
