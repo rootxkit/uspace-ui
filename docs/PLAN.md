@@ -764,8 +764,8 @@ bitten by). Jobs on push to `main` and pull requests, and on tags `v*`
 through `release.yml` (`workflow_call`); `ubuntu-latest`; Node 22 from
 `.nvmrc`; pnpm from `packageManager`; `concurrency: ci-${{
 github.workflow }}-${{ github.ref }}` with cancel-in-progress; every job
-`timeout-minutes: 15`; path filter ignores `docs/**` and `*.md` except
-`docs/api/**` (the API report is code). No scheduled job.
+`timeout-minutes: 15`; no path filter (the required checks must report on
+every pull request, docs-only included). No scheduled job.
 
 1. `check`: `pnpm install --frozen-lockfile`; `prettier --check`; `eslint`
    (the kit's own `/eslint` config, so the kit obeys its own rules);

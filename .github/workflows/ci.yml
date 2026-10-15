@@ -4,24 +4,13 @@
 # job built and tested (WP-13a).
 name: ci
 
+# No path filter: the ruleset requires gitleaks, check and test, and a
+# workflow skipped by a filter never reports them, so a docs-only pull
+# request could not merge.
 on:
   push:
     branches: [main]
-    paths:
-      - "**"
-      - "!docs/**"
-      - "!**/*.md"
-      - "docs/api/**"
-      - "docs/CORE_VERSION"
-      - "docs/LAB_VERSION"
   pull_request:
-    paths:
-      - "**"
-      - "!docs/**"
-      - "!**/*.md"
-      - "docs/api/**"
-      - "docs/CORE_VERSION"
-      - "docs/LAB_VERSION"
   workflow_call:
     outputs:
       tarball-name:
