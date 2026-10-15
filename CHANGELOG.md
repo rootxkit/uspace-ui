@@ -7,6 +7,67 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
+## 1.1.1
+
+A patch on 1.1.0: table cells wrap. Prepared on `main`, not tagged: the
+owner tags `v1.1.1` and the release is a GitHub Release asset as before
+(docs/RELEASING.md). Pin it exactly:
+
+```jsonc
+"@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.1.1/rootxkit-uspace-ui-1.1.1.tgz"
+```
+
+No `@public` line of `docs/api/uspace-ui.api.md` is removed or changed
+(two lines are added), and no legend token or symbology mapping changes.
+A console that builds with 1.1.0 builds with 1.1.1 without an edit.
+
+### Entry points that ship
+
+`model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api` (with the
+`uspace-ui-gen-api` bin), `auth/server`, `auth/client`, `symbology`,
+`layers`, `legend`, `live`, `status`, `alerts`, `table`, `form`,
+`eslint`, `test`, and `styles/tokens.css`, `styles/map.css`,
+`fonts/fonts.css` with the woff2 files, as in 1.1.0.
+
+### Fixed
+
+- `ui`: `TableHead` and `TableCell` were `whitespace-nowrap`, so one long
+  text cell widened a table past its container (a register 2000 px wide
+  at 1280 px). They wrap now: a header between words
+  (`wrap-break-word`), a cell between words and a long token anywhere
+  (`wrap-anywhere`, which, unlike `break-words`, also lowers the cell's
+  min-content width, so an auto-layout table can narrow the column). A
+  local patch of the vendored `table.tsx`, listed in
+  `src/ui/UPGRADING.md`.
+- `table`: `DataTable` cells and headers wrap the same way, except a
+  column whose value reads as one unit: `columns.num`, `columns.utc`,
+  `columns.age` and a `columns.text` with `mono` (an id, a code) stay on
+  one line by default. The selection column is unchanged.
+
+### Added
+
+- `ui`: `TABLE_NOWRAP` (`@public`), the class that keeps a `TableHead`, a
+  `TableCell`, or an element inside one, on one line, for ids,
+  timestamps and numbers: `<TableCell className={TABLE_NOWRAP}>`.
+- `table`: `ColumnOptions.nowrap` (`@public`) on every helper, to keep a
+  column on one line or to let a default-nowrap one wrap;
+  `KitColumnMeta.nowrap` (`@beta`) carries it to `DataTable`.
+- `browser/table/wrap.test.tsx`: a `Table` and a `DataTable` with a long
+  text cell fit a 1280 px container with no horizontal overflow, the
+  long cell on several lines; a nowrap column stays on one line when
+  squeezed. Each has its twin: the long cell kept on one line does
+  overflow, and the same time in a wrapping column does break. In
+  English light and Georgian dark, with axe.
+
+### Upgrading from 1.1.0
+
+Replace the asset URL and commit the lockfile. A `TableCell` of yours
+that holds an id, a code, a timestamp or a number, where a line break
+would change how it reads, takes `className={TABLE_NOWRAP}`; a
+`DataTable` column you wrote with `tableColumn()` renders such a value
+inside `<span className={TABLE_NOWRAP}>`. An override that set
+`whitespace-normal` on a kit table cell to make it wrap can go.
+
 ## 1.1.0
 
 The console redesign, an additive minor on the API frozen in 1.0.0.

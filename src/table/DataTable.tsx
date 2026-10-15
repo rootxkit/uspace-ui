@@ -408,7 +408,10 @@ function HeaderCell<Row>(props: {
       tabIndex={focusOnCell ? tabIndex : undefined}
       style={hydrated ? { width: header.getSize() } : undefined}
       className={cn(
-        "sticky top-0 z-10 border-b border-border bg-panel-header px-3 text-left align-middle text-xs font-semibold whitespace-nowrap text-muted-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring",
+        "sticky top-0 z-10 border-b border-border bg-panel-header px-3 text-left align-middle text-xs font-semibold text-muted-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring",
+        // A header wraps between words (never inside one), so a long
+        // name does not widen the table, nowrap column or not.
+        "whitespace-normal wrap-break-word",
         dense ? "h-8" : "h-10",
         // `sticky` is also the positioning context of the resize handle.
         meta?.align === "end" && "text-right",
@@ -914,7 +917,13 @@ export function DataTable<Row>(props: DataTableProps<Row>) {
                         data-column={cell.column.id}
                         className={cn(
                           cellPad,
-                          "align-middle whitespace-nowrap focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring",
+                          "align-middle focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring",
+                          // Cells wrap, a long token anywhere, so the table
+                          // fits its container; an id, a time or a number
+                          // stays on one line (`KitColumnMeta.nowrap`).
+                          meta?.nowrap === true
+                            ? "whitespace-nowrap"
+                            : "whitespace-normal wrap-anywhere",
                           meta?.align === "end" && "text-right tabular-nums",
                         )}
                       >

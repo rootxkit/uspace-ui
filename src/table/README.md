@@ -92,3 +92,26 @@ The table is an ARIA grid with one tab stop (WAI-ARIA APG, "Data Grid"):
 
 A column the app writes itself joins the array through `tableColumn()`,
 and gets the kit's header and filter with `meta: kitColumnMeta({...})`.
+
+## Wrapping
+
+Cells wrap (1.1.1): a header between words, a cell between words and a
+long token (a hash, a path, a list with no spaces) anywhere, so a table
+fits its container instead of widening past it. A column whose value
+must read as one unit stays on one line: `num`, `utc`, `age` and a
+`text` column with `mono` (an id, a code) do so by default. Any helper
+takes `nowrap` to say otherwise, either way:
+
+```tsx
+c.text("serial", { mono: true }), // one line (the default for mono)
+c.text("hash", { mono: true, nowrap: false }), // a long hash may wrap
+c.text("callsign", { nowrap: true }), // one line, not mono
+```
+
+A column the app writes itself with `tableColumn()` wraps; to keep its
+value on one line, render it inside an element with `TABLE_NOWRAP` from
+`@rootxkit/uspace-ui/ui` (`<span className={TABLE_NOWRAP}>`). The same
+class keeps a `TableHead` or a `TableCell` of the vendored `Table` on one
+line. A column on one line widens the table by its longest value, so
+keep it to short values; on a narrow screen the table's container
+scrolls sideways.

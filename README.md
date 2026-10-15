@@ -20,11 +20,13 @@ kit's view models in an adapter it owns.
 
 ## Status
 
-`1.1.0` is the console redesign on the frozen API of `1.0.0`: an
-additive minor with a dark-first operations look, the console frame
-(`AppShell`, `PageHeader`, `StatTile`, `KpiRow`, `Panel`, `StatusBadge`,
-`StatusPill`, `MapPanel`) and the status tones, prepared on `main` and
-tagged by the owner, a GitHub Release asset of this repository (see
+`1.1.1` is a patch on `1.1.0` (table cells wrap; `TABLE_NOWRAP` keeps
+an id, a time or a number on one line). `1.1.0` is the console redesign
+on the frozen API of `1.0.0`: an additive minor with a dark-first
+operations look, the console frame (`AppShell`, `PageHeader`,
+`StatTile`, `KpiRow`, `Panel`, `StatusBadge`, `StatusPill`, `MapPanel`)
+and the status tones. Each is prepared on `main` and tagged by the
+owner, a GitHub Release asset of this repository (see
 Installing). It ships every entry point: `model`,
 `theme`, `ui`, `i18n`, `fonts`, `map`, `api` (with the
 `uspace-ui-gen-api` bin), `auth/server`, `auth/client`, `symbology`,
@@ -66,7 +68,7 @@ path for later. Depend on the asset URL of one release, exactly:
 ```jsonc
 // web/package.json
 "dependencies": {
-  "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.1.0/rootxkit-uspace-ui-1.1.0.tgz",
+  "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.1.1/rootxkit-uspace-ui-1.1.1.tgz",
   "maplibre-gl": "5.x"
 }
 ```
@@ -81,7 +83,7 @@ depend on a `github:` spec or a branch. From `0.1.0` the tarball carries
 a signed build provenance attestation; check it with `gh attestation
 verify` before pinning (`docs/RELEASING.md`).
 
-## Consuming (`1.1.0`)
+## Consuming (`1.1.1`)
 
 ```css
 /* web/app/globals.css */
