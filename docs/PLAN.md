@@ -970,6 +970,13 @@ D10).
   cells wrap; `ColumnOptions.nowrap`, on by default for the number, time,
   age and mono text columns), `form`, `eslint` and `test`. Two `@public`
   lines added, none removed or changed; no legend value changed.
+- `v1.1.2`: a patch, native controls follow the scheme (owner's request
+  of 2026-10-16). *Prepared on `main`, tagged by the owner:* every entry
+  point of §2 as in `v1.1.1`, `model`, `theme`, `ui`, `i18n`, `fonts`,
+  `map`, `api`, `auth/server`, `auth/client`, `symbology`, `layers`,
+  `legend`, `live`, `status`, `alerts`, `table`, `form`, `eslint` and
+  `test`; `styles/tokens.css` themes `option` and `optgroup`. No
+  `@public` line added, removed or changed; no legend value changed.
 - From `v1`: within a major only additive changes (new exports, new
   optional props, new catalogue keys, new enumeration values *rendered*
   because `model` gained them). The following are a **major**: removing

@@ -20,7 +20,8 @@ kit's view models in an adapter it owns.
 
 ## Status
 
-`1.1.1` is a patch on `1.1.0` (table cells wrap; `TABLE_NOWRAP` keeps
+`1.1.2` is a patch on `1.1.1` (native selects and pickers follow the
+scheme). `1.1.1` is a patch on `1.1.0` (table cells wrap; `TABLE_NOWRAP` keeps
 an id, a time or a number on one line). `1.1.0` is the console redesign
 on the frozen API of `1.0.0`: an additive minor with a dark-first
 operations look, the console frame (`AppShell`, `PageHeader`,

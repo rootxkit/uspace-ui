@@ -25,6 +25,14 @@ not tagged: the owner tags `v1.1.2` (docs/RELEASING.md). Pin it exactly:
 
 No `@public` line of `docs/api/uspace-ui.api.md` changes.
 
+### Entry points that ship
+
+`model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api` (with the
+`uspace-ui-gen-api` bin), `auth/server`, `auth/client`, `symbology`,
+`layers`, `legend`, `live`, `status`, `alerts`, `table`, `form`,
+`eslint`, `test`, and `styles/tokens.css`, `styles/map.css`,
+`fonts/fonts.css` with the woff2 files, as in 1.1.1.
+
 ## 1.1.1
 
 A patch on 1.1.0: table cells wrap. Prepared on `main`, not tagged: the
