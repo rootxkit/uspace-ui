@@ -68,7 +68,7 @@ path for later. Depend on the asset URL of one release, exactly:
 ```jsonc
 // web/package.json
 "dependencies": {
-  "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.1.1/rootxkit-uspace-ui-1.1.1.tgz",
+  "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.1.2/rootxkit-uspace-ui-1.1.2.tgz",
   "maplibre-gl": "5.x"
 }
 ```
@@ -83,7 +83,7 @@ depend on a `github:` spec or a branch. From `0.1.0` the tarball carries
 a signed build provenance attestation; check it with `gh attestation
 verify` before pinning (`docs/RELEASING.md`).
 
-## Consuming (`1.1.1`)
+## Consuming (`1.1.2`)
 
 ```css
 /* web/app/globals.css */
