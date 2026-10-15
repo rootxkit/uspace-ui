@@ -946,6 +946,15 @@ D10).
   freeze"). The consoles: uspace-authority's picture (`TrackLayer`,
   `TrackDetail`, the alert store) and uspace-ussp's traffic page and
   console (`TrackLayer`, `alertSummary`, `SeverityMark`), both on `0.1.0`.
+- `v1.1.0`: the console redesign, additive (owner's request of
+  2026-10-15). *Prepared on `main`, tagged by the owner:* every entry
+  point of §2 as in `v1.0.0`, `model`, `theme` (with the status tones),
+  `ui` (with the console frame: `AppShell`, `PageHeader`, `StatTile`,
+  `KpiRow`, `Panel`, `StatusBadge`, `StatusPill`, `LanguageSwitch`,
+  `UserMenu`, `MapPanel`), `i18n`, `fonts`, `map`, `api`,
+  `auth/server`, `auth/client`, `symbology`, `layers`, `legend`, `live`,
+  `status`, `alerts`, `table`, `form`, `eslint` and `test`. No legend
+  value changed (semver gate rule 2 does not fire).
 - From `v1`: within a major only additive changes (new exports, new
   optional props, new catalogue keys, new enumeration values *rendered*
   because `model` gained them). The following are a **major**: removing
