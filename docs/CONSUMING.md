@@ -349,11 +349,10 @@ minimum for all of them.
 
 For the CISP planner (`uspace-cisp/web`, its WP-9 scaffold):
 
-- The CISP pins `0.1.0-rc.1`. On `0.1.0`, its `createBff` passes
-  `trustedProxyHops` only when `CISP_WEB_TRUSTED_PROXY_HOPS` is set, and
-  `bffHandlers` with `secure: true` now throws without it or
-  `noTrustedProxy: true`: the variable becomes required, or the CISP
-  passes `noTrustedProxy: true` when it is unset.
+- The CISP pins `1.0.0`. Its `createBff` passes `trustedProxyHops`
+  from `CISP_WEB_TRUSTED_PROXY_HOPS`; since `0.1.0`, `bffHandlers` with
+  `secure: true` throws without it or `noTrustedProxy: true`, so the
+  deployment sets the variable.
 - The CISP routes by locale prefix (`/ka`, `/en`, redirected in
   `proxy.ts`); the example keeps one URL per page and switches language
   by the `uspace_lang` cookie. Both negotiate the same way.
