@@ -40,6 +40,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   type KeyboardEvent,
   type MouseEvent,
   type ReactNode,
@@ -337,6 +338,24 @@ function FreshnessFooter(props: {
   );
 }
 
+const noSubscribe = (): (() => void) => () => undefined;
+
+/**
+ * False on the server and while hydrating, true after. The table's sizes
+ * are `style` props, which the server would write as `style` attributes:
+ * the CSP every `web/` sets (PLAN §7: no 'unsafe-inline' for styles)
+ * refuses those and reports a violation, and hydration never puts them
+ * back. Set after hydration, React writes them through the CSSOM, which
+ * the policy allows.
+ */
+function useHydrated(): boolean {
+  return useSyncExternalStore(
+    noSubscribe,
+    () => true,
+    () => false,
+  );
+}
+
 function HeaderCell<Row>(props: {
   header: Header<Row, unknown>;
   pos: GridPos;
@@ -367,6 +386,7 @@ function HeaderCell<Row>(props: {
   const tabIndex = active ? 0 : -1;
   const isSelect = meta?.select === true;
   const focusOnCell = !canSort && !isSelect;
+  const hydrated = useHydrated();
   return (
     <th
       scope="col"
@@ -383,7 +403,7 @@ function HeaderCell<Row>(props: {
       data-column={column.id}
       data-grid-cell={focusOnCell ? cellKey : undefined}
       tabIndex={focusOnCell ? tabIndex : undefined}
-      style={{ width: header.getSize() }}
+      style={hydrated ? { width: header.getSize() } : undefined}
       className={cn(
         "sticky top-0 z-10 border-b border-border bg-background px-2 text-left align-middle font-medium whitespace-nowrap text-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring",
         dense ? "h-8" : "h-10",
@@ -477,6 +497,7 @@ export function DataTable<Row>(props: DataTableProps<Row>) {
   const t = useT();
   const { lang } = useLang();
   const hintId = useId();
+  const hydrated = useHydrated();
   const [own, setOwn] = useState<TableState>(
     () => props.state ?? initialTableState(),
   );
@@ -752,7 +773,9 @@ export function DataTable<Row>(props: DataTableProps<Row>) {
       <div
         ref={scrollRef}
         className="relative w-full overflow-auto rounded-md border border-border"
-        style={virtual ? { maxHeight: VIRTUAL_VIEWPORT_PX } : undefined}
+        style={
+          hydrated && virtual ? { maxHeight: VIRTUAL_VIEWPORT_PX } : undefined
+        }
         data-part="scroll"
       >
         <p id={hintId} className="sr-only">
@@ -771,7 +794,7 @@ export function DataTable<Row>(props: DataTableProps<Row>) {
             "w-full caption-top border-collapse",
             error !== null && rowsGiven > 0 && "opacity-60",
           )}
-          style={{ minWidth: table.getTotalSize() }}
+          style={hydrated ? { minWidth: table.getTotalSize() } : undefined}
           onKeyDown={onKeyDown}
           onFocus={onFocus}
           onClick={onClick}
