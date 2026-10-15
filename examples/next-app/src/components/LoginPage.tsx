@@ -5,28 +5,26 @@
 import { useRouter } from "next/navigation";
 import { BFF_LOGIN_PATH, LoginForm } from "@rootxkit/uspace-ui/auth/client";
 import { useT } from "@rootxkit/uspace-ui/i18n";
+import { PageHeader, Panel } from "@rootxkit/uspace-ui/ui";
 
 export function LoginPage() {
   const t = useT();
   const router = useRouter();
   return (
-    <section
-      aria-labelledby="login-heading"
-      className="flex max-w-md flex-col gap-3"
-    >
-      <h1 id="login-heading" className="text-xl font-bold">
-        {t("example.login.heading")}
-      </h1>
-      <p className="text-sm text-muted-foreground">
-        {t("example.login.stub_note")}
-      </p>
-      <LoginForm
-        action={BFF_LOGIN_PATH}
-        onSuccess={() => {
-          router.push("/protected");
-          router.refresh();
-        }}
+    <div className="grid w-full max-w-md gap-4">
+      <PageHeader
+        title={t("example.login.heading")}
+        description={t("example.login.stub_note")}
       />
-    </section>
+      <Panel>
+        <LoginForm
+          action={BFF_LOGIN_PATH}
+          onSuccess={() => {
+            router.push("/protected");
+            router.refresh();
+          }}
+        />
+      </Panel>
+    </div>
   );
 }

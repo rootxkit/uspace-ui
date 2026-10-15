@@ -12,6 +12,10 @@
       "status": "pending GCAA"
     }
   },
+  "environment": {
+    "$comment": "Display-only: the tone of the environment badge in the top bar (a StatusTone of @rootxkit/uspace-ui/theme). Its name is the catalogue key example.environment.",
+    "tone": "info"
+  },
   "map": {
     "$comment": "Display-only sample camera over the browser tests' Tbilisi extract (browser/public/basemap/), which the smoke test serves; a system configures its own.",
     "center": [44.8, 41.705],

@@ -15,6 +15,8 @@
 // - the public map loads: the basemap with its OSM date, the zones with
 //   "version 42, updated ... UTC" and the ETag, the legend's five types;
 // - the language switch renders Georgian and sets <html lang="ka">;
+// - the dashboard (/dashboard) renders the console frame over demo data
+//   and is checked with every other page below;
 // - signed out, the protected page says so (the twin of the next check);
 // - a refused sign-in shows the API's detail and stays on the form;
 // - the one-role fixture user sees the protected page's denial;
@@ -68,7 +70,7 @@ const AXE_TAGS = [
   "wcag22a",
   "wcag22aa",
 ];
-const PAGES = ["/", "/login", "/protected"];
+const PAGES = ["/", "/dashboard", "/login", "/protected"];
 const LANG_SETUPS = [
   { lang: "en", colorScheme: "light", region: "Map", canvas: /^Map view/ },
   { lang: "ka", colorScheme: "dark", region: "რუკა", canvas: /^რუკის ხედი/ },
@@ -532,7 +534,9 @@ async function run() {
     pass(
       "the session cookie is HttpOnly and SameSite=Strict; the CSRF cookie is readable",
     );
-    await page.getByRole("button", { name: "Sign out" }).click();
+    // The user menu of the kit's AppShell holds "Sign out".
+    await page.getByRole("button", { name: /^Account menu: / }).click();
+    await page.getByRole("menuitem", { name: "Sign out" }).click();
     await page
       .getByRole("link", { name: "Sign in" })
       .waitFor({ timeout: WAIT_MS });
@@ -545,8 +549,12 @@ async function run() {
     await page.waitForURL(`${APP}/protected`, { timeout: WAIT_MS });
     await page.getByTestId("protected-body").waitFor({ timeout: WAIT_MS });
     await page
+      .getByRole("button", { name: "Account menu: TEST-account-0001" })
+      .click();
+    await page
       .getByText("Signed in as TEST-account-0001")
       .waitFor({ timeout: WAIT_MS });
+    await page.keyboard.press("Escape");
     pass("the two-role user signs in and reaches the protected page");
 
     await checkAccessibility(browser);
