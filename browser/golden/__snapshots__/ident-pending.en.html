@@ -1,0 +1,617 @@
+<div lang="en" class="bg-background p-4 text-foreground">
+<div class="grid gap-4" data-testid="pending" style="max-width: 420px;">
+<section class="us-legend rounded-lg border border-border bg-card p-3 text-sm text-card-foreground shadow-panel" aria-label="Identification" data-legend="identification">
+<h2 class="m-0 text-sm font-semibold">
+<button type="button" class="w-full rounded-sm text-left font-semibold focus-visible:outline-2 focus-visible:outline-ring" aria-expanded="true" aria-controls="id-0">Identification</button>
+</h2>
+<div id="id-0">
+<ul class="mt-2 grid list-none gap-2 p-0">
+<li data-ident="registered" data-attention="false" class="flex items-start gap-2">
+<span class="inline-flex shrink-0 items-center gap-0.5" aria-hidden="true">
+<svg width="18" height="18" viewBox="0 0 18 18" data-token="--us-ident-registered">
+<circle cx="9" cy="9" r="7" fill="var(--us-ident-registered)" stroke="var(--us-surface)" stroke-width="1">
+</circle>
+</svg>
+<span class="w-3 text-center font-semibold" data-mark="">
+</span>
+</span>
+<span class="min-w-0">registered<span class="block text-xs text-muted-foreground">The serial and the operator match an active registration.</span>
+<span class="sr-only">No mark beside the symbol</span>
+</span>
+<span class="ml-auto whitespace-nowrap tabular-nums" data-count="absent" title="not provided">—<span class="sr-only">not provided</span>
+</span>
+</li>
+<li data-ident="suspended" data-attention="false" class="flex items-start gap-2">
+<span class="inline-flex shrink-0 items-center gap-0.5" aria-hidden="true">
+<svg width="18" height="18" viewBox="0 0 18 18" data-token="--us-ident-suspended">
+<circle cx="9" cy="9" r="7" fill="var(--us-ident-suspended)" stroke="var(--us-surface)" stroke-width="1">
+</circle>
+</svg>
+<span class="w-3 text-center font-semibold" data-mark="!">!</span>
+</span>
+<span class="min-w-0">suspended<span class="block text-xs text-muted-foreground">Registered, but the aircraft or its operator is suspended or revoked.</span>
+<span class="sr-only">Mark beside the symbol: !</span>
+</span>
+<span class="ml-auto whitespace-nowrap tabular-nums" data-count="absent" title="not provided">—<span class="sr-only">not provided</span>
+</span>
+</li>
+<li data-ident="unknown_operator" data-attention="true" class="flex items-start gap-2">
+<span class="inline-flex shrink-0 items-center gap-0.5" aria-hidden="true">
+<svg width="18" height="18" viewBox="0 0 18 18" data-token="--us-ident-unknown_operator">
+<circle cx="9" cy="9" r="7" fill="var(--us-ident-unknown_operator)" stroke="var(--us-surface)" stroke-width="1">
+</circle>
+</svg>
+<span class="w-3 text-center font-semibold" data-mark="?">?</span>
+</span>
+<span class="min-w-0">unknown operator<span class="block text-xs text-muted-foreground">The serial is not registered, or the operator given is missing, unknown or not the owner.</span>
+<span class="sr-only">Mark beside the symbol: ?</span>
+</span>
+<span class="ml-auto whitespace-nowrap tabular-nums" data-count="absent" title="not provided">—<span class="sr-only">not provided</span>
+</span>
+</li>
+<li data-ident="unidentified" data-attention="true" class="flex items-start gap-2">
+<span class="inline-flex shrink-0 items-center gap-0.5" aria-hidden="true">
+<svg width="18" height="18" viewBox="0 0 18 18" data-token="--us-ident-unidentified">
+<circle cx="9" cy="9" r="7" fill="var(--us-ident-unidentified)" stroke="var(--us-surface)" stroke-width="1">
+</circle>
+</svg>
+<span class="w-3 text-center font-semibold" data-mark="×">×</span>
+</span>
+<span class="min-w-0">unidentified<span class="block text-xs text-muted-foreground">No usable serial number: nobody can say what aircraft this is.</span>
+<span class="sr-only">Mark beside the symbol: ×</span>
+</span>
+<span class="ml-auto whitespace-nowrap tabular-nums" data-count="1">1 track</span>
+</li>
+<li data-ident="pending" data-attention="false" class="flex items-start gap-2">
+<span class="inline-flex shrink-0 items-center gap-0.5" aria-hidden="true">
+<svg width="18" height="18" viewBox="0 0 18 18" data-token="--us-ident-pending">
+<circle cx="9" cy="9" r="7" fill="var(--us-ident-pending)" stroke="var(--us-surface)" stroke-width="1">
+</circle>
+</svg>
+<span class="w-3 text-center font-semibold" data-mark="…">…</span>
+</span>
+<span class="min-w-0">pending<span class="block text-xs text-muted-foreground">Not judged yet: the provider's details have not been fetched, or the registry could not be reached. Neither unidentified nor an alarm.</span>
+<span class="sr-only">Mark beside the symbol: …</span>
+</span>
+<span class="ml-auto whitespace-nowrap tabular-nums" data-count="2">2 tracks</span>
+</li>
+<li data-ident="none" data-attention="false" class="flex items-start gap-2">
+<span class="inline-flex shrink-0 items-center gap-0.5" aria-hidden="true">
+<svg width="18" height="18" viewBox="0 0 18 18" data-token="--us-ident-none">
+<circle cx="9" cy="9" r="7" fill="var(--us-ident-none)" stroke="var(--us-surface)" stroke-width="1">
+</circle>
+</svg>
+<span class="w-3 text-center font-semibold" data-mark="–">–</span>
+</span>
+<span class="min-w-0">no identification<span class="block text-xs text-muted-foreground">No identification has been received for this track.</span>
+<span class="sr-only">Mark beside the symbol: –</span>
+</span>
+<span class="ml-auto whitespace-nowrap tabular-nums" data-count="absent" title="not provided">—<span class="sr-only">not provided</span>
+</span>
+</li>
+</ul>
+<p class="mt-2 mb-0 text-xs text-muted-foreground" data-note="attention">Listed after registered and suspended: the statuses that need attention. The server raises the alerts.</p>
+<p class="mt-2 mb-0 text-xs text-muted-foreground" data-note="broadcast">Broadcast and unverified: anyone can transmit this identity and position.</p>
+<p class="mt-2 mb-0 text-xs text-muted-foreground" data-note="provider">Reported by a provider, unverified: a peer system's claim.</p>
+<p class="mt-2 mb-0 text-xs text-muted-foreground" data-note="mismatch">A mismatch is shown as a mismatch, never as registered.</p>
+</div>
+</section>
+<div class="grid gap-2 text-sm" data-table="" data-virtual="false" data-state-kind="rows">
+<div class="flex flex-wrap items-end justify-between gap-3">
+<div role="group" aria-label="Filters" class="flex flex-wrap items-end gap-3" data-part="filters">
+<div class="grid gap-1">
+<label data-slot="label" class="flex items-center gap-2 select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 text-xs font-semibold text-muted-foreground" for="id-1">Filter: Identification</label>
+<select id="id-1" data-filter="identification" class="h-9 rounded-md border border-input bg-card px-2 text-sm focus-visible:outline-2 focus-visible:outline-ring">
+<option value="">All</option>
+<option value="registered">registered</option>
+<option value="suspended">suspended</option>
+<option value="unknown_operator">unknown operator</option>
+<option value="unidentified">unidentified</option>
+<option value="pending">pending</option>
+<option value="none">no identification</option>
+</select>
+</div>
+</div>
+</div>
+<div class="relative w-full overflow-auto rounded-lg border border-border bg-card text-card-foreground shadow-panel" data-part="scroll">
+<p id="id-2" class="sr-only">Arrow keys move between cells. Home and End go to the first and last cell of a row, with Control to the first and last row. Page Up and Page Down move ten rows. Enter selects a row or sorts by a column, with Shift adding to the sort. Space toggles a checkbox. Alt with Left or Right resizes a column.</p>
+<table role="grid" aria-rowcount="4" aria-colcount="1" aria-describedby="id-2" tabindex="-1" class="w-full caption-top border-collapse" style="min-width: 150px;">
+<caption class="px-2 py-2 text-left text-sm font-semibold text-foreground">Identification</caption>
+<thead>
+<tr aria-rowindex="1">
+<th scope="col" colspan="1" aria-sort="none" data-column="identification" class="sticky top-0 z-10 border-b border-border bg-panel-header px-3 text-left align-middle text-xs font-semibold text-muted-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring whitespace-normal wrap-break-word h-10" style="width: 150px;">
+<button type="button" data-grid-cell="0:0" tabindex="0" class="inline-flex items-center gap-1 rounded-sm font-semibold transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring">
+<span>Identification</span>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-down size-3.5 shrink-0 opacity-50" aria-hidden="true">
+<path d="m21 16-4 4-4-4">
+</path>
+<path d="M17 20V4">
+</path>
+<path d="m3 8 4-4 4 4">
+</path>
+<path d="M7 4v16">
+</path>
+</svg>
+</button>
+<span aria-hidden="true" data-part="resize" class="absolute top-0 right-0 h-full w-1.5 cursor-col-resize touch-none select-none hover:bg-border">
+</span>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr data-row-id="TEST-TRK-0901" aria-rowindex="2" class="border-b border-border transition-colors last:border-b-0 hover:bg-hover data-[state=selected]:bg-muted data-[state=selected]:shadow-[inset_3px_0_0_var(--us-brand-accent)]">
+<td data-grid-cell="1:0" tabindex="-1" data-column="identification" class="px-3 py-2 align-middle focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring whitespace-normal wrap-anywhere">
+<span class="inline-flex flex-col gap-0.5" data-ident="pending">
+<span class="inline-flex w-fit items-center rounded-full border-2 px-2 py-0.5 text-xs font-medium border-ident-pending border-dashed">pending: details not yet fetched</span>
+<span class="text-xs text-muted-foreground">Reported by a provider, unverified: a peer system's claim.</span>
+</span>
+</td>
+</tr>
+<tr data-row-id="TEST-TRK-0902" aria-rowindex="3" class="border-b border-border transition-colors last:border-b-0 hover:bg-hover data-[state=selected]:bg-muted data-[state=selected]:shadow-[inset_3px_0_0_var(--us-brand-accent)]">
+<td data-grid-cell="2:0" tabindex="-1" data-column="identification" class="px-3 py-2 align-middle focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring whitespace-normal wrap-anywhere">
+<span class="inline-flex flex-col gap-0.5" data-ident="pending">
+<span class="inline-flex w-fit items-center rounded-full border-2 px-2 py-0.5 text-xs font-medium border-ident-pending border-dashed">pending: registry unreachable</span>
+<span class="text-xs text-muted-foreground">Serial and operator as broadcast and unverified.</span>
+</span>
+</td>
+</tr>
+<tr data-row-id="TEST-TRK-0903" aria-rowindex="4" class="border-b border-border transition-colors last:border-b-0 hover:bg-hover data-[state=selected]:bg-muted data-[state=selected]:shadow-[inset_3px_0_0_var(--us-brand-accent)]">
+<td data-grid-cell="3:0" tabindex="-1" data-column="identification" class="px-3 py-2 align-middle focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring whitespace-normal wrap-anywhere">
+<span class="inline-flex flex-col gap-0.5" data-ident="unidentified">
+<span class="inline-flex w-fit items-center rounded-full border-2 px-2 py-0.5 text-xs font-medium border-ident-unidentified">unidentified</span>
+<span class="text-xs text-muted-foreground">Serial and operator as broadcast and unverified.</span>
+</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+<div class="flex flex-wrap items-center gap-2">
+<span data-part="range">Rows 1 to 3 of 3</span>
+</div>
+<nav aria-label="Pages" class="flex flex-wrap items-center gap-2" data-part="pager">
+<label for="id-3">Rows per page</label>
+<select id="id-3" class="h-8 rounded-md border border-input bg-card px-1 text-foreground">
+<option value="10">10</option>
+<option value="25">25</option>
+<option value="50">50</option>
+<option value="100">100</option>
+</select>
+<button data-slot="button" data-variant="outline" data-size="sm" class="inline-flex shrink-0 items-center justify-center text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*='size-'])]:size-4 border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-8 gap-1.5 rounded-md px-3 has-[&gt;svg]:px-2.5" type="button" aria-label="Go to the previous page" disabled="">Previous</button>
+<span data-part="page" aria-live="polite">Page 1 of 1</span>
+<button data-slot="button" data-variant="outline" data-size="sm" class="inline-flex shrink-0 items-center justify-center text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*='size-'])]:size-4 border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-8 gap-1.5 rounded-md px-3 has-[&gt;svg]:px-2.5" type="button" aria-label="Go to the next page" disabled="">Next</button>
+</nav>
+</div>
+</div>
+<div data-case="details_unavailable">
+<article class="us-track-detail grid gap-2 text-xs" data-detail="uas" data-trust="authenticated" aria-labelledby="id-4">
+<h3 id="id-4" class="m-0 text-sm font-semibold">Unmanned aircraft TEST-TRK-0901</h3>
+<section aria-labelledby="id-5" data-section="id-5">
+<h4 id="id-5" class="m-0 mb-1 text-xs font-semibold uppercase">Identification</h4>
+<p class="m-0 text-xs font-semibold" data-part="basis-caveat">Reported by a provider, unverified: a peer system's claim.</p>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="ident-status" data-kind="text">
+<dt class="text-muted-foreground">Status</dt>
+<dd class="m-0 font-medium break-words">
+<span data-ident="pending">pending</span>
+<span class="block font-normal" data-part="status-hint">Not judged yet: the provider's details have not been fetched, so nobody has asked what aircraft this is.</span>
+</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="ident-reason" data-kind="text">
+<dt class="text-muted-foreground">Reason</dt>
+<dd class="m-0 font-medium break-words">The provider's details have not been fetched yet: identification is pending, not judged.</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="ident-basis" data-kind="text">
+<dt class="text-muted-foreground">Basis</dt>
+<dd class="m-0 font-medium break-words">reported by a provider, unverified</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="serial" data-kind="text">
+<dt class="text-muted-foreground">Serial number</dt>
+<dd class="m-0 font-medium break-words">—</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="registration" data-kind="text">
+<dt class="text-muted-foreground">Operator registration (public part)</dt>
+<dd class="m-0 font-medium break-words">—</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-6" data-section="id-6">
+<h4 id="id-6" class="m-0 mb-1 text-xs font-semibold uppercase">Position and altitude</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="position" data-kind="text">
+<dt class="text-muted-foreground">Position</dt>
+<dd class="m-0 font-medium break-words">41.70000, 44.80000 (WGS84)</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="alt-amsl" data-kind="altitude">
+<dt class="text-muted-foreground">Altitude</dt>
+<dd class="m-0 font-medium break-words">552 m AMSL</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="alt-source" data-kind="text">
+<dt class="text-muted-foreground">Altitude source</dt>
+<dd class="m-0 font-medium break-words">geodetic: satellite fix through the geoid</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="alt-wgs84" data-kind="altitude">
+<dt class="text-muted-foreground">Altitude above the ellipsoid</dt>
+<dd class="m-0 font-medium break-words">571 m above the WGS84 ellipsoid</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="height" data-kind="altitude">
+<dt class="text-muted-foreground">Height</dt>
+<dd class="m-0 font-medium break-words">42 m above take-off</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-7" data-section="id-7">
+<h4 id="id-7" class="m-0 mb-1 text-xs font-semibold uppercase">Motion</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="speed" data-kind="text">
+<dt class="text-muted-foreground">Ground speed</dt>
+<dd class="m-0 font-medium break-words">8.4 m/s</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="track" data-kind="text">
+<dt class="text-muted-foreground">Course over ground (degrees true)</dt>
+<dd class="m-0 font-medium break-words">090°</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="vspeed" data-kind="text">
+<dt class="text-muted-foreground">Vertical speed (positive up)</dt>
+<dd class="m-0 font-medium break-words">1.5 m/s</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="operational-status" data-kind="text">
+<dt class="text-muted-foreground">Operational status</dt>
+<dd class="m-0 font-medium break-words">Airborne</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="emergency" data-kind="text">
+<dt class="text-muted-foreground">Emergency</dt>
+<dd class="m-0 font-medium break-words">
+<span data-emergency="false">none reported</span>
+</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-8" data-section="id-8">
+<h4 id="id-8" class="m-0 mb-1 text-xs font-semibold uppercase">Source and trust</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="trust" data-kind="text">
+<dt class="text-muted-foreground">Trust class</dt>
+<dd class="m-0 font-medium break-words">Authenticated<span class="block font-normal" data-part="trust-meaning">Sent over the operator's own authenticated session for this aircraft.</span>
+</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="source" data-kind="text">
+<dt class="text-muted-foreground">Source</dt>
+<dd class="m-0 font-medium break-words">operator_ws</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="instance" data-kind="text">
+<dt class="text-muted-foreground">Instance</dt>
+<dd class="m-0 font-medium break-words">TEST-CLIENT-1</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="flight" data-kind="text">
+<dt class="text-muted-foreground">Flight</dt>
+<dd class="m-0 font-medium break-words">TEST-FLT-0101</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="intent" data-kind="text">
+<dt class="text-muted-foreground">Intent</dt>
+<dd class="m-0 font-medium break-words">TEST-INT-0001</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-9" data-section="id-9">
+<h4 id="id-9" class="m-0 mb-1 text-xs font-semibold uppercase">Times and age</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="ts" data-kind="time">
+<dt class="text-muted-foreground">Source time (the source's clock)</dt>
+<dd class="m-0 font-medium break-words">2026-01-01 11:59:57 UTC</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="rx-ts" data-kind="time">
+<dt class="text-muted-foreground">Received (this system's clock)</dt>
+<dd class="m-0 font-medium break-words">2026-01-01 11:59:58 UTC</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="captured-at" data-kind="time">
+<dt class="text-muted-foreground">Captured (this system's clock)</dt>
+<dd class="m-0 font-medium break-words">2026-01-01 11:59:57 UTC</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="time-source" data-kind="text">
+<dt class="text-muted-foreground">Capture time placed by</dt>
+<dd class="m-0 font-medium break-words">the source's clock</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="age-received" data-kind="text">
+<dt class="text-muted-foreground">Age since received</dt>
+<dd class="m-0 font-medium break-words">
+<span data-age="live">2 s · Live</span>
+</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="age-captured" data-kind="text">
+<dt class="text-muted-foreground">Age since captured</dt>
+<dd class="m-0 font-medium break-words">—</dd>
+</div>
+</dl>
+</section>
+</article>
+</div>
+<div data-case="registry_unavailable">
+<article class="us-track-detail grid gap-2 text-xs" data-detail="uas" data-trust="authenticated" aria-labelledby="id-10">
+<h3 id="id-10" class="m-0 text-sm font-semibold">Unmanned aircraft TEST-TRK-0902</h3>
+<section aria-labelledby="id-11" data-section="id-11">
+<h4 id="id-11" class="m-0 mb-1 text-xs font-semibold uppercase">Identification</h4>
+<p class="m-0 text-xs font-semibold" data-part="basis-caveat">Serial and operator as broadcast and unverified.</p>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="ident-status" data-kind="text">
+<dt class="text-muted-foreground">Status</dt>
+<dd class="m-0 font-medium break-words">
+<span data-ident="pending">pending</span>
+<span class="block font-normal" data-part="status-hint">Not judged yet: the registry could not be reached, so the identity has not been checked.</span>
+</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="ident-reason" data-kind="text">
+<dt class="text-muted-foreground">Reason</dt>
+<dd class="m-0 font-medium break-words">The registry could not be consulted.</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="ident-basis" data-kind="text">
+<dt class="text-muted-foreground">Basis</dt>
+<dd class="m-0 font-medium break-words">as broadcast and unverified</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="serial" data-kind="text">
+<dt class="text-muted-foreground">Serial number</dt>
+<dd class="m-0 font-medium break-words">TEST-SN-0101</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="registration" data-kind="text">
+<dt class="text-muted-foreground">Operator registration (public part)</dt>
+<dd class="m-0 font-medium break-words">GEO-TEST-OP-0101</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-12" data-section="id-12">
+<h4 id="id-12" class="m-0 mb-1 text-xs font-semibold uppercase">Position and altitude</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="position" data-kind="text">
+<dt class="text-muted-foreground">Position</dt>
+<dd class="m-0 font-medium break-words">41.70000, 44.80000 (WGS84)</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="alt-amsl" data-kind="altitude">
+<dt class="text-muted-foreground">Altitude</dt>
+<dd class="m-0 font-medium break-words">552 m AMSL</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="alt-source" data-kind="text">
+<dt class="text-muted-foreground">Altitude source</dt>
+<dd class="m-0 font-medium break-words">geodetic: satellite fix through the geoid</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="alt-wgs84" data-kind="altitude">
+<dt class="text-muted-foreground">Altitude above the ellipsoid</dt>
+<dd class="m-0 font-medium break-words">571 m above the WGS84 ellipsoid</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="height" data-kind="altitude">
+<dt class="text-muted-foreground">Height</dt>
+<dd class="m-0 font-medium break-words">42 m above take-off</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-13" data-section="id-13">
+<h4 id="id-13" class="m-0 mb-1 text-xs font-semibold uppercase">Motion</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="speed" data-kind="text">
+<dt class="text-muted-foreground">Ground speed</dt>
+<dd class="m-0 font-medium break-words">8.4 m/s</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="track" data-kind="text">
+<dt class="text-muted-foreground">Course over ground (degrees true)</dt>
+<dd class="m-0 font-medium break-words">090°</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="vspeed" data-kind="text">
+<dt class="text-muted-foreground">Vertical speed (positive up)</dt>
+<dd class="m-0 font-medium break-words">1.5 m/s</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="operational-status" data-kind="text">
+<dt class="text-muted-foreground">Operational status</dt>
+<dd class="m-0 font-medium break-words">Airborne</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="emergency" data-kind="text">
+<dt class="text-muted-foreground">Emergency</dt>
+<dd class="m-0 font-medium break-words">
+<span data-emergency="false">none reported</span>
+</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-14" data-section="id-14">
+<h4 id="id-14" class="m-0 mb-1 text-xs font-semibold uppercase">Source and trust</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="trust" data-kind="text">
+<dt class="text-muted-foreground">Trust class</dt>
+<dd class="m-0 font-medium break-words">Authenticated<span class="block font-normal" data-part="trust-meaning">Sent over the operator's own authenticated session for this aircraft.</span>
+</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="source" data-kind="text">
+<dt class="text-muted-foreground">Source</dt>
+<dd class="m-0 font-medium break-words">operator_ws</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="instance" data-kind="text">
+<dt class="text-muted-foreground">Instance</dt>
+<dd class="m-0 font-medium break-words">TEST-CLIENT-1</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="flight" data-kind="text">
+<dt class="text-muted-foreground">Flight</dt>
+<dd class="m-0 font-medium break-words">TEST-FLT-0101</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="intent" data-kind="text">
+<dt class="text-muted-foreground">Intent</dt>
+<dd class="m-0 font-medium break-words">TEST-INT-0001</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-15" data-section="id-15">
+<h4 id="id-15" class="m-0 mb-1 text-xs font-semibold uppercase">Times and age</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="ts" data-kind="time">
+<dt class="text-muted-foreground">Source time (the source's clock)</dt>
+<dd class="m-0 font-medium break-words">2026-01-01 11:59:57 UTC</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="rx-ts" data-kind="time">
+<dt class="text-muted-foreground">Received (this system's clock)</dt>
+<dd class="m-0 font-medium break-words">2026-01-01 11:59:58 UTC</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="captured-at" data-kind="time">
+<dt class="text-muted-foreground">Captured (this system's clock)</dt>
+<dd class="m-0 font-medium break-words">2026-01-01 11:59:57 UTC</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="time-source" data-kind="text">
+<dt class="text-muted-foreground">Capture time placed by</dt>
+<dd class="m-0 font-medium break-words">the source's clock</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="age-received" data-kind="text">
+<dt class="text-muted-foreground">Age since received</dt>
+<dd class="m-0 font-medium break-words">
+<span data-age="live">2 s · Live</span>
+</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="age-captured" data-kind="text">
+<dt class="text-muted-foreground">Age since captured</dt>
+<dd class="m-0 font-medium break-words">—</dd>
+</div>
+</dl>
+</section>
+</article>
+</div>
+<div data-case="no_serial">
+<article class="us-track-detail grid gap-2 text-xs" data-detail="uas" data-trust="authenticated" aria-labelledby="id-16">
+<h3 id="id-16" class="m-0 text-sm font-semibold">Unmanned aircraft TEST-TRK-0903</h3>
+<section aria-labelledby="id-17" data-section="id-17">
+<h4 id="id-17" class="m-0 mb-1 text-xs font-semibold uppercase">Identification</h4>
+<p class="m-0 text-xs font-semibold" data-part="basis-caveat">Serial and operator as broadcast and unverified.</p>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="ident-status" data-kind="text">
+<dt class="text-muted-foreground">Status</dt>
+<dd class="m-0 font-medium break-words">
+<span data-ident="unidentified">unidentified</span>
+<span class="block font-normal" data-part="status-hint">No usable serial number: nobody can say what aircraft this is.</span>
+</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="ident-reason" data-kind="text">
+<dt class="text-muted-foreground">Reason</dt>
+<dd class="m-0 font-medium break-words">No serial was given.</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="ident-basis" data-kind="text">
+<dt class="text-muted-foreground">Basis</dt>
+<dd class="m-0 font-medium break-words">as broadcast and unverified</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="serial" data-kind="text">
+<dt class="text-muted-foreground">Serial number</dt>
+<dd class="m-0 font-medium break-words">—</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="registration" data-kind="text">
+<dt class="text-muted-foreground">Operator registration (public part)</dt>
+<dd class="m-0 font-medium break-words">—</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-18" data-section="id-18">
+<h4 id="id-18" class="m-0 mb-1 text-xs font-semibold uppercase">Position and altitude</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="position" data-kind="text">
+<dt class="text-muted-foreground">Position</dt>
+<dd class="m-0 font-medium break-words">41.70000, 44.80000 (WGS84)</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="alt-amsl" data-kind="altitude">
+<dt class="text-muted-foreground">Altitude</dt>
+<dd class="m-0 font-medium break-words">552 m AMSL</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="alt-source" data-kind="text">
+<dt class="text-muted-foreground">Altitude source</dt>
+<dd class="m-0 font-medium break-words">geodetic: satellite fix through the geoid</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="alt-wgs84" data-kind="altitude">
+<dt class="text-muted-foreground">Altitude above the ellipsoid</dt>
+<dd class="m-0 font-medium break-words">571 m above the WGS84 ellipsoid</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="height" data-kind="altitude">
+<dt class="text-muted-foreground">Height</dt>
+<dd class="m-0 font-medium break-words">42 m above take-off</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-19" data-section="id-19">
+<h4 id="id-19" class="m-0 mb-1 text-xs font-semibold uppercase">Motion</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="speed" data-kind="text">
+<dt class="text-muted-foreground">Ground speed</dt>
+<dd class="m-0 font-medium break-words">8.4 m/s</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="track" data-kind="text">
+<dt class="text-muted-foreground">Course over ground (degrees true)</dt>
+<dd class="m-0 font-medium break-words">090°</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="vspeed" data-kind="text">
+<dt class="text-muted-foreground">Vertical speed (positive up)</dt>
+<dd class="m-0 font-medium break-words">1.5 m/s</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="operational-status" data-kind="text">
+<dt class="text-muted-foreground">Operational status</dt>
+<dd class="m-0 font-medium break-words">Airborne</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="emergency" data-kind="text">
+<dt class="text-muted-foreground">Emergency</dt>
+<dd class="m-0 font-medium break-words">
+<span data-emergency="false">none reported</span>
+</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-20" data-section="id-20">
+<h4 id="id-20" class="m-0 mb-1 text-xs font-semibold uppercase">Source and trust</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="trust" data-kind="text">
+<dt class="text-muted-foreground">Trust class</dt>
+<dd class="m-0 font-medium break-words">Authenticated<span class="block font-normal" data-part="trust-meaning">Sent over the operator's own authenticated session for this aircraft.</span>
+</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="source" data-kind="text">
+<dt class="text-muted-foreground">Source</dt>
+<dd class="m-0 font-medium break-words">operator_ws</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="instance" data-kind="text">
+<dt class="text-muted-foreground">Instance</dt>
+<dd class="m-0 font-medium break-words">TEST-CLIENT-1</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="flight" data-kind="text">
+<dt class="text-muted-foreground">Flight</dt>
+<dd class="m-0 font-medium break-words">TEST-FLT-0101</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="intent" data-kind="text">
+<dt class="text-muted-foreground">Intent</dt>
+<dd class="m-0 font-medium break-words">TEST-INT-0001</dd>
+</div>
+</dl>
+</section>
+<section aria-labelledby="id-21" data-section="id-21">
+<h4 id="id-21" class="m-0 mb-1 text-xs font-semibold uppercase">Times and age</h4>
+<dl class="m-0 grid gap-0.5">
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="ts" data-kind="time">
+<dt class="text-muted-foreground">Source time (the source's clock)</dt>
+<dd class="m-0 font-medium break-words">2026-01-01 11:59:57 UTC</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="rx-ts" data-kind="time">
+<dt class="text-muted-foreground">Received (this system's clock)</dt>
+<dd class="m-0 font-medium break-words">2026-01-01 11:59:58 UTC</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="captured-at" data-kind="time">
+<dt class="text-muted-foreground">Captured (this system's clock)</dt>
+<dd class="m-0 font-medium break-words">2026-01-01 11:59:57 UTC</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="time-source" data-kind="text">
+<dt class="text-muted-foreground">Capture time placed by</dt>
+<dd class="m-0 font-medium break-words">the source's clock</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="age-received" data-kind="text">
+<dt class="text-muted-foreground">Age since received</dt>
+<dd class="m-0 font-medium break-words">
+<span data-age="live">2 s · Live</span>
+</dd>
+</div>
+<div class="grid grid-cols-[minmax(7rem,40%)_1fr] gap-2" data-field="age-captured" data-kind="text">
+<dt class="text-muted-foreground">Age since captured</dt>
+<dd class="m-0 font-medium break-words">—</dd>
+</div>
+</dl>
+</section>
+</article>
+</div>
+</div>
+</div>

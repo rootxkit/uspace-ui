@@ -130,6 +130,56 @@ export function pictureRows(): PictureRow[] {
   ];
 }
 
+/**
+ * Rows whose identification was not judged (04 §3.2, G-13), one per
+ * reason, and a judged unidentified one beside them (the presence twin).
+ */
+export function pendingRows(): PictureRow[] {
+  const at = PICTURE_NOW_MS - 1000;
+  return [
+    {
+      id: "d1",
+      severity: null,
+      trust: "provider",
+      identification: ident({
+        basis: "provider",
+        status: "unidentified",
+        reason: "details_unavailable",
+        serial: null,
+        operatorReg: null,
+      }),
+      receivedAtMs: at,
+      kind: null,
+    },
+    {
+      id: "r1",
+      severity: null,
+      trust: "broadcast",
+      identification: ident({
+        basis: "as_broadcast",
+        status: "unknown_operator",
+        reason: "registry_unavailable",
+      }),
+      receivedAtMs: at,
+      kind: null,
+    },
+    {
+      id: "u1",
+      severity: null,
+      trust: "broadcast",
+      identification: ident({
+        basis: "as_broadcast",
+        status: "unidentified",
+        reason: "no_serial",
+        serial: null,
+        operatorReg: null,
+      }),
+      receivedAtMs: at,
+      kind: null,
+    },
+  ];
+}
+
 /** What a refused list read returns (RFC 9457, M28). */
 export const REFUSED: Problem = {
   type: "https://schemas.uspace.ge/problems/cis_stale",

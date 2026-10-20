@@ -2174,6 +2174,12 @@ const IDENT_BASIS_KEYS: Readonly<Record<IdentBasis, Key>>;
 // @beta
 const IDENT_ORDER: readonly IdentKey[];
 
+// @beta
+const IDENT_PENDING_KEYS: Readonly<Record<UnjudgedReason, Readonly<{
+    hint: Key;
+    short: Key;
+}>>>;
+
 // @public
 const IDENT_REASON_KEYS: Readonly<Record<IdentReason, Key>>;
 
@@ -2237,7 +2243,13 @@ interface IdentificationLegendProps {
 }
 
 // @public
-type IdentKey = IdentStatus | "none";
+type IdentKey = IdentStatus | "none" | "pending";
+
+// @beta
+function identKeyNeedsAttention(k: IdentKey): boolean;
+
+// @beta
+function identKeyToken(k: IdentKey): string;
 
 // @beta
 function identMark(s: IdentKey): string;
@@ -2457,6 +2469,9 @@ const isIdentReason: (x: unknown) => x is "matched" | "session_binding" | "uas_s
 
 // @public (undocumented)
 const isIdentStatus: (x: unknown) => x is "registered" | "suspended" | "unknown_operator" | "unidentified";
+
+// @public
+function isJudged(ident: Identification | null): boolean;
 
 // @beta
 function isKnownKind(kind: string): kind is AlertView["kind"];
@@ -4713,17 +4728,23 @@ declare namespace symbology {
         MannedTrack,
         IDENT_BASIS_KEYS,
         IDENT_ORDER,
+        IDENT_PENDING_KEYS,
         IDENT_REASON_KEYS,
         IDENT_STATUS_HINT_KEYS,
         IDENT_STATUS_KEYS,
         identDrawn,
         identHintKey,
+        identKeyNeedsAttention,
+        identKeyToken,
         identMark,
         identOrder,
         identToken,
+        isJudged,
         needsAttention,
+        unjudgedReason,
         IdentHint,
         IdentKey,
+        UnjudgedReason,
         RESTRICTION_LINE_KEYS,
         RESTRICTION_STATE_KEYS,
         restrictionLine,
@@ -5094,6 +5115,7 @@ interface Tokens {
     // (undocumented)
     ident: Readonly<Record<IdentStatus, string>>;
     identNone: string;
+    identPending: string;
     // (undocumented)
     severity: Readonly<Record<Severity, string>>;
     // (undocumented)
@@ -5642,6 +5664,12 @@ const UNIT_KEYS: Readonly<{
 }>;
 
 // @beta
+type UnjudgedReason = "details_unavailable" | "registry_unavailable";
+
+// @beta
+function unjudgedReason(r: IdentReason): UnjudgedReason | null;
+
+// @beta
 const UNRESOLVED_COLOUR = "#808080";
 
 // @public
@@ -6030,15 +6058,15 @@ interface ZoneView {
 
 // Warnings were encountered during analysis:
 //
-// src/table/columns.tsx:630:21 - (ae-forgotten-export) The symbol "num" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:630:21 - (ae-forgotten-export) The symbol "utc" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:630:21 - (ae-forgotten-export) The symbol "age" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:630:21 - (ae-forgotten-export) The symbol "severity" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:630:21 - (ae-forgotten-export) The symbol "trust" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:630:21 - (ae-forgotten-export) The symbol "ident" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:630:21 - (ae-forgotten-export) The symbol "enumColumn" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:630:21 - (ae-forgotten-export) The symbol "text" needs to be exported by the entry point entry.d.ts
-// src/table/columns.tsx:630:21 - (ae-forgotten-export) The symbol "select" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:639:21 - (ae-forgotten-export) The symbol "num" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:639:21 - (ae-forgotten-export) The symbol "utc" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:639:21 - (ae-forgotten-export) The symbol "age" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:639:21 - (ae-forgotten-export) The symbol "severity" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:639:21 - (ae-forgotten-export) The symbol "trust" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:639:21 - (ae-forgotten-export) The symbol "ident" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:639:21 - (ae-forgotten-export) The symbol "enumColumn" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:639:21 - (ae-forgotten-export) The symbol "text" needs to be exported by the entry point entry.d.ts
+// src/table/columns.tsx:639:21 - (ae-forgotten-export) The symbol "select" needs to be exported by the entry point entry.d.ts
 
 // (No @packageDocumentation comment for this package)
 

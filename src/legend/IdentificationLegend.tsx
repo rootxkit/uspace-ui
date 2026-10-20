@@ -1,7 +1,8 @@
 "use client";
 // IdentificationLegend (docs/PLAN.md §3.10, WP-7; spec 04 §3.2): the four
-// identification statuses and "no identification", in `identOrder()`
-// (expected first, then those needing attention, G-03), each with the
+// identification statuses, "pending" (not judged, G-13) and "no
+// identification", in `identOrder()` (expected first, then those needing
+// attention, G-03), each with the
 // colour and the mark the map draws, its name, what it means and an
 // optional count; then the broadcast and provider caveats (R-05, PLAN
 // §14 Q18) and the mismatch note (G-02). The statuses are the server's;
@@ -10,10 +11,10 @@ import { useT } from "../i18n/I18nProvider.js";
 import {
   IDENT_STATUS_HINT_KEYS,
   IDENT_STATUS_KEYS,
+  identKeyNeedsAttention,
+  identKeyToken,
   identMark,
   identOrder,
-  identToken,
-  needsAttention,
   type IdentKey,
 } from "../symbology/ident.js";
 import { LegendCount, LegendNote, LegendSection } from "./LegendSection.js";
@@ -38,13 +39,13 @@ export function IdentSwatch(props: { status: IdentKey }) {
         width={SWATCH_PX}
         height={SWATCH_PX}
         viewBox="0 0 18 18"
-        data-token={identToken(status === "none" ? null : status)}
+        data-token={identKeyToken(status)}
       >
         <circle
           cx="9"
           cy="9"
           r="7"
-          fill={`var(${identToken(status === "none" ? null : status)})`}
+          fill={`var(${identKeyToken(status)})`}
           stroke="var(--us-surface)"
           strokeWidth="1"
         />
@@ -59,8 +60,8 @@ export function IdentSwatch(props: { status: IdentKey }) {
 /** @public */
 export interface IdentificationLegendProps {
   /**
-   * Tracks per status (`none`: no identification block), as the app
-   * counted what it shows. When given, a status absent from it shows a
+   * Tracks per `identDrawn` key (`none`: no identification block), as
+   * the app counted what it shows. When given, a status absent from it shows a
    * dash (not provided), never a zero.
    */
   counts?: Partial<Record<IdentKey, number>>;
@@ -86,11 +87,7 @@ export function IdentificationLegend(props: IdentificationLegendProps) {
             <li
               key={status}
               data-ident={status}
-              data-attention={
-                needsAttention(status === "none" ? null : status)
-                  ? "true"
-                  : "false"
-              }
+              data-attention={identKeyNeedsAttention(status) ? "true" : "false"}
               className="flex items-start gap-2"
             >
               <IdentSwatch status={status} />

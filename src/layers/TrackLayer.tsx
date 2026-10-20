@@ -21,7 +21,11 @@ import { mapFontstack } from "../fonts/faces.js";
 import { createTranslator } from "../i18n/translate.js";
 import { useMapContext } from "../map/context.js";
 import type { TrackView } from "../model/index.js";
-import { IDENT_ORDER, identToken, type IdentKey } from "../symbology/ident.js";
+import {
+  IDENT_ORDER,
+  identKeyToken,
+  type IdentKey,
+} from "../symbology/ident.js";
 import {
   TRACK_COLOUR_TOKENS,
   TRACK_ICON_IDS,
@@ -78,7 +82,7 @@ export function trackLayerIds(id: string): TrackLayerIds {
 export function resolveTrackColours(map: MapLibreMap): TrackColours {
   const ident = {} as Record<IdentKey, string>;
   for (const s of IDENT_ORDER) {
-    ident[s] = resolveColour(map, identToken(s === "none" ? null : s));
+    ident[s] = resolveColour(map, identKeyToken(s));
   }
   return {
     ident,

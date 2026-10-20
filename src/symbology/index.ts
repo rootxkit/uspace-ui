@@ -45,17 +45,23 @@ export {
 export {
   IDENT_BASIS_KEYS,
   IDENT_ORDER,
+  IDENT_PENDING_KEYS,
   IDENT_REASON_KEYS,
   IDENT_STATUS_HINT_KEYS,
   IDENT_STATUS_KEYS,
   identDrawn,
   identHintKey,
+  identKeyNeedsAttention,
+  identKeyToken,
   identMark,
   identOrder,
   identToken,
+  isJudged,
   needsAttention,
+  unjudgedReason,
   type IdentHint,
   type IdentKey,
+  type UnjudgedReason,
 } from "./ident.js";
 export {
   RESTRICTION_LINE_KEYS,

@@ -23,6 +23,7 @@ import {
 import { AGE_BUCKET_KEYS } from "../symbology/age.js";
 import {
   IDENT_BASIS_KEYS,
+  IDENT_PENDING_KEYS,
   IDENT_REASON_KEYS,
   IDENT_STATUS_HINT_KEYS,
   IDENT_STATUS_KEYS,
@@ -162,6 +163,10 @@ const DYNAMIC_KEYS: Readonly<Record<string, readonly string[]>> = {
   ),
   "src/symbology/ident.ts IDENT_REASON_KEYS": Object.values(IDENT_REASON_KEYS),
   "src/symbology/ident.ts IDENT_BASIS_KEYS": Object.values(IDENT_BASIS_KEYS),
+  // identHintKey and trackLabel for a block that was not judged
+  "src/symbology/ident.ts IDENT_PENDING_KEYS": Object.values(
+    IDENT_PENDING_KEYS,
+  ).flatMap((k) => [k.hint, k.short]),
   "src/symbology/ident.ts identHintKey caveats": [
     "ident.registered_as_broadcast",
     "ident.caveat.as_broadcast",
