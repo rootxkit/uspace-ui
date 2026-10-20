@@ -7,6 +7,96 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
+## 1.3.0
+
+A minor on 1.2.0: an identification that was not judged is drawn as
+pending (spec 04 §3.2 and its errata of 2026-10-20, uspace-lab#37;
+LESSONS G-13; uspace-core v1.8.0 `IdentReason.Judged()`). Prepared on
+`main`, not tagged: the owner tags `v1.3.0` (docs/RELEASING.md). Pin it
+exactly:
+
+```jsonc
+"@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.3.0/rootxkit-uspace-ui-1.3.0.tgz"
+```
+
+### Changed (legend-change)
+
+- `symbology`: `identDrawn` draws a block whose reason is
+  `details_unavailable` or `registry_unavailable` as `pending`, whatever
+  status it carries (spec 04 §3.2: "not judged ... shown as pending with
+  the missing input named"; LESSONS G-13). Until 1.2.0 such a track had
+  the unidentified colour and the "×" mark, was flagged as needing
+  attention in `IdentificationLegend` and read "nobody can say what
+  aircraft this is". Judged `unidentified` (`no_serial`,
+  `serial_unknown`, ...) keeps exactly that treatment.
+- `symbology`: `identHintKey` gives a block that was not judged the
+  pending hint naming its input ("the provider's details have not been
+  fetched", "the registry could not be reached") instead of the
+  status's, and never "registered, as broadcast and unverified" (R-05)
+  on one; the reason, basis caveat and mismatch lines are unchanged.
+- `legend`: `IdentificationLegend` has a `pending` row between
+  `unidentified` and `none` (`identOrder()`), with its colour, mark,
+  hint and count, `data-attention="false"`.
+- `layers`: a pending track keeps its symbol (never hidden, CLAUDE.md
+  rule 6); its label shows the registration or serial it carries, if
+  any, and "pending: details not yet fetched" or "pending: registry
+  unreachable", never "unidentified".
+- `table`: the `ident()` column shows a dashed `pending` badge naming
+  the input.
+
+### Added
+
+- `symbology`: `isJudged(identification)` (`@public`), the kit's mirror
+  of core's `(*Identification).Judged()`, and the one place the
+  decision is made: `unjudgedReason(reason)`, `identKeyToken(key)`,
+  `identKeyNeedsAttention(key)`,
+  `IDENT_PENDING_KEYS` and `UnjudgedReason` (`@beta`) read it.
+  `IdentKey` gains `"pending"`.
+- `theme`: `tokens.identPending` and `--us-ident-pending`, a muted slate
+  (`#505888` light, `#98b0e0` dark), at least 3:1 on both surfaces and
+  apart from every identification colour by CIEDE2000 12 or more in
+  normal vision, deuteranopia and protanopia (`src/theme/tokens.test.ts`);
+  `--color-ident-pending` for Tailwind. The mark "…" (U+2026) carries the
+  state without colour.
+- `i18n`: `ident.status.pending`, `ident.hint.pending`,
+  `ident.hint.pending.details_unavailable`,
+  `ident.hint.pending.registry_unavailable`,
+  `ident.pending.details_unavailable` and
+  `ident.pending.registry_unavailable`, in `en` and `ka`.
+
+### What a consumer on 1.2.x does
+
+Replace the asset URL and commit the lockfile. `TrackLayer`,
+`IdentificationLegend`, `TrackDetail` and `DataTable`'s `ident()` column
+change with no edit. `IdentKey` gains `"pending"`: a
+`Record<IdentKey, ...>` of your own needs the key, a `switch` over it the
+case, and counts built from `identDrawn` gain a `pending` row, which is
+not an attention status. A local rule that singled out
+`details_unavailable` can be replaced by `isJudged`; note that it must
+cover `registry_unavailable` too.
+
+### The semver gate
+
+One `@public` line of `docs/api/uspace-ui.api.md` changes, `IdentKey`
+gaining `"pending"`, which rule 1 reads as additive; every other line is
+added. No `--us-ident-*` value is removed or changed (one is added) and
+no `*Token` line changes (`identKeyToken` is new), so rule 2 does not
+fire; the PR still carries `legend-change` because `identDrawn` maps
+two reasons to a new symbol (PLAN §12). Not a major: no existing colour,
+shape or mark changes what it means. `unidentified` keeps the meaning
+spec 04 §3.2 gives it, a judged block with no usable serial; the two
+reasons had been drawn against the spec. The golden snapshots
+`track-legends.*` and `palettes.*` change for the new row and colour,
+and `ident-pending.*` is new.
+
+### Entry points that ship
+
+`model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api` (with the
+`uspace-ui-gen-api` bin), `auth/server`, `auth/client`, `symbology`,
+`layers`, `legend`, `live`, `status`, `alerts`, `table`, `form`,
+`eslint`, `test`, and `styles/tokens.css`, `styles/map.css`,
+`fonts/fonts.css` with the woff2 files, as in 1.2.0.
+
 ## 1.2.0
 
 A minor on 1.1.2: the identification reason `details_unavailable`, from
