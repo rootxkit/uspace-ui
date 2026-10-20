@@ -13,6 +13,7 @@ import {
   classifyReport,
   diffLines,
   evaluate,
+  isWidenedByStrings,
   legendFunctionRanges,
   symbologyChanges,
   tokenChanges,
@@ -268,6 +269,173 @@ describe("rule 1: the API report", () => {
     expect(
       breakingHeading("0.1.0", "## 0.1.0\n", "## 0.1.0\n").found,
     ).toBeNull();
+  });
+});
+
+// PLAN §12: a new enumeration value is additive within a major.
+// api-extractor writes a const tuple and a type predicate on one line, so
+// the value changes that line; the gate reads it as additive only when
+// the line gains string members and nothing else.
+const ENUM_REPORT = `## API Report File for "@rootxkit/uspace-ui"
+
+\`\`\`ts
+
+// @public (undocumented)
+const IDENT_REASONS: readonly ["matched", "no_serial", "registry_unavailable"];
+
+// @public (undocumented)
+const isIdentReason: (x: unknown) => x is "matched" | "no_serial" | "registry_unavailable";
+
+\`\`\`
+`;
+
+const TUPLE =
+  'const IDENT_REASONS: readonly ["matched", "no_serial", "registry_unavailable"];';
+const PREDICATE =
+  'const isIdentReason: (x: unknown) => x is "matched" | "no_serial" | "registry_unavailable";';
+const TUPLE_GAINS = [
+  '"registry_unavailable"];',
+  '"registry_unavailable", "details_unavailable"];',
+] as const;
+const PREDICATE_GAINS = [
+  '| "registry_unavailable";',
+  '| "registry_unavailable" | "details_unavailable";',
+] as const;
+
+function enumInput(headReport: string): GateInput {
+  return {
+    baseVersion: "1.1.2",
+    base: { report: ENUM_REPORT, tokens: TOKENS_CSS, changelog: CHANGELOG },
+    head: { report: headReport, tokens: TOKENS_CSS, changelog: CHANGELOG },
+    symbology: [],
+    labels: [],
+  };
+}
+
+describe("rule 1: a tuple or union that only gains string members", () => {
+  it("IDENT_REASONS gaining a value is additive: not fired, and said so", () => {
+    const head = ENUM_REPORT.replace(...TUPLE_GAINS);
+    const c = apiReportChanges(ENUM_REPORT, head);
+    expect(c.breaking).toEqual([]);
+    expect(c.widened.map((e) => e.name)).toEqual(["IDENT_REASONS"]);
+    const r = evaluate(enumInput(head));
+    expect(r.ok).toBe(true);
+    expect(r.report[0]).toMatch(
+      /^rule 1 .*not fired.*1 @public line\(s\) only gained string members of a tuple or union, additive: IDENT_REASONS/,
+    );
+  });
+
+  it("the isIdentReason type gaining a value is additive", () => {
+    const head = ENUM_REPORT.replace(...PREDICATE_GAINS);
+    const c = apiReportChanges(ENUM_REPORT, head);
+    expect(c.breaking).toEqual([]);
+    expect(c.widened.map((e) => e.name)).toEqual(["isIdentReason"]);
+    expect(evaluate(enumInput(head)).ok).toBe(true);
+  });
+
+  it("both at once, as a new enumeration value changes them", () => {
+    const head = ENUM_REPORT.replace(...TUPLE_GAINS).replace(
+      ...PREDICATE_GAINS,
+    );
+    const c = apiReportChanges(ENUM_REPORT, head);
+    expect(c.breaking).toEqual([]);
+    expect(c.widened.map((e) => e.name)).toEqual([
+      "IDENT_REASONS",
+      "isIdentReason",
+    ]);
+  });
+
+  it.each([
+    [
+      "a member removed from the tuple",
+      TUPLE,
+      'const IDENT_REASONS: readonly ["matched", "registry_unavailable"];',
+    ],
+    [
+      "a member removed from the union",
+      PREDICATE,
+      'const isIdentReason: (x: unknown) => x is "matched" | "registry_unavailable";',
+    ],
+    [
+      "members reordered",
+      TUPLE,
+      'const IDENT_REASONS: readonly ["no_serial", "matched", "registry_unavailable"];',
+    ],
+    [
+      "members reordered while one is gained",
+      PREDICATE,
+      'const isIdentReason: (x: unknown) => x is "no_serial" | "matched" | "registry_unavailable" | "details_unavailable";',
+    ],
+    [
+      "a member renamed",
+      TUPLE,
+      'const IDENT_REASONS: readonly ["matched", "no_serial", "registry_down"];',
+    ],
+    [
+      "the line otherwise edited while a member is gained",
+      TUPLE,
+      'const IDENT_REASONS: ["matched", "no_serial", "registry_unavailable", "details_unavailable"];',
+    ],
+    [
+      "the predicate's parameter changed while a member is gained",
+      PREDICATE,
+      'const isIdentReason: (x: string) => x is "matched" | "no_serial" | "registry_unavailable" | "details_unavailable";',
+    ],
+    [
+      "a non-string member gained",
+      PREDICATE,
+      'const isIdentReason: (x: unknown) => x is "matched" | "no_serial" | "registry_unavailable" | null;',
+    ],
+    [
+      "a string and a non-string member gained",
+      TUPLE,
+      'const IDENT_REASONS: readonly ["matched", "no_serial", "registry_unavailable", "details_unavailable", 0];',
+    ],
+  ])("still breaking: %s", (_why, from, to) => {
+    const head = ENUM_REPORT.replace(from, to);
+    expect(head).not.toBe(ENUM_REPORT);
+    const c = apiReportChanges(ENUM_REPORT, head);
+    expect(c.widened).toEqual([]);
+    expect(c.breaking.length).toBe(1);
+    const r = evaluate(enumInput(head));
+    expect(r.ok).toBe(false);
+    expect(r.report[0]).toMatch(/^rule 1 .*FIRED: 1 @public line/);
+    expect(r.report.join("\n")).toMatch(/the label "breaking": MISSING/);
+  });
+
+  it("a member gained on one line does not excuse a removal on another", () => {
+    const head = ENUM_REPORT.replace(
+      TUPLE,
+      TUPLE.replace('"no_serial", ', ""),
+    ).replace(...PREDICATE_GAINS);
+    const c = apiReportChanges(ENUM_REPORT, head);
+    expect(c.breaking.map((e) => e.name)).toEqual(["IDENT_REASONS"]);
+    expect(c.widened.map((e) => e.name)).toEqual(["isIdentReason"]);
+    expect(evaluate(enumInput(head)).ok).toBe(false);
+  });
+
+  it("a declaration demoted to @beta while it gains a member stays breaking", () => {
+    const head = ENUM_REPORT.replace(
+      "// @public (undocumented)\nconst IDENT_REASONS",
+      "// @beta (undocumented)\nconst IDENT_REASONS",
+    ).replace(...TUPLE_GAINS);
+    const c = apiReportChanges(ENUM_REPORT, head);
+    expect(c.widened).toEqual([]);
+    expect(c.breaking.map((e) => e.name)).toContain("IDENT_REASONS");
+  });
+
+  it("isWidenedByStrings: gained string members only, the old ones in order", () => {
+    const base = 'x is "a" | "b";';
+    expect(isWidenedByStrings(base, 'x is "a" | "b" | "c";')).toBe(true);
+    expect(isWidenedByStrings(base, 'x is "c" | "a" | "b";')).toBe(true);
+    expect(isWidenedByStrings(base, 'x is "a" | "c" | "b";')).toBe(true);
+    expect(isWidenedByStrings(base, base)).toBe(false);
+    expect(isWidenedByStrings(base, 'x is "b" | "a" | "c";')).toBe(false);
+    expect(isWidenedByStrings(base, 'x is "a" | "c";')).toBe(false);
+    expect(isWidenedByStrings(base, 'x is "a" | "b" | number;')).toBe(false);
+    expect(isWidenedByStrings(base, 'y is "a" | "b" | "c";')).toBe(false);
+    // A literal glued on without a separator is not a member.
+    expect(isWidenedByStrings(base, 'x is "a" | "b""c";')).toBe(false);
   });
 });
 

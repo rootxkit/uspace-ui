@@ -170,6 +170,11 @@ required check on `main`.
    label `breaking` and a version heading the base did not have: the
    next major from `1.0.0` (`## 2.0.0`), the next minor before it. A
    public declaration demoted to `@beta` is a change of its public line.
+   A line that only gains string-literal members of a tuple or a union
+   (a new enumeration value: every old member still there, in order,
+   nothing else on the line changed) is additive, as PLAN §12 says; a
+   removed, reordered or renamed member, a gained member that is not a
+   string, or any other edit of the line is still a change.
 2. **Legend.** A removed or changed `--us-severity-*`, `--us-trust-*`,
    `--us-ident-*`, `--us-zone-*` or `--us-age-*` value in
    `styles/tokens.css`, or a removed or changed code line inside a

@@ -992,8 +992,10 @@ D10).
 - The semver gate (WP-14): `api-extractor` writes
   `docs/api/uspace-ui.api.md`; a PR whose diff removes or changes a line
   there (as opposed to adding one) must add a new major heading to
-  `CHANGELOG.md` and carry the label `breaking`; a diff under
-  `styles/tokens.css` that changes a semantic colour, or under
+  `CHANGELOG.md` and carry the label `breaking`, except a line that only
+  gains string-literal members of a tuple or a union (a new enumeration
+  value, which api-extractor writes on the declaration's one line); a
+  diff under `styles/tokens.css` that changes a semantic colour, or under
   `src/symbology/` that changes a `*Token`/`*Shape` mapping, needs the
   label `legend-change` and a CHANGELOG line naming the lesson or spec
   row behind it.
