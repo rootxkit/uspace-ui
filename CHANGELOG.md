@@ -27,7 +27,7 @@ exactly:
 - Size (PLAN §8, gzip level 9, budgets unchanged):
   `map`+`layers`+`symbology`+`legend` 61383 to 44806 of 61440 bytes,
   `table` 17866 to 13219 of 40960, `form` 20185 to 14308 of 30720. The
-  tarball goes from 610035 to 547922 bytes.
+  tarball is about 62 kB smaller (the pack job prints its exact size).
 
 No `@public` line of `docs/api/uspace-ui.api.md` changes; no legend
 value changes.
