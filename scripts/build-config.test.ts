@@ -33,7 +33,11 @@ afterEach(() => {
   rmSync(tmp, { recursive: true, force: true });
 });
 
-/** Emits src/answer.ts under `config`'s options into tmp/dist. */
+/**
+ * Emits src/answer.ts under `config`'s options into tmp/dist. The program
+ * loads the default lib files, which is slow on a loaded runner; hence the
+ * timeouts below, as in release-tags.test.ts.
+ */
 function emit(config: string): void {
   const path = join(repo, config);
   const read = ts.readConfigFile(path, ts.sys.readFile);
@@ -56,7 +60,7 @@ describe("build configs", () => {
     expect(readFileSync(out("answer.d.ts"), "utf8")).toContain(DOC);
     expect(existsSync(out("answer.d.ts.map"))).toBe(true);
     expect(existsSync(out("answer.js"))).toBe(false);
-  });
+  }, 60_000);
 
   it("tsconfig.build.js.json emits JavaScript without comments and no declarations", () => {
     emit("tsconfig.build.js.json");
@@ -67,7 +71,7 @@ describe("build configs", () => {
     expect(js).toContain("//# sourceMappingURL=answer.js.map");
     expect(existsSync(out("answer.js.map"))).toBe(true);
     expect(existsSync(out("answer.d.ts"))).toBe(false);
-  });
+  }, 60_000);
 
   it("pnpm build runs both, declarations first", () => {
     const pkg = JSON.parse(
