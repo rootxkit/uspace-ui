@@ -20,6 +20,8 @@ kit's view models in an adapter it owns.
 
 ## Status
 
+`1.3.0` is a minor on `1.2.0` (an identification that was not judged,
+`details_unavailable` or `registry_unavailable`, is drawn as pending).
 `1.2.0` is a minor on `1.1.2` (the identification reason
 `details_unavailable` of uspace-core v1.8.0, shown as pending).
 `1.1.2` is a patch on `1.1.1` (native selects and pickers follow the
@@ -71,7 +73,7 @@ path for later. Depend on the asset URL of one release, exactly:
 ```jsonc
 // web/package.json
 "dependencies": {
-  "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.2.0/rootxkit-uspace-ui-1.2.0.tgz",
+  "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.3.0/rootxkit-uspace-ui-1.3.0.tgz",
   "maplibre-gl": "5.x"
 }
 ```
@@ -86,7 +88,7 @@ depend on a `github:` spec or a branch. From `0.1.0` the tarball carries
 a signed build provenance attestation; check it with `gh attestation
 verify` before pinning (`docs/RELEASING.md`).
 
-## Consuming (`1.2.0`)
+## Consuming (`1.3.0`)
 
 ```css
 /* web/app/globals.css */

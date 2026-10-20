@@ -16,7 +16,9 @@ import {
 import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { en } from "../i18n/en.js";
 import { I18nProvider } from "../i18n/I18nProvider.js";
+import { ka } from "../i18n/ka.js";
 import type { Lang } from "../i18n/lang.js";
 import { axeCheck } from "../test/axe.js";
 import { UNIT_KEYS, columnsFor, type TableColumn } from "./columns.js";
@@ -28,6 +30,7 @@ import {
   PICTURE_NOW_MS,
   REFUSED,
   REG_STATUSES,
+  pendingRows,
   pictureRows,
   registrationRows,
   type PictureRow,
@@ -730,6 +733,51 @@ describe("column helpers in cells", () => {
     expect(cell?.firstElementChild?.textContent).toBe("unknown operator");
     expect(tr?.textContent).toMatch(/as broadcast and unverified/);
   });
+
+  it.each(["en", "ka"] as const)(
+    "shows a block that was not judged as pending, naming its input, beside a judged unidentified one (%s)",
+    (lang) => {
+      const { container } = wrap(
+        <DataTable<PictureRow>
+          caption="Alerts"
+          columns={[p.ident()]}
+          rows={pendingRows()}
+          getRowId={(r) => r.id}
+          empty={null}
+        />,
+        lang,
+      );
+      const cat = lang === "en" ? en : ka;
+      const cell = (id: string) =>
+        container.querySelector(`tr[data-row-id="${id}"] [data-ident]`);
+      expect(cell("d1")?.getAttribute("data-ident")).toBe("pending");
+      expect(cell("d1")?.firstElementChild?.textContent).toBe(
+        cat["ident.pending.details_unavailable"],
+      );
+      expect(cell("d1")?.firstElementChild?.className).toMatch(
+        /border-ident-pending/,
+      );
+      expect(cell("r1")?.getAttribute("data-ident")).toBe("pending");
+      expect(cell("r1")?.firstElementChild?.textContent).toBe(
+        cat["ident.pending.registry_unavailable"],
+      );
+      expect(cell("r1")?.textContent).toContain(
+        cat["ident.caveat.as_broadcast"],
+      );
+      // The presence twin: judged unidentified keeps its badge.
+      expect(cell("u1")?.getAttribute("data-ident")).toBe("unidentified");
+      expect(cell("u1")?.firstElementChild?.textContent).toBe(
+        cat["ident.status.unidentified"],
+      );
+      expect(cell("u1")?.firstElementChild?.className).toMatch(
+        /border-ident-unidentified/,
+      );
+      for (const id of ["d1", "r1"])
+        expect(cell(id)?.textContent).not.toContain(
+          cat["ident.status.unidentified"],
+        );
+    },
+  );
 
   it("names the provider caveat and shows no identification as its own status", () => {
     const { container } = renderPicture();

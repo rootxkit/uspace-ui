@@ -394,6 +394,7 @@ export function trustShape(t: Trust): Shape                   // authenticated t
 export function trustToken(t: Trust): string                  // CSS variable name
 export function identToken(s: IdentStatus | null): string; export function identOrder(): readonly (IdentStatus | "none")[]   // legend order: expected first, then those needing attention (predecessor identification.ts)
 export function needsAttention(s: IdentStatus | null): boolean   // unknown_operator, unidentified (G-03 lists them; the kit only orders the legend by it)
+export function isJudged(ident: Identification | null): boolean   // 1.3.0: core v1.8.0 (*Identification).Judged(); false for null, details_unavailable and registry_unavailable (04 §3.2, G-13). The one place the kit decides it: identDrawn draws a block that is not judged as "pending" (IdentKey gains it; legend order registered, suspended, unknown_operator, unidentified, pending, none), muted --us-ident-pending with the mark "…", the input that was not consulted named in the hint and the label, never counted as needing attention, never hidden
 export function ageBucket(ageS: number | null, staleAfterS: number): "live" | "aging" | "stale" | "unknown"   // live < staleAfterS/3, aging < staleAfterS, else stale; staleAfterS is the policy value from the feed, required
 export function severityToken(s: Severity): string; export function severityOrder(): readonly Severity[]
 export function zoneToken(t: ZoneType): string; export function zonePattern(t: ZoneType): "solid" | "hatched" | "dotted" | "none"   // PROHIBITED solid red, REQ_AUTHORIZATION hatched amber, CONDITIONAL dotted, NO_RESTRICTION outline only, USPACE blue outline
@@ -424,7 +425,7 @@ export function DrawLayer(props: { outline: DrawOutline; onChange(next: DrawOutl
 ```ts
 export function ZoneLegend(props: { counts?: Partial<Record<ZoneType, number>> }): JSX.Element
 export function TrackLegend(props: { counts?: Partial<Record<Trust, number>> }): JSX.Element
-export function IdentificationLegend(props: { counts?: Record<IdentStatus | "none", number> }): JSX.Element   // with the hint text per status; the broadcast caveat (R-05)
+export function IdentificationLegend(props: { counts?: Record<IdentStatus | "none", number> }): JSX.Element   // with the hint text per status; the broadcast caveat (R-05); 1.3.0: a "pending" row (04 §3.2, G-13), counted by identDrawn's key, not flagged for attention
 export function SeverityLegend(): JSX.Element;  export function AgeLegend(props: { staleAfterS: number }): JSX.Element
 ```
 
@@ -986,6 +987,22 @@ D10).
   value, `symbology` and `i18n` its key in `en` and `ka`. Two `@public`
   lines changed (the `IDENT_REASONS` tuple and `isIdentReason`, each
   gaining the value), none removed; no legend value changed.
+- `v1.3.0`: a minor, an identification that was not judged is drawn as
+  pending (spec 04 §3.2 and its errata of 2026-10-20, uspace-lab#37;
+  LESSONS G-13; core v1.8.0 `Judged()`). *Prepared on `main`, tagged by
+  the owner:* every entry point of §2 as in `v1.2.0`, `model`, `theme`
+  (`tokens.identPending`, `--us-ident-pending`), `ui`, `i18n`, `fonts`,
+  `map`, `api`, `auth/server`, `auth/client`, `symbology` (`isJudged`,
+  `IdentKey` gains `pending`), `layers`, `legend` (the pending row),
+  `live`, `status`, `alerts`, `table`, `form`, `eslint` and `test`. One
+  `@public` line changed, `IdentKey` gaining `"pending"` (additive by
+  rule 1); no legend value removed or changed, one added; label
+  `legend-change`, since `identDrawn` maps `details_unavailable` and
+  `registry_unavailable` to the new key instead of the status. Not a
+  major: no existing colour, shape or mark changes what it means, and
+  `unidentified` keeps the meaning 04 §3.2 gives it (judged, no usable
+  serial); the two reasons were drawn against the spec, which says
+  "shown as pending".
 - From `v1`: within a major only additive changes (new exports, new
   optional props, new catalogue keys, new enumeration values *rendered*
   because `model` gained them). The following are a **major**: removing

@@ -22,9 +22,11 @@ import type { Identification, Severity, Trust } from "../model/index.js";
 import { AgeChip } from "../status/AgeChip.js";
 import {
   IDENT_ORDER,
+  IDENT_PENDING_KEYS,
   IDENT_STATUS_KEYS,
   identDrawn,
   identHintKey,
+  unjudgedReason,
   type IdentKey,
 } from "../symbology/ident.js";
 import { SEVERITY_KEYS } from "../symbology/severity.js";
@@ -239,6 +241,8 @@ const IDENT_BORDER: Readonly<Record<IdentKey, string>> = {
   suspended: "border-ident-suspended",
   unknown_operator: "border-ident-unknown_operator",
   unidentified: "border-ident-unidentified",
+  // Not judged (04 §3.2, G-13): dashed, so it reads without colour.
+  pending: "border-ident-pending border-dashed",
   none: "border-ident-none border-dotted",
 };
 
@@ -296,16 +300,21 @@ function IdentCell(props: { ident: Identification | null }) {
     props.ident === null || drawn === "none"
       ? null
       : identHintKey(
-          drawn,
+          drawn === "pending" ? props.ident.status : drawn,
           props.ident.reason,
           props.ident.basis,
           props.ident.mismatch,
         );
+  // A pending block names its missing input (04 §3.2, G-13).
+  const pending =
+    props.ident === null ? null : unjudgedReason(props.ident.reason);
   // "registered, as broadcast and unverified" replaces "registered" (R-05).
   const label =
     hint?.caveat === "ident.registered_as_broadcast"
       ? t(hint.caveat)
-      : t(IDENT_STATUS_KEYS[drawn]);
+      : drawn === "pending" && pending !== null
+        ? t(IDENT_PENDING_KEYS[pending].short)
+        : t(IDENT_STATUS_KEYS[drawn]);
   const caveat =
     hint !== null &&
     hint.caveat !== null &&

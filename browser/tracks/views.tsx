@@ -16,7 +16,6 @@ import { MapView } from "../../src/map/index.js";
 import {
   IDENT_BASES,
   IDENT_REASONS,
-  IDENT_STATUSES,
   SEVERITIES,
   TRUSTS,
   type Trust,
@@ -25,6 +24,7 @@ import {
   IDENT_BASIS_KEYS,
   identDrawn,
   identHintKey,
+  identMark,
   identOrder,
   type IdentKey,
 } from "../../src/symbology/index.js";
@@ -176,9 +176,15 @@ export async function checkTrackMap(canvasElement: HTMLElement): Promise<void> {
         .map((f) => f.properties as Props);
       const set = (k: string) => new Set(pts.map((p) => String(p[k])));
       expect([...set("trust")].sort()).toEqual([...TRUSTS].sort());
-      expect([...set("ident")].sort()).toEqual(
-        [...IDENT_STATUSES, "none"].sort(),
-      );
+      // Every drawn key, pending included: the sky's details_unavailable
+      // track is not judged (04 §3.2, G-13) and is drawn, never hidden.
+      expect([...set("ident")].sort()).toEqual([...identOrder()].sort());
+      const pending = pts.filter((p) => p["ident"] === "pending");
+      expect(pending.length).toBeGreaterThan(0);
+      for (const p of pending) {
+        expect(p["mark"]).toBe(identMark("pending"));
+        expect(String(p["label"])).not.toMatch(/unidentified/);
+      }
       expect([...set("age")].sort()).toEqual(["aging", "live", "stale"]);
       expect(
         pts.some(

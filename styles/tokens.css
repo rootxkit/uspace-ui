@@ -89,12 +89,15 @@
   --us-trust-sensor: #109c8d;
   --us-trust-simulated: #4c4e55;
 
-  /* Identification status (spec 04 §3.2); `none` = no identification. */
+  /* Identification status (spec 04 §3.2); `none` = no identification;
+     `pending` = a block that was not judged (04 §3.2, G-13), a muted
+     slate: neither unidentified nor an alarm. */
   --us-ident-registered: #257051;
   --us-ident-suspended: #c47b08;
   --us-ident-unknown_operator: #ac0202;
   --us-ident-unidentified: #222124;
   --us-ident-none: #848b8b;
+  --us-ident-pending: #505888;
 
   /* Zone type (spec 00 §5, ED-318 spelling). */
   --us-zone-PROHIBITED: #861325;
@@ -170,6 +173,7 @@
   --us-ident-unknown_operator: #e74c58;
   --us-ident-unidentified: #f7f7f8;
   --us-ident-none: #796e81;
+  --us-ident-pending: #98b0e0;
 
   --us-zone-PROHIBITED: #e64c64;
   --us-zone-REQ_AUTHORIZATION: #fc7f08;
@@ -253,6 +257,7 @@
     --us-ident-unknown_operator: #e74c58;
     --us-ident-unidentified: #f7f7f8;
     --us-ident-none: #796e81;
+    --us-ident-pending: #98b0e0;
 
     --us-zone-PROHIBITED: #e64c64;
     --us-zone-REQ_AUTHORIZATION: #fc7f08;
@@ -498,6 +503,7 @@
   --color-ident-unknown_operator: var(--us-ident-unknown_operator);
   --color-ident-unidentified: var(--us-ident-unidentified);
   --color-ident-none: var(--us-ident-none);
+  --color-ident-pending: var(--us-ident-pending);
 
   --color-zone-PROHIBITED: var(--us-zone-PROHIBITED);
   --color-zone-REQ_AUTHORIZATION: var(--us-zone-REQ_AUTHORIZATION);

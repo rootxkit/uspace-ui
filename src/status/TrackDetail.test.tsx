@@ -359,6 +359,65 @@ describe("identification", () => {
     },
   );
 
+  // 04 §3.2, G-13: a block that was not judged is pending, naming its
+  // input; the status hint is never unidentified's.
+  it.each([
+    ["en", "details_unavailable"],
+    ["ka", "details_unavailable"],
+    ["en", "registry_unavailable"],
+    ["ka", "registry_unavailable"],
+  ] as const)(
+    "shows %s %s as pending with the missing input named",
+    (lang, reason) => {
+      const t = uasTrack();
+      const pending: TrackView = {
+        ...t,
+        identification: {
+          ...(t.identification as NonNullable<TrackView["identification"]>),
+          status: "unidentified",
+          reason,
+          serial: null,
+          operatorReg: null,
+          basis: "provider",
+        },
+      };
+      const root = show(pending, lang);
+      const cat = lang === "en" ? en : ka;
+      const status = field(root, "ident-status");
+      expect(
+        status?.querySelector("[data-ident]")?.getAttribute("data-ident"),
+      ).toBe("pending");
+      expect(status?.textContent).toContain(cat["ident.status.pending"]);
+      expect(status?.textContent).toContain(
+        cat[`ident.hint.pending.${reason}`],
+      );
+      expect(status?.textContent).not.toContain(cat["ident.hint.unidentified"]);
+      expect(status?.textContent).not.toContain(
+        cat["ident.status.unidentified"],
+      );
+    },
+  );
+
+  it("still shows judged unidentified as unidentified (the presence twin)", () => {
+    const t = uasTrack();
+    const judged: TrackView = {
+      ...t,
+      identification: {
+        ...(t.identification as NonNullable<TrackView["identification"]>),
+        status: "unidentified",
+        reason: "no_serial",
+        serial: null,
+        operatorReg: null,
+      },
+    };
+    const root = show(judged);
+    const status = field(root, "ident-status");
+    expect(
+      status?.querySelector("[data-ident]")?.getAttribute("data-ident"),
+    ).toBe("unidentified");
+    expect(status?.textContent).toContain(en["ident.hint.unidentified"]);
+  });
+
   it("shows only the public part of a registration that carries a secret one", () => {
     const t = uasTrack();
     const root = show({

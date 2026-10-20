@@ -208,6 +208,7 @@ export const ka: Readonly<Record<Key, string>> = {
   "ident.status.unknown_operator": "უცნობი ოპერატორი",
   "ident.status.unidentified": "უიდენტიფიკაციო",
   "ident.status.none": "იდენტიფიკაცია არ არის",
+  "ident.status.pending": "მოლოდინში",
   "ident.hint.registered":
     "სერიული ნომერი და ოპერატორი ემთხვევა მოქმედ რეგისტრაციას.",
   "ident.hint.suspended":
@@ -217,6 +218,14 @@ export const ka: Readonly<Record<Key, string>> = {
   "ident.hint.unidentified":
     "გამოსადეგი სერიული ნომერი არ არის: ვერავინ იტყვის, რა აპარატია.",
   "ident.hint.none": "ამ ტრეკისთვის იდენტიფიკაცია არ მიღებულა.",
+  "ident.hint.pending":
+    "ჯერ არ შეფასებულა: პროვაიდერის მონაცემები არ მიღებულა, ან რეესტრთან დაკავშირება ვერ მოხერხდა. არც უიდენტიფიკაციოა და არც განგაში.",
+  "ident.hint.pending.details_unavailable":
+    "ჯერ არ შეფასებულა: პროვაიდერის მონაცემები ჯერ არ მიღებულა, ამიტომ ჯერ არავის უკითხავს, რა აპარატია.",
+  "ident.hint.pending.registry_unavailable":
+    "ჯერ არ შეფასებულა: რეესტრთან დაკავშირება ვერ მოხერხდა, ამიტომ იდენტიფიკაცია არ შემოწმებულა.",
+  "ident.pending.details_unavailable": "მოლოდინში: მონაცემები ჯერ არ მიღებულა",
+  "ident.pending.registry_unavailable": "მოლოდინში: რეესტრი მიუწვდომელია",
   "ident.reason.matched": "სერიული ნომერი და ოპერატორი ემთხვევა რეესტრს.",
   "ident.reason.session_binding":
     "მიბმულია ოპერატორის ავთენტიფიცირებული სესიით.",

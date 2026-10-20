@@ -220,6 +220,9 @@ const catalogue = {
   "ident.status.unknown_operator": "unknown operator",
   "ident.status.unidentified": "unidentified",
   "ident.status.none": "no identification",
+  // A block that was not judged (04 §3.2, G-13): pending, with the missing
+  // input named; never "unidentified", never an alarm.
+  "ident.status.pending": "pending",
   "ident.hint.registered":
     "The serial and the operator match an active registration.",
   "ident.hint.suspended":
@@ -229,6 +232,14 @@ const catalogue = {
   "ident.hint.unidentified":
     "No usable serial number: nobody can say what aircraft this is.",
   "ident.hint.none": "No identification has been received for this track.",
+  "ident.hint.pending":
+    "Not judged yet: the provider's details have not been fetched, or the registry could not be reached. Neither unidentified nor an alarm.",
+  "ident.hint.pending.details_unavailable":
+    "Not judged yet: the provider's details have not been fetched, so nobody has asked what aircraft this is.",
+  "ident.hint.pending.registry_unavailable":
+    "Not judged yet: the registry could not be reached, so the identity has not been checked.",
+  "ident.pending.details_unavailable": "pending: details not yet fetched",
+  "ident.pending.registry_unavailable": "pending: registry unreachable",
   "ident.reason.matched": "Serial and operator match the registry.",
   "ident.reason.session_binding":
     "Bound by the operator's authenticated session.",

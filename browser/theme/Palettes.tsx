@@ -17,7 +17,11 @@ const PALETTES: readonly Palette[] = [
   { title: "Trust class", names: tokens.trust },
   {
     title: "Identification status",
-    names: { ...tokens.ident, none: tokens.identNone },
+    names: {
+      ...tokens.ident,
+      pending: tokens.identPending,
+      none: tokens.identNone,
+    },
   },
   { title: "Zone type", names: tokens.zone },
   {

@@ -45,6 +45,7 @@ const COLOURS: TrackColours = {
     suspended: "#c47b08",
     unknown_operator: "#ac0202",
     unidentified: "#222124",
+    pending: "#505888",
     none: "#848b8b",
   },
   emergency: "#88122b",

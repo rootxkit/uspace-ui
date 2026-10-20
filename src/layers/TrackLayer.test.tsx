@@ -2,7 +2,9 @@
 // (T-13) with its twin, backlog to the trail only (T-04) with its twin,
 // bounded trails (E-10), the arrow, the emergency ring, staleness that
 // arrives with no new frame (E-02), one setData for 400 upserts in a
-// frame, selection, labels and the R-05 wording, and the lifecycle.
+// frame, selection, labels and the R-05 wording, a block that was not
+// judged drawn as pending with its input named (04 §3.2, G-13) beside a
+// judged unidentified one, and the lifecycle.
 import {
   createExpression,
   featureFilter,
@@ -27,7 +29,8 @@ import { TRUSTS, type TrackView } from "../model/index.js";
 import { TRACK_ICON_IDS, trackIconId } from "../symbology/track.js";
 import { TRACK_ICON_PIXEL_RATIO } from "../symbology/trackIcon.js";
 import { layerCounters, resetLayerCountersForTests } from "./counters.js";
-import { TrackHold, compareCapturedAt } from "./trackFeatures.js";
+import { createTranslator } from "../i18n/translate.js";
+import { TrackHold, compareCapturedAt, trackLabel } from "./trackFeatures.js";
 import {
   TRACK_LAYER_ID,
   TrackLayer,
@@ -504,6 +507,97 @@ describe("TrackLayer: symbols", () => {
     const p = pointOf(map).properties;
     expect(p["ident"]).toBe("unknown_operator");
     expect(p["label"]).toContain("operator mismatch");
+  });
+});
+
+describe("TrackLayer: a block that was not judged (04 §3.2, G-13)", () => {
+  const unjudged = (
+    reason: "details_unavailable" | "registry_unavailable",
+    over: Partial<NonNullable<TrackView["identification"]>> = {},
+  ): TrackView => {
+    const base = track();
+    return track({
+      trust: "provider",
+      identification: {
+        ...(base.identification as NonNullable<TrackView["identification"]>),
+        status: "unidentified",
+        reason,
+        basis: "provider",
+        ...over,
+      },
+    });
+  };
+
+  it.each(["details_unavailable", "registry_unavailable"] as const)(
+    "%s is drawn pending, in the pending colour with the ellipsis, and kept on the map",
+    async (reason) => {
+      const { map } = await mount([
+        unjudged(reason, { serial: null, operatorReg: null }),
+      ]);
+      const p = pointOf(map).properties;
+      expect(p["ident"]).toBe("pending");
+      expect(p["mark"]).toBe("…");
+      expect(drawnBy(map, ids.mark, p)).toBe(true);
+      expect(drawnBy(map, ids.icon, p)).toBe(true);
+      expect(points(map)).toHaveLength(1);
+      const label = String(p["label"]);
+      expect(label).not.toMatch(/unidentified/);
+      expect(label.split("\n")[0]).toBe(
+        reason === "details_unavailable"
+          ? "pending: details not yet fetched"
+          : "pending: registry unreachable",
+      );
+      expect(label).toContain("reported by a provider, unverified");
+    },
+  );
+
+  it("keeps the registration it carries on the label, then names the input", async () => {
+    const { map } = await mount([unjudged("registry_unavailable")]);
+    const lines = String(pointOf(map).properties["label"]).split("\n");
+    expect(lines.slice(0, 2)).toEqual([
+      "GEO-TEST-OP-0001",
+      "pending: registry unreachable",
+    ]);
+  });
+
+  it("names the input in Georgian on a ka map", async () => {
+    const { map } = await mount(
+      [unjudged("details_unavailable", { serial: null, operatorReg: null })],
+      {},
+      { lang: "ka" },
+    );
+    const label = String(pointOf(map).properties["label"]);
+    expect(label.split("\n")[0]).toBe("მოლოდინში: მონაცემები ჯერ არ მიღებულა");
+  });
+
+  it.each(["no_serial", "serial_unknown"] as const)(
+    "judged unidentified (%s) keeps the unidentified symbol and label (the presence twin)",
+    async (reason) => {
+      const base = track();
+      const { map } = await mount([
+        track({
+          identification: {
+            ...(base.identification as NonNullable<
+              TrackView["identification"]
+            >),
+            status: "unidentified",
+            reason,
+            serial: null,
+          },
+        }),
+      ]);
+      const p = pointOf(map).properties;
+      expect(p["ident"]).toBe("unidentified");
+      expect(p["mark"]).toBe("×");
+      expect(String(p["label"]).split("\n")[0]).toBe("unidentified");
+    },
+  );
+
+  it("trackLabel says 'pending' when handed pending for a judged block", () => {
+    const t = track();
+    expect(
+      trackLabel(t, "pending", createTranslator("en")).split("\n"),
+    ).toEqual(["GEO-TEST-OP-0001", "pending"]);
   });
 });
 

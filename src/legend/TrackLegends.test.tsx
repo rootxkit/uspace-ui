@@ -1,8 +1,9 @@
 // The track legends (WP-7, PLAN §3.10): order, counts with the dash for an
 // uncounted row, the hollow and dashed cues, the age ranges under a chosen
 // threshold and without one, the R-05 caveat present in the
-// identification legend and absent from the severity legend, Georgian, and
-// axe in both languages.
+// identification legend and absent from the severity legend, the pending
+// row of a block that was not judged (04 §3.2, G-13), Georgian, and axe in
+// both languages.
 import { cleanup, fireEvent, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -125,12 +126,17 @@ describe("TrackLegend", () => {
 });
 
 describe("IdentificationLegend", () => {
-  it("lists the statuses in identOrder(), none last", () => {
+  it("lists the statuses in identOrder(), then pending, none last", () => {
     renderWithKit(<IdentificationLegend />);
     expect(rows("ident").map((li) => li.dataset["ident"])).toEqual([
       ...identOrder(),
     ]);
-    expect(rows("ident")).toHaveLength(IDENT_STATUSES.length + 1);
+    expect(rows("ident")).toHaveLength(IDENT_STATUSES.length + 2);
+    expect(
+      rows("ident")
+        .slice(-2)
+        .map((li) => li.dataset["ident"]),
+    ).toEqual(["pending", "none"]);
   });
 
   it("flags the attention statuses, and only them (G-03)", () => {
@@ -140,6 +146,13 @@ describe("IdentificationLegend", () => {
       .map((li) => li.dataset["ident"]);
     expect(flagged).toEqual(["unknown_operator", "unidentified"]);
     expect(document.querySelector('[data-note="attention"]')).not.toBeNull();
+    // Pending is not counted as needing attention (04 §3.2: it raises
+    // nothing); unidentified, above, is.
+    expect(
+      document
+        .querySelector('li[data-ident="pending"]')
+        ?.getAttribute("data-attention"),
+    ).toBe("false");
   });
 
   it("draws each status's colour and its mark; registered alone has none", () => {
@@ -154,7 +167,35 @@ describe("IdentificationLegend", () => {
       li.querySelector("svg")?.getAttribute("data-token"),
     );
     expect(tokens.at(-1)).toBe("--us-ident-none");
-    expect(new Set(tokens).size).toBe(5);
+    expect(tokens.at(-2)).toBe("--us-ident-pending");
+    expect(new Set(tokens).size).toBe(6);
+  });
+
+  it("draws pending in its own colour with the ellipsis, apart from unidentified", () => {
+    renderWithKit(<IdentificationLegend />);
+    const row = (s: string) =>
+      document.querySelector(`li[data-ident="${s}"]`) as HTMLElement;
+    const pending = row("pending");
+    const unidentified = row("unidentified");
+    expect(
+      pending.querySelector("[data-mark]")?.getAttribute("data-mark"),
+    ).toBe("…");
+    expect(pending.querySelector("circle")?.getAttribute("fill")).toBe(
+      "var(--us-ident-pending)",
+    );
+    // The presence twin: unidentified keeps its colour and cross.
+    expect(
+      unidentified.querySelector("[data-mark]")?.getAttribute("data-mark"),
+    ).toBe("×");
+    expect(unidentified.querySelector("circle")?.getAttribute("fill")).toBe(
+      "var(--us-ident-unidentified)",
+    );
+    expect(pending.textContent).toContain("pending");
+    expect(pending.textContent).toContain(
+      "the provider's details have not been fetched, or the registry could not be reached",
+    );
+    expect(pending.textContent).not.toContain("nobody can say what aircraft");
+    expect(pending.textContent).toContain("Mark beside the symbol: …");
   });
 
   it("gives each status its hint", () => {
@@ -187,6 +228,33 @@ describe("IdentificationLegend", () => {
     expect(
       row("unidentified").querySelector('[data-count="absent"]'),
     ).not.toBeNull();
+    expect(
+      row("pending").querySelector('[data-count="absent"]'),
+    ).not.toBeNull();
+  });
+
+  it("counts pending on its own row, apart from unidentified and attention", () => {
+    renderWithKit(
+      <IdentificationLegend counts={{ unidentified: 1, pending: 3 }} />,
+    );
+    const row = (s: string) =>
+      document.querySelector(`li[data-ident="${s}"]`) as HTMLElement;
+    expect(row("pending").textContent).toContain("3 tracks");
+    expect(row("pending").dataset["attention"]).toBe("false");
+    expect(row("unidentified").textContent).toContain("1 track");
+    expect(row("unidentified").textContent).not.toContain("3 tracks");
+    expect(row("unidentified").dataset["attention"]).toBe("true");
+  });
+
+  it("words pending in Georgian", () => {
+    renderWithKit(<IdentificationLegend />, { lang: "ka" });
+    const pending = document.querySelector(
+      'li[data-ident="pending"]',
+    ) as HTMLElement;
+    expect(pending.textContent).toContain("მოლოდინში");
+    expect(pending.textContent).toContain("ჯერ არ შეფასებულა");
+    // Not the unidentified hint ("nobody can say what aircraft this is").
+    expect(pending.textContent).not.toContain("ვერავინ იტყვის");
   });
 });
 

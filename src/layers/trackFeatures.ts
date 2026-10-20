@@ -13,9 +13,11 @@ import type { TrackView } from "../model/index.js";
 import type { AgeBucket } from "../theme/tokens.js";
 import { ageBucket } from "../symbology/age.js";
 import {
+  IDENT_PENDING_KEYS,
   IDENT_STATUS_KEYS,
   identDrawn,
   identMark,
+  unjudgedReason,
   type IdentKey,
 } from "../symbology/ident.js";
 import type {
@@ -171,10 +173,11 @@ export function receivedAgeS(t: TrackView, nowMs: number): number | null {
 /**
  * The label: the registration number's public part, else the serial, else
  * "unidentified"; an unidentified track or one with no identification
- * says so whatever it broadcast (I-02). Further lines carry what must not
- * be lost when the label is read alone: a status that is not registered,
- * a mismatch (G-02), the broadcast or provider caveat (R-05, PLAN §14
- * Q18) and an emergency.
+ * says so whatever it broadcast (I-02); a pending one (04 §3.2, G-13)
+ * names the missing input instead. Further lines carry what must not be
+ * lost when the label is read alone: a status that is not registered, a
+ * mismatch (G-02), the broadcast or provider caveat (R-05, PLAN §14 Q18)
+ * and an emergency.
  *
  * @beta
  */
@@ -189,15 +192,21 @@ export function trackLabel(
     lines.push(tr(IDENT_STATUS_KEYS[drawn]));
   } else {
     const reg = fmtRegistrationNumber(id.operatorReg);
-    const serial = id.serial?.trim() ?? "";
-    lines.push(
-      reg !== DASH
-        ? reg
-        : serial !== ""
-          ? serial
-          : tr("track.label.unidentified"),
-    );
-    if (drawn !== "registered") lines.push(tr(IDENT_STATUS_KEYS[drawn]));
+    const name = reg !== DASH ? reg : (id.serial?.trim() ?? "");
+    if (drawn === "pending") {
+      const input = unjudgedReason(id.reason);
+      if (name !== "") lines.push(name);
+      lines.push(
+        tr(
+          input === null
+            ? IDENT_STATUS_KEYS.pending
+            : IDENT_PENDING_KEYS[input].short,
+        ),
+      );
+    } else {
+      lines.push(name !== "" ? name : tr("track.label.unidentified"));
+      if (drawn !== "registered") lines.push(tr(IDENT_STATUS_KEYS[drawn]));
+    }
   }
   if (id?.mismatch === true) lines.push(tr("ident.mismatch_short"));
   if (t.trust === "broadcast") lines.push(tr("track.broadcast"));

@@ -259,7 +259,11 @@ const PALETTES = {
   severity: { names: tokens.severity, min: MIN_CONTRAST_TEXT },
   trust: { names: tokens.trust, min: MIN_CONTRAST_GRAPHICS },
   ident: {
-    names: { ...tokens.ident, none: tokens.identNone },
+    names: {
+      ...tokens.ident,
+      pending: tokens.identPending,
+      none: tokens.identNone,
+    },
     min: MIN_CONTRAST_GRAPHICS,
   },
   zone: { names: tokens.zone, min: MIN_CONTRAST_GRAPHICS },
@@ -360,6 +364,7 @@ describe.each(Object.entries(SCHEMES))("%s scheme", (_scheme, s) => {
       ...Object.values(tokens.trust),
       ...Object.values(tokens.ident),
       tokens.identNone,
+      tokens.identPending,
       ...Object.values(tokens.zone),
       ...tokens.age,
       tokens.brandAccent,
@@ -368,7 +373,7 @@ describe.each(Object.entries(SCHEMES))("%s scheme", (_scheme, s) => {
       SEVERITIES.length +
         TRUSTS.length +
         IDENT_STATUSES.length +
-        1 +
+        2 +
         ZONE_TYPES.length +
         AGE_BUCKETS.length +
         1,

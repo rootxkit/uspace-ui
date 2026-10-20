@@ -54,6 +54,7 @@ import {
   checkRegistry,
 } from "../table/views.js";
 import { checkPalettes, Palettes } from "../theme/Palettes.js";
+import { Pending, checkPending } from "../tracks/pending.js";
 import { LegendsBox, checkLegends } from "../tracks/views.js";
 import { Details, checkDetails } from "../traffic/views.js";
 import { Cards, LegendBox, checkCards, checkLegend } from "../zones/views.js";
@@ -151,6 +152,21 @@ const GOLDEN: Record<
     <LegendsBox />,
     KA_DARK,
     (c) => checkLegends(c, /დაუდასტურებელი/),
+  ],
+  "ident-pending.en": [
+    <Pending />,
+    EN_LIGHT,
+    (c) =>
+      checkPending(c, { pending: "pending", unidentified: "unidentified" }),
+  ],
+  "ident-pending.ka": [
+    <Pending />,
+    KA_DARK,
+    (c) =>
+      checkPending(c, {
+        pending: "მოლოდინში",
+        unidentified: "უიდენტიფიკაციო",
+      }),
   ],
   "login-form.en": [<LoginForm {...LOGIN_PROPS} />, EN_LIGHT, () => undefined],
   "login-form.ka": [<LoginForm {...LOGIN_PROPS} />, KA_DARK, () => undefined],
