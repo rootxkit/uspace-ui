@@ -200,6 +200,20 @@ const MEMBER_SEPARATOR = /^\s*(?:,|\|)\s*$/;
  * `,` or `|` separator between two literals gives `base` exactly. A
  * removed or reordered member, a gained member that is not a string
  * literal, or any other edit is not a widening.
+ *
+ * A `,` member (a tuple's) may only be appended, after the last old
+ * literal: one inserted before it shifts every later index
+ * (`IDENT_REASONS[1]`), a mapped type over its keys, and the runtime
+ * order the kit lists options and legend rows in. A `|` member (a
+ * union's) may come anywhere, since a union has no order. A gained
+ * duplicate of an old literal is accepted like any other appended
+ * member: in a union it changes nothing, and in a tuple it only adds an
+ * index at the end.
+ *
+ * The gate reads text, not variance: a union widened where a consumer
+ * supplies the value (a callback parameter it implements, a prop it
+ * passes) is also accepted, though such a consumer must now handle the
+ * new member. The CHANGELOG section of the release says so.
  */
 export function isWidenedByStrings(base, head) {
   if (base === head) return false;
@@ -216,21 +230,25 @@ export function isWidenedByStrings(base, head) {
       j += 1;
     }
   if (j < old.length) return false;
+  const lastKept = keep.lastIndexOf(true);
   // parts[i] precedes lits[i]; parts[i + 1] follows it.
   const dropPart = new Array(parts.length).fill(false);
   const dropLit = new Array(lits.length).fill(false);
   for (let i = 0; i < lits.length; i++) {
     if (keep[i]) continue;
     dropLit[i] = true;
-    if (i > 0 && !dropPart[i] && MEMBER_SEPARATOR.test(parts[i]))
-      dropPart[i] = true;
+    let sep;
+    if (i > 0 && !dropPart[i] && MEMBER_SEPARATOR.test(parts[i])) sep = i;
     else if (
       i + 1 < lits.length &&
       !dropPart[i + 1] &&
       MEMBER_SEPARATOR.test(parts[i + 1])
     )
-      dropPart[i + 1] = true;
+      sep = i + 1;
     else return false;
+    // A tuple member inserted before the last old one moves indices.
+    if (parts[sep].includes(",") && i < lastKept) return false;
+    dropPart[sep] = true;
   }
   let rebuilt = "";
   for (let i = 0; i < parts.length; i++) {

@@ -172,9 +172,13 @@ required check on `main`.
    public declaration demoted to `@beta` is a change of its public line.
    A line that only gains string-literal members of a tuple or a union
    (a new enumeration value: every old member still there, in order,
-   nothing else on the line changed) is additive, as PLAN §12 says; a
-   removed, reordered or renamed member, a gained member that is not a
-   string, or any other edit of the line is still a change.
+   a tuple's new members only after its last old one, nothing else on
+   the line changed) is additive, as PLAN §12 says; a removed,
+   reordered or renamed member, a member inserted mid-tuple, a gained
+   member that is not a string, or any other edit of the line is still
+   a change. The gate cannot see variance: a union widened where a
+   consumer supplies the value passes too, so the CHANGELOG says what a
+   consumer must handle.
 2. **Legend.** A removed or changed `--us-severity-*`, `--us-trust-*`,
    `--us-ident-*`, `--us-zone-*` or `--us-age-*` value in
    `styles/tokens.css`, or a removed or changed code line inside a

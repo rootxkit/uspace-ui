@@ -367,6 +367,16 @@ describe("rule 1: a tuple or union that only gains string members", () => {
       'const isIdentReason: (x: unknown) => x is "no_serial" | "matched" | "registry_unavailable" | "details_unavailable";',
     ],
     [
+      "a member inserted mid-tuple",
+      TUPLE,
+      'const IDENT_REASONS: readonly ["matched", "details_unavailable", "no_serial", "registry_unavailable"];',
+    ],
+    [
+      "a member inserted at the start of the tuple",
+      TUPLE,
+      'const IDENT_REASONS: readonly ["details_unavailable", "matched", "no_serial", "registry_unavailable"];',
+    ],
+    [
       "a member renamed",
       TUPLE,
       'const IDENT_REASONS: readonly ["matched", "no_serial", "registry_down"];',
@@ -403,6 +413,42 @@ describe("rule 1: a tuple or union that only gains string members", () => {
     expect(r.report.join("\n")).toMatch(/the label "breaking": MISSING/);
   });
 
+  it("a member inserted mid-union is additive: a union has no order", () => {
+    const head = ENUM_REPORT.replace(
+      PREDICATE,
+      'const isIdentReason: (x: unknown) => x is "matched" | "details_unavailable" | "no_serial" | "registry_unavailable";',
+    );
+    const c = apiReportChanges(ENUM_REPORT, head);
+    expect(c.breaking).toEqual([]);
+    expect(c.widened.map((e) => e.name)).toEqual(["isIdentReason"]);
+    expect(evaluate(enumInput(head)).ok).toBe(true);
+  });
+
+  it("a gained duplicate of an old literal is accepted, appended in a tuple or anywhere in a union", () => {
+    const tuple = ENUM_REPORT.replace(
+      '"registry_unavailable"];',
+      '"registry_unavailable", "matched"];',
+    );
+    expect(
+      apiReportChanges(ENUM_REPORT, tuple).widened.map((e) => e.name),
+    ).toEqual(["IDENT_REASONS"]);
+    const union = ENUM_REPORT.replace(
+      'x is "matched" |',
+      'x is "matched" | "no_serial" |',
+    );
+    expect(
+      apiReportChanges(ENUM_REPORT, union).widened.map((e) => e.name),
+    ).toEqual(["isIdentReason"]);
+    // Duplicated before the last old member of a tuple is an insertion.
+    const midTuple = ENUM_REPORT.replace(
+      'readonly ["matched", "no_serial",',
+      'readonly ["matched", "matched", "no_serial",',
+    );
+    expect(
+      apiReportChanges(ENUM_REPORT, midTuple).breaking.map((e) => e.name),
+    ).toEqual(["IDENT_REASONS"]);
+  });
+
   it("a member gained on one line does not excuse a removal on another", () => {
     const head = ENUM_REPORT.replace(
       TUPLE,
@@ -428,6 +474,11 @@ describe("rule 1: a tuple or union that only gains string members", () => {
     const base = 'x is "a" | "b";';
     expect(isWidenedByStrings(base, 'x is "a" | "b" | "c";')).toBe(true);
     expect(isWidenedByStrings(base, 'x is "c" | "a" | "b";')).toBe(true);
+    const tuple = '["a", "b"];';
+    expect(isWidenedByStrings(tuple, '["a", "b", "c"];')).toBe(true);
+    expect(isWidenedByStrings(tuple, '["a", "b", "c", "d"];')).toBe(true);
+    expect(isWidenedByStrings(tuple, '["c", "a", "b"];')).toBe(false);
+    expect(isWidenedByStrings(tuple, '["a", "c", "b"];')).toBe(false);
     expect(isWidenedByStrings(base, 'x is "a" | "c" | "b";')).toBe(true);
     expect(isWidenedByStrings(base, base)).toBe(false);
     expect(isWidenedByStrings(base, 'x is "b" | "a" | "c";')).toBe(false);
