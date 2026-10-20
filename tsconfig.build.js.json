@@ -1,0 +1,14 @@
+// The JavaScript of dist/, without comments: they reach no consumer's
+// editor from here (the .d.ts files carry them, tsconfig.build.json) but
+// count against the gzip budgets of PLAN §8. Same sources as the
+// declarations.
+{
+  "extends": "./tsconfig.build.json",
+  "compilerOptions": {
+    "declaration": false,
+    "declarationMap": false,
+    "emitDeclarationOnly": false,
+    "removeComments": true,
+    "sourceMap": true
+  }
+}

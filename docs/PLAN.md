@@ -1003,6 +1003,16 @@ D10).
   `unidentified` keeps the meaning 04 §3.2 gives it (judged, no usable
   serial); the two reasons were drawn against the spec, which says
   "shown as pending".
+- `v1.3.1`: a patch, the built JavaScript ships without comments (two
+  emits: declarations with their doc comments, JavaScript with
+  `removeComments`), which takes `map`+`layers`+`symbology`+`legend`
+  from 61383 to 44806 of the 61440 gzipped bytes of §8. *Prepared on
+  `main`, tagged by the owner:* every entry point of §2 as in `v1.3.0`,
+  `model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api`, `auth/server`,
+  `auth/client`, `symbology`, `layers`, `legend`, `live`, `status`,
+  `alerts`, `table`, `form`, `eslint` and `test`; every `.d.ts` as in
+  `v1.3.0`. No `@public` line added, removed or changed; no legend value
+  changed; no budget changed.
 - From `v1`: within a major only additive changes (new exports, new
   optional props, new catalogue keys, new enumeration values *rendered*
   because `model` gained them). The following are a **major**: removing
