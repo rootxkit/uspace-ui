@@ -2178,7 +2178,7 @@ const IDENT_ORDER: readonly IdentKey[];
 const IDENT_REASON_KEYS: Readonly<Record<IdentReason, Key>>;
 
 // @public (undocumented)
-const IDENT_REASONS: readonly ["matched", "session_binding", "uas_suspended", "uas_revoked", "operator_suspended", "operator_revoked", "serial_unknown", "not_a_serial", "operator_absent", "operator_mismatch", "owner_unknown", "not_in_registry", "serial_conflict", "no_serial", "registry_unavailable"];
+const IDENT_REASONS: readonly ["matched", "session_binding", "uas_suspended", "uas_revoked", "operator_suspended", "operator_revoked", "serial_unknown", "not_a_serial", "operator_absent", "operator_mismatch", "owner_unknown", "not_in_registry", "serial_conflict", "no_serial", "registry_unavailable", "details_unavailable"];
 
 // @beta
 const IDENT_STATUS_HINT_KEYS: Readonly<Record<IdentKey, Key>>;
@@ -2453,7 +2453,7 @@ function isDssState(v: unknown): v is DssState;
 const isIdentBasis: (x: unknown) => x is "authenticated" | "provider" | "as_broadcast";
 
 // @public (undocumented)
-const isIdentReason: (x: unknown) => x is "matched" | "session_binding" | "uas_suspended" | "uas_revoked" | "operator_suspended" | "operator_revoked" | "serial_unknown" | "not_a_serial" | "operator_absent" | "operator_mismatch" | "owner_unknown" | "not_in_registry" | "serial_conflict" | "no_serial" | "registry_unavailable";
+const isIdentReason: (x: unknown) => x is "matched" | "session_binding" | "uas_suspended" | "uas_revoked" | "operator_suspended" | "operator_revoked" | "serial_unknown" | "not_a_serial" | "operator_absent" | "operator_mismatch" | "owner_unknown" | "not_in_registry" | "serial_conflict" | "no_serial" | "registry_unavailable" | "details_unavailable";
 
 // @public (undocumented)
 const isIdentStatus: (x: unknown) => x is "registered" | "suspended" | "unknown_operator" | "unidentified";
