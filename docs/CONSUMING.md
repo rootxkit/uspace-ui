@@ -6,7 +6,7 @@ is shown working in [`examples/next-app/`](../examples/next-app/), which
 CI builds against the kit's current source and smokes in Chromium on
 every pull request. The rules behind the steps are `docs/PLAN.md` §6.3
 (the contracts), §7 (security) and §11 (consumption). This guide is for
-`1.1.2`.
+`1.2.0`.
 
 ## 1. Install the release tarball with pnpm
 
@@ -22,7 +22,7 @@ install --frozen-lockfile`.
 {
   "packageManager": "pnpm@11.9.0",
   "dependencies": {
-    "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.1.2/rootxkit-uspace-ui-1.1.2.tgz",
+    "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.2.0/rootxkit-uspace-ui-1.2.0.tgz",
     "maplibre-gl": "5.24.0",
     "next": "16.3.8",
     "react": "19.3.0",
@@ -45,8 +45,8 @@ install --frozen-lockfile`.
 - Before pinning, check the asset's signed build provenance:
 
   ```sh
-  gh release download v1.1.2 --repo rootxkit/uspace-ui --pattern 'rootxkit-uspace-ui-1.1.2.tgz'
-  gh attestation verify rootxkit-uspace-ui-1.1.2.tgz --repo rootxkit/uspace-ui \
+  gh release download v1.2.0 --repo rootxkit/uspace-ui --pattern 'rootxkit-uspace-ui-1.2.0.tgz'
+  gh attestation verify rootxkit-uspace-ui-1.2.0.tgz --repo rootxkit/uspace-ui \
     --signer-workflow rootxkit/uspace-ui/.github/workflows/release.yml
   ```
 
@@ -357,6 +357,14 @@ A `TableCell` holding an id, a code, a timestamp or a number takes
 one line; `DataTable`'s `num`, `utc`, `age` and `mono` `text` columns
 already do, and any helper takes `nowrap` to say otherwise. A local
 override that made a kit table cell wrap can be removed.
+
+From `1.1.x` to `1.2.0` (identification reason `details_unavailable`,
+uspace-core v1.8.0): replace the asset URL and commit the lockfile. A
+track whose reason is `details_unavailable` is pending, not judged: the
+Service Provider's details have not been fetched yet. Show it as the
+kit does, never as `no_serial`. Code that switches exhaustively over
+`IdentReason`, or keeps its own `Record<IdentReason, ...>`, needs the new
+case; nothing else needs an edit.
 
 ## Minimum version per consumer
 
