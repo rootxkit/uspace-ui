@@ -37,6 +37,12 @@ export interface Tokens {
   ident: Readonly<Record<IdentStatus, string>>;
   /** No identification at all; not an `IdentStatus`, so kept apart. */
   identNone: string;
+  /**
+   * A block that was not judged (`isJudged` false: 04 §3.2, G-13), drawn
+   * `pending`; not an `IdentStatus`, so kept apart. A muted colour: it is
+   * neither unidentified nor an alarm.
+   */
+  identPending: string;
   zone: Readonly<Record<ZoneType, string>>;
   /** In `AGE_BUCKETS` order. */
   age: readonly string[];
@@ -50,6 +56,7 @@ export const tokens: Tokens = Object.freeze({
   trust: names("trust", TRUSTS),
   ident: names("ident", IDENT_STATUSES),
   identNone: "--us-ident-none",
+  identPending: "--us-ident-pending",
   zone: names("zone", ZONE_TYPES),
   age: Object.freeze(AGE_BUCKETS.map((b) => `--us-age-${b}`)),
   brandAccent: "--us-brand-accent",
