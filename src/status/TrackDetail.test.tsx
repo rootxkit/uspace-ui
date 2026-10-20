@@ -326,6 +326,39 @@ describe("identification", () => {
     expect(value(root, "registration")).toBe("GEO-TEST-OP-0101");
   });
 
+  // uspace-core v1.8.0 (lab#37, 04 §3.2): details_unavailable is not
+  // judged. Its reason reads as pending in both languages, in the same
+  // neutral row as every other reason, never in a severity colour.
+  it.each(["en", "ka"] as const)(
+    "labels details_unavailable as pending, not judged, and not as an alarm (%s)",
+    (lang) => {
+      const t = uasTrack();
+      const pending: TrackView = {
+        ...t,
+        identification: {
+          ...(t.identification as NonNullable<TrackView["identification"]>),
+          status: "unidentified",
+          reason: "details_unavailable",
+          serial: null,
+          operatorReg: null,
+          basis: "provider",
+        },
+      };
+      const root = show(pending, lang);
+      const cat = lang === "en" ? en : ka;
+      expect(value(root, "ident-reason")).toBe(
+        cat["ident.reason.details_unavailable"],
+      );
+      expect(value(root, "ident-reason")).not.toBe(
+        cat["ident.reason.no_serial"],
+      );
+      const row = field(root, "ident-reason");
+      expect(row?.querySelector("[class*='severity']")).toBeNull();
+      expect(row?.className ?? "").not.toMatch(/severity/);
+      expect(row?.querySelector("[role='alert']")).toBeNull();
+    },
+  );
+
   it("shows only the public part of a registration that carries a secret one", () => {
     const t = uasTrack();
     const root = show({

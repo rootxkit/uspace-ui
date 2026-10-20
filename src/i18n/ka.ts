@@ -237,6 +237,8 @@ export const ka: Readonly<Record<Key, string>> = {
     "რეესტრის ჩანაწერები ერთმანეთს ეწინააღმდეგება სერიულ ნომერზე.",
   "ident.reason.no_serial": "სერიული ნომერი არ არის მითითებული.",
   "ident.reason.registry_unavailable": "რეესტრთან დაკავშირება ვერ მოხერხდა.",
+  "ident.reason.details_unavailable":
+    "პროვაიდერის მონაცემები ჯერ არ მიღებულა: იდენტიფიკაცია მოლოდინშია და არ შეფასებულა.",
   "ident.caveat.as_broadcast":
     "სერიული ნომერი და ოპერატორი, როგორც გადაცემულია, დაუდასტურებლად.",
   "ident.caveat.provider":

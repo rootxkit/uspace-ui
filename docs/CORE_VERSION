@@ -1,4 +1,4 @@
-v1.3.0
+v1.8.0
 # The uspace-core tag src/model mirrors (scripts/check-enums.sh reads the
 # first line). Bumping it is its own `build:` commit that runs the check.
 #

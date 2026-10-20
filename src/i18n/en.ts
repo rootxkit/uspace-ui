@@ -250,6 +250,8 @@ const catalogue = {
   "ident.reason.serial_conflict": "Registry records conflict over the serial.",
   "ident.reason.no_serial": "No serial was given.",
   "ident.reason.registry_unavailable": "The registry could not be consulted.",
+  "ident.reason.details_unavailable":
+    "The provider's details have not been fetched yet: identification is pending, not judged.",
   "ident.caveat.as_broadcast":
     "Serial and operator as broadcast and unverified.",
   "ident.caveat.provider":

@@ -176,6 +176,7 @@ export const IDENT_REASON_KEYS: Readonly<Record<IdentReason, Key>> =
     serial_conflict: "ident.reason.serial_conflict",
     no_serial: "ident.reason.no_serial",
     registry_unavailable: "ident.reason.registry_unavailable",
+    details_unavailable: "ident.reason.details_unavailable",
   });
 
 /**

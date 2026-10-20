@@ -213,7 +213,7 @@ export type Trust = "authenticated" | "provider" | "surveillance" | "broadcast" 
 export type Severity = "info" | "warning" | "critical";
 export type ZoneType = "PROHIBITED" | "REQ_AUTHORIZATION" | "CONDITIONAL" | "NO_RESTRICTION" | "USPACE";   // ED-318 spelling (00 §5)
 export type IdentStatus = "registered" | "suspended" | "unknown_operator" | "unidentified";
-export type IdentReason = "matched" | "session_binding" | "uas_suspended" | "uas_revoked" | "operator_suspended" | "operator_revoked" | "serial_unknown" | "not_a_serial" | "operator_absent" | "operator_mismatch" | "owner_unknown" | "not_in_registry" | "serial_conflict" | "no_serial" | "registry_unavailable";
+export type IdentReason = "matched" | "session_binding" | "uas_suspended" | "uas_revoked" | "operator_suspended" | "operator_revoked" | "serial_unknown" | "not_a_serial" | "operator_absent" | "operator_mismatch" | "owner_unknown" | "not_in_registry" | "serial_conflict" | "no_serial" | "registry_unavailable" | "details_unavailable";
 export type IdentBasis = "authenticated" | "as_broadcast" | "provider";   // `provider` = a Display Provider peer's claim, neither authenticated nor broadcast (core v1.1.0 `BasisProvider`, reconciliation Q-A8); rendered with its own caveat, never as `authenticated`
 export type TimeSource = "source_clock" | "broadcast" | "receiver" | "provider" | "system";
 export type AlertKind = "proximity" | "nonconformance" | "nonconformance_nearby" | "height_exceedance" | "zone_incursion" | "lost_link" | "restriction_activated" | "emergency_nearby";
@@ -977,6 +977,15 @@ D10).
   `legend`, `live`, `status`, `alerts`, `table`, `form`, `eslint` and
   `test`; `styles/tokens.css` themes `option` and `optgroup`. No
   `@public` line added, removed or changed; no legend value changed.
+- `v1.2.0`: a minor, the identification reason `details_unavailable` of
+  uspace-core v1.8.0 (uspace-lab#37, spec 04 §3.2). *Prepared on `main`,
+  tagged by the owner:* every entry point of §2 as in `v1.1.2`, `model`,
+  `theme`, `ui`, `i18n`, `fonts`, `map`, `api`, `auth/server`,
+  `auth/client`, `symbology`, `layers`, `legend`, `live`, `status`,
+  `alerts`, `table`, `form`, `eslint` and `test`; `model` gains the
+  value, `symbology` and `i18n` its key in `en` and `ka`. Two `@public`
+  lines changed (the `IDENT_REASONS` tuple and `isIdentReason`, each
+  gaining the value), none removed; no legend value changed.
 - From `v1`: within a major only additive changes (new exports, new
   optional props, new catalogue keys, new enumeration values *rendered*
   because `model` gained them). The following are a **major**: removing

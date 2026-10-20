@@ -64,7 +64,10 @@ export const IDENT_STATUSES = [
 /** @public */
 export type IdentStatus = (typeof IDENT_STATUSES)[number];
 
-// core/ident.go IdentReason
+// core/ident.go IdentReason. `details_unavailable` (core v1.8.0
+// `ReasonDetailsUnavailable`, lab#37, 04 §3.2): the Service Provider's
+// details have not been fetched, so the block is not judged; it is shown
+// as pending, never as `no_serial`, which means the source was asked.
 /** @public */
 export const IDENT_REASONS = [
   "matched",
@@ -82,6 +85,7 @@ export const IDENT_REASONS = [
   "serial_conflict",
   "no_serial",
   "registry_unavailable",
+  "details_unavailable",
 ] as const;
 /** @public */
 export type IdentReason = (typeof IDENT_REASONS)[number];

@@ -7,6 +7,60 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
+## 1.2.0
+
+A minor on 1.1.2: the identification reason `details_unavailable`, from
+uspace-core v1.8.0 and uspace-lab#37 (spec 04 §3.2, LESSONS G-13).
+Prepared on `main`, not tagged: the owner tags `v1.2.0`
+(docs/RELEASING.md). Pin it exactly:
+
+```jsonc
+"@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.2.0/rootxkit-uspace-ui-1.2.0.tgz"
+```
+
+### Added
+
+- `model`: `IDENT_REASONS`, `IdentReason` and `isIdentReason` gain
+  `details_unavailable`, mirroring core v1.8.0 `ReasonDetailsUnavailable`:
+  the Service Provider's details of a network flight have not been
+  fetched, so the identification is pending and not judged. It is not
+  `no_serial`, which means the source was asked and gave none.
+  `docs/CORE_VERSION` pins `v1.8.0`.
+- `symbology`: `IDENT_REASON_KEYS.details_unavailable` is
+  `ident.reason.details_unavailable`, so `identHintKey` and
+  `TrackDetail` name it.
+- `i18n`: `ident.reason.details_unavailable` in `en` ("The provider's
+  details have not been fetched yet: identification is pending, not
+  judged.") and `ka`. The reason is shown as plain text in the detail,
+  like every reason; nothing draws it as an alarm. The track keeps the
+  colour and mark of the status the server sends.
+
+### What a consumer on 1.1.x does
+
+Replace the asset URL and commit the lockfile. A `web/` whose adapter
+refuses an unknown reason (as the kit's reference adapter does) now
+accepts `details_unavailable` instead of refusing the track. Code that
+switches exhaustively over `IdentReason`, or keeps its own
+`Record<IdentReason, ...>`, gets a type error until it handles the new
+value: that is the one edit.
+
+### The semver gate
+
+Two `@public` lines of `docs/api/uspace-ui.api.md` change, the
+`IDENT_REASONS` tuple and the `isIdentReason` predicate, each gaining
+`details_unavailable`; none is removed. PLAN §12 counts a new
+enumeration value rendered because `model` gained it as additive within
+a major. The gate's rule 1 reads a changed line as a removal and fires
+on both; see the pull request for the owner's decision.
+
+### Entry points that ship
+
+`model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api` (with the
+`uspace-ui-gen-api` bin), `auth/server`, `auth/client`, `symbology`,
+`layers`, `legend`, `live`, `status`, `alerts`, `table`, `form`,
+`eslint`, `test`, and `styles/tokens.css`, `styles/map.css`,
+`fonts/fonts.css` with the woff2 files, as in 1.1.2.
+
 ## 1.1.2
 
 A patch on 1.1.1: native controls follow the scheme. Prepared on `main`,
