@@ -175,6 +175,51 @@ describe("a value the kit cannot name is refused, naming the field (the twin)", 
     const plain = parseFrame(raw);
     expect(adaptTelemetry(plain as NonNullable<typeof plain>).ok).toBe(true);
   });
+
+  // uspace-core v1.8.0 ReasonDetailsUnavailable (lab#37, 04 §3.2): the
+  // Service Provider's details are not fetched yet, so the block is not
+  // judged. The kit names it; a reason it cannot name is still refused.
+  const withReason = (reason: string) => {
+    const raw = LAB_EXAMPLES[
+      "lab/track/telemetry/v1/authenticated-operator-session.json"
+    ] as { body: Record<string, unknown> };
+    const ident = raw.body["identification"] as Record<string, unknown>;
+    const f = parseFrame({
+      ...raw,
+      body: {
+        ...raw.body,
+        identification: {
+          ...ident,
+          status: "unidentified",
+          reason,
+          serial: null,
+          operator_reg: null,
+          registry_uas_id: null,
+          basis: "provider",
+        },
+      },
+    });
+    expect(f).not.toBeNull();
+    return adaptTelemetry(f as NonNullable<typeof f>);
+  };
+
+  it("a telemetry example with reason details_unavailable is accepted", () => {
+    const a = withReason("details_unavailable");
+    expect(a.ok).toBe(true);
+    expect(a.ok && a.value.identification).toMatchObject({
+      status: "unidentified",
+      reason: "details_unavailable",
+      basis: "provider",
+    });
+  });
+
+  it("a telemetry example with an unknown identification reason is refused", () => {
+    expect(withReason("details_pending")).toMatchObject({
+      ok: false,
+      field: "identification.reason",
+      value: "details_pending",
+    });
+  });
 });
 
 // --- enumeration coverage ------------------------------------------------------
