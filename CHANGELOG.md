@@ -7,6 +7,39 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
+## 1.3.1
+
+A patch on 1.3.0: the built JavaScript carries no comments. Prepared on
+`main`, not tagged: the owner tags `v1.3.1` (docs/RELEASING.md). Pin it
+exactly:
+
+```jsonc
+"@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.3.1/rootxkit-uspace-ui-1.3.1.tgz"
+```
+
+- Build: `pnpm build` emits the declarations (`tsconfig.build.json`,
+  with their doc comments) and the JavaScript (`tsconfig.build.js.json`,
+  `removeComments`) in two passes of the same sources. The doc comments
+  stay in every `.d.ts`, where editors and api-extractor read them; the
+  `.js` files no longer ship them. Every `.d.ts` and `.d.ts.map` is byte
+  for byte that of 1.3.0, the file list is the same, and every `.js`
+  prints the same as 1.3.0's once comments are removed.
+- Size (PLAN §8, gzip level 9, budgets unchanged):
+  `map`+`layers`+`symbology`+`legend` 61383 to 44806 of 61440 bytes,
+  `table` 17866 to 13219 of 40960, `form` 20185 to 14308 of 30720. The
+  tarball goes from 610035 to 547922 bytes.
+
+No `@public` line of `docs/api/uspace-ui.api.md` changes; no legend
+value changes.
+
+### Entry points that ship
+
+`model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api` (with the
+`uspace-ui-gen-api` bin), `auth/server`, `auth/client`, `symbology`,
+`layers`, `legend`, `live`, `status`, `alerts`, `table`, `form`,
+`eslint`, `test`, and `styles/tokens.css`, `styles/map.css`,
+`fonts/fonts.css` with the woff2 files, as in 1.3.0.
+
 ## 1.3.0
 
 A minor on 1.2.0: an identification that was not judged is drawn as

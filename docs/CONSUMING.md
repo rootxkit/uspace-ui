@@ -6,7 +6,7 @@ is shown working in [`examples/next-app/`](../examples/next-app/), which
 CI builds against the kit's current source and smokes in Chromium on
 every pull request. The rules behind the steps are `docs/PLAN.md` §6.3
 (the contracts), §7 (security) and §11 (consumption). This guide is for
-`1.3.0`.
+`1.3.1`.
 
 ## 1. Install the release tarball with pnpm
 
@@ -22,7 +22,7 @@ install --frozen-lockfile`.
 {
   "packageManager": "pnpm@11.9.0",
   "dependencies": {
-    "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.3.0/rootxkit-uspace-ui-1.3.0.tgz",
+    "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.3.1/rootxkit-uspace-ui-1.3.1.tgz",
     "maplibre-gl": "5.24.0",
     "next": "16.3.8",
     "react": "19.3.0",
@@ -45,8 +45,8 @@ install --frozen-lockfile`.
 - Before pinning, check the asset's signed build provenance:
 
   ```sh
-  gh release download v1.3.0 --repo rootxkit/uspace-ui --pattern 'rootxkit-uspace-ui-1.3.0.tgz'
-  gh attestation verify rootxkit-uspace-ui-1.3.0.tgz --repo rootxkit/uspace-ui \
+  gh release download v1.3.1 --repo rootxkit/uspace-ui --pattern 'rootxkit-uspace-ui-1.3.1.tgz'
+  gh attestation verify rootxkit-uspace-ui-1.3.1.tgz --repo rootxkit/uspace-ui \
     --signer-workflow rootxkit/uspace-ui/.github/workflows/release.yml
   ```
 
@@ -378,6 +378,11 @@ counts built from `identDrawn` gain a `pending` row that is not an
 attention status. A local rule that singled out `details_unavailable`
 can go: ask `isJudged(identification)`, or name the input with
 `IDENT_PENDING_KEYS[unjudgedReason(reason)]`.
+
+From `1.3.0` to `1.3.1` (the built JavaScript ships without comments):
+replace the asset URL and commit the lockfile. The `.d.ts` files, and
+so the doc comments your editor shows, are unchanged; nothing needs an
+edit.
 
 ## Minimum version per consumer
 
