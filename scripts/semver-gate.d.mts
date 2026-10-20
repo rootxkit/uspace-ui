@@ -27,10 +27,11 @@ export interface ApiChange {
   text: string;
   name: string | undefined;
 }
+export function isWidenedByStrings(base: string, head: string): boolean;
 export function apiReportChanges(
   baseText: string,
   headText: string,
-): { breaking: ApiChange[]; beta: ApiChange[] };
+): { breaking: ApiChange[]; beta: ApiChange[]; widened: ApiChange[] };
 
 export function tokenChanges(
   baseText: string,

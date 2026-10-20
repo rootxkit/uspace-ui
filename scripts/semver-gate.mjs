@@ -6,6 +6,10 @@
 //      heading in CHANGELOG.md, the next major from v1 (the next minor or
 //      higher before v1), and the PR label `breaking`. A @beta
 //      declaration is outside the gate; documentation comments are too.
+//      A line that only gains string-literal members of a tuple or a
+//      union (a new enumeration value: every old member still there, in
+//      order, and nothing else on the line changed) is additive, as PLAN
+//      §12 says; api-extractor writes such a declaration on one line.
 //   2. styles/tokens.css: a removed or changed `--us-severity-*`,
 //      `--us-trust-*`, `--us-ident-*`, `--us-zone-*` or `--us-age-*`
 //      value needs the label `legend-change` and a CHANGELOG line added
@@ -186,18 +190,105 @@ export function classifyReport(text) {
   return { lines: ls, classes: out, tags };
 }
 
-/** The public lines of the base report that the head removed or changed. */
+const STRING_LITERAL = /"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'/g;
+const MEMBER_SEPARATOR = /^\s*(?:,|\|)\s*$/;
+
+/**
+ * Whether `head` is `base` with string-literal members added to a tuple
+ * or a union and nothing else changed: every literal of `base` is still
+ * in `head`, in order, and deleting each added literal with one adjacent
+ * `,` or `|` separator between two literals gives `base` exactly. A
+ * removed or reordered member, a gained member that is not a string
+ * literal, or any other edit is not a widening.
+ *
+ * A `,` member (a tuple's) may only be appended, after the last old
+ * literal: one inserted before it shifts every later index
+ * (`IDENT_REASONS[1]`), a mapped type over its keys, and the runtime
+ * order the kit lists options and legend rows in. A `|` member (a
+ * union's) may come anywhere, since a union has no order. A gained
+ * duplicate of an old literal is accepted like any other appended
+ * member: in a union it changes nothing, and in a tuple it only adds an
+ * index at the end.
+ *
+ * The gate reads text, not variance: a union widened where a consumer
+ * supplies the value (a callback parameter it implements, a prop it
+ * passes) is also accepted, though such a consumer must now handle the
+ * new member. The CHANGELOG section of the release says so.
+ */
+export function isWidenedByStrings(base, head) {
+  if (base === head) return false;
+  const parts = head.split(STRING_LITERAL);
+  const lits = head.match(STRING_LITERAL) ?? [];
+  const old = base.match(STRING_LITERAL) ?? [];
+  if (lits.length <= old.length) return false;
+  // Keep the old literals, in order, greedily.
+  const keep = new Array(lits.length).fill(false);
+  let j = 0;
+  for (let i = 0; i < lits.length && j < old.length; i++)
+    if (lits[i] === old[j]) {
+      keep[i] = true;
+      j += 1;
+    }
+  if (j < old.length) return false;
+  const lastKept = keep.lastIndexOf(true);
+  // parts[i] precedes lits[i]; parts[i + 1] follows it.
+  const dropPart = new Array(parts.length).fill(false);
+  const dropLit = new Array(lits.length).fill(false);
+  for (let i = 0; i < lits.length; i++) {
+    if (keep[i]) continue;
+    dropLit[i] = true;
+    let sep;
+    if (i > 0 && !dropPart[i] && MEMBER_SEPARATOR.test(parts[i])) sep = i;
+    else if (
+      i + 1 < lits.length &&
+      !dropPart[i + 1] &&
+      MEMBER_SEPARATOR.test(parts[i + 1])
+    )
+      sep = i + 1;
+    else return false;
+    // A tuple member inserted before the last old one moves indices.
+    if (parts[sep].includes(",") && i < lastKept) return false;
+    dropPart[sep] = true;
+  }
+  let rebuilt = "";
+  for (let i = 0; i < parts.length; i++) {
+    if (!dropPart[i]) rebuilt += parts[i];
+    if (i < lits.length && !dropLit[i]) rebuilt += lits[i];
+  }
+  return rebuilt === base;
+}
+
+/**
+ * The public lines of the base report that the head removed or changed,
+ * the @beta ones, and the public lines that only gained string members
+ * (`widened`, additive).
+ */
 export function apiReportChanges(baseText, headText) {
   const base = classifyReport(baseText);
+  const head = classifyReport(headText);
   // A trailing comma is not a change: removing the last member of a
   // namespace's export list takes the comma off the member before it.
   const bare = (l) => l.replace(/,\s*$/, "");
-  const { removed } = diffLines(
+  const { removed, added } = diffLines(
     base.lines.map(bare),
-    lines(headText).map(bare),
+    head.lines.map(bare),
   );
   const breaking = [];
   const beta = [];
+  const widened = [];
+  const used = new Set();
+  /** An added head line of the same public declaration that widens `i`. */
+  const widening = (i, name) =>
+    added.find((k) => {
+      if (used.has(k)) return false;
+      const h = head.classes[k];
+      return (
+        h.kind === "decl" &&
+        h.tag === "public" &&
+        h.name === name &&
+        isWidenedByStrings(base.lines[i], head.lines[k])
+      );
+    });
   for (const i of removed) {
     const c = base.classes[i];
     const text = base.lines[i];
@@ -209,10 +300,18 @@ export function apiReportChanges(baseText, headText) {
           ? "public"
           : c.tag;
     const entry = { line: i + 1, text, name: c.name };
-    if (tag === "public") breaking.push(entry);
-    else beta.push(entry);
+    if (tag !== "public") {
+      beta.push(entry);
+      continue;
+    }
+    const k = c.kind === "decl" ? widening(i, c.name) : undefined;
+    if (k === undefined) breaking.push(entry);
+    else {
+      used.add(k);
+      widened.push(entry);
+    }
   }
-  return { breaking, beta };
+  return { breaking, beta, widened };
 }
 
 // --- rule 2: the semantic tokens ------------------------------------------
@@ -361,6 +460,9 @@ export function evaluate(input) {
   if (api.breaking.length === 0) {
     out.push(
       `rule 1 (API report, PLAN §12): not fired: no @public line removed or changed in ${API_REPORT}` +
+        (api.widened.length > 0
+          ? ` (${api.widened.length} @public line(s) only gained string members of a tuple or union, additive: ${api.widened.map((e) => e.name ?? "?").join(", ")})`
+          : "") +
         (api.beta.length > 0
           ? ` (${api.beta.length} @beta line(s) changed, outside the gate)`
           : ""),

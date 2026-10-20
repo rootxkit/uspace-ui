@@ -1001,11 +1001,16 @@ D10).
 - The semver gate (WP-14): `api-extractor` writes
   `docs/api/uspace-ui.api.md`; a PR whose diff removes or changes a line
   there (as opposed to adding one) must add a new major heading to
-  `CHANGELOG.md` and carry the label `breaking`; a diff under
-  `styles/tokens.css` that changes a semantic colour, or under
-  `src/symbology/` that changes a `*Token`/`*Shape` mapping, needs the
-  label `legend-change` and a CHANGELOG line naming the lesson or spec
-  row behind it.
+  `CHANGELOG.md` and carry the label `breaking`, except a line that only
+  gains string-literal members of a tuple (appended only) or a union (a
+  new enumeration value, which api-extractor writes on the
+  declaration's one line). The gate reads text, not variance: a union
+  widened in a position a consumer implements (a callback parameter)
+  passes as well, and the release's CHANGELOG section names what a
+  consumer must handle. A diff under `styles/tokens.css` that changes a
+  semantic colour, or under `src/symbology/` that changes a
+  `*Token`/`*Shape` mapping, needs the label `legend-change` and a
+  CHANGELOG line naming the lesson or spec row behind it.
 - `docs/CORE_VERSION` pins the `uspace-core` tag the enumerations are
   mirrored from; bumping it is its own `build:` commit that runs the
   enum check.
