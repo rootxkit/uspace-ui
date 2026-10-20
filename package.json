@@ -113,7 +113,7 @@
     "provenance": true
   },
   "scripts": {
-    "build": "node scripts/clean.mjs dist && tsc -p tsconfig.build.json",
+    "build": "node scripts/clean.mjs dist && tsc -p tsconfig.build.json && tsc -p tsconfig.build.js.json",
     "check": "pnpm run check:format && pnpm run build && pnpm run check:lint && pnpm run check:types && pnpm run check:package && pnpm run check:pack && pnpm run check:api && pnpm run check:consumers && pnpm run check:size && pnpm run check:hostnames",
     "check:format": "prettier --check .",
     "check:lint": "eslint --max-warnings 0 .",

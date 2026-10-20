@@ -1,3 +1,7 @@
+// The declarations: dist/**/*.d.ts with their doc comments, which
+// api-extractor (docs/api) and consumers' editors read. The JavaScript is
+// emitted by tsconfig.build.js.json, without comments; `pnpm build` runs
+// both.
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
@@ -6,7 +10,7 @@
     "outDir": "dist",
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true,
+    "emitDeclarationOnly": true,
     "types": []
   },
   "include": ["src"],
