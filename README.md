@@ -20,7 +20,9 @@ kit's view models in an adapter it owns.
 
 ## Status
 
-`1.3.1` is a patch on `1.3.0` (the built JavaScript ships without
+`1.3.2` is a patch on `1.3.1` (a keyboard move in `DataTable` is no
+longer lost while an earlier render's effects are pending). `1.3.1` is
+a patch on `1.3.0` (the built JavaScript ships without
 comments; the `.d.ts` files keep them). `1.3.0` is a minor on `1.2.0` (an identification that was not judged,
 `details_unavailable` or `registry_unavailable`, is drawn as pending).
 `1.2.0` is a minor on `1.1.2` (the identification reason
@@ -74,7 +76,7 @@ path for later. Depend on the asset URL of one release, exactly:
 ```jsonc
 // web/package.json
 "dependencies": {
-  "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.3.1/rootxkit-uspace-ui-1.3.1.tgz",
+  "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.3.2/rootxkit-uspace-ui-1.3.2.tgz",
   "maplibre-gl": "5.x"
 }
 ```
@@ -89,7 +91,7 @@ depend on a `github:` spec or a branch. From `0.1.0` the tarball carries
 a signed build provenance attestation; check it with `gh attestation
 verify` before pinning (`docs/RELEASING.md`).
 
-## Consuming (`1.3.1`)
+## Consuming (`1.3.2`)
 
 ```css
 /* web/app/globals.css */

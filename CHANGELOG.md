@@ -7,6 +7,38 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
+## 1.3.2
+
+A patch on 1.3.1: a keyboard move in `DataTable` is no longer lost when
+it arrives while an earlier render's effects are pending. Prepared on
+`main`, not tagged: the owner tags `v1.3.2` (docs/RELEASING.md). Pin it
+exactly:
+
+```jsonc
+"@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.3.2/rootxkit-uspace-ui-1.3.2.tgz"
+```
+
+- Table: a grid move (arrows, Home/End, Ctrl+Home/End, PageUp/PageDown)
+  kept a flag for "focus the active cell", and an effect read the cell
+  from its own render. React runs a pending effect of the render before
+  the move first, and that effect took the flag and focused the cell
+  the move had left, so focus stayed put. The request now names the
+  cell and is kept until that cell is in the DOM, a virtualised row
+  included. Seen as the CI flake of the browser test "10 000 rows
+  virtualised" (Ctrl+End stayed on `0:0`); two browser tests force the
+  ordering and fail on 1.3.1.
+
+No `@public` line of `docs/api/uspace-ui.api.md` changes; no legend
+value changes.
+
+### Entry points that ship
+
+`model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api` (with the
+`uspace-ui-gen-api` bin), `auth/server`, `auth/client`, `symbology`,
+`layers`, `legend`, `live`, `status`, `alerts`, `table`, `form`,
+`eslint`, `test`, and `styles/tokens.css`, `styles/map.css`,
+`fonts/fonts.css` with the woff2 files, as in 1.3.1.
+
 ## 1.3.1
 
 A patch on 1.3.0: the built JavaScript carries no comments. Prepared on

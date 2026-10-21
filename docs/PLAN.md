@@ -1013,6 +1013,15 @@ D10).
   `alerts`, `table`, `form`, `eslint` and `test`; every `.d.ts` as in
   `v1.3.0`. No `@public` line added, removed or changed; no legend value
   changed; no budget changed.
+- `v1.3.2`: a patch, a `DataTable` keyboard move keeps the cell it asked
+  for until that cell is in the DOM, so a pending effect of an earlier
+  render can no longer take the request and leave focus where it was
+  (the CI flake of "10 000 rows virtualised"). *Prepared on `main`,
+  tagged by the owner:* every entry point of §2 as in `v1.3.1`,
+  `model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api`, `auth/server`,
+  `auth/client`, `symbology`, `layers`, `legend`, `live`, `status`,
+  `alerts`, `table`, `form`, `eslint` and `test`. No `@public` line
+  added, removed or changed; no legend value changed; no budget changed.
 - From `v1`: within a major only additive changes (new exports, new
   optional props, new catalogue keys, new enumeration values *rendered*
   because `model` gained them). The following are a **major**: removing
