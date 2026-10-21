@@ -1,7 +1,7 @@
 import { waitFor, within } from "@testing-library/react";
 import type { Map as MapLibreMap } from "maplibre-gl";
 import { useState } from "react";
-import { afterEach, expect, it } from "vitest";
+import { afterEach, beforeEach, expect, it } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import {
@@ -103,12 +103,23 @@ async function loadedMap(canvasElement: HTMLElement): Promise<MapLibreMap> {
   return map;
 }
 
+// The resource timeline is the page's, shared by every test of this file:
+// each test starts it empty, so the checks below see only what that test's
+// map fetched, not what an earlier test left (or a full buffer dropped).
+beforeEach(() => {
+  performance.clearResourceTimings();
+});
+
 /**
- * Every resource the page fetched came from the test page's own origin. Glyph
- * requests come from MapLibre's worker and are not in the page's resource
- * timeline, so the style's own URLs are checked as well.
+ * Every resource the page fetched came from the test page's own origin, and
+ * one of them was under `expected`. Glyph requests come from MapLibre's
+ * worker and are not in the page's resource timeline, so the style's own
+ * URLs are checked as well.
  */
-async function expectSameOriginOnly(map: MapLibreMap): Promise<void> {
+async function expectSameOriginOnly(
+  map: MapLibreMap,
+  expected = "/basemap/",
+): Promise<void> {
   const origin = window.location.origin;
   const urls = performance
     .getEntriesByType("resource")
@@ -116,7 +127,7 @@ async function expectSameOriginOnly(map: MapLibreMap): Promise<void> {
     .filter((u) => !u.startsWith("data:") && !u.startsWith("blob:"));
   const foreign = urls.filter((u) => !u.startsWith(origin));
   expect(foreign).toEqual([]);
-  expect(urls.some((u) => u.includes("/basemap/"))).toBe(true);
+  expect(urls.filter((u) => u.startsWith(origin + expected))).not.toEqual([]);
   const style = map.getStyle();
   const styleUrls = [
     style.glyphs,
@@ -236,7 +247,7 @@ it("Georgian, dark", async () => {
 
 it("no basemap", async () => {
   const canvasElement = renderKit(
-    <MapTest lang="en" scheme="light" basemapPath="no-such-basemap" />,
+    <MapTest lang="en" scheme="light" basemapPath="/no-such-basemap" />,
     EN_LIGHT,
   ).container;
   const canvas = within(canvasElement);
@@ -246,7 +257,9 @@ it("no basemap", async () => {
     }),
   ).toBeTruthy();
   const map = await loadedMap(canvasElement);
-  await expectSameOriginOnly(map);
+  // SOURCE.json was asked for under the missing base path, on the page's
+  // own origin: the notice comes from a real failed request.
+  await expectSameOriginOnly(map, "/no-such-basemap/basemap/SOURCE.json");
 });
 
 const getContext = HTMLCanvasElement.prototype.getContext;
