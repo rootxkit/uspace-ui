@@ -599,15 +599,22 @@ export function DataTable<Row>(props: DataTableProps<Row>) {
     row: Math.min(active.row, bodyCount),
     col: Math.min(active.col, Math.max(0, cols - 1)),
   };
-  const wantFocus = useRef(false);
+  // The cell a keyboard move asked to focus, until it is in the DOM (a
+  // virtualised row renders only after the scroll). It carries the cell
+  // itself, not a flag: React flushes an earlier render's pending effect
+  // before it renders the move, and that effect only knows its own
+  // render's cell, so a flag let it take the request and focus the cell
+  // the move had left.
+  const wantFocus = useRef<GridPos | null>(null);
 
   useEffect(() => {
-    if (!wantFocus.current) return;
+    const want = wantFocus.current;
+    if (want === null) return;
     const el = tableRef.current?.querySelector<HTMLElement>(
-      `[data-grid-cell="${pos.row}:${pos.col}"]`,
+      `[data-grid-cell="${want.row}:${want.col}"]`,
     );
     if (el === null || el === undefined) return;
-    wantFocus.current = false;
+    wantFocus.current = null;
     el.focus();
   });
 
@@ -616,7 +623,7 @@ export function DataTable<Row>(props: DataTableProps<Row>) {
 
   const moveTo = (next: GridPos) => {
     setActive(next);
-    wantFocus.current = true;
+    wantFocus.current = next;
     if (virtual && next.row >= 1) virtualizer.scrollToIndex(next.row - 1);
   };
 
