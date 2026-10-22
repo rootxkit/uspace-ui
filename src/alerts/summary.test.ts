@@ -251,6 +251,49 @@ describe("the other kinds", () => {
     expect(r({ restriction_id: "R1" })).toBe("Restriction R1 active");
   });
 
+  it("restriction_activated of a manned emergency names the aircraft, not a restriction", () => {
+    const r = (detail: Record<string, unknown>) =>
+      en(alert({ kind: "restriction_activated", detail }));
+    const manned = {
+      icao24: "f0e001",
+      callsign: "TEST01",
+      squawk: "7700",
+      trust: "surveillance",
+      vertical_judged: true,
+    };
+    expect(
+      r({
+        cause: "manned_emergency",
+        decision: "informed",
+        withdrawn: false,
+        manned,
+      }),
+    ).toBe(
+      "Emergency manned aircraft TEST01 (squawk 7700) in or heading through the authorised volume; the authorisation stands",
+    );
+    // Broadcast, the vertical not judged, the input held: each said.
+    const held = r({
+      cause: "manned_emergency",
+      decision: "informed",
+      manned: { ...manned, trust: "broadcast", vertical_judged: false },
+      inputs_unavailable_since: "2026-10-22T12:00:00Z",
+    });
+    expect(held).toContain("f0e001 is broadcast and unverified");
+    expect(held).toContain("vertical not judged");
+    expect(held).toContain("held, not cleared");
+    // An icao24 when no callsign; a dash for what is not sent.
+    expect(r({ cause: "manned_emergency", manned: { icao24: "f0e001" } })).toBe(
+      "Emergency manned aircraft f0e001 (squawk \u2014) in or heading through the authorised volume",
+    );
+    // A restriction's notice keeps its own sentence (the pair).
+    expect(
+      r({ cause: "restriction", restriction_id: "R1", withdrawn: true }),
+    ).toBe("Restriction R1 active; the authorisation was withdrawn");
+    expect(r({ cause: "restriction", restriction_id: "R1" })).not.toMatch(
+      /manned/,
+    );
+  });
+
   it("emergency_nearby carries a broadcast peer's caveat", () => {
     const a = alert({
       kind: "emergency_nearby",
