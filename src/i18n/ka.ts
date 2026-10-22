@@ -552,6 +552,13 @@ export const ka: Readonly<Record<Key, string>> = {
   "alert.summary.restriction_activated": "შეზღუდვა {restriction} მოქმედებს",
   "alert.summary.authorisation_updated": "ნებართვა განახლდა",
   "alert.summary.authorisation_withdrawn": "ნებართვა გაუქმდა",
+  "alert.summary.restriction_activated.manned_emergency":
+    "საგანგებო მდგომარეობაში მყოფი პილოტირებადი საჰაერო ხომალდი {aircraft} (სკვოკი {squawk}) ნებადართულ მოცულობაშია ან მასში გადის",
+  "alert.summary.authorisation_stands": "ნებართვა ძალაში რჩება",
+  "alert.summary.vertical_not_judged":
+    "ვერტიკალი არ შეფასდა (გეოდეზიური სიმაღლე არ არის)",
+  "alert.summary.manned_input_unavailable":
+    "პილოტირებადი მოძრაობის მონაცემები მიუწვდომელია: შენარჩუნებულია, არ მოხსნილა",
   "alert.summary.emergency_nearby":
     "ახლომდებარე საჰაერო ხომალდმა საგანგებო მდგომარეობა გამოაცხადა",
   "alert.summary.unregistered": "ამ საჰაერო ხომალდის რეგისტრაცია ვერ მოიძებნა",

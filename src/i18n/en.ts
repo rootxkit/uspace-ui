@@ -579,6 +579,13 @@ const catalogue = {
   "alert.summary.restriction_activated": "Restriction {restriction} active",
   "alert.summary.authorisation_updated": "the authorisation was updated",
   "alert.summary.authorisation_withdrawn": "the authorisation was withdrawn",
+  "alert.summary.restriction_activated.manned_emergency":
+    "Emergency manned aircraft {aircraft} (squawk {squawk}) in or heading through the authorised volume",
+  "alert.summary.authorisation_stands": "the authorisation stands",
+  "alert.summary.vertical_not_judged":
+    "vertical not judged (no geodetic altitude)",
+  "alert.summary.manned_input_unavailable":
+    "manned traffic input unavailable: held, not cleared",
   "alert.summary.emergency_nearby": "An aircraft nearby declared an emergency",
   "alert.summary.unregistered": "No registration found for this aircraft",
   "alert.summary.no_authorisation":

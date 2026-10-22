@@ -181,6 +181,43 @@ function peerCaveat(t: Translate, peer: AlertPeer): string | null {
   }
 }
 
+/**
+ * The sentence of a `restriction_activated` notice with `cause:
+ * manned_emergency` (uspace-ussp PLAN §15 Q39): the emergency manned
+ * aircraft by its callsign (or its icao24) and its squawk as the server
+ * sent them, that the authorisation stands (`decision: informed`), the
+ * broadcast caveat of a broadcast track (R-05), a vertical the server
+ * did not judge (R-09), and a held alert whose manned input is
+ * unavailable. No advice: the remote pilot decides.
+ */
+function mannedEmergency(t: Translate, d: Detail): string {
+  const raw = Object.hasOwn(d, "manned") ? d["manned"] : undefined;
+  const m: Detail =
+    typeof raw === "object" && raw !== null && !Array.isArray(raw)
+      ? (raw as Detail)
+      : {};
+  const aircraft = detailString(m, "callsign", "icao24") ?? DASH;
+  let text = t("alert.summary.restriction_activated.manned_emergency", {
+    aircraft,
+    squawk: detailString(m, "squawk") ?? DASH,
+  });
+  if (detailString(d, "decision") === "informed")
+    text = join(t, text, t("alert.summary.authorisation_stands"));
+  if (detailString(m, "trust") === "broadcast")
+    text = join(
+      t,
+      text,
+      t("alert.summary.peer_broadcast", {
+        peer: detailString(m, "icao24") ?? aircraft,
+      }),
+    );
+  if (detailFlag(m, "vertical_judged") === false)
+    text = join(t, text, t("alert.summary.vertical_not_judged"));
+  if (detailString(d, "inputs_unavailable_since") !== null)
+    text = join(t, text, t("alert.summary.manned_input_unavailable"));
+  return text;
+}
+
 /** The zone notes of R-09 and Z-09, in the order the brief lists them. */
 function zoneNotes(t: Translate, d: Detail): string[] {
   const notes: string[] = [];
@@ -262,6 +299,8 @@ function activeSummary(alert: AlertView, t: Translate, lang: Lang): string {
         t(key, zoneName(t, d)),
       );
     case "restriction_activated": {
+      if (detailString(d, "cause") === "manned_emergency")
+        return mannedEmergency(t, d);
       const text = t(key, {
         restriction: detailString(d, "restriction_id") ?? DASH,
       });
