@@ -1028,7 +1028,10 @@ D10).
   authorisation stands when `decision` is `informed`, and carries the
   broadcast caveat, an unjudged vertical and a held input; four
   catalogue keys added in `en` and `ka`. *Prepared on `main`, tagged by
-  the owner:* every entry point of §2 as in `v1.3.2`. No `@public` line
+  the owner:* every entry point of §2 as in `v1.3.2`, `model`,
+  `theme`, `ui`, `i18n`, `fonts`, `map`, `api`, `auth/server`,
+  `auth/client`, `symbology`, `layers`, `legend`, `live`, `status`,
+  `alerts`, `table`, `form`, `eslint` and `test`. No `@public` line
   added, removed or changed; no legend value changed; no budget changed.
 - From `v1`: within a major only additive changes (new exports, new
   optional props, new catalogue keys, new enumeration values *rendered*
