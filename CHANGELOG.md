@@ -7,6 +7,46 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
+## 1.4.0
+
+A minor on 1.3.2: the alert summary tells a manned-emergency notice
+from a restriction's. Prepared on `main`, not tagged: the owner tags
+`v1.4.0` (docs/RELEASING.md). Pin it exactly:
+
+```jsonc
+"@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.4.0/rootxkit-uspace-ui-1.4.0.tgz"
+```
+
+- Alerts: a `restriction_activated` alert with
+  `detail.cause: manned_emergency` (uspace-ussp's Art. 10(10)
+  manned-emergency re-check, its PLAN §15 Q39) read "Restriction — active", which is
+  wrong: it names no restriction. It now reads "Emergency manned
+  aircraft {aircraft} (squawk {squawk}) in or heading through the
+  authorised volume", with the aircraft's callsign (else its icao24) and
+  squawk from `detail.manned` as sent (a dash for one not sent); "the
+  authorisation stands" when `decision` is `informed`; the broadcast
+  caveat of a broadcast track (R-05); "vertical not judged" when the
+  server did not judge it (`vertical_judged: false`, R-09); and "manned
+  traffic input unavailable: held, not cleared" with
+  `inputs_unavailable_since`. Every other `restriction_activated` reads
+  as before. New catalogue keys, `en` and `ka`:
+  `alert.summary.restriction_activated.manned_emergency`,
+  `alert.summary.authorisation_stands`,
+  `alert.summary.vertical_not_judged`,
+  `alert.summary.manned_input_unavailable`. No advice: the remote pilot
+  decides.
+
+No `@public` line of `docs/api/uspace-ui.api.md` changes; no legend
+value changes.
+
+### Entry points that ship
+
+`model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api` (with the
+`uspace-ui-gen-api` bin), `auth/server`, `auth/client`, `symbology`,
+`layers`, `legend`, `live`, `status`, `alerts`, `table`, `form`,
+`eslint`, `test`, and `styles/tokens.css`, `styles/map.css`,
+`fonts/fonts.css` with the woff2 files, as in 1.3.2.
+
 ## 1.3.2
 
 A patch on 1.3.1: a keyboard move in `DataTable` is no longer lost when
