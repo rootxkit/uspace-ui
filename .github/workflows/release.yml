@@ -148,7 +148,7 @@ jobs:
             --verify-tag --title "$GITHUB_REF_NAME" \
             --notes-file "$RUNNER_TEMP/notes.md" "${flags[@]}"
       # Read the release back instead of trusting the log (E-02): the flag,
-      # the assets, and the bytes a consumer will download from the URL.
+      # the assets, and the bytes a consumer downloads.
       - name: Read the release back
         run: |
           gh release view "$GITHUB_REF_NAME" --json isPrerelease,assets \
@@ -165,7 +165,10 @@ jobs:
           # fails after the bound and passes only on a read that showed the
           # mark (scripts/release.mjs checkLatest).
           node scripts/release.mjs check-latest "$GITHUB_REF_NAME"
-          curl -sSfL -o "$RUNNER_TEMP/$NAME" "$(node scripts/release.mjs url)"
+          # The repository is private (since 2026-10-24): the download URL
+          # answers 404 anonymously and to a token alike, so the asset is
+          # read through the API, as a consumer with read access gets it.
+          gh release download "$GITHUB_REF_NAME" --pattern "$NAME" --dir "$RUNNER_TEMP" --clobber
           echo "$SHA256  $RUNNER_TEMP/$NAME" | sha256sum -c -
           # The downloaded bytes carry this workflow's signed provenance.
           gh attestation verify "$RUNNER_TEMP/$NAME" --repo "$GITHUB_REPOSITORY" \
