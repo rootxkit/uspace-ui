@@ -1,7 +1,7 @@
 // release.yml signs what it releases: the release job may mint the OIDC
 // token keyless signing needs and store an attestation, it attests the
 // tarball before the GitHub Release is created, and its read-back
-// verifies the attestation on the bytes downloaded from the public URL.
+// verifies the attestation on the bytes downloaded from the release.
 // SHA256SUMS alone is written by the same job and proves no origin.
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -47,7 +47,7 @@ describe("release.yml provenance", () => {
       '--signer-workflow "$GITHUB_REPOSITORY/.github/workflows/release.yml"',
     );
     expect(readBack.indexOf("gh attestation verify")).toBeGreaterThan(
-      readBack.indexOf("curl -sSfL"),
+      readBack.indexOf("gh release download"),
     );
   });
 
@@ -74,7 +74,7 @@ describe("release.yml provenance", () => {
     // The check runs before the bytes are downloaded and verified, and
     // the job's bound leaves room for its wait.
     expect(readBack.indexOf("check-latest")).toBeLessThan(
-      readBack.indexOf("curl -sSfL"),
+      readBack.indexOf("gh release download"),
     );
     expect(releaseJob).toMatch(/^ {4}timeout-minutes: 10$/m);
   });

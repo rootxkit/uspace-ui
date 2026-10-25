@@ -309,6 +309,27 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
+      - name: read access to the private uspace-lab
+        # uspace-lab is private (since 2026-10-24). Git reaches
+        # https://github.com/rootxkit/ with the read token as an HTTP
+        # header for the rest of the job (masked, never in a URL or on a
+        # command line). Missing, it is an error where the online check is
+        # required and a warning elsewhere ("unverified", as before).
+        env:
+          CROSS_REPO_READ_TOKEN: ${{ secrets.CROSS_REPO_READ_TOKEN }}
+          REQUIRE_LAB: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')) && '1' || '0' }}
+        run: |
+          if [ -z "$CROSS_REPO_READ_TOKEN" ]; then
+            if [ "$REQUIRE_LAB" = 1 ]; then
+              echo "::error title=CROSS_REPO_READ_TOKEN is not set::the fixtures are compared with the private uspace-lab; add the repository secret CROSS_REPO_READ_TOKEN (fine-grained token, Contents: read)"
+              exit 1
+            fi
+            echo "::warning title=CROSS_REPO_READ_TOKEN is not set::uspace-lab is private; the online comparison below reports unverified"
+            exit 0
+          fi
+          b64="$(printf 'x-access-token:%s' "$CROSS_REPO_READ_TOKEN" | base64 | tr -d '\n')"
+          echo "::add-mask::$b64"
+          printf '[http "https://github.com/rootxkit/"]\n\textraheader = AUTHORIZATION: basic %s\n' "$b64" >> "$HOME/.gitconfig"
       - env:
           REQUIRE_LAB: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')) && '1' || '0' }}
         run: bash scripts/check-fixtures.sh --online
@@ -329,4 +350,19 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: read access to the private uspace-core
+        # uspace-core is private (since 2026-10-24): check-enums.sh clones
+        # it with the read token as git's HTTP header for
+        # https://github.com/rootxkit/ (masked, never in a URL or on a
+        # command line), or stops here naming the missing secret.
+        env:
+          CROSS_REPO_READ_TOKEN: ${{ secrets.CROSS_REPO_READ_TOKEN }}
+        run: |
+          if [ -z "$CROSS_REPO_READ_TOKEN" ]; then
+            echo "::error title=CROSS_REPO_READ_TOKEN is not set::check-enums.sh clones the private uspace-core; add the repository secret CROSS_REPO_READ_TOKEN (fine-grained token, Contents: read)"
+            exit 1
+          fi
+          b64="$(printf 'x-access-token:%s' "$CROSS_REPO_READ_TOKEN" | base64 | tr -d '\n')"
+          echo "::add-mask::$b64"
+          printf '[http "https://github.com/rootxkit/"]\n\textraheader = AUTHORIZATION: basic %s\n' "$b64" >> "$HOME/.gitconfig"
       - run: sh scripts/check-enums.sh
