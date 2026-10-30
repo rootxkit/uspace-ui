@@ -20,7 +20,10 @@ kit's view models in an adapter it owns.
 
 ## Status
 
-`1.4.0` is a minor on `1.3.2` (the alert summary names the emergency
+`1.5.0` is a minor on `1.4.0` (the identification reason
+`registration_mismatch`, a bound aircraft that declares a registration
+other than its authorised intent's, is rendered with its own reason and
+mismatch line). `1.4.0` is a minor on `1.3.2` (the alert summary names the emergency
 manned aircraft of a `restriction_activated` notice with `cause:
 manned_emergency`). `1.3.2` is a patch on `1.3.1` (a keyboard move in `DataTable` is no
 longer lost while an earlier render's effects are pending). `1.3.1` is
@@ -78,7 +81,7 @@ path for later. Depend on the asset URL of one release, exactly:
 ```jsonc
 // web/package.json
 "dependencies": {
-  "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.4.0/rootxkit-uspace-ui-1.4.0.tgz",
+  "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.5.0/rootxkit-uspace-ui-1.5.0.tgz",
   "maplibre-gl": "5.x"
 }
 ```
@@ -93,7 +96,7 @@ depend on a `github:` spec or a branch. From `0.1.0` the tarball carries
 a signed build provenance attestation; check it with `gh attestation
 verify` before pinning (`docs/RELEASING.md`).
 
-## Consuming (`1.4.0`)
+## Consuming (`1.5.0`)
 
 ```css
 /* web/app/globals.css */

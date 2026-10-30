@@ -452,6 +452,36 @@ describe("identification", () => {
     expect(value(root, "registered-operator")).toBe("GEO-TEST-OP-0999");
   });
 
+  it.each(["en", "ka"] as const)(
+    "shows a registration_mismatch track with its reason and the registration mismatch line (%s)",
+    (lang) => {
+      const cat = lang === "en" ? en : ka;
+      const t = uasTrack();
+      const track: TrackView = {
+        ...t,
+        identification: {
+          ...(t.identification as NonNullable<TrackView["identification"]>),
+          status: "registered",
+          reason: "registration_mismatch",
+          basis: "authenticated",
+          mismatch: true,
+        },
+      };
+      const root = show(track, lang);
+      expect(value(root, "ident-reason")).toBe(
+        cat["ident.reason.registration_mismatch"],
+      );
+      expect(root.querySelector('[data-part="mismatch"]')?.textContent).toBe(
+        cat["ident.mismatch.registration"],
+      );
+      expect(
+        root
+          .querySelector('[data-field="ident-status"] [data-ident]')
+          ?.getAttribute("data-ident"),
+      ).toBe("unknown_operator");
+    },
+  );
+
   it("without a mismatch there is no mismatch line nor registered operator (the twin)", () => {
     const root = show(uasTrack());
     expect(root.querySelector('[data-part="mismatch"]')).toBeNull();

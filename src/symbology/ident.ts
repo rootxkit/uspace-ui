@@ -243,6 +243,7 @@ export const IDENT_REASON_KEYS: Readonly<Record<IdentReason, Key>> =
     no_serial: "ident.reason.no_serial",
     registry_unavailable: "ident.reason.registry_unavailable",
     details_unavailable: "ident.reason.details_unavailable",
+    registration_mismatch: "ident.reason.registration_mismatch",
   });
 
 /**
@@ -303,6 +304,27 @@ function caveatKey(
 }
 
 /**
+ * The mismatch line of a reason (G-02): a registration that differs from
+ * the authorised intent's (`registration_mismatch`, lab#64) says so; any
+ * other mismatch is the operator's. Internal: identHintKey and the
+ * track label read it.
+ */
+export function mismatchKey(reason: IdentReason): Key {
+  return reason === "registration_mismatch"
+    ? "ident.mismatch.registration"
+    : "ident.mismatch";
+}
+
+/**
+ * The short mismatch label of a reason, for the map label. Internal.
+ */
+export function mismatchShortKey(reason: IdentReason): Key {
+  return reason === "registration_mismatch"
+    ? "ident.mismatch_short.registration"
+    : "ident.mismatch_short";
+}
+
+/**
  * The detail text of an identification (TrackDetail, WP-12, renders it):
  * the status hint, the reason, the basis caveat and the mismatch line;
  * for a reason not judged, the pending hint naming the missing input (04
@@ -324,6 +346,6 @@ export function identHintKey(
         : IDENT_PENDING_KEYS[pending].hint,
     reason: IDENT_REASON_KEYS[reason],
     caveat: caveatKey(status, basis, pending === null),
-    mismatch: mismatch ? "ident.mismatch" : null,
+    mismatch: mismatch ? mismatchKey(reason) : null,
   };
 }

@@ -67,6 +67,7 @@ const PLAN = {
     "no_serial",
     "registry_unavailable",
     "details_unavailable",
+    "registration_mismatch",
   ],
   IDENT_BASES: ["authenticated", "as_broadcast", "provider"],
   TIME_SOURCES: ["source_clock", "broadcast", "receiver", "provider", "system"],
@@ -214,6 +215,7 @@ describe("model enumerations", () => {
       | "no_serial"
       | "registry_unavailable"
       | "details_unavailable"
+      | "registration_mismatch"
     >();
     expectTypeOf<IdentBasis>().toEqualTypeOf<
       "authenticated" | "as_broadcast" | "provider"
