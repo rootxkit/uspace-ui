@@ -1048,6 +1048,19 @@ D10).
   `test`. The `IdentReason` union widens by one
   value; no other `@public` line changes; no legend value changed; no
   budget changed.
+- `v1.5.1`: a patch, the user menu's trigger meets WCAG 2.5.3 (label
+  in name) as axe-core 4.14 checks it (`label-content-name-mismatch`,
+  a WCAG 2.1 A rule there): the avatar's initials are drawn by CSS from
+  `data-initials`, so the trigger's visible text is the name its
+  accessible name "Account menu: {user}" contains; the `ka`
+  `ui.next_page` of `DataTable`'s pager is "შემდეგი გვერდი", so it
+  contains its visible "შემდეგი". The kit's own tests
+  run axe-core 4.14.0. *Prepared on `main`, tagged by the owner:* every
+  entry point of §2 as in `v1.5.0`, `model`, `theme`, `ui`, `i18n`,
+  `fonts`, `map`, `api`, `auth/server`, `auth/client`, `symbology`,
+  `layers`, `legend`, `live`, `status`, `alerts`, `table`, `form`,
+  `eslint` and `test`. No `@public` line added, removed or changed; one
+  `ka` string changed; no legend value changed; no budget changed.
 - From `v1`: within a major only additive changes (new exports, new
   optional props, new catalogue keys, new enumeration values *rendered*
   because `model` gained them). The following are a **major**: removing

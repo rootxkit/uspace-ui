@@ -7,6 +7,44 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
+## 1.5.1
+
+A patch on 1.5.0: the user menu's trigger passes axe-core 4.14.
+Prepared on `main`, not tagged: the owner tags `v1.5.1`
+(docs/RELEASING.md). Pin it exactly:
+
+```jsonc
+"@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.5.1/rootxkit-uspace-ui-1.5.1.tgz"
+```
+
+- `UserMenu`: axe-core 4.14 runs `label-content-name-mismatch` as a
+  WCAG 2.1 A rule (2.5.3, label in name), and the trigger failed it on
+  every page with a user menu: its visible text was the avatar's
+  initials and the name, and its accessible name, "Account menu:
+  {user}", lacks the initials. The initials are now drawn by CSS from
+  the avatar's `data-initials` (still `aria-hidden`), so the visible
+  text is the name, which the accessible name contains. The name, the
+  menu and the accessible name are unchanged.
+- `DataTable`: the same rule failed the `ka` "next page" button, whose
+  visible text "შემდეგი" is not a word of its accessible name "შემდეგ
+  გვერდზე გადასვლა". `ui.next_page` in `ka` is now "შემდეგი გვერდი"
+  (next page). `en` and every other key are unchanged.
+- The kit's own tests run axe-core 4.14.0 (was 4.13.0); a browser test
+  checks the trigger against the rule, beside the same markup with the
+  initials written as text, which fails it.
+
+No `@public` line of `docs/api/uspace-ui.api.md` changes; one `ka`
+string changes (`ui.next_page`); no key, legend value or budget
+changes.
+
+### Entry points that ship
+
+`model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api` (with the
+`uspace-ui-gen-api` bin), `auth/server`, `auth/client`, `symbology`,
+`layers`, `legend`, `live`, `status`, `alerts`, `table`, `form`,
+`eslint`, `test`, and `styles/tokens.css`, `styles/map.css`,
+`fonts/fonts.css` with the woff2 files, as in 1.5.0.
+
 ## 1.5.0
 
 A minor on 1.4.0: the identification reason `registration_mismatch`.
