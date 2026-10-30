@@ -7,6 +7,43 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
+## 1.5.0
+
+A minor on 1.4.0: the identification reason `registration_mismatch`.
+Prepared on `main`, not tagged: the owner tags `v1.5.0`
+(docs/RELEASING.md). Pin it exactly:
+
+```jsonc
+"@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.5.0/rootxkit-uspace-ui-1.5.0.tgz"
+```
+
+- Identification: `registration_mismatch` (uspace-core v1.12.0
+  `ReasonRegistrationMismatch`, lab#64, 04 §3.2 errata 2026-10-22), a
+  bound aircraft whose telemetry declares a UA registration other than
+  its authorised intent's. The status stays `registered` and `mismatch`
+  is set. `IDENT_REASONS`, `IdentReason` and `isIdentReason` gain the
+  value, so a track with it is adapted and drawn, not refused.
+  `IDENT_REASON_KEYS` maps it to `ident.reason.registration_mismatch`.
+  It is drawn as every mismatch is (G-02: never as registered), and its
+  mismatch line and map label name the registration instead of the
+  operator. New catalogue keys, `en` and `ka`:
+  `ident.reason.registration_mismatch`, `ident.mismatch.registration`,
+  `ident.mismatch_short.registration`. No advice.
+- `docs/CORE_VERSION` is `v1.13.0` (the core the four systems pin); the
+  enumeration check agrees on every enumeration with the same listed
+  skip as before.
+
+The `IdentReason` union widens by one value; no other `@public` line of
+`docs/api/uspace-ui.api.md` changes; no legend value changes.
+
+### Entry points that ship
+
+`model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api` (with the
+`uspace-ui-gen-api` bin), `auth/server`, `auth/client`, `symbology`,
+`layers`, `legend`, `live`, `status`, `alerts`, `table`, `form`,
+`eslint`, `test`, and `styles/tokens.css`, `styles/map.css`,
+`fonts/fonts.css` with the woff2 files, as in 1.4.0.
+
 ## 1.4.0
 
 A minor on 1.3.2: the alert summary tells a manned-emergency notice
