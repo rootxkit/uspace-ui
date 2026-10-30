@@ -54,12 +54,17 @@ export function UserMenu(props: UserMenuProps): ReactNode {
           className,
         )}
       >
+        {/* The initials are drawn from data-initials by CSS, not written as
+            text: the trigger's accessible name is its aria-label ("Account
+            menu: {user}"), and WCAG 2.5.3 wants every word of its visible
+            text in that name (axe label-content-name-mismatch, a WCAG 2.1 A
+            rule from axe-core 4.14). Initials written as text are visible
+            text the name lacks; the name shown beside them is in it. */}
         <span
           aria-hidden="true"
-          className="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-accent-soft text-2xs font-bold text-accent-text"
-        >
-          {initials(name)}
-        </span>
+          data-initials={initials(name)}
+          className="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-accent-soft text-2xs font-bold text-accent-text before:content-[attr(data-initials)]"
+        />
         <span className="hidden min-w-0 truncate sm:inline">{name}</span>
         <ChevronDown
           aria-hidden="true"

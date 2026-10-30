@@ -305,7 +305,12 @@ describe("UserMenu", () => {
     const trigger = screen.getByRole("button", {
       name: "Account menu: TEST operator one",
     });
-    expect(trigger.textContent).toContain("TO");
+    // The initials are the avatar's data-initials, drawn by CSS, so the
+    // trigger's text is only the name its accessible name contains.
+    expect(
+      trigger.querySelector("[data-initials]")?.getAttribute("data-initials"),
+    ).toBe("TO");
+    expect(trigger.textContent).toBe("TEST operator one");
     fireEvent.pointerDown(trigger, { button: 0, ctrlKey: false });
     expect(screen.getByText("Signed in as TEST operator one")).toBeTruthy();
     expect(screen.getByText("viewer, auditor")).toBeTruthy();
