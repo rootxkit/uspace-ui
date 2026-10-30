@@ -71,6 +71,10 @@ jobs:
   checks:
     needs: tag
     uses: ./.github/workflows/ci.yml
+    # A called workflow sees no secret unless the caller passes it on: the
+    # fixtures and enums jobs read the private lab and core with
+    # CROSS_REPO_READ_TOKEN, and failed on the v1.5.0 tag without it.
+    secrets: inherit
     permissions:
       contents: read
 
