@@ -263,6 +263,8 @@ const catalogue = {
   "ident.reason.registry_unavailable": "The registry could not be consulted.",
   "ident.reason.details_unavailable":
     "The provider's details have not been fetched yet: identification is pending, not judged.",
+  "ident.reason.registration_mismatch":
+    "The aircraft's declared registration differs from its authorised intent's.",
   "ident.caveat.as_broadcast":
     "Serial and operator as broadcast and unverified.",
   "ident.caveat.provider":
@@ -270,6 +272,9 @@ const catalogue = {
   "ident.mismatch":
     "Operator mismatch: the operator given is not the registered owner.",
   "ident.mismatch_short": "operator mismatch",
+  "ident.mismatch.registration":
+    "Registration mismatch: the registration the aircraft declares is not its authorised intent's.",
+  "ident.mismatch_short.registration": "registration mismatch",
   "ident.legend.title": "Identification",
   "ident.legend.attention":
     "Listed after registered and suspended: the statuses that need attention. The server raises the alerts.",

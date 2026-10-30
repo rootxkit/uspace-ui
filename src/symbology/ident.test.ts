@@ -345,6 +345,23 @@ describe("identHintKey", () => {
     }
   });
 
+  it("registration_mismatch yields its reason and the registration mismatch line (lab#64)", () => {
+    const h = identHintKey(
+      "registered",
+      "registration_mismatch",
+      "authenticated",
+      true,
+    );
+    expect(h.reason).toBe("ident.reason.registration_mismatch");
+    expect(h.mismatch).toBe("ident.mismatch.registration");
+    expect(h.status).toBe(IDENT_STATUS_HINT_KEYS.registered);
+    for (const cat of [en, ka]) {
+      expect(cat["ident.reason.registration_mismatch"]).not.toBe("");
+      expect(cat["ident.mismatch.registration"]).not.toBe("");
+      expect(cat["ident.mismatch_short.registration"]).not.toBe("");
+    }
+  });
+
   it("mismatch: false yields no mismatch line (the twin)", () => {
     for (const status of IDENT_STATUSES) {
       expect(

@@ -508,6 +508,30 @@ describe("TrackLayer: symbols", () => {
     expect(p["ident"]).toBe("unknown_operator");
     expect(p["label"]).toContain("operator mismatch");
   });
+
+  // lab#64, core v1.12.0: registration_mismatch keeps the status
+  // registered with mismatch set. The track is drawn (not dropped), as
+  // the mismatch like the operator case above, and its label names the
+  // registration, not the operator.
+  it("a registration_mismatch track is drawn as the mismatch and labelled as a registration mismatch", async () => {
+    const base = track();
+    const { map } = await mount([
+      track({
+        identification: {
+          ...(base.identification as NonNullable<TrackView["identification"]>),
+          status: "registered",
+          reason: "registration_mismatch",
+          basis: "authenticated",
+          mismatch: true,
+        },
+      }),
+    ]);
+    const p = pointOf(map).properties;
+    expect(p["ident"]).toBe("unknown_operator");
+    expect(drawnBy(map, ids.mark, p)).toBe(true);
+    expect(p["label"]).toContain("registration mismatch");
+    expect(p["label"]).not.toContain("operator mismatch");
+  });
 });
 
 describe("TrackLayer: a block that was not judged (04 §3.2, G-13)", () => {

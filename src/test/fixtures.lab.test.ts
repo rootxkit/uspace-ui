@@ -213,6 +213,35 @@ describe("a value the kit cannot name is refused, naming the field (the twin)", 
     });
   });
 
+  // lab#64, core v1.12.0: a registration that differs from the intent's.
+  it("a telemetry example with reason registration_mismatch is accepted, not dropped", () => {
+    const raw = LAB_EXAMPLES[
+      "lab/track/telemetry/v1/authenticated-operator-session.json"
+    ] as { body: Record<string, unknown> };
+    const ident = raw.body["identification"] as Record<string, unknown>;
+    const f = parseFrame({
+      ...raw,
+      body: {
+        ...raw.body,
+        identification: {
+          ...ident,
+          status: "registered",
+          reason: "registration_mismatch",
+          mismatch: true,
+          basis: "authenticated",
+        },
+      },
+    });
+    expect(f).not.toBeNull();
+    const a = adaptTelemetry(f as NonNullable<typeof f>);
+    expect(a.ok).toBe(true);
+    expect(a.ok && a.value.identification).toMatchObject({
+      status: "registered",
+      reason: "registration_mismatch",
+      mismatch: true,
+    });
+  });
+
   it("a telemetry example with an unknown identification reason is refused", () => {
     expect(withReason("details_pending")).toMatchObject({
       ok: false,

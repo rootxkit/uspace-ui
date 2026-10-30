@@ -248,6 +248,8 @@ export const ka: Readonly<Record<Key, string>> = {
   "ident.reason.registry_unavailable": "რეესტრთან დაკავშირება ვერ მოხერხდა.",
   "ident.reason.details_unavailable":
     "პროვაიდერის მონაცემები ჯერ არ მიღებულა: იდენტიფიკაცია მოლოდინშია და არ შეფასებულა.",
+  "ident.reason.registration_mismatch":
+    "აპარატის მიერ გამოცხადებული რეგისტრაცია განსხვავდება მისი ნებადართული განზრახვის რეგისტრაციისგან.",
   "ident.caveat.as_broadcast":
     "სერიული ნომერი და ოპერატორი, როგორც გადაცემულია, დაუდასტურებლად.",
   "ident.caveat.provider":
@@ -255,6 +257,9 @@ export const ka: Readonly<Record<Key, string>> = {
   "ident.mismatch":
     "ოპერატორი არ ემთხვევა: მითითებული ოპერატორი არ არის რეგისტრირებული მფლობელი.",
   "ident.mismatch_short": "ოპერატორი არ ემთხვევა",
+  "ident.mismatch.registration":
+    "რეგისტრაცია არ ემთხვევა: აპარატის მიერ გამოცხადებული რეგისტრაცია არ არის მისი ნებადართული განზრახვის რეგისტრაცია.",
+  "ident.mismatch_short.registration": "რეგისტრაცია არ ემთხვევა",
   "ident.legend.title": "იდენტიფიკაცია",
   "ident.legend.attention":
     "რეგისტრირებულისა და შეჩერებულის შემდეგ ჩამოთვლილია ყურადღების საჭირო სტატუსები. განგაშს სერვერი აცხადებს.",

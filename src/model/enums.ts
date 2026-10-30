@@ -68,6 +68,10 @@ export type IdentStatus = (typeof IDENT_STATUSES)[number];
 // `ReasonDetailsUnavailable`, lab#37, 04 §3.2): the Service Provider's
 // details have not been fetched, so the block is not judged; it is shown
 // as pending, never as `no_serial`, which means the source was asked.
+// `registration_mismatch` (core v1.12.0 `ReasonRegistrationMismatch`,
+// lab#64, 04 §3.2 errata 2026-10-22): a bound aircraft declares a UA
+// registration other than its authorised intent's; the status stays
+// `registered`, `mismatch` is always set, and it is judged.
 /** @public */
 export const IDENT_REASONS = [
   "matched",
@@ -86,6 +90,7 @@ export const IDENT_REASONS = [
   "no_serial",
   "registry_unavailable",
   "details_unavailable",
+  "registration_mismatch",
 ] as const;
 /** @public */
 export type IdentReason = (typeof IDENT_REASONS)[number];

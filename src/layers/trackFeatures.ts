@@ -17,6 +17,7 @@ import {
   IDENT_STATUS_KEYS,
   identDrawn,
   identMark,
+  mismatchShortKey,
   unjudgedReason,
   type IdentKey,
 } from "../symbology/ident.js";
@@ -208,7 +209,7 @@ export function trackLabel(
       if (drawn !== "registered") lines.push(tr(IDENT_STATUS_KEYS[drawn]));
     }
   }
-  if (id?.mismatch === true) lines.push(tr("ident.mismatch_short"));
+  if (id?.mismatch === true) lines.push(tr(mismatchShortKey(id.reason)));
   if (t.trust === "broadcast") lines.push(tr("track.broadcast"));
   if (t.trust === "provider") lines.push(tr("track.provider"));
   if (t.emergency) lines.push(tr("track.emergency"));
