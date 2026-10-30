@@ -102,7 +102,7 @@ export const ka: Readonly<Record<Key, string>> = {
   "ui.previous": "წინა",
   "ui.next": "შემდეგი",
   "ui.previous_page": "წინა გვერდზე გადასვლა",
-  "ui.next_page": "შემდეგ გვერდზე გადასვლა",
+  "ui.next_page": "შემდეგი გვერდი",
   "ui.pagination": "გვერდები",
   "ui.breadcrumb": "ნავიგაციის ჯაჭვი",
   "ui.command_title": "ბრძანებების პანელი",
