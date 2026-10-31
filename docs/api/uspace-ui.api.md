@@ -1004,6 +1004,64 @@ interface ClientOptions {
 // @public
 const CLOSE_UNAUTHORIZED = 4401;
 
+// @beta
+const CLUSTER_FILL_OPACITY = 0.12;
+
+// @beta
+const CLUSTER_LABEL_SIZE_PX = 14;
+
+// @beta (undocumented)
+const CLUSTER_LAYER_ID = "us-clusters";
+
+// @beta (undocumented)
+type ClusterFeatureCollection = GeoJSON_2.FeatureCollection<GeoJSON_2.Polygon, {
+    count: number;
+    label: string;
+}>;
+
+// @beta
+function clusterFeatureCollection(clusters: readonly ClusterView[]): ClusterFeatureCollection;
+
+// @public (undocumented)
+function ClusterLayer(props: ClusterLayerProps): null;
+
+// @beta (undocumented)
+interface ClusterLayerIds {
+    // (undocumented)
+    fill: string;
+    // (undocumented)
+    label: string;
+    // (undocumented)
+    line: string;
+    // (undocumented)
+    source: string;
+}
+
+// @beta (undocumented)
+function clusterLayerIds(id: string): ClusterLayerIds;
+
+// @public (undocumented)
+interface ClusterLayerProps {
+    // (undocumented)
+    clusters: readonly ClusterView[];
+    id?: string;
+    visible?: boolean;
+}
+
+// @public
+interface ClusterView {
+    // (undocumented)
+    maxLat: number;
+    // (undocumented)
+    maxLng: number;
+    // (undocumented)
+    minLat: number;
+    // (undocumented)
+    minLng: number;
+    // (undocumented)
+    numberOfFlights: number;
+}
+
 // @public (undocumented)
 function cn(...inputs: ClassValue[]): string;
 
@@ -2713,6 +2771,15 @@ declare namespace layers {
         AlertFeature,
         AlertFeatureCollection,
         AlertFeatureProperties,
+        CLUSTER_FILL_OPACITY,
+        CLUSTER_LABEL_SIZE_PX,
+        CLUSTER_LAYER_ID,
+        ClusterLayer,
+        clusterFeatureCollection,
+        clusterLayerIds,
+        ClusterFeatureCollection,
+        ClusterLayerIds,
+        ClusterLayerProps,
         countLayer,
         layerCounters,
         resetLayerCountersForTests,
@@ -3470,6 +3537,7 @@ declare namespace model {
         isDisabledBy,
         Times,
         Identification,
+        ClusterView,
         TrackView,
         MannedView,
         ZoneView,

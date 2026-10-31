@@ -1061,6 +1061,20 @@ D10).
   `layers`, `legend`, `live`, `status`, `alerts`, `table`, `form`,
   `eslint` and `test`. No `@public` line added, removed or changed; one
   `ka` string changed; no legend value changed; no budget changed.
+- `v1.6.0`: a minor, `ClusterLayer` (`layers`) and `ClusterView`
+  (`model`) for F3411 NET0480 and the owner's decision of 2026-10-31: a
+  map whose visible area's diagonal exceeds
+  NetDetailsMaxDisplayAreaDiagonalKm shows Network RID peer flights as
+  the server's clusters only, each box drawn as given in the provider
+  trust colour with its count, no per-flight detail and nothing to
+  select; the server measures and clusters, the layer draws. *Prepared
+  on `main`, tagged by the owner:* every entry point of §2 as in
+  `v1.5.1`, `model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api`,
+  `auth/server`, `auth/client`, `symbology`, `layers`, `legend`, `live`,
+  `status`, `alerts`, `table`, `form`, `eslint` and `test`. `@public`
+  lines added (`ClusterLayer`, `ClusterLayerProps`, `ClusterView`), none
+  removed or changed; no catalogue key added; no legend value changed;
+  no budget changed.
 - From `v1`: within a major only additive changes (new exports, new
   optional props, new catalogue keys, new enumeration values *rendered*
   because `model` gained them). The following are a **major**: removing

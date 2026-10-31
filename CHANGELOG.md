@@ -7,6 +7,35 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
+## 1.6.0
+
+A minor on 1.5.1: the clusters of Network RID peer flights. Prepared on
+`main`, not tagged: the owner tags `v1.6.0` (docs/RELEASING.md). Pin it
+exactly:
+
+```jsonc
+"@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.6.0/rootxkit-uspace-ui-1.6.0.tgz"
+```
+
+- `ClusterLayer` and the `ClusterView` model (F3411 NET0480; owner
+  decision 2026-10-31): draws the clusters of Network RID peer flights
+  a server sends for a view wider than NetDetailsMaxDisplayAreaDiagonalKm,
+  each box with its count and no per-flight detail. The server measures
+  and clusters; the layer only draws.
+
+`@public` lines are added to `docs/api/uspace-ui.api.md` (`ClusterLayer`,
+`ClusterLayerProps`, `ClusterView`; the helpers beside them are
+`@beta`); none is removed or changed. No catalogue key, legend value or
+budget changes.
+
+### Entry points that ship
+
+`model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api` (with the
+`uspace-ui-gen-api` bin), `auth/server`, `auth/client`, `symbology`,
+`layers`, `legend`, `live`, `status`, `alerts`, `table`, `form`,
+`eslint`, `test`, and `styles/tokens.css`, `styles/map.css`,
+`fonts/fonts.css` with the woff2 files, as in 1.5.1.
+
 ## 1.5.1
 
 A patch on 1.5.0: the user menu's trigger passes axe-core 4.14.

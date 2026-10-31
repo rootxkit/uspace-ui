@@ -31,6 +31,16 @@ export interface Times { ts: string | null; rxTs: string; capturedAt: string; ti
 /** @public */
 export interface Identification { status: IdentStatus; reason: IdentReason; serial: string | null; operatorReg: string | null; registeredOperatorReg: string | null; mismatch: boolean; basis: IdentBasis }
 
+/**
+ * One cluster of Network RID peer flights as the server sent it: the box
+ * of the view it covers and how many flights are in it (F3411 NET0480; a
+ * view wider than NetDetailsMaxDisplayAreaDiagonalKm shows clusters
+ * only). The server measures and clusters; the kit draws.
+ *
+ * @public
+ */
+export interface ClusterView { minLat: number; minLng: number; maxLat: number; maxLng: number; numberOfFlights: number }
+
 /** @public */
 export interface TrackView {
   trackId: string; trust: Trust; source: string; sourceInstance: string;
