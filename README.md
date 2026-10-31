@@ -20,7 +20,9 @@ kit's view models in an adapter it owns.
 
 ## Status
 
-`1.5.1` is a patch on `1.5.0` (the user menu's trigger has its visible
+`1.6.0` is a minor on `1.5.1` (`ClusterLayer` draws the clusters of
+Network RID peer flights a server sends for a wide view, F3411 NET0480,
+each box with its count). `1.5.1` is a patch on `1.5.0` (the user menu's trigger has its visible
 text in its accessible name, WCAG 2.5.3, as axe-core 4.14 checks, and
 so does the `ka` "next page" button of `DataTable`).
 `1.5.0` is a minor on `1.4.0` (the identification reason
@@ -84,7 +86,7 @@ path for later. Depend on the asset URL of one release, exactly:
 ```jsonc
 // web/package.json
 "dependencies": {
-  "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.5.1/rootxkit-uspace-ui-1.5.1.tgz",
+  "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.6.0/rootxkit-uspace-ui-1.6.0.tgz",
   "maplibre-gl": "5.x"
 }
 ```
@@ -99,7 +101,7 @@ depend on a `github:` spec or a branch. From `0.1.0` the tarball carries
 a signed build provenance attestation; check it with `gh attestation
 verify` before pinning (`docs/RELEASING.md`).
 
-## Consuming (`1.5.1`)
+## Consuming (`1.6.0`)
 
 ```css
 /* web/app/globals.css */

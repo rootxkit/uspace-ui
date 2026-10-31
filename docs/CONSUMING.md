@@ -6,7 +6,7 @@ is shown working in [`examples/next-app/`](../examples/next-app/), which
 CI builds against the kit's current source and smokes in Chromium on
 every pull request. The rules behind the steps are `docs/PLAN.md` §6.3
 (the contracts), §7 (security) and §11 (consumption). This guide is for
-`1.5.1`.
+`1.6.0`.
 
 ## 1. Install the release tarball with pnpm
 
@@ -22,7 +22,7 @@ install --frozen-lockfile`.
 {
   "packageManager": "pnpm@11.9.0",
   "dependencies": {
-    "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.5.1/rootxkit-uspace-ui-1.5.1.tgz",
+    "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.6.0/rootxkit-uspace-ui-1.6.0.tgz",
     "maplibre-gl": "5.24.0",
     "next": "16.3.8",
     "react": "19.3.0",
@@ -45,8 +45,8 @@ install --frozen-lockfile`.
 - Before pinning, check the asset's signed build provenance:
 
   ```sh
-  gh release download v1.5.1 --repo rootxkit/uspace-ui --pattern 'rootxkit-uspace-ui-1.5.1.tgz'
-  gh attestation verify rootxkit-uspace-ui-1.5.1.tgz --repo rootxkit/uspace-ui \
+  gh release download v1.6.0 --repo rootxkit/uspace-ui --pattern 'rootxkit-uspace-ui-1.6.0.tgz'
+  gh attestation verify rootxkit-uspace-ui-1.6.0.tgz --repo rootxkit/uspace-ui \
     --signer-workflow rootxkit/uspace-ui/.github/workflows/release.yml
   ```
 
@@ -409,6 +409,15 @@ string changes: `ui.next_page` is "შემდეგი გვერდი", so
 overrides it keeps the visible "შემდეგი" in it. The avatar's initials are drawn
 by CSS from `data-initials`, so a test that read them as the trigger's
 text reads that attribute instead.
+
+From `1.5.1` to `1.6.0` (`ClusterLayer` draws the server's clusters of
+Network RID peer flights, F3411 NET0480): replace the asset URL and
+commit the lockfile. Additive only: `ClusterLayer`, `ClusterLayerProps`
+(`layers`) and `ClusterView` (`model`) are new, with beta helpers
+beside them; nothing existing changes, and no catalogue key is added.
+An app shows clusters by mapping the server's cluster message to
+`ClusterView`s and rendering `<ClusterLayer clusters={...} />` over its
+map; the layer measures nothing.
 
 ## Minimum version per consumer
 
