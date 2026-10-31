@@ -22,6 +22,17 @@ export {
   type AlertFeatureProperties,
 } from "./alertFeatures.js";
 export {
+  CLUSTER_FILL_OPACITY,
+  CLUSTER_LABEL_SIZE_PX,
+  CLUSTER_LAYER_ID,
+  ClusterLayer,
+  clusterFeatureCollection,
+  clusterLayerIds,
+  type ClusterFeatureCollection,
+  type ClusterLayerIds,
+  type ClusterLayerProps,
+} from "./ClusterLayer.js";
+export {
   countLayer,
   layerCounters,
   resetLayerCountersForTests,

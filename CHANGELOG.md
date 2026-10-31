@@ -7,6 +7,12 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
+- `ClusterLayer` and the `ClusterView` model (F3411 NET0480; owner
+  decision 2026-10-31): draws the clusters of Network RID peer flights
+  a server sends for a view wider than NetDetailsMaxDisplayAreaDiagonalKm,
+  each box with its count and no per-flight detail. The server measures
+  and clusters; the layer only draws.
+
 ## 1.5.1
 
 A patch on 1.5.0: the user menu's trigger passes axe-core 4.14.
