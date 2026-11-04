@@ -1075,6 +1075,11 @@ D10).
   lines added (`ClusterLayer`, `ClusterLayerProps`, `ClusterView`), none
   removed or changed; no catalogue key added; no legend value changed;
   no budget changed.
+- `v1.6.1`: a patch, `AppShell`'s collapse button grows with its label
+  so the `ka` label stays inside it. *Prepared on `main`, tagged by the
+  owner:* every entry point of §2 as in `v1.6.0`, `model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api`, `auth/server`, `auth/client`, `symbology`, `layers`, `legend`, `live`, `status`, `alerts`, `table`, `form`, `eslint` and `test`. No `@public` line added,
+  removed or changed; no catalogue key added; no legend value changed;
+  no budget changed.
 - From `v1`: within a major only additive changes (new exports, new
   optional props, new catalogue keys, new enumeration values *rendered*
   because `model` gained them). The following are a **major**: removing
