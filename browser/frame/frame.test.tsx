@@ -218,6 +218,25 @@ describe.each(LOOKS)("console frame, %s", (look) => {
     ).toBeVisible();
   });
 
+  it(`keeps the collapse label inside its button (${name})`, async () => {
+    await page.viewport(1280, 900);
+    const view = renderKit(<Frame look={look} />, look);
+    const toggle = view.container.querySelector<HTMLButtonElement>(
+      '[data-part="collapse"]',
+    );
+    const label = toggle?.querySelector("span");
+    expect(label).toBeTruthy();
+    const box = (toggle as HTMLButtonElement).getBoundingClientRect();
+    const text = (label as HTMLSpanElement).getBoundingClientRect();
+    // The Georgian label is longer than the sidebar is wide and wraps to
+    // two lines. A fixed-height button met them edge to edge here and
+    // spilled them in a console's own font; the button grows instead and
+    // keeps its padding round however many lines there are.
+    expect(text.top - box.top).toBeGreaterThanOrEqual(4);
+    expect(box.bottom - text.bottom).toBeGreaterThanOrEqual(4);
+    expect(text.right).toBeLessThanOrEqual(box.right);
+  });
+
   it(`collapses the sidebar to icons (${name})`, async () => {
     await page.viewport(1280, 900);
     const view = renderKit(<Frame look={look} />, look);

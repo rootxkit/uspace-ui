@@ -310,17 +310,27 @@ export function AppShell(props: AppShellProps): ReactNode {
                 data-part="collapse"
                 onClick={toggle}
                 className={cn(
-                  "inline-flex h-8 w-full items-center gap-2 rounded-md px-2.5 text-xs font-semibold text-sidebar-muted transition-colors hover:bg-hover hover:text-sidebar-text",
+                  "inline-flex min-h-8 w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-xs font-semibold text-sidebar-muted transition-colors hover:bg-hover hover:text-sidebar-text",
                   FOCUS,
                   collapsed && "justify-center px-0",
                 )}
               >
                 {collapsed ? (
-                  <PanelLeftOpen aria-hidden="true" className="size-4" />
+                  <PanelLeftOpen
+                    aria-hidden="true"
+                    className="size-4 shrink-0"
+                  />
                 ) : (
-                  <PanelLeftClose aria-hidden="true" className="size-4" />
+                  <PanelLeftClose
+                    aria-hidden="true"
+                    className="size-4 shrink-0"
+                  />
                 )}
-                <span className={collapsed ? "sr-only" : undefined}>
+                <span
+                  className={
+                    collapsed ? "sr-only" : "min-w-0 flex-1 leading-tight"
+                  }
+                >
                   {collapsed ? t("shell.expand") : t("shell.collapse")}
                 </span>
               </button>
