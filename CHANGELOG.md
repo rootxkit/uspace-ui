@@ -7,6 +7,30 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
+## 1.6.1
+
+A patch on 1.6.0: the sidebar's collapse label stays inside its button.
+Prepared on `main`, not tagged: the owner tags `v1.6.1`
+(docs/RELEASING.md). Pin it exactly:
+
+```jsonc
+"@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.6.1/rootxkit-uspace-ui-1.6.1.tgz"
+```
+
+- `AppShell`: the collapse button grows with its label instead of
+  having a fixed height, so the `ka` label, which wraps to two lines in
+  the 15rem sidebar, no longer spills out of it.
+
+No export, prop, catalogue key, legend value or budget changes.
+
+### Entry points that ship
+
+`model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api` (with the
+`uspace-ui-gen-api` bin), `auth/server`, `auth/client`, `symbology`,
+`layers`, `legend`, `live`, `status`, `alerts`, `table`, `form`,
+`eslint`, `test`, and `styles/tokens.css`, `styles/map.css`,
+`fonts/fonts.css` with the woff2 files, as in 1.6.0.
+
 ## 1.6.0
 
 A minor on 1.5.1: the clusters of Network RID peer flights. Prepared on
