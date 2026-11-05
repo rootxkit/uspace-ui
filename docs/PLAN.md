@@ -1,7 +1,7 @@
 # uspace-ui implementation plan
 
 Status: plan for parallel implementation by independent agents; WP-0 to
-WP-14 are merged and the latest release is `v1.0.0`. Written on branch
+WP-14 are merged and the latest release is `v1.6.1`. Written on branch
 `plan/initial`. Inputs: the spec at `uspace-lab/docs/spec/` (especially
 `00 §6`, `00 §6.2`, `00 §6.3` (the `rootxkit/uspace-ui` paragraph), `01`
 (users and roles per system), `02 §1` (conventions: time, geometry,

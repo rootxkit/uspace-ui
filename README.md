@@ -20,48 +20,13 @@ kit's view models in an adapter it owns.
 
 ## Status
 
-`1.6.1` is a patch on `1.6.0` (the sidebar's collapse button grows
-with its label, so the `ka` label no longer spills out of it).
-`1.6.0` is a minor on `1.5.1` (`ClusterLayer` draws the clusters of
-Network RID peer flights a server sends for a wide view, F3411 NET0480,
-each box with its count). `1.5.1` is a patch on `1.5.0` (the user menu's trigger has its visible
-text in its accessible name, WCAG 2.5.3, as axe-core 4.14 checks, and
-so does the `ka` "next page" button of `DataTable`).
-`1.5.0` is a minor on `1.4.0` (the identification reason
-`registration_mismatch`, a bound aircraft that declares a registration
-other than its authorised intent's, is rendered with its own reason and
-mismatch line). `1.4.0` is a minor on `1.3.2` (the alert summary names the emergency
-manned aircraft of a `restriction_activated` notice with `cause:
-manned_emergency`). `1.3.2` is a patch on `1.3.1` (a keyboard move in `DataTable` is no
-longer lost while an earlier render's effects are pending). `1.3.1` is
-a patch on `1.3.0` (the built JavaScript ships without
-comments; the `.d.ts` files keep them). `1.3.0` is a minor on `1.2.0` (an identification that was not judged,
-`details_unavailable` or `registry_unavailable`, is drawn as pending).
-`1.2.0` is a minor on `1.1.2` (the identification reason
-`details_unavailable` of uspace-core v1.8.0, shown as pending).
-`1.1.2` is a patch on `1.1.1` (native selects and pickers follow the
-scheme). `1.1.1` is a patch on `1.1.0` (table cells wrap; `TABLE_NOWRAP` keeps
-an id, a time or a number on one line). `1.1.0` is the console redesign
-on the frozen API of `1.0.0`: an additive minor with a dark-first
-operations look, the console frame (`AppShell`, `PageHeader`,
-`StatTile`, `KpiRow`, `Panel`, `StatusBadge`, `StatusPill`, `MapPanel`)
-and the status tones. Each is prepared on `main` and tagged by the
-owner, a GitHub Release asset of this repository (see
-Installing). It ships every entry point: `model`,
+The current release is `1.6.1`, a GitHub Release asset of this
+repository (see Installing). It ships every entry point: `model`,
 `theme`, `ui`, `i18n`, `fonts`, `map`, `api` (with the
 `uspace-ui-gen-api` bin), `auth/server`, `auth/client`, `symbology`,
-`layers` (zones, restrictions, tracks, alerts, manned traffic, intents,
-Remote ID receivers and the drawing tool), `legend`, `live`, `status`,
-`alerts`, `table`, `form`, `eslint` and `test`, with the tokens, the map
-stylesheet and the fonts. `CHANGELOG.md` lists what is in it, what a
-consumer on `0.1.0` does, and what is not yet.
-
-From `1.0.0` the API is additive within a major. The contract is what
-[`docs/api/uspace-ui.api.md`](docs/api/uspace-ui.api.md) tags `@public`;
-`@beta` exports may change in a minor, with a CHANGELOG line. CI's
-semver gate holds every pull request to it (`CLAUDE.md` "The semver
-gate"). Distribution is GitHub Release tarballs; every consumer
-installs with pnpm, pinned to one release asset URL.
+`layers`, `legend`, `live`, `status`, `alerts`, `table`, `form`,
+`eslint` and `test`, with the tokens, the map stylesheet and the fonts.
+[`CHANGELOG.md`](CHANGELOG.md) says what each release changed.
 
 ## Links
 
@@ -71,6 +36,9 @@ installs with pnpm, pinned to one release asset URL.
   packages and waves, open questions)
 - Work packages: [`docs/WORKPACKAGES/`](docs/WORKPACKAGES/) (WP-0 to
   WP-14, plus WP-13a for the rc publish)
+- API contract: [`docs/api/uspace-ui.api.md`](docs/api/uspace-ui.api.md)
+  (what is `@public` is additive within a major; `@beta` may change in a
+  minor)
 - Rules for contributors and agents: [`CLAUDE.md`](CLAUDE.md)
 - Spec: `uspace-lab/docs/spec/` (`00 §6.3` names this package; `07`
   U-M1 is its first milestone)
@@ -282,6 +250,18 @@ table,form,eslint,test}`. The full step list for a `web/` app, from
 `package.json` to the Docker image, is
 [`docs/CONSUMING.md`](docs/CONSUMING.md); every step runs in
 [`examples/next-app/`](examples/next-app/), which CI builds and smokes.
+
+Some components a console reaches for:
+
+- `ReceiverLayer` (`layers`): Remote ID receivers with the source state the server judged.
+- `IntentLayer` (`layers`): operational intent footprints by DSS state, peers patterned.
+- `AlertToaster` (`alerts`): one notice per alert, and the tone until a critical one is acknowledged.
+- `FrozenOverlay` (`status`): dims the map with the data's age while the feed is not live.
+- `SourcesPanel` (`status`): every source by type, with its state and a reasoned switch.
+- `UserMenu` (`ui`): the top bar's account menu with the name it is given.
+- `LanguageSwitch` (`ui`): the `ka`/`en` switch, each language named in itself.
+- `ConfirmDialog` (`form`): confirms an audited act and asks for its reason.
+- `useTableUrlState` (`table`): a `DataTable`'s state in the URL, PII filters left out.
 
 ## Developing
 
