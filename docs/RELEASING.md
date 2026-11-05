@@ -15,7 +15,7 @@ An exact release asset URL, never a range, a branch or a `github:` spec:
 ```jsonc
 // web/package.json
 "dependencies": {
-  "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.0.0/rootxkit-uspace-ui-1.0.0.tgz"
+  "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v<version>/rootxkit-uspace-ui-<version>.tgz"
 }
 ```
 
@@ -61,7 +61,7 @@ prints the URL of the version in `package.json`.
      section plus the dependency line. A version with a pre-release
      suffix (`-rc.1`, `-beta.2`) is marked as a pre-release. A plain
      version is marked latest. The job then reads the release back and
-     re-downloads the asset from its public URL, checking the
+     re-downloads the asset through the API (`gh release download`), checking the
      pre-release flag, the latest mark (a plain version is the latest
      release, a pre-release never), the SHA-256 and the attestation.
      The latest mark is read per tag (`node scripts/release.mjs

@@ -159,7 +159,7 @@ export const bff = bffHandlers({
   session: { secure: true, maxAgeS: 12 * 3600 },
   allowPaths: [/^\/v1\/zones$/], // matched against the whole upstream path
   timeoutMs: 10_000,
-  trustedProxyHops: 1, // one Caddy in front; or noTrustedProxy: true
+  trustedProxyHops: 1, // one reverse proxy in front; or noTrustedProxy: true
 });
 ```
 
@@ -242,7 +242,7 @@ API said and deciding nothing (`examples/next-app/src/map/adapt.ts`):
 `MapView` reads `${origin}/basemap/` (`basemap={{ baseUrl:
 window.location.origin }}`; the paths default to the bundle layout of
 PLAN §6.3: `basemap.pmtiles`, `SOURCE.json`, `fonts/`, `sprites/v4/`).
-The deployment's Caddy (`uspace-deploy`) serves `/basemap/*` from one
+The deployment's reverse proxy serves `/basemap/*` from one
 shared read-only volume on every host, with range requests and long
 cache headers; the bundle is the lab's (WP-L3). Your image contains no
 tiles, and the page shows the extract's OSM date. The map's first view
@@ -446,8 +446,8 @@ For the CISP planner (`uspace-cisp/web`, its WP-9 scaffold):
   `proxy.ts`); the example keeps one URL per page and switches language
   by the `uspace_lang` cookie. Both negotiate the same way.
 - The CISP's public map reads `/public/v1/*` straight from the API
-  through Caddy; the example reads zones through the BFF, the console's
+  through the reverse proxy; the example reads zones through the BFF, the console's
   path. The CISP revokes a session with `DELETE` through `forward`; the
   example uses the kit's `logout` with `apiLogoutPath`.
-- `uspace-cisp/deploy/Dockerfile.web` uses `node:22-alpine` without a
-  digest; the example (and the authority's `web/Dockerfile`) pins it.
+- The CISP's web image uses `node:22-alpine` without a digest; the
+  example pins the base image by digest.

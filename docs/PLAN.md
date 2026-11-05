@@ -1,7 +1,7 @@
 # uspace-ui implementation plan
 
 Status: plan for parallel implementation by independent agents; WP-0 to
-WP-14 are merged and the latest release is `v1.0.0`. Written on branch
+WP-14 are merged and the latest release is `v1.6.1`. Written on branch
 `plan/initial`. Inputs: the spec at `uspace-lab/docs/spec/` (especially
 `00 §6`, `00 §6.2`, `00 §6.3` (the `rootxkit/uspace-ui` paragraph), `01`
 (users and roles per system), `02 §1` (conventions: time, geometry,
@@ -634,8 +634,8 @@ same-origin with the session cookie on the upgrade (§6.3, M22).
 | The package API of §3 and the `exports` map of §2 | `docs/api/uspace-ui.api.md` (api-extractor report, committed) | every `web/` |
 | The view-model enumerations, mirroring `uspace-core/core` | `model/` | every `web/` adapter; the lab's schema examples test |
 | The console frame (adopted by all four systems, M29; the schemas live in `uspace-lab/schemas/common/`) | below | every system's WS process and the kit's `live` |
-| The session and cookie contract (adopted by all four systems, M20, M21, M22): the BFF route set `/_bff/login`, `/_bff/logout`, `/_bff/api/*`; cookie names `uspace_session` (`HttpOnly; Secure; SameSite=Strict`, the API-issued session JWT) and `uspace_csrf` (readable, double-submit), header `X-CSRF-Token` on unsafe methods; the session JWT shape the kit decodes for display: `iss` = the system's issuer, `aud` = the system's own host, `sub` = account id, `scope = "session"`, `roles: [string]`, `realm` (`console` / `police` / `portal`), `jti`, `exp` ≤ 12 h, `kid`; WebSocket authentication = the session cookie on a same-origin upgrade with an `Origin` allow-list, close code `4401` = re-login; no ticket route | `auth/server`, `live` | every `web/` and every WS process; the Caddy config in `uspace-deploy` |
-| The basemap bundle layout `/basemap/basemap.pmtiles`, `/basemap/SOURCE.json` (`bounds`, `osm_data_as_of`), `/basemap/fonts/{fontstack}/{range}.pbf`, `/basemap/sprites/v4/{light,dark}.*` and the fontstack name | `map`, `fonts` | the lab's basemap build; each compose and Caddy |
+| The session and cookie contract (adopted by all four systems, M20, M21, M22): the BFF route set `/_bff/login`, `/_bff/logout`, `/_bff/api/*`; cookie names `uspace_session` (`HttpOnly; Secure; SameSite=Strict`, the API-issued session JWT) and `uspace_csrf` (readable, double-submit), header `X-CSRF-Token` on unsafe methods; the session JWT shape the kit decodes for display: `iss` = the system's issuer, `aud` = the system's own host, `sub` = account id, `scope = "session"`, `roles: [string]`, `realm` (`console` / `police` / `portal`), `jti`, `exp` ≤ 12 h, `kid`; WebSocket authentication = the session cookie on a same-origin upgrade with an `Origin` allow-list, close code `4401` = re-login; no ticket route | `auth/server`, `live` | every `web/` and every WS process; the deployment's reverse-proxy configuration |
+| The basemap bundle layout `/basemap/basemap.pmtiles`, `/basemap/SOURCE.json` (`bounds`, `osm_data_as_of`), `/basemap/fonts/{fontstack}/{range}.pbf`, `/basemap/sprites/v4/{light,dark}.*` and the fontstack name | `map`, `fonts` | the lab's basemap build; each deployment |
 | Branding variables `UI_BRAND_NAME`, `UI_BRAND_SHORT_NAME`, `UI_BRAND_LOGO_URL`, `UI_BRAND_CONTACT`, `UI_BRAND_ACCENT`; language cookie `uspace_lang` and `Accept-Language` negotiation | `theme`, `i18n` | each deploy's config bundle (`06 §4`) |
 | The lint rules of §3.17 | `eslint` | every `web/` CI |
 
@@ -682,7 +682,7 @@ frames are not optional for a browser-facing WebSocket.
 | every WS process | the console frame of §6.3; the session cookie accepted on a same-origin upgrade with an `Origin` check | §14 Q5, decided (M29, M22) |
 | every API that serves a picture or a feed | the display thresholds (`stale_after_s`, `live_max_age_s`) in the status frame | §14 Q6, decided (M29) |
 | the CISP read API and the authority's `GET /v1/zones/export` | `?applies_at=<RFC 3339>`: annotate every feature with `extendedProperties.cis_applicability` ∈ `applies` / `not_applicable` / `unknown`, no filtering, beside the filtering `?at=` | §14 Q3, decided (M17); the app maps `cis_applicability` onto `ZoneView.applies` (`applies` → `true`, `not_applicable` → `false`, `unknown` → `null`) |
-| `uspace-deploy` and the lab | `/basemap/*` served by the deployment's Caddy from one shared read-only volume on every host; the bundle built by lab WP-L3 | §14 Q4, decided (M38) |
+| the deployment and the lab | `/basemap/*` served by the deployment's reverse proxy from one shared read-only volume on every host; the bundle built by lab WP-L3 | §14 Q4, decided (M38) |
 
 ---
 
@@ -698,7 +698,7 @@ frames are not optional for a browser-facing WebSocket.
 | No judgement in TypeScript (`06` T12) | the `/eslint` rules, applied to the kit itself in its own CI. |
 | Supply chain (`06 §4`) | exact pins, `pnpm install --frozen-lockfile`, Dependabot, `pnpm audit` as a non-gating report, release tarballs built and tested in CI and pinned by lockfile integrity, with `SHA256SUMS` (D10; npm provenance if the npm path is switched on), `SECURITY.md` with a 90-day policy. |
 | Content Security Policy | the kit documents the CSP every `web/` sets (`connect-src 'self'` for API, WS and the basemap; `worker-src blob:` for MapLibre; `font-src 'self'`; no `unsafe-eval`) and `examples/next-app` ships it; a browser test (`browser/csp/`) loads under it. |
-| Public repository | no hostname, no organisation name, no logo in the repo; `GEO-TEST-*` and `TEST*` fixtures only; a CI grep for `chikox.net` fails outside `examples/*/README.md`. |
+| Public repository | no hostname, no organisation name, no logo in the repo; `GEO-TEST-*` and `TEST*` fixtures only; a CI grep for the production domain fails outside `examples/*/README.md`. |
 | Display is not authorisation | `RequireRole` hides, the API decides. Every component that triggers an audited act collects a reason and calls back; it never calls an API itself. |
 
 ---
@@ -778,7 +778,7 @@ every pull request, docs-only included). No scheduled job.
    (the kit's own `/eslint` config, so the kit obeys its own rules);
    `tsc --noEmit`; `pnpm build`; `publint`; `attw`; `api-extractor run`
    (fails if `docs/api/uspace-ui.api.md` is stale); size budget check;
-   the `chikox.net` grep.
+   the production-domain grep.
 2. `test`: `vitest run --coverage` (node and jsdom projects); coverage
    summary printed; profile uploaded.
 3. `browser`: Playwright Chromium from the cache (`~/.cache/ms-playwright`
@@ -882,7 +882,7 @@ Every `web/` also (M38, M22, M21):
 - serves the kit's fonts through `next/font/local` from `/fonts`
   (`fontClassName` on `<html>`); no Google Fonts;
 - reads the basemap at `/basemap/` (`BasemapConfig.baseUrl`), which the
-  deployment's Caddy (`uspace-deploy`) serves from one shared read-only
+  deployment's reverse proxy serves from one shared read-only
   volume on every host with range requests and long cache headers; the
   bundle is built by the lab (WP-L3) as a release artefact with a size
   budget (a Georgia-wide extract with city-level zooms for Tbilisi,
@@ -902,9 +902,9 @@ pins their asset URL exactly like a release's and moves to `0.1.0`'s
 when it is tagged.
 
 Images: each system's CI builds its `web/` with `next build` (`output:
-standalone`) into that system's image; the droplet never builds Next.js
+standalone`) into that system's image; the production host never builds Next.js
 ("Never build Next.js on the server"). The kit adds nothing to runtime
-memory beyond its JS; the 3.8 GB droplet constraint is the systems'
+memory beyond its JS; the host's memory budget is the systems'
 concern and the kit's bundle budget (§8) is its contribution.
 
 This repo hosts nothing: the release tarball is its only artefact (D9,
@@ -1189,7 +1189,7 @@ the default is a proposal, not the answer.
 | Q1 | Registry: "npm or GitHub Packages". GitHub Packages needs a token to *install* even a public package (every `web/` CI, every Docker build, every developer machine); npmjs needs the `@rootxkit` scope and supports OIDC trusted publishing with provenance, so no secret is stored anywhere. | D10 as changed by the owner on 2026-10-02: neither registry; GitHub Release tarballs pinned by URL and lockfile integrity, because the npm account and scope are not available. npmjs with trusted publishing stays a switched-off path (`docs/RELEASING.md`). | **Decided by the owner** (2026-10-02): GitHub Release tarballs. Reopens only if the owner sets up the `@rootxkit` npm scope and trusted publishing and asks for the switch. |
 | Q2 | The spec fixes no error body for the national APIs. The form kit needs a field-addressed error and `uspace-core` already names the field and reason (`core.FieldError`, `ed269.Problems` with a JSON path). | `model.Problem`: RFC 9457 `application/problem+json` with `type`, `title`, `status`, `detail`, `instance`, `errors: [{field, reason}]`, `truncated?`; `field` is the JSON path as core writes it; `type` = `https://schemas.uspace.ge/problems/<slug>`. The kit degrades to "request failed, status N" for anything else. | **Decided** (M28): adopted by all four systems; `problem/v1` lives in `uspace-lab/schemas/common/`. |
 | Q3 | Zone applicability on a console: the kit must dim a zone that does not apply now (`limitedApplicability`), but evaluating applicability is a judgement (`ed269.Applies`, T-09) and must not run in TypeScript. `02 F3` offers `GET /v1/{dataset}?at=` which returns only the applicable features. | `ZoneView.applies` is `boolean | null` and the kit dims only on `false`. The CISP read API and the authority's `GET /v1/zones/export` add `?applies_at=<RFC 3339>`, which annotates every feature with `extendedProperties.cis_applicability` ∈ `applies` / `not_applicable` / `unknown` without filtering (the filtering `?at=` stays). The app maps it onto `applies`; no double fetch. | **Decided** (M17): additive on both APIs. |
-| Q4 | Who builds and hosts the basemap bundle (PMTiles extract of Georgia, Protomaps glyphs *including Georgian ranges* for the fontstack, sprites), how big it is (the predecessor's was hundreds of MB) and how it is refreshed. The kit assumes the `/basemap/` layout of §6.3. | The lab builds it (lab WP-L3) from the predecessor's `infra/basemap/fetch_basemap.sh` as a release artefact with `SOURCE.json` and a size budget: a Georgia-wide extract with city-level zooms for Tbilisi, Kutaisi, Batumi and Poti and `z ≤ 12` elsewhere, under about 1 GB. The deployment repo (`uspace-deploy`) serves `/basemap/*` from one shared read-only volume on every host (Caddy `file_server`, range requests, long cache headers; one copy for five systems). The kit's `fonts.mapFontstack` names the glyph set. The browser tests use a tiny Tbilisi-only extract committed under `browser/public/basemap/` (a few MB) so they render offline. | **Decided** (M38). The droplet's disk is part of the sizing question the reconciliation leaves to the owner (its §2.1, "droplet sizing"). |
+| Q4 | Who builds and hosts the basemap bundle (PMTiles extract of Georgia, Protomaps glyphs *including Georgian ranges* for the fontstack, sprites), how big it is (the predecessor's was hundreds of MB) and how it is refreshed. The kit assumes the `/basemap/` layout of §6.3. | The lab builds it (lab WP-L3) from the predecessor's `infra/basemap/fetch_basemap.sh` as a release artefact with `SOURCE.json` and a size budget: a Georgia-wide extract with city-level zooms for Tbilisi, Kutaisi, Batumi and Poti and `z ≤ 12` elsewhere, under about 1 GB. The deployment serves `/basemap/*` from one shared read-only volume on every host (a static file server with range requests, long cache headers; one copy for five systems). The kit's `fonts.mapFontstack` names the glyph set. The browser tests use a tiny Tbilisi-only extract committed under `browser/public/basemap/` (a few MB) so they render offline. | **Decided** (M38). The host's disk is part of the sizing question the reconciliation leaves to the owner (its §2.1). |
 | Q5 | No browser-facing WS frame is specified; `02 §3` names the endpoints and `04 §2` the envelope. Four systems could invent four stream shapes. | §6.3's console frame (`console/status/v1`, `console/snapshot/v1`, `console/subscribe/v1`, plus the catalogued messages as bodies) on every browser-facing WebSocket of the four systems; the CISP's `resync` becomes a status frame with `resync_since`, the ANSP's `feed/status/v1` is retired for `console/status/v1`, the authority's `{viewport}` becomes `console/subscribe/v1`. Machine-facing streams carry the same envelope. The schemas are owned by `uspace-lab/schemas/common/`. | **Decided** (M29, M12, M14): adopted by all four systems. |
 | Q6 | Display thresholds (`stale_after_s`, `live_max_age_s`) are policy rows per system (`04 §3.3`); the kit refuses to default them (INV-03) and must get them from the API. | The status frame of §6.3 carries them (`policy_version`, `stale_after_s`, `live_max_age_s`) on connect and every 2 s. Until a system sends them, its console cannot colour age, and the age chip shows the raw seconds without a bucket (visible, not wrong). | **Decided** (M29): thresholds come in `console/status/v1`. |
 | Q7 | Visual regression without a hosted service (cost, secret) means no pixel diff of the map. | D9: component tests in a real browser, `axe`, DOM snapshots of a golden set as the reviewed reference; symbology tested as expressions. If the owner wants pixel diffs later, Playwright `toHaveScreenshot` on the golden set with committed PNGs can be added without a service, accepting Linux-only rendering. | **Open, owner-only** (spending money on pixel snapshots is the owner's). Default until answered: accept D9. |
