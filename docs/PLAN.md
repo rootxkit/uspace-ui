@@ -698,7 +698,7 @@ frames are not optional for a browser-facing WebSocket.
 | No judgement in TypeScript (`06` T12) | the `/eslint` rules, applied to the kit itself in its own CI. |
 | Supply chain (`06 §4`) | exact pins, `pnpm install --frozen-lockfile`, Dependabot, `pnpm audit` as a non-gating report, release tarballs built and tested in CI and pinned by lockfile integrity, with `SHA256SUMS` (D10; npm provenance if the npm path is switched on), `SECURITY.md` with a 90-day policy. |
 | Content Security Policy | the kit documents the CSP every `web/` sets (`connect-src 'self'` for API, WS and the basemap; `worker-src blob:` for MapLibre; `font-src 'self'`; no `unsafe-eval`) and `examples/next-app` ships it; a browser test (`browser/csp/`) loads under it. |
-| Public repository | no hostname, no organisation name, no logo in the repo; `GEO-TEST-*` and `TEST*` fixtures only; a CI grep for `chikox.net` fails outside `examples/*/README.md`. |
+| Public repository | no hostname, no organisation name, no logo in the repo; `GEO-TEST-*` and `TEST*` fixtures only; a CI grep for the production domain fails outside `examples/*/README.md`. |
 | Display is not authorisation | `RequireRole` hides, the API decides. Every component that triggers an audited act collects a reason and calls back; it never calls an API itself. |
 
 ---
@@ -778,7 +778,7 @@ every pull request, docs-only included). No scheduled job.
    (the kit's own `/eslint` config, so the kit obeys its own rules);
    `tsc --noEmit`; `pnpm build`; `publint`; `attw`; `api-extractor run`
    (fails if `docs/api/uspace-ui.api.md` is stale); size budget check;
-   the `chikox.net` grep.
+   the production-domain grep.
 2. `test`: `vitest run --coverage` (node and jsdom projects); coverage
    summary printed; profile uploaded.
 3. `browser`: Playwright Chromium from the cache (`~/.cache/ms-playwright`

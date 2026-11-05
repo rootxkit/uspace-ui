@@ -56,7 +56,7 @@ test (`browser/welcome.test.tsx`) so the browser job has something to
 run. (Storybook was part of this package until the owner removed it on
 2026-10-02, PLAN D9.)
 Scripts: `check` (prettier, eslint, tsc, build, publint, attw,
-api-extractor, size, the `chikox.net` grep), `test`, `test:browser`,
+api-extractor, size, the production-domain grep), `test`, `test:browser`,
 `api-report`.
 
 **`src/model/`.** The types and enumerations of PLAN §3.1, verbatim.

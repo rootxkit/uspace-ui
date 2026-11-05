@@ -1,17 +1,15 @@
 #!/bin/sh
 # Fails if the owner's production domain appears in the repository's files,
 # tracked or not yet tracked (PLAN §7 "Public repository"; spec 06 §4).
-# Allowed: examples/*/README.md (WP-13's example URL) and the plan
-# documents that state this rule. The pattern is assembled so this script
-# does not match itself.
+# Allowed: examples/*/README.md (WP-13's example URL). The plan documents
+# name the rule without the domain, so they are checked like everything
+# else. The pattern is assembled so this script does not match itself.
 set -u
 cd "$(dirname "$0")/.."
 
 pattern='chikox''\.net'
 git grep --untracked -n -I -i -E "$pattern" -- . \
-  ':(exclude,glob)examples/*/README.md' \
-  ':(exclude)docs/PLAN.md' \
-  ':(exclude,glob)docs/WORKPACKAGES/*.md'
+  ':(exclude,glob)examples/*/README.md'
 status=$?
 case $status in
   0)

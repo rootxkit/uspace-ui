@@ -87,7 +87,7 @@ from `src/ui/index.ts`. `cn()` in `src/ui/cn.ts`. Every component keeps
 - [ ] Every shadcn component listed renders in a browser test in both schemes
   with `axe` clean; `UPGRADING.md` written.
 - [ ] No string naming an organisation, a hostname or a logo path in
-  `src/theme/` or `styles/` (the `chikox.net` grep plus a reviewer read).
+  `src/theme/` or `styles/` (the production-domain grep plus a reviewer read).
 - [ ] `pnpm check`, `pnpm test`, `pnpm test:browser` outputs in the PR.
 
 ## Safety notes
