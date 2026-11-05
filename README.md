@@ -177,7 +177,7 @@ export const bff = bffHandlers({
   session: { secure: true, maxAgeS: 12 * 3600 },
   allowPaths: [/^\/v1\/(zones|restrictions)(\/|$)/], // what the console may reach
   timeoutMs: 10_000,
-  trustedProxyHops: 1, // one Caddy in front of Next.js appends to X-Forwarded-For
+  trustedProxyHops: 1, // one reverse proxy in front of Next.js appends to X-Forwarded-For
 });
 ```
 
