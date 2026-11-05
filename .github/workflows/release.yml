@@ -72,8 +72,8 @@ jobs:
     needs: tag
     uses: ./.github/workflows/ci.yml
     # A called workflow sees no secret unless the caller passes it on: the
-    # fixtures and enums jobs read the private lab and core with
-    # CROSS_REPO_READ_TOKEN, and failed on the v1.5.0 tag without it.
+    # fixtures job reads the private lab with CROSS_REPO_READ_TOKEN, and
+    # failed on the v1.5.0 tag without it.
     secrets: inherit
     permissions:
       contents: read
@@ -169,9 +169,9 @@ jobs:
           # fails after the bound and passes only on a read that showed the
           # mark (scripts/release.mjs checkLatest).
           node scripts/release.mjs check-latest "$GITHUB_REF_NAME"
-          # The repository is private (since 2026-10-24): the download URL
-          # answers 404 anonymously and to a token alike, so the asset is
-          # read through the API, as a consumer with read access gets it.
+          # The asset is read back through the API with this run's token;
+          # the repository is public, so its download URL serves the same
+          # bytes anonymously.
           gh release download "$GITHUB_REF_NAME" --pattern "$NAME" --dir "$RUNNER_TEMP" --clobber
           echo "$SHA256  $RUNNER_TEMP/$NAME" | sha256sum -c -
           # The downloaded bytes carry this workflow's signed provenance.

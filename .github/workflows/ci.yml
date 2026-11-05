@@ -350,19 +350,5 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: read access to the private uspace-core
-        # uspace-core is private (since 2026-10-24): check-enums.sh clones
-        # it with the read token as git's HTTP header for
-        # https://github.com/rootxkit/ (masked, never in a URL or on a
-        # command line), or stops here naming the missing secret.
-        env:
-          CROSS_REPO_READ_TOKEN: ${{ secrets.CROSS_REPO_READ_TOKEN }}
-        run: |
-          if [ -z "$CROSS_REPO_READ_TOKEN" ]; then
-            echo "::error title=CROSS_REPO_READ_TOKEN is not set::check-enums.sh clones the private uspace-core; add the repository secret CROSS_REPO_READ_TOKEN (fine-grained token, Contents: read)"
-            exit 1
-          fi
-          b64="$(printf 'x-access-token:%s' "$CROSS_REPO_READ_TOKEN" | base64 | tr -d '\n')"
-          echo "::add-mask::$b64"
-          printf '[http "https://github.com/rootxkit/"]\n\textraheader = AUTHORIZATION: basic %s\n' "$b64" >> "$HOME/.gitconfig"
+      # uspace-core is public: check-enums.sh clones it without a token.
       - run: sh scripts/check-enums.sh
