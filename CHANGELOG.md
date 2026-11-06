@@ -7,6 +7,8 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
+- Licensed under Apache-2.0 (`LICENSE`, `license` in `package.json`); no code change.
+
 ## 1.6.1
 
 A patch on 1.6.0: the sidebar's collapse label stays inside its button.

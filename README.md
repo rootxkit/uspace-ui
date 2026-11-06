@@ -270,3 +270,11 @@ pnpm install --frozen-lockfile   # Node 22, pnpm via corepack
 pnpm check                       # prettier, eslint, tsc, build, publint, attw, pack, api report, consumers, size, hostnames
 pnpm test && pnpm test:browser   # vitest; components in Chromium with axe
 ```
+
+## Licence
+
+Apache License 2.0 ([`LICENSE`](LICENSE)), copyright 2026 chikox.
+Bundled third-party material keeps its own licence: the Noto fonts are
+under the SIL Open Font License 1.1 ([`fonts/LICENSE-OFL.txt`](fonts/LICENSE-OFL.txt)),
+and the browser basemap's data, glyphs and sprites are listed in
+[`browser/public/basemap/README.md`](browser/public/basemap/README.md).
