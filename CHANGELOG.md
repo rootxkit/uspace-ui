@@ -8,6 +8,41 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 ## Unreleased
 
 - Licensed under Apache-2.0 (`LICENSE`, `license` in `package.json`); no code change.
+- A stale track is no longer drawn as live when its sample is delivered
+  again (review 2026-11-12, F1; CLAUDE.md rules 2 and 6). The track and
+  manned stores keep `sampleReceivedAtMs`, the first arrival of a
+  `capturedAt`; `receivedAtMs` still moves on every delivery.
+  `TrackLayer`, `MannedLayer` and `TrackDetail` take the age bucket from
+  `freshnessBucket(observedAgeS(...), staleAfterS, serverState)`: the age
+  of the observation, never fresher than the server's own state.
+  `TrackView` and `MannedView` gain the optional `serverState`
+  (`TrackServerState`: `live`, `stale`, `source_disabled`),
+  `serverAgeS` and `sampleReceivedAtMs`; `TrackLayer` and `MannedLayer`
+  gain the optional `clockOffsetMs`. **What a console must do:** pass
+  `clockOffsetMs={feed.clockOffsetMs}` to both layers, so a sample that
+  arrives already old is drawn old; map the server's `state` and `age_s`
+  to `serverState` and `serverAgeS` in its adapter where its API sends
+  them; and replace its own `ageS(track, nowMs)` on a track with
+  `observedAgeS(track, nowMs, feed.clockOffsetMs)`. `ageS` is unchanged:
+  on the `"received"` basis it is still the age of the last delivery.
+- The feed client has a liveness check (review 2026-11-12, F2). The
+  status frame is the heartbeat: an open socket with no valid
+  `console/status/v1` within the silence bound is closed by the client,
+  which goes `down` with `silent: true` and retries; the bound is
+  `FeedOptions.silentAfterS` (a number, `"stale_after_s"` or
+  `"live_max_age_s"`; by default the status frame's `stale_after_s`, and
+  no bound is assumed before one is known). `FeedStatusBar` and
+  `FrozenOverlay` say so (`feed.silent`, `en` and `ka`). **A change of
+  behaviour within the contract:** a feed on which status frames stop is
+  now `down` after `stale_after_s`, where it stayed `live` for ever; a
+  server that does not send `console/status/v1` every 2 s (PLAN §6.3)
+  will be seen to flap. A console with its own silent-stream rule can
+  drop it for `feed.silent` and `feed.connection`.
+
+`@public` lines are added to `docs/api/uspace-ui.api.md`; none is
+removed or changed. New catalogue keys: `feed.silent`,
+`detail.server_state` and its three values. No legend value or budget
+changes. This is a minor on 1.6.1.
 
 ## 1.6.1
 
