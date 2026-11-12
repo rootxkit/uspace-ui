@@ -7,6 +7,20 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
+## 1.7.0 - 2026-11-12
+
+A minor on 1.6.1: a track's age is the age of its observation, the feed
+client notices a silent server, and the repository is licensed under
+Apache-2.0. Prepared on `main`, not tagged: the owner tags `v1.7.0`
+(docs/RELEASING.md). Pin it exactly:
+
+```jsonc
+"@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.7.0/rootxkit-uspace-ui-1.7.0.tgz"
+```
+
+`docs/CONSUMING.md` ("From `1.6.1` to `1.7.0`") lists what a console
+does when it upgrades.
+
 - Licensed under Apache-2.0 (`LICENSE`, `license` in `package.json`); no code change.
 - A stale track is no longer drawn as live when its sample is delivered
   again (review 2026-11-12, F1; CLAUDE.md rules 2 and 6). The track and
@@ -43,6 +57,14 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 removed or changed. New catalogue keys: `feed.silent`,
 `detail.server_state` and its three values. No legend value or budget
 changes. This is a minor on 1.6.1.
+
+### Entry points that ship
+
+`model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api` (with the
+`uspace-ui-gen-api` bin), `auth/server`, `auth/client`, `symbology`,
+`layers`, `legend`, `live`, `status`, `alerts`, `table`, `form`,
+`eslint`, `test`, and `styles/tokens.css`, `styles/map.css`,
+`fonts/fonts.css` with the woff2 files, as in 1.6.1.
 
 ## 1.6.1
 
