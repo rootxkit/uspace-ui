@@ -1,7 +1,7 @@
 # uspace-ui implementation plan
 
 Status: plan for parallel implementation by independent agents; WP-0 to
-WP-14 are merged and the latest release is `v1.6.1`. Written on branch
+WP-14 are merged and the latest release is `v1.7.0`. Written on branch
 `plan/initial`. Inputs: the spec at `uspace-lab/docs/spec/` (especially
 `00 §6`, `00 §6.2`, `00 §6.3` (the `rootxkit/uspace-ui` paragraph), `01`
 (users and roles per system), `02 §1` (conventions: time, geometry,
@@ -1090,6 +1090,24 @@ D10).
   owner:* every entry point of §2 as in `v1.6.0`, `model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api`, `auth/server`, `auth/client`, `symbology`, `layers`, `legend`, `live`, `status`, `alerts`, `table`, `form`, `eslint` and `test`. No `@public` line added,
   removed or changed; no catalogue key added; no legend value changed;
   no budget changed.
+- `v1.7.0`: a minor, the two live-feed findings of the review of
+  2026-11-12 and the licence. F1: a track's age is the age of its
+  observation (`observedAge`, `observedAgeS`, `freshnessBucket`; the
+  stores keep `sampleReceivedAtMs`; `TrackView` and `MannedView` gain
+  the optional `serverState`, `serverAgeS` and `sampleReceivedAtMs`,
+  `TrackLayer` and `MannedLayer` the optional `clockOffsetMs`), so a
+  sample delivered again or arriving old is not drawn as live. F2: the
+  feed client closes a socket on which no valid `console/status/v1`
+  arrives within the silence bound (`FeedOptions.silentAfterS`, by
+  default the status frame's `stale_after_s`) and goes `down` with
+  `silent: true`, a change of behaviour within the contract of §6.3.
+  The repository is licensed under Apache-2.0. *Prepared on `main`,
+  tagged by the owner:* every entry point of §2 as in `v1.6.1`,
+  `model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api`,
+  `auth/server`, `auth/client`, `symbology`, `layers`, `legend`,
+  `live`, `status`, `alerts`, `table`, `form`, `eslint` and `test`.
+  `@public` lines added, none removed or changed; five catalogue keys
+  added in `en` and `ka`; no legend value changed; no budget changed.
 - From `v1`: within a major only additive changes (new exports, new
   optional props, new catalogue keys, new enumeration values *rendered*
   because `model` gained them). The following are a **major**: removing

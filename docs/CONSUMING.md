@@ -6,7 +6,7 @@ is shown working in [`examples/next-app/`](../examples/next-app/), which
 CI builds against the kit's current source and smokes in Chromium on
 every pull request. The rules behind the steps are `docs/PLAN.md` §6.3
 (the contracts), §7 (security) and §11 (consumption). This guide is for
-`1.6.1`.
+`1.7.0`.
 
 ## 1. Install the release tarball with pnpm
 
@@ -22,7 +22,7 @@ install --frozen-lockfile`.
 {
   "packageManager": "pnpm@11.9.0",
   "dependencies": {
-    "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.6.1/rootxkit-uspace-ui-1.6.1.tgz",
+    "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.7.0/rootxkit-uspace-ui-1.7.0.tgz",
     "maplibre-gl": "5.24.0",
     "next": "16.3.8",
     "react": "19.3.0",
@@ -45,8 +45,8 @@ install --frozen-lockfile`.
 - Before pinning, check the asset's signed build provenance:
 
   ```sh
-  gh release download v1.6.1 --repo rootxkit/uspace-ui --pattern 'rootxkit-uspace-ui-1.6.1.tgz'
-  gh attestation verify rootxkit-uspace-ui-1.6.1.tgz --repo rootxkit/uspace-ui \
+  gh release download v1.7.0 --repo rootxkit/uspace-ui --pattern 'rootxkit-uspace-ui-1.7.0.tgz'
+  gh attestation verify rootxkit-uspace-ui-1.7.0.tgz --repo rootxkit/uspace-ui \
     --signer-workflow rootxkit/uspace-ui/.github/workflows/release.yml
   ```
 
@@ -423,6 +423,50 @@ From `1.6.0` to `1.6.1` (the sidebar's collapse button grows with its
 label): replace the asset URL and commit the lockfile. No export, prop
 or key changes. The button is no longer a fixed 2rem high; with the
 `ka` label it is two lines high.
+
+From `1.6.1` to `1.7.0` (a track's age is the age of its observation;
+the feed client notices a silent server; Apache-2.0): replace the asset
+URL and commit the lockfile. No export or prop is removed or changed,
+so the upgrade compiles as it is, but a console that stops there still
+draws a sample that arrived old as fresh. Do these four things:
+
+1. Pass the feed's clock offset to both layers:
+   `<TrackLayer clockOffsetMs={feed.clockOffsetMs} />` and
+   `<MannedLayer clockOffsetMs={feed.clockOffsetMs} />`
+   (`LiveStatus.clockOffsetMs`; null until the first status frame).
+   Without it the layers cannot age a sample from its `capturedAt`.
+2. In the adapter, map the server's `state` and `age_s` of a track to
+   `serverState` (`TrackServerState`: `live`, `stale`,
+   `source_disabled`) and `serverAgeS` on `TrackView` and `MannedView`,
+   where the system's API sends them. A track is then never drawn
+   fresher than the server says it is, and `TrackDetail` shows the
+   server's state. Leave them unset where the API does not send them;
+   never derive them in TypeScript.
+3. Replace the console's own `ageS(track, nowMs)` on a track with
+   `observedAgeS(track, nowMs, feed.clockOffsetMs)` (`live`), and its
+   own `ageBucket(...)` on a track with
+   `freshnessBucket(observedAgeS(...), staleAfterS, track.serverState)`
+   (`symbology`). `ageS` is unchanged and on the `"received"` basis is
+   still the age of the last delivery, which a sample delivered again
+   resets; it is no longer the age to show for a track.
+   `sampleReceivedAtMs` is set by the kit's stores, not by the adapter.
+4. Expect a silent feed to go `down`. **A change of behaviour:** an
+   open socket on which no valid `console/status/v1` arrives within
+   `stale_after_s` (the last status frame's own value) is closed by the
+   client, which goes `down` with `silent: true` and retries; before
+   `1.7.0` it stayed `live` for ever. A server that does not send the
+   status frame every 2 s (PLAN §6.3) will be seen to flap.
+   `FeedOptions.silentAfterS` (a number of seconds, `"stale_after_s"`
+   or `"live_max_age_s"`) sets another bound; no bound is assumed
+   before a status frame or the option gives one. `FeedStatusBar` and
+   `FrozenOverlay` say "Server silent" themselves; a console with its
+   own silent-stream rule can drop it and read `feed.silent` and
+   `feed.connection`.
+
+Five catalogue keys are added (`feed.silent`, `detail.server_state`
+and `detail.server_state.live`, `.stale`, `.source_disabled`); an app
+that overrides the catalogue adds them in `en` and `ka`. The tarball
+is licensed under Apache-2.0 (`license` in its `package.json`).
 
 ## Minimum version per consumer
 
