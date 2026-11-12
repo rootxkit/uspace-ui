@@ -4,9 +4,13 @@
 // hollow hexagon, R-05), colour and mark by identification status, opacity
 // by age bucket, an arrow rotated by `trackDeg` (none when null, R-10), a
 // ring for an emergency and another for the selection, optional labels and
-// trails. It reads fields; it never decides a status, a trust class or a
-// freshness, and it holds no threshold (`staleAfterS` is the feed's) and
-// no timer (the app re-renders on its tick with a new `nowMs`).
+// trails. It reads fields; it never decides a status or a trust class, and
+// it holds no threshold (`staleAfterS` is the feed's) and no timer (the
+// app re-renders on its tick with a new `nowMs`). The age bucket is the
+// server's own state where the feed sends one, and otherwise the age of
+// the observation against the feed's threshold (`observedAgeS`,
+// `freshnessBucket`): never fresher than the server says, and never
+// renewed by the same sample arriving again.
 //
 // Updates are coalesced by useLayer into one `setData` per animation
 // frame (PLAN §8), whatever the number of upserts in that frame.
@@ -242,6 +246,13 @@ export interface TrackLayerProps {
   staleAfterS: number;
   /** The app's clock tick, in ms since the epoch; drives the age buckets. */
   nowMs: number;
+  /**
+   * Server minus browser clock, from the status frame
+   * (`LiveStatus.clockOffsetMs`). With it a sample that arrives already
+   * old is drawn as old (`observedAgeS`); without it the age counts from
+   * the sample's first arrival here, or from the server's `serverAgeS`.
+   */
+  clockOffsetMs?: number | null;
   selectedId?: string | null;
   /** Called with the track id of a clicked symbol. */
   onSelect?(id: string): void;
@@ -275,6 +286,7 @@ export function TrackLayer(props: TrackLayerProps) {
     tracks,
     staleAfterS,
     nowMs,
+    clockOffsetMs = null,
     selectedId = null,
     onSelect,
     labels = true,
@@ -292,10 +304,17 @@ export function TrackLayer(props: TrackLayerProps) {
   );
   const t = useMemo(() => createTranslator(lang), [lang]);
   const data = useMemo(
-    () => trackFeatureCollection(hold, { nowMs, staleAfterS, selectedId, t }),
+    () =>
+      trackFeatureCollection(hold, {
+        nowMs,
+        staleAfterS,
+        clockOffsetMs,
+        selectedId,
+        t,
+      }),
     // `version` stands for the hold's contents.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [hold, version, nowMs, staleAfterS, selectedId, t],
+    [hold, version, nowMs, staleAfterS, clockOffsetMs, selectedId, t],
   );
   const map = useLayer({
     id,

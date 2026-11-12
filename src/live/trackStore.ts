@@ -80,7 +80,13 @@ export interface TrackStoreOptions {
  * @public
  */
 export interface PositionStore<V extends Positioned> {
-  /** Adds or replaces a sample; stamps `receivedAtMs` on the browser clock. */
+  /**
+   * Adds or replaces a sample. Stamps `receivedAtMs` on the browser clock
+   * at every delivery, and `sampleReceivedAtMs` when the sample's
+   * `capturedAt` first arrived: the same sample delivered again keeps the
+   * earlier `sampleReceivedAtMs`, so it does not look younger
+   * (`observedAgeS`). A `sampleReceivedAtMs` given in `t` is ignored.
+   */
   upsert(t: Omit<V, "receivedAtMs">): void;
   /** Removes a track, with the server's reason (kept in the ring). */
   remove(id: string, reason: ClearReason | "source_disabled"): void;
@@ -111,6 +117,7 @@ interface Positioned {
   lng: number;
   times: Times;
   receivedAtMs: number;
+  sampleReceivedAtMs?: number;
 }
 
 function checkBound(name: string, v: number, min: number): void {
@@ -171,6 +178,12 @@ function createPositionStore<V extends Positioned>(
   const apply = (t: Omit<V, "receivedAtMs">): boolean => {
     const id = t.trackId;
     const held = views.get(id);
+    const nowMs = now();
+    // When this capture time first arrived. The same sample delivered
+    // again (a snapshot or a product that still carries a silent track)
+    // keeps it: only a newer capture time is news, so re-delivery cannot
+    // make a track look younger (review 2026-11-12, F1).
+    let sampleReceivedAtMs = nowMs;
     if (held !== undefined && !held.times.backlog) {
       if (t.times.backlog) {
         push(id, t);
@@ -188,13 +201,17 @@ function createPositionStore<V extends Positioned>(
         return false;
       }
       if (order !== 0) push(id, t);
+      // Two times that cannot be ordered are the same sample only when
+      // they are the same text.
+      if (order === 0 || t.times.capturedAt === held.times.capturedAt)
+        sampleReceivedAtMs = held.sampleReceivedAtMs ?? held.receivedAtMs;
     } else {
       push(id, t);
     }
     // Delete first, so the map's order is the order of last update and
     // the first key is the one to evict.
     views.delete(id);
-    views.set(id, { ...t, receivedAtMs: now() } as V);
+    views.set(id, { ...t, receivedAtMs: nowMs, sampleReceivedAtMs } as V);
     while (views.size > opts.maxTracks) {
       const oldest = views.keys().next().value as string;
       drop(oldest, "evicted");

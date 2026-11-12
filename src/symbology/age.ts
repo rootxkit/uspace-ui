@@ -4,6 +4,7 @@
 // rule 3, INV-03): `staleAfterS` is the policy value of the feed's status
 // frame (`console/status/v1` `stale_after_s`, PLAN §6.3), never a default.
 import type { Key } from "../i18n/en.js";
+import type { TrackServerState } from "../model/index.js";
 import type { AgeBucket } from "../theme/tokens.js";
 
 /**
@@ -24,6 +25,27 @@ export function ageBucket(ageS: number | null, staleAfterS: number): AgeBucket {
   if (ageS < staleAfterS / 3) return "live";
   if (ageS < staleAfterS) return "aging";
   return "stale";
+}
+
+/**
+ * The bucket a track is drawn with when the server may have said how
+ * fresh it is (`TrackView.serverState`): `stale` as soon as the server
+ * says `stale` or `source_disabled`, whatever the age and even without a
+ * threshold; otherwise `ageBucket` of the age given. A server that says
+ * `live` does not hold a track back from ageing here: the feed may have
+ * stopped since. So the drawing is never fresher than the server's word
+ * nor than the age (CLAUDE.md rules 2 and 6).
+ *
+ * @public
+ */
+export function freshnessBucket(
+  ageS: number | null,
+  staleAfterS: number,
+  serverState: TrackServerState | null = null,
+): AgeBucket {
+  if (serverState === "stale" || serverState === "source_disabled")
+    return "stale";
+  return ageBucket(ageS, staleAfterS);
 }
 
 /**

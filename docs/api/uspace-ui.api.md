@@ -1635,6 +1635,7 @@ interface ExternalStore<T> {
 
 // @beta (undocumented)
 interface FeatureOptions {
+    clockOffsetMs?: number | null;
     // (undocumented)
     nowMs: number;
     // (undocumented)
@@ -1670,6 +1671,7 @@ interface FeedOptions {
     // (undocumented)
     protocols?: string[];
     random?: () => number;
+    silentAfterS?: number | "stale_after_s" | "live_max_age_s";
     stores?: FeedStores;
     url: string | (() => Promise<string>);
 }
@@ -1714,6 +1716,8 @@ type FeedStatusInput = FeedStatus & {
     lastFrameAtMs?: number | null;
     framesMalformed?: number;
     unauthorized?: boolean;
+    silent?: boolean;
+    silentAfterS?: number | null;
 };
 
 // @public
@@ -2035,6 +2039,9 @@ interface Freshness {
     updatedAt: string | null;
     version: string | null;
 }
+
+// @public
+function freshnessBucket(ageS: number | null, staleAfterS: number, serverState?: TrackServerState | null): AgeBucket;
 
 // @public
 function freshnessOf(res: Response, body: unknown, pick?: FreshnessPick): Freshness;
@@ -3018,8 +3025,13 @@ declare namespace live {
         SourceStoreCounter,
         ageS,
         compareCapturedAt,
+        observedAge,
+        observedAgeS,
         utcMs,
         AgeBasis,
+        Observed,
+        ObservedAge,
+        ObservedAgeBasis,
         RECENTLY_REMOVED_LIMIT,
         createMannedStore,
         createTrackStore,
@@ -3075,6 +3087,12 @@ type LiveCounter =
 | "url_refused"
 /** A socket that closed while the client was running. */
 | "closed"
+/**
+* A socket the client closed itself because no valid status frame
+* arrived within the silence bound (`FeedOptions.silentAfterS`). Not
+* counted as `closed`: the server never closed it.
+*/
+| "silent_closed"
 /** A close with code 4401: the session is gone (PLAN §6.3, M22). */
 | "unauthorized"
 /** A subscribe frame replaced by a newer one before it could be sent. */
@@ -3108,6 +3126,8 @@ interface LiveStatus extends FeedStatus {
     lastFrameAtMs: number | null;
     lastStatusAtMs: number | null;
     nextRetryAtMs: number | null;
+    silent?: boolean;
+    silentAfterS?: number | null;
     unauthorized: boolean;
     zonesVersion: string | null;
 }
@@ -3165,7 +3185,7 @@ const MANNED_LAYER_ID = "us-manned";
 const MANNED_SOURCE_CLASS_KEYS: Readonly<Record<string, Key>>;
 
 // @beta
-function mannedAge(m: MannedTrack, nowMs: number, staleAfterS: number): AgeBucket;
+function mannedAge(m: MannedTrack, nowMs: number, staleAfterS: number, clockOffsetMs?: number | null): AgeBucket;
 
 // @beta
 interface MannedColours {
@@ -3187,6 +3207,7 @@ function mannedFeatureCollection(tracks: readonly MannedTrack[], opts: MannedFea
 
 // @beta (undocumented)
 interface MannedFeatureOptions {
+    clockOffsetMs?: number | null;
     // (undocumented)
     nowMs: number;
     // (undocumented)
@@ -3257,6 +3278,7 @@ function mannedLayerIds(id: string): MannedLayerIds;
 
 // @public (undocumented)
 interface MannedLayerProps {
+    clockOffsetMs?: number | null;
     id?: string;
     labels?: boolean;
     nowMs: number;
@@ -3330,6 +3352,12 @@ interface MannedView {
     lng: number;
     // (undocumented)
     receivedAtMs: number;
+    // (undocumented)
+    sampleReceivedAtMs?: number;
+    // (undocumented)
+    serverAgeS?: number | null;
+    // (undocumented)
+    serverState?: TrackServerState | null;
     // (undocumented)
     sourceClass: string;
     // (undocumented)
@@ -3548,6 +3576,7 @@ declare namespace model {
         FieldError,
         Problem,
         SessionDisplay,
+        TrackServerState,
         DrawPoint,
         DrawOutline
     }
@@ -3597,6 +3626,35 @@ const notoSansGeorgian: NextFontWithVariable;
 
 // @public
 function NumberField(props: FieldBaseProps): JSX.Element;
+
+// @public
+interface Observed {
+    // (undocumented)
+    receivedAtMs: number;
+    // (undocumented)
+    sampleReceivedAtMs?: number;
+    // (undocumented)
+    serverAgeS?: number | null;
+    // (undocumented)
+    times?: Times;
+}
+
+// @public
+interface ObservedAge {
+    // (undocumented)
+    ageS: number;
+    // (undocumented)
+    basis: ObservedAgeBasis;
+}
+
+// @public
+function observedAge(t: Observed, nowMs: number, clockOffsetMs?: number | null): ObservedAge | null;
+
+// @public
+type ObservedAgeBasis = "server" | "captured" | "received";
+
+// @public
+function observedAgeS(t: Observed, nowMs: number, clockOffsetMs?: number | null): number | null;
 
 // @public
 const OUTLINE_KINDS: readonly ["polygon", "circle"];
@@ -4759,6 +4817,7 @@ declare namespace symbology {
         ageBucket,
         ageOpacity,
         ageToken,
+        freshnessBucket,
         DSS_STATES,
         INTENT_ACTIVE_EXTRA_FILL,
         INTENT_ACTIVE_EXTRA_WIDTH_PX,
@@ -5345,6 +5404,7 @@ function trackLayerIds(id: string): TrackLayerIds;
 
 // @public (undocumented)
 interface TrackLayerProps {
+    clockOffsetMs?: number | null;
     id?: string;
     labels?: boolean;
     nowMs: number;
@@ -5370,6 +5430,9 @@ interface TrackLegendProps {
     // (undocumented)
     defaultCollapsed?: boolean;
 }
+
+// @public (undocumented)
+type TrackServerState = "live" | "stale" | "source_disabled";
 
 // @public (undocumented)
 type TrackStore = PositionStore<TrackView>;
@@ -5466,6 +5529,12 @@ interface TrackView {
     lng: number;
     // (undocumented)
     receivedAtMs: number;
+    // (undocumented)
+    sampleReceivedAtMs?: number;
+    // (undocumented)
+    serverAgeS?: number | null;
+    // (undocumented)
+    serverState?: TrackServerState | null;
     // (undocumented)
     source: string;
     // (undocumented)

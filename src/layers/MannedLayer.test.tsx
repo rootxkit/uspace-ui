@@ -26,6 +26,7 @@ import { resetLayerCountersForTests } from "./counters.js";
 import {
   MANNED_LAYER_ID,
   MannedLayer,
+  mannedAge,
   mannedLayerIds,
   type MannedLayerProps,
 } from "./MannedLayer.js";
@@ -355,5 +356,48 @@ describe("the hover card", () => {
     expect(screen.queryByRole("tooltip")).not.toBeNull();
     act(() => map.fire("mouseout"));
     expect(screen.queryByRole("tooltip")).toBeNull();
+  });
+});
+
+describe("MannedLayer: the age of the observation (review 2026-11-12, F1)", () => {
+  it("mannedAge: the same sample delivered again keeps ageing", () => {
+    const m = mannedTrack({
+      receivedAtMs: NOW_MS,
+      sampleReceivedAtMs: NOW_MS - 45_000,
+    });
+    expect(mannedAge(m, NOW_MS, STALE_AFTER_S)).toBe("stale");
+    // The twin: first heard just now.
+    const fresh = mannedTrack({
+      receivedAtMs: NOW_MS,
+      sampleReceivedAtMs: NOW_MS,
+    });
+    expect(mannedAge(fresh, NOW_MS, STALE_AFTER_S)).toBe("live");
+  });
+
+  it("mannedAge: the server state and the clock offset are read", () => {
+    const m = mannedTrack({ receivedAtMs: NOW_MS });
+    expect(
+      mannedAge({ ...m, serverState: "stale" }, NOW_MS, STALE_AFTER_S),
+    ).toBe("stale");
+    expect(
+      mannedAge(
+        { ...m, serverState: "live", serverAgeS: 31 },
+        NOW_MS,
+        STALE_AFTER_S,
+      ),
+    ).toBe("stale");
+    // Captured 300 ms before receipt: live on the server clock; a server
+    // clock 60 s ahead of the browser makes it 60.3 s old.
+    expect(mannedAge(m, NOW_MS, STALE_AFTER_S, 0)).toBe("live");
+    expect(mannedAge(m, NOW_MS, STALE_AFTER_S, 60_000)).toBe("stale");
+  });
+
+  it("the layer passes clockOffsetMs to its features", async () => {
+    const m = mannedTrack({ receivedAtMs: NOW_MS });
+    const { map, rerender } = await mount([m], { clockOffsetMs: 60_000 });
+    expect(propsOf(map)["age"]).toBe("stale");
+    rerender([m], { clockOffsetMs: 0 });
+    flushFrames();
+    expect(propsOf(map)["age"]).toBe("live");
   });
 });

@@ -4,7 +4,9 @@
 // when 0 as well, so a zero is seen to be a zero), the frames this console
 // ignored, what is degraded, and a session that ended. `down` is "feed
 // down, retrying" with the age of the last frame, never "data lost"
-// (C-12). A quiet feed stays `live` and its last-frame age climbs (E-02).
+// (C-12). A feed with no tracks stays `live` while status frames arrive;
+// one that went silent (no status frame within the bound) is `down` like
+// any other, and the bar says why (review 2026-11-12, F2).
 import type { ReactNode } from "react";
 
 import { fmtAge } from "../i18n/format.js";
@@ -15,7 +17,8 @@ import { CONNECTION_KEYS, degradedLabel } from "./words.js";
 
 /**
  * `FeedStatus`, and what `useFeed` adds when the app passes its result:
- * the last frame's time, the ignored frames, a 4401 close.
+ * the last frame's time, the ignored frames, a 4401 close, and a feed
+ * that went silent with the bound it was held to.
  *
  * @public
  */
@@ -23,6 +26,8 @@ export type FeedStatusInput = FeedStatus & {
   lastFrameAtMs?: number | null;
   framesMalformed?: number;
   unauthorized?: boolean;
+  silent?: boolean;
+  silentAfterS?: number | null;
 };
 
 /** @public */
@@ -96,6 +101,13 @@ export function FeedStatusBar(props: FeedStatusBarProps) {
     parts.push(
       <Part key="threshold" part="no-threshold">
         {t("feed.no_threshold")}
+      </Part>,
+    );
+  }
+  if (status.silent === true) {
+    parts.push(
+      <Part key="silent" part="silent">
+        {t("feed.silent", { age: fmtAge(status.silentAfterS ?? null, lang) })}
       </Part>,
     );
   }

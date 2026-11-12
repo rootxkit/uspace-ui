@@ -316,6 +316,7 @@ export const ka: Readonly<Record<Key, string>> = {
 
   // WP-8: the feed's status bar and frozen overlay
   "feed.down_retrying": "ნაკადი შეწყვეტილია, ხელახლა ვუკავშირდებით",
+  "feed.silent": "სერვერი დუმს: სტატუსის კადრი არ მოსულა {age}",
   "feed.last_frame": "ბოლო კადრი {age} წინ",
   "feed.no_frame_yet": "კადრი ჯერ არ მიღებულა",
   "feed.as_of":
@@ -687,6 +688,10 @@ export const ka: Readonly<Record<Key, string>> = {
   "detail.backlog": "ისტორია: მიწოდებულია დაგროვილი სახით, არა ცოცხლად",
   "detail.age_received": "ასაკი მიღებიდან",
   "detail.age_captured": "ასაკი დაფიქსირებიდან",
+  "detail.server_state": "სერვერის მიერ გამოგზავნილი მდგომარეობა",
+  "detail.server_state.live": "ცოცხალი",
+  "detail.server_state.stale": "მოძველებული",
+  "detail.server_state.source_disabled": "წყარო გამორთულია",
   "detail.flight": "ფრენა",
   "detail.intent": "განზრახვა",
 

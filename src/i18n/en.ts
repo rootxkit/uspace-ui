@@ -333,6 +333,9 @@ const catalogue = {
   // WP-8: the feed's status bar and frozen overlay (C-12: down is "feed
   // down, retrying" with the age of the last frame, never "data lost").
   "feed.down_retrying": "Feed down, retrying",
+  // The feed went silent: the socket was open and no status frame came
+  // within the bound ({age}); never "lost" (C-12).
+  "feed.silent": "Server silent: no status frame for {age}",
   "feed.last_frame": "last frame {age} ago",
   "feed.no_frame_yet": "no frame received yet",
   "feed.as_of": "Showing data as of {time}, received {age} ago",
@@ -716,6 +719,11 @@ const catalogue = {
   "detail.backlog": "History: delivered as backlog, not live",
   "detail.age_received": "Age since received",
   "detail.age_captured": "Age since captured",
+  // What the server itself says of the track (its `state`), with its age.
+  "detail.server_state": "State sent by the server",
+  "detail.server_state.live": "Live",
+  "detail.server_state.stale": "Stale",
+  "detail.server_state.source_disabled": "Source disabled",
   "detail.flight": "Flight",
   "detail.intent": "Intent",
 

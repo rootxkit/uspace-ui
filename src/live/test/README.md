@@ -26,7 +26,7 @@ names three, and they are here:
 | File | What it exercises |
 |---|---|
 | `session-expiry-4401.json` | close 4401, a second 4401 on the next upgrade, then a successful upgrade (re-login without a reload) |
-| `silence-60s.json` | an open, healthy socket that sends nothing for 60 s |
+| `silence-60s.json` | an open socket that goes silent for 60 s (no status frame either): the client leaves `live` at its silence bound |
 | `backlog-burst.json` | a relay draining its queue: live, then backlog samples captured earlier, then live |
 
 No system served the console frame when WP-8 was written, so these three
