@@ -2,7 +2,13 @@
 // enumerations to visual values and MapLibre expressions. No React, no map.
 // WP-6 adds the zone and restriction part; WP-7 adds the track part;
 // WP-12 adds the manned and intent parts.
-export { AGE_BUCKET_KEYS, ageBucket, ageOpacity, ageToken } from "./age.js";
+export {
+  AGE_BUCKET_KEYS,
+  ageBucket,
+  ageOpacity,
+  ageToken,
+  freshnessBucket,
+} from "./age.js";
 export {
   DSS_STATES,
   INTENT_ACTIVE_EXTRA_FILL,

@@ -716,6 +716,11 @@ const catalogue = {
   "detail.backlog": "History: delivered as backlog, not live",
   "detail.age_received": "Age since received",
   "detail.age_captured": "Age since captured",
+  // What the server itself says of the track (its `state`), with its age.
+  "detail.server_state": "State sent by the server",
+  "detail.server_state.live": "Live",
+  "detail.server_state.stale": "Stale",
+  "detail.server_state.source_disabled": "Source disabled",
   "detail.flight": "Flight",
   "detail.intent": "Intent",
 

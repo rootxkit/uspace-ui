@@ -660,3 +660,55 @@ describe("accessibility", () => {
     }
   }
 });
+
+describe("the state and age the server sent (review 2026-11-12, F1)", () => {
+  it("shows the server state with its age counted on, in both languages", () => {
+    const t = uasTrack({ serverState: "stale", serverAgeS: 58 });
+    const root = show(t);
+    // Received 2 s ago with age_s 58: 60 s now.
+    expect(value(root, "server-state")).toBe("Stale · 1 min");
+    expect(label(root, "server-state")).toBe(en["detail.server_state"]);
+    cleanup();
+    const ka = show(t, "ka");
+    expect(value(ka, "server-state")).not.toBe("(no row)");
+    expect(value(ka, "server-state")).not.toContain("Stale");
+  });
+
+  it("has no such row when the feed sends neither (the twin)", () => {
+    expect(field(show(uasTrack()), "server-state")).toBeNull();
+  });
+
+  it("source_disabled is worded, and an age without a state keeps a dash for the state", () => {
+    const root = show(uasTrack({ serverState: "source_disabled" }));
+    expect(value(root, "server-state")).toBe("Source disabled");
+    cleanup();
+    const ageOnly = show(uasTrack({ serverAgeS: 3 }));
+    expect(value(ageOnly, "server-state")).toBe("— · 5 s");
+  });
+
+  it("the bucket is never fresher than the server state: stale beside a 2 s receipt", () => {
+    const root = show(uasTrack({ serverState: "stale" }));
+    expect(value(root, "age-received")).toBe("2 s · Stale");
+    cleanup();
+    // The pair: the server says live.
+    const live = show(uasTrack({ serverState: "live" }));
+    expect(value(live, "age-received")).toBe("2 s · Live");
+  });
+
+  it("the bucket follows the first arrival of a sample delivered again", () => {
+    const t = uasTrack();
+    const root = show({ ...t, sampleReceivedAtMs: t.receivedAtMs - 60_000 });
+    expect(
+      root
+        .querySelector("[data-field=age-received] [data-age]")
+        ?.getAttribute("data-age"),
+    ).toBe("stale");
+  });
+
+  it("the compact card carries the server state too", () => {
+    const root = show(uasTrack({ serverState: "stale" }), "en", {
+      compact: true,
+    });
+    expect(value(root, "server-state")).toBe("Stale");
+  });
+});

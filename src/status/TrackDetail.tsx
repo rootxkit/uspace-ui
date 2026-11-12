@@ -29,14 +29,15 @@ import {
 import { useOptionalI18n, useTFor } from "../i18n/I18nProvider.js";
 import type { Lang } from "../i18n/lang.js";
 import type { Translate } from "../i18n/translate.js";
-import { ageS } from "../live/time.js";
+import { ageS, observedAgeS } from "../live/time.js";
 import type {
   AltSource,
   TimeSource,
   Times,
+  TrackServerState,
   TrackView,
 } from "../model/index.js";
-import { AGE_BUCKET_KEYS, ageBucket } from "../symbology/age.js";
+import { AGE_BUCKET_KEYS, freshnessBucket } from "../symbology/age.js";
 import {
   IDENT_BASIS_KEYS,
   IDENT_STATUS_KEYS,
@@ -178,13 +179,37 @@ function text(v: string | null | undefined): string {
   return v === null || v === undefined || v.trim() === "" ? DASH : v;
 }
 
+const SERVER_STATE_KEYS: Readonly<Record<TrackServerState, Key>> =
+  Object.freeze({
+    live: "detail.server_state.live",
+    stale: "detail.server_state.stale",
+    source_disabled: "detail.server_state.source_disabled",
+  });
+
+/** What the times section needs beyond the two plain ages. */
+interface Freshness {
+  /** `observedAgeS`: the age the map draws the track with. */
+  observedS: number | null;
+  serverState: TrackServerState | null;
+  /** The server's `age_s`, counted on since its frame arrived. */
+  serverAgeS: number | null;
+}
+
+// The bucket is the one the map draws (`freshnessBucket` of the observed
+// age and the server's state), so the detail never says "Live" beside a
+// symbol drawn stale; the number is the age the label names.
 function AgeValue(props: {
   ageS: number | null;
+  fresh: Freshness;
   staleAfterS: number | null;
   lang: Lang;
   t: Translate;
 }) {
-  const bucket = ageBucket(props.ageS, props.staleAfterS ?? Number.NaN);
+  const bucket = freshnessBucket(
+    props.fresh.observedS,
+    props.staleAfterS ?? Number.NaN,
+    props.fresh.serverState,
+  );
   return (
     <span data-age={bucket}>
       {fmtAge(props.ageS, props.lang)}
@@ -367,6 +392,7 @@ function motionSection(
 function timesSection(
   times: Times,
   age: { received: number | null; captured: number | null },
+  fresh: Freshness,
   staleAfterS: number | null,
   compact: boolean,
   c: Ctx,
@@ -408,11 +434,23 @@ function timesSection(
       <Row field="age-received" label={t("detail.age_received")}>
         <AgeValue
           ageS={age.received}
+          fresh={fresh}
           staleAfterS={staleAfterS}
           lang={lang}
           t={t}
         />
       </Row>
+      {(fresh.serverState !== null || fresh.serverAgeS !== null) && (
+        <Row field="server-state" label={t("detail.server_state")}>
+          <span data-server-state={fresh.serverState ?? ""}>
+            {fresh.serverState === null
+              ? DASH
+              : t(SERVER_STATE_KEYS[fresh.serverState])}
+            {fresh.serverAgeS !== null &&
+              ` · ${fmtAge(fresh.serverAgeS, lang)}`}
+          </span>
+        </Row>
+      )}
       {!compact && (
         <Row field="age-captured" label={t("detail.age_captured")}>
           {fmtAge(age.captured, lang)}
@@ -445,6 +483,16 @@ export function TrackDetail(props: TrackDetailProps) {
   const age = {
     received: ageS(track, nowMs, "received"),
     captured: ageS(track, nowMs, "captured", clockOffsetMs),
+  };
+  const sentAgeS = track.serverAgeS;
+  const sinceReceiptS = age.received ?? 0;
+  const fresh: Freshness = {
+    observedS: observedAgeS(track, nowMs, clockOffsetMs),
+    serverState: track.serverState ?? null,
+    serverAgeS:
+      typeof sentAgeS === "number" && Number.isFinite(sentAgeS) && sentAgeS >= 0
+        ? sentAgeS + (sinceReceiptS > 0 ? sinceReceiptS : 0)
+        : null,
   };
   const link = (kind: DetailLink["kind"], id: string | null): ReactNode =>
     id === null
@@ -509,7 +557,7 @@ export function TrackDetail(props: TrackDetailProps) {
             {sourceClassLabel(track.sourceClass, t)}
           </Row>
         </Section>
-        {timesSection(track.times, age, staleAfterS, compact, c)}
+        {timesSection(track.times, age, fresh, staleAfterS, compact, c)}
       </article>
     );
   }
@@ -574,7 +622,7 @@ export function TrackDetail(props: TrackDetailProps) {
           </>
         )}
       </Section>
-      {timesSection(track.times, age, staleAfterS, compact, c)}
+      {timesSection(track.times, age, fresh, staleAfterS, compact, c)}
     </article>
   );
 }

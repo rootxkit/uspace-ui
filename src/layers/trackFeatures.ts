@@ -11,7 +11,7 @@ import { DASH, fmtRegistrationNumber } from "../i18n/format.js";
 import type { Translate } from "../i18n/translate.js";
 import type { TrackView } from "../model/index.js";
 import type { AgeBucket } from "../theme/tokens.js";
-import { ageBucket } from "../symbology/age.js";
+import { freshnessBucket } from "../symbology/age.js";
 import {
   IDENT_PENDING_KEYS,
   IDENT_STATUS_KEYS,
@@ -25,7 +25,7 @@ import type {
   TrackFeatureProperties,
   TrailFeatureProperties,
 } from "../symbology/track.js";
-import { ageS, compareCapturedAt } from "../live/time.js";
+import { ageS, compareCapturedAt, observedAgeS } from "../live/time.js";
 import { countLayer } from "./counters.js";
 
 // The ordering of two capture times and the display age live in `live`
@@ -220,13 +220,16 @@ export function trackLabel(
 export interface FeatureOptions {
   nowMs: number;
   staleAfterS: number;
+  /** `LiveStatus.clockOffsetMs`; absent or null: no captured reading. */
+  clockOffsetMs?: number | null;
   selectedId: string | null;
   t: Translate;
 }
 
 /**
  * One point per track with a live sample and one line per trail of two
- * points or more. A track that has only sent backlog has a trail and no
+ * points or more. The age bucket is `freshnessBucket` of the track's
+ * `observedAgeS` and the server's own state: never fresher than either. A track that has only sent backlog has a trail and no
  * point (T-04), and its trail draws as `stale`: it is history.
  *
  * @beta
@@ -241,7 +244,11 @@ export function trackFeatureCollection(
     const age: AgeBucket =
       h.view === null
         ? "stale"
-        : ageBucket(ageS(h.view, opts.nowMs, "received"), opts.staleAfterS);
+        : freshnessBucket(
+            observedAgeS(h.view, opts.nowMs, opts.clockOffsetMs ?? null),
+            opts.staleAfterS,
+            h.view.serverState ?? null,
+          );
     if (h.trail.length >= 2) {
       trails.push({
         type: "Feature",

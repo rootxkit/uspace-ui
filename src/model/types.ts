@@ -53,9 +53,11 @@ export interface TrackView {
   flightId: string | null; intentId: string | null;
   times: Times;
   receivedAtMs: number;                               // browser clock; set by the live store, never by the API
+  serverState?: TrackServerState | null; serverAgeS?: number | null;   // 1.7.0 (additive): the server's own word on this track and its age in seconds when the frame was written (`state`, `age_s`), as sent; absent or null: the feed gives none
+  sampleReceivedAtMs?: number;                        // 1.7.0 (additive): browser clock when this `capturedAt` first arrived; set by the live store and kept when the same sample is delivered again, which moves `receivedAtMs` only
 }
 /** @public */
-export interface MannedView { trackId: string; icao24: string | null; callsign: string | null; lat: number; lng: number; altPressureM: number | null; altWgs84M: number | null; gsMs: number | null; trackDeg: number | null; vrateMs: number | null; sourceClass: string; emergency: boolean; times: Times; receivedAtMs: number }
+export interface MannedView { trackId: string; icao24: string | null; callsign: string | null; lat: number; lng: number; altPressureM: number | null; altWgs84M: number | null; gsMs: number | null; trackDeg: number | null; vrateMs: number | null; sourceClass: string; emergency: boolean; times: Times; receivedAtMs: number; serverState?: TrackServerState | null; serverAgeS?: number | null; sampleReceivedAtMs?: number }   // 1.7.0 (additive): the three freshness fields of TrackView
 /** @public */
 export interface ZoneView {                           // one ED-318 feature as the API serves it, untouched geometry
   identifier: string; name: string | null; type: ZoneType; variant: string | null; reason: string[]; message: string | null;
@@ -76,6 +78,9 @@ export interface FieldError { field: string; reason: string }      // uspace-cor
 export interface Problem { type: string; title: string; status: number; detail: string | null; instance: string | null; errors: FieldError[]; truncated?: boolean }   // §14 Q2 (decided, M28): `type` = https://schemas.uspace.ge/problems/<slug>; `errors` capped at 100 by the server, `truncated: true` when it was cut; the form kit says "and more" on it
 /** @public */
 export interface SessionDisplay { sub: string; roles: string[]; realm: string; exp: number }   // the session JWT claims the BFF decodes for display (M20): `roles` is always an array (one element where a system has single-role users); `realm` is `console` (default), `police` (authority) or `portal` (USSP operators)
+// 1.7.0 (additive): what a server says of a track it still sends (uspace-ussp internal/traffic `StateLive`, `StateStale`, `StateSourceDisabled`; the ANSP's manned-feed uses the same three). Carried as sent and drawn never fresher than it says (CLAUDE.md rules 2 and 6): `stale` and `source_disabled` both draw as stale.
+/** @public */
+export type TrackServerState = "live" | "stale" | "source_disabled";
 
 // 1.0.0 (additive): an outline a person is drawing or typing (layers/DrawLayer, form/OutlineFields), passed to the app as entered. The kit never closes, simplifies, buffers or measures it, and never turns a circle into a polygon: the API judges the outline and, where a circle must be drawn, draws its outline in Go (uspace-core geodesy) and returns it.
 /** @public */

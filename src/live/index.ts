@@ -72,7 +72,17 @@ export {
   type SourceStore,
   type SourceStoreCounter,
 } from "./sourceStore.js";
-export { ageS, compareCapturedAt, utcMs, type AgeBasis } from "./time.js";
+export {
+  ageS,
+  compareCapturedAt,
+  observedAge,
+  observedAgeS,
+  utcMs,
+  type AgeBasis,
+  type Observed,
+  type ObservedAge,
+  type ObservedAgeBasis,
+} from "./time.js";
 export {
   RECENTLY_REMOVED_LIMIT,
   createMannedStore,

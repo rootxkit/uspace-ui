@@ -820,3 +820,64 @@ describe("TrackLayer: lifecycle", () => {
     expect(MockMap.instances.length).toBeGreaterThan(0);
   });
 });
+
+describe("TrackLayer: the age of the observation (review 2026-11-12, F1)", () => {
+  it("the same sample handed over again as a new object does not look younger", async () => {
+    // What the live store hands over when a sample is delivered again:
+    // a new receipt, the first arrival kept.
+    const first = track({ receivedAtMs: NOW_MS, sampleReceivedAtMs: NOW_MS });
+    const { map, rerender } = await mount([first]);
+    expect(pointOf(map).properties["age"]).toBe("live");
+    const again = {
+      ...first,
+      receivedAtMs: NOW_MS + 40_000,
+      sampleReceivedAtMs: NOW_MS,
+    };
+    rerender([again], { nowMs: NOW_MS + 40_000 });
+    flushFrames();
+    expect(pointOf(map).properties["age"]).toBe("stale");
+  });
+
+  it("a newer sample at the same moment is live (the twin)", async () => {
+    const first = track({ receivedAtMs: NOW_MS, sampleReceivedAtMs: NOW_MS });
+    const { map, rerender } = await mount([first]);
+    const newer = at("2026-01-01T12:00:40.000Z", {
+      receivedAtMs: NOW_MS + 40_000,
+      sampleReceivedAtMs: NOW_MS + 40_000,
+    });
+    rerender([newer], { nowMs: NOW_MS + 40_000 });
+    flushFrames();
+    expect(pointOf(map).properties["age"]).toBe("live");
+  });
+
+  it("clockOffsetMs: a sample that arrives old is drawn old; without the prop it is not known", async () => {
+    // Captured 45 s before it arrived.
+    const old = at("2026-01-01T11:59:15.000Z");
+    const { map, rerender } = await mount([old], { clockOffsetMs: 0 });
+    expect(pointOf(map).properties["age"]).toBe("stale");
+    rerender([old], {});
+    flushFrames();
+    // The pair: no offset, no server age: only the receipt is known.
+    expect(pointOf(map).properties["age"]).toBe("live");
+  });
+
+  it("the state the server sent wins over a fresh receipt, and clears with it", async () => {
+    const stale = track({ serverState: "stale", serverAgeS: 50 });
+    const { map, rerender } = await mount([stale]);
+    expect(pointOf(map).properties["age"]).toBe("stale");
+    const disabled = at("2026-01-01T12:00:01.000Z", {
+      serverState: "source_disabled",
+    });
+    rerender([disabled]);
+    flushFrames();
+    expect(pointOf(map).properties["age"]).toBe("stale");
+    const live = at("2026-01-01T12:00:02.000Z", {
+      serverState: "live",
+      serverAgeS: 0,
+    });
+    rerender([live]);
+    flushFrames();
+    expect(pointOf(map).properties["age"]).toBe("live");
+    expect(points(map)).toHaveLength(1);
+  });
+});

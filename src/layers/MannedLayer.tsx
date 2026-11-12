@@ -23,11 +23,11 @@ import { useMemo } from "react";
 import { mapFontstack } from "../fonts/faces.js";
 import { useTFor } from "../i18n/I18nProvider.js";
 import type { Translate } from "../i18n/translate.js";
-import { ageS } from "../live/time.js";
+import { observedAgeS } from "../live/time.js";
 import { useMapContext } from "../map/context.js";
 import { TRUSTS, type Trust } from "../model/index.js";
 import { TrackDetail } from "../status/TrackDetail.js";
-import { ageBucket } from "../symbology/age.js";
+import { freshnessBucket } from "../symbology/age.js";
 import {
   MANNED_COLOUR_TOKENS,
   MANNED_ICON_IDS,
@@ -116,8 +116,10 @@ const EMPTY: MannedFeatureCollection = {
 
 /**
  * The age bucket a manned track draws with: the thirds rule on the age
- * since this console received it, except that a backlog sample is history
- * and draws as `stale` whatever its age (T-04: never drawn as live).
+ * of the observation (`observedAgeS`: not renewed by the same sample
+ * arriving again), never fresher than the server's own state
+ * (`freshnessBucket`), except that a backlog sample is history and draws
+ * as `stale` whatever its age (T-04: never drawn as live).
  *
  * @beta
  */
@@ -125,9 +127,14 @@ export function mannedAge(
   m: MannedTrack,
   nowMs: number,
   staleAfterS: number,
+  clockOffsetMs: number | null = null,
 ): AgeBucket {
   if (m.times.backlog) return "stale";
-  return ageBucket(ageS(m, nowMs, "received"), staleAfterS);
+  return freshnessBucket(
+    observedAgeS(m, nowMs, clockOffsetMs),
+    staleAfterS,
+    m.serverState ?? null,
+  );
 }
 
 /**
@@ -168,6 +175,8 @@ export function mannedLabel(
 export interface MannedFeatureOptions {
   nowMs: number;
   staleAfterS: number;
+  /** `LiveStatus.clockOffsetMs`; absent or null: no captured reading. */
+  clockOffsetMs?: number | null;
   selectedId: string | null;
   t: Translate;
 }
@@ -184,7 +193,12 @@ export function mannedFeatureCollection(
   return {
     type: "FeatureCollection",
     features: tracks.map((m) => {
-      const age = mannedAge(m, opts.nowMs, opts.staleAfterS);
+      const age = mannedAge(
+        m,
+        opts.nowMs,
+        opts.staleAfterS,
+        opts.clockOffsetMs ?? null,
+      );
       return {
         type: "Feature",
         geometry: { type: "Point", coordinates: [m.lng, m.lat] },
@@ -290,6 +304,11 @@ export interface MannedLayerProps {
   staleAfterS: number;
   /** The app's clock tick, in ms since the epoch; drives the age buckets. */
   nowMs: number;
+  /**
+   * Server minus browser clock, from the status frame
+   * (`LiveStatus.clockOffsetMs`); see `TrackLayerProps.clockOffsetMs`.
+   */
+  clockOffsetMs?: number | null;
   selectedId?: string | null;
   /** Called with the track id of a clicked symbol. */
   onSelect?(id: string): void;
@@ -321,6 +340,7 @@ export function MannedLayer(props: MannedLayerProps) {
     tracks,
     staleAfterS,
     nowMs,
+    clockOffsetMs = null,
     selectedId = null,
     onSelect,
     labels = true,
@@ -332,8 +352,15 @@ export function MannedLayer(props: MannedLayerProps) {
   const t = useTFor(lang);
   const list = useMemo(() => listOf(tracks), [tracks]);
   const data = useMemo(
-    () => mannedFeatureCollection(list, { nowMs, staleAfterS, selectedId, t }),
-    [list, nowMs, staleAfterS, selectedId, t],
+    () =>
+      mannedFeatureCollection(list, {
+        nowMs,
+        staleAfterS,
+        clockOffsetMs,
+        selectedId,
+        t,
+      }),
+    [list, nowMs, staleAfterS, clockOffsetMs, selectedId, t],
   );
   const map = useLayer({
     id,
@@ -359,6 +386,7 @@ export function MannedLayer(props: MannedLayerProps) {
           track={track}
           nowMs={nowMs}
           staleAfterS={staleAfterS}
+          clockOffsetMs={clockOffsetMs}
           lang={lang}
           compact
         />

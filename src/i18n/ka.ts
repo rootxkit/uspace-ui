@@ -687,6 +687,10 @@ export const ka: Readonly<Record<Key, string>> = {
   "detail.backlog": "ისტორია: მიწოდებულია დაგროვილი სახით, არა ცოცხლად",
   "detail.age_received": "ასაკი მიღებიდან",
   "detail.age_captured": "ასაკი დაფიქსირებიდან",
+  "detail.server_state": "სერვერის მიერ გამოგზავნილი მდგომარეობა",
+  "detail.server_state.live": "ცოცხალი",
+  "detail.server_state.stale": "მოძველებული",
+  "detail.server_state.source_disabled": "წყარო გამორთულია",
   "detail.flight": "ფრენა",
   "detail.intent": "განზრახვა",
 
