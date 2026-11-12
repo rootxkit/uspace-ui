@@ -104,8 +104,13 @@ and the lab consumes it at build time, pinned by an exact version. Read
   "does not call back", "not in the URL" has a twin that renders, calls
   back, or lands in the URL. Every refusal has its acceptance.
 - **E-02 Run the branch that says nothing is wrong.** A feed that stays
-  `live` for ten minutes with no frames shows ages climbing; a basemap
-  that loads shows the OSM date; a form that succeeds clears its
+  `live` for ten minutes on status frames alone shows every track's
+  `observedAgeS(track, nowMs, feed.clockOffsetMs)` climbing: the age of
+  the observation, which a sample delivered again does not reset (never
+  `ageS` on `receivedAtMs`, the age of the last delivery); a feed
+  whose status frames stop does not stay `live`, it goes `down` with
+  `silent: true` after the silence bound; a basemap that loads shows
+  the OSM date; a form that succeeds clears its
   errors; a muted tone is a visible state. Take the dependency away
   (no basemap, no WebGL, no status frame) and check the exact notice
   and counter.

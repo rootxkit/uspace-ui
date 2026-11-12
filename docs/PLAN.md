@@ -743,8 +743,9 @@ is the proof.
 Rules of `CLAUDE.md` (from LESSONS E-01, E-02, E-04, E-10, E-11): test
 presence, not only absence (every "renders nothing" has a "renders it"
 twin; every "does not call back" has a "calls back"); run the branch
-that says nothing is wrong (a feed that stays live for ten minutes with
-no frames must show the age climbing; a basemap that loads must show the
+that says nothing is wrong (a feed that stays live for ten minutes on
+status frames alone must show each track's `observedAgeS` climbing, and
+one whose status frames stop must go `down` with `silent: true`; a basemap that loads must show the
 OSM date; a form that succeeds must clear its errors); report what was
 run and seen; drive every bounded structure past its bound; tests restore
 global state (timers, `matchMedia`, cookies) and pass shuffled.
