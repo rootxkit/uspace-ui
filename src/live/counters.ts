@@ -46,6 +46,12 @@ export type LiveCounter =
   | "url_refused"
   /** A socket that closed while the client was running. */
   | "closed"
+  /**
+   * A socket the client closed itself because no valid status frame
+   * arrived within the silence bound (`FeedOptions.silentAfterS`). Not
+   * counted as `closed`: the server never closed it.
+   */
+  | "silent_closed"
   /** A close with code 4401: the session is gone (PLAN §6.3, M22). */
   | "unauthorized"
   /** A subscribe frame replaced by a newer one before it could be sent. */
@@ -65,6 +71,7 @@ const ZERO: Readonly<Record<LiveCounter, number>> = {
   connect_failed: 0,
   url_refused: 0,
   closed: 0,
+  silent_closed: 0,
   unauthorized: 0,
   subscribe_superseded: 0,
 };

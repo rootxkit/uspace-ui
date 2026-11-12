@@ -11,10 +11,22 @@
 //
 // State machine: `connecting` (a socket is being opened, or is open and no
 // status frame has arrived yet) -> `live` (a valid `console/status/v1`
-// arrived) -> `down` (the socket closed or could not open) -> `connecting`
-// on the next attempt. `sinceMs` moves on each change. A quiet feed stays
-// `live`: the ages it shows climb (E-02), and `lastFrameAtMs` says how
-// long it has been quiet.
+// arrived) -> `down` (the socket closed, could not open, or went silent)
+// -> `connecting` on the next attempt. `sinceMs` moves on each change.
+//
+// Liveness (review 2026-11-12, F2). The status frame is the heartbeat: it
+// comes on connect and every 2 s (PLAN §6.3), tracks or no tracks. A feed
+// with no tracks stays `live` as long as status frames arrive, and the
+// ages it shows climb (E-02). An open socket on which no valid status
+// frame arrives within the silence bound is not live, whatever else it
+// delivers: a browser gets no close event on a half-open connection, and
+// a server whose status ticker died leaves thresholds and source states
+// frozen. The client then closes the socket itself, goes `down` with
+// `silent: true`, and retries like any close. The bound is data, never a
+// default (CLAUDE.md rule 3): `FeedOptions.silentAfterS`, by default the
+// status frame's own `stale_after_s`. Before any bound is known (no
+// option, no status frame yet) nothing is assumed, and the feed is
+// `connecting`, which is not shown as live.
 //
 // Frames: a message that is not a console frame is counted and dropped,
 // never thrown; `console/status/v1` sets the status and the source store;
@@ -104,6 +116,22 @@ export interface FeedOptions {
   random?: () => number;
   /** Stores the feed fills from status and snapshot frames. */
   stores?: FeedStores;
+  /**
+   * The silence bound, in seconds: an open socket on which no valid
+   * `console/status/v1` arrives for this long is not live. The client
+   * closes it, goes `down` with `silent: true`, and retries.
+   *
+   * - a number: the app's own bound; it also holds before the first
+   *   status frame of a connection. One that is not finite and positive
+   *   is ignored, and the default applies.
+   * - `"stale_after_s"` (the default) or `"live_max_age_s"`: that
+   *   threshold of the last status frame (PLAN §6.3). Until a status
+   *   frame has carried it there is no bound, and none is assumed.
+   *
+   * Status frames come every 2 s by contract, so a bound should span
+   * more than one period.
+   */
+  silentAfterS?: number | "stale_after_s" | "live_max_age_s";
 }
 
 /**
@@ -125,6 +153,18 @@ export interface LiveStatus extends FeedStatus {
   lastStatusAtMs: number | null;
   /** The last close was 4401 and the feed has not been live since. */
   unauthorized: boolean;
+  /**
+   * The feed left `live` or `connecting` because no valid status frame
+   * arrived within `silentAfterS`, and has not been live since. Always
+   * set by `FeedClient`; optional so a value built elsewhere stays valid.
+   */
+  silent?: boolean;
+  /**
+   * The silence bound in force, in seconds (`FeedOptions.silentAfterS`
+   * resolved); null while none is known, in which case silence cannot be
+   * detected.
+   */
+  silentAfterS?: number | null;
   /**
    * Attempts that failed in the current run of failures; a close after a
    * connection that stayed live `STABLE_AFTER_MS` starts a new run.
@@ -201,6 +241,8 @@ function initialStatus(nowMs: number): LiveStatus {
     lastFrameAtMs: null,
     lastStatusAtMs: null,
     unauthorized: false,
+    silent: false,
+    silentAfterS: null,
     attempt: 0,
     nextRetryAtMs: null,
     framesMalformed: 0,
@@ -225,6 +267,10 @@ export class FeedClient {
   private readonly emitter = new Emitter();
   private socket: WebSocket | null = null;
   private timer: ReturnType<typeof setTimeout> | null = null;
+  private watchdog: ReturnType<typeof setTimeout> | null = null;
+  // Browser clock of the last proof of life on the current socket: its
+  // open, then each valid status frame.
+  private heardAtMs: number | null = null;
   private running = false;
   private run = 0;
   private liveAtMs: number | null = null;
@@ -264,19 +310,79 @@ export class FeedClient {
     this.run += 1;
     if (this.timer !== null) clearTimeout(this.timer);
     this.timer = null;
+    this.disarm();
+    this.heardAtMs = null;
+    this.abandon();
+  }
+
+  // Detaches and closes the current socket, if any: nothing it delivers
+  // afterwards is applied, and no close event of it is waited for.
+  private abandon(): void {
     const s = this.socket;
     this.socket = null;
-    if (s !== null) {
-      s.onopen = null;
-      s.onmessage = null;
-      s.onclose = null;
-      s.onerror = null;
-      try {
-        s.close(1000);
-      } catch {
-        // Closing a socket that never opened can throw; it is gone either way.
-      }
+    if (s === null) return;
+    s.onopen = null;
+    s.onmessage = null;
+    s.onclose = null;
+    s.onerror = null;
+    try {
+      s.close(1000);
+    } catch {
+      // Closing a socket that never opened can throw; it is gone either way.
     }
+  }
+
+  // The silence bound in force, in ms; null when none is known.
+  private silentAfterMs(): number | null {
+    const o = this.opts.silentAfterS;
+    if (typeof o === "number" && Number.isFinite(o) && o > 0) return o * 1000;
+    const s =
+      o === "live_max_age_s"
+        ? this.status.liveMaxAgeS
+        : this.status.staleAfterS;
+    return s !== null && Number.isFinite(s) && s > 0 ? s * 1000 : null;
+  }
+
+  private disarm(): void {
+    if (this.watchdog !== null) clearTimeout(this.watchdog);
+    this.watchdog = null;
+  }
+
+  // (Re)arms the watchdog for the current socket, counting from the last
+  // proof of life. Called on open and on every valid status frame.
+  private arm(run: number): void {
+    this.disarm();
+    const boundMs = this.silentAfterMs();
+    const boundS = boundMs === null ? null : boundMs / 1000;
+    if (this.status.silentAfterS !== boundS) this.set({ silentAfterS: boundS });
+    if (boundMs === null || this.heardAtMs === null) return;
+    const dueMs = this.heardAtMs + boundMs - this.now();
+    this.watchdog = setTimeout(
+      () => {
+        this.onWatchdog(run);
+      },
+      dueMs > 0 ? dueMs : 0,
+    );
+  }
+
+  private onWatchdog(run: number): void {
+    this.watchdog = null;
+    if (run !== this.run || this.socket === null) return;
+    const boundMs = this.silentAfterMs();
+    if (boundMs === null || this.heardAtMs === null) return;
+    // A timer may fire early, and the bound may have changed: only the
+    // clock decides.
+    if (this.now() - this.heardAtMs < boundMs) {
+      this.arm(run);
+      return;
+    }
+    countLive("silent_closed");
+    this.abandon();
+    this.heardAtMs = null;
+    const upMs = this.liveAtMs === null ? null : this.now() - this.liveAtMs;
+    this.liveAtMs = null;
+    this.status = { ...this.status, silent: true };
+    this.retry(run, upMs);
   }
 
   /**
@@ -360,6 +466,8 @@ export class FeedClient {
       if (run !== this.run) return;
       this.subscribeSent = false;
       this.flushSubscribe();
+      this.heardAtMs = this.now();
+      this.arm(run);
     };
     socket.onmessage = (ev: MessageEvent) => {
       if (run !== this.run) return;
@@ -371,6 +479,8 @@ export class FeedClient {
     socket.onclose = (ev: CloseEvent) => {
       if (run !== this.run) return;
       this.socket = null;
+      this.heardAtMs = null;
+      this.disarm();
       countLive("closed");
       const upMs = this.liveAtMs === null ? null : this.now() - this.liveAtMs;
       this.liveAtMs = null;
@@ -477,6 +587,7 @@ export class FeedClient {
       lastFrameAtMs: nowMs,
       lastStatusAtMs: nowMs,
       unauthorized: false,
+      silent: false,
       nextRetryAtMs: null,
       extras: {
         datasets: body.datasets,
@@ -490,6 +601,10 @@ export class FeedClient {
         evaluationPeriodS: body.evaluationPeriodS,
       },
     });
+    // The heartbeat: the watchdog counts on from here, with the bound
+    // this frame may just have brought.
+    this.heardAtMs = nowMs;
+    this.arm(this.run);
     // The CISP's resync goes to the app as a status frame (PLAN §6.3).
     if (body.resyncSince !== null) this.deliver(frame);
   }

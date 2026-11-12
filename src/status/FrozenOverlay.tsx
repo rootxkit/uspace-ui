@@ -4,7 +4,9 @@
 // feed is not live the picture stays, dimmed, under a notice that says the
 // feed is down and retrying (never "lost", C-12) and how old the data is.
 // Before any frame it says no data has arrived, so an empty map is not
-// read as an empty sky. While the feed is live it renders nothing.
+// read as an empty sky. While the feed is live it renders nothing; a feed
+// that went silent is not live (the client leaves `live` at its silence
+// bound), and the notice says so.
 //
 // Place it inside the map's positioned container, after the map: it
 // covers its parent and lets the map underneath keep its controls.
@@ -59,6 +61,13 @@ export function FrozenOverlay(props: FrozenOverlayProps) {
         <p className="m-0 font-semibold">
           {t(CONNECTION_KEYS[status.connection])}
         </p>
+        {status.silent === true && (
+          <p className="m-0" data-part="silent">
+            {t("feed.silent", {
+              age: fmtAge(status.silentAfterS ?? null, lang),
+            })}
+          </p>
+        )}
         <p className="m-0" data-part="as-of">
           {line}
         </p>

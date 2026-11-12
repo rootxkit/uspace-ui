@@ -333,6 +333,9 @@ const catalogue = {
   // WP-8: the feed's status bar and frozen overlay (C-12: down is "feed
   // down, retrying" with the age of the last frame, never "data lost").
   "feed.down_retrying": "Feed down, retrying",
+  // The feed went silent: the socket was open and no status frame came
+  // within the bound ({age}); never "lost" (C-12).
+  "feed.silent": "Server silent: no status frame for {age}",
   "feed.last_frame": "last frame {age} ago",
   "feed.no_frame_yet": "no frame received yet",
   "feed.as_of": "Showing data as of {time}, received {age} ago",

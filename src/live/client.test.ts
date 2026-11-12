@@ -3,16 +3,17 @@
 // 4401 once per outage and its normal-close twin, no token in any URL,
 // a hundred reconnects, malformed frames counted with the next good one
 // applied, subscribe re-sent, snapshot replacement with its pair, ten
-// quiet minutes, and the three recorded sequences.
+// minutes of heartbeats with no tracks, the silent feed that leaves live
+// at its bound and comes back, and the three recorded sequences.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ageS } from "./time.js";
+import { ageS, observedAgeS } from "./time.js";
 import { createAlertStore } from "./alertStore.js";
 import { DEFAULT_BACKOFF } from "./backoff.js";
 import { FeedClient, resolveFeedUrl, type FeedOptions } from "./client.js";
 import { liveCounters, resetLiveCountersForTests } from "./counters.js";
 import { parseFrame, subscribeFrame, type ConsoleFrame } from "./frame.js";
-import { createSourceStore, sourceAgeS } from "./sourceStore.js";
+import { createSourceStore } from "./sourceStore.js";
 import { createTrackStore } from "./trackStore.js";
 import { adaptAlert, adaptTrack } from "./test/adapters.js";
 import {
@@ -200,7 +201,9 @@ describe("reconnect with backoff (B-08)", () => {
     await advance(4000);
     server.accept();
     server.send(labExample(STATUS));
-    await advance(10_000);
+    // Ten live seconds are ten seconds of status frames: without them the
+    // feed is silent at `stale_after_s` and was not live for 10 s.
+    await beat(10_000);
     server.close(1011);
     expect((c.getStatus().nextRetryAtMs ?? 0) - Date.now()).toBe(1000);
   });
@@ -650,8 +653,22 @@ describe("snapshot (console/snapshot/v1, C-08)", () => {
   });
 });
 
+// The status frame is the feed's heartbeat: `console/status/v1` comes on
+// connect and every 2 s (PLAN §6.3). The lab example's `stale_after_s`
+// is 5, which is the bound these tests run against unless they say so.
+const HEARTBEAT_MS = 2000;
+const SILENT_AFTER_MS = 5000;
+
+/** `ms` of a healthy feed: a status frame every `HEARTBEAT_MS`, no data. */
+async function beat(ms: number): Promise<void> {
+  for (let done = 0; done < ms; done += HEARTBEAT_MS) {
+    await advance(Math.min(HEARTBEAT_MS, ms - done));
+    server.send(labExample(STATUS));
+  }
+}
+
 describe("quiet but healthy (E-02)", () => {
-  it("ten minutes live with no frames: still live, and every age climbs", async () => {
+  it("ten minutes of heartbeats and no tracks: still live, and every age climbs", async () => {
     const tracks = createTrackStore({ trailPoints: 10, maxTracks: 100 });
     const sources = createSourceStore();
     const { client: c } = start({
@@ -661,42 +678,267 @@ describe("quiet but healthy (E-02)", () => {
     server.send(labExample(STATUS));
     server.send(labExample(SNAPSHOT));
     const t0 = Date.now();
-    await advance(600_000);
+    const seen: string[] = [];
+    c.subscribe(() => seen.push(c.getStatus().connection));
+    await beat(600_000);
     const now = Date.now();
     const s = c.getStatus();
     expect(s.connection).toBe("live");
+    expect(s.silent).toBe(false);
+    expect(s.silentAfterS).toBe(5);
     expect(s.sinceMs).toBe(t0);
-    expect((now - (s.lastFrameAtMs ?? 0)) / 1000).toBe(600);
+    expect(s.lastStatusAtMs).toBe(now);
+    expect(tracks.snapshot().size).toBe(2);
     for (const t of tracks.snapshot().values()) {
       expect(ageS(t, now)).toBe(600);
-      // On the server's clock: captured 09:15:03.214 and 09:15:04.000.
-      expect(ageS(t, now, "captured", s.clockOffsetMs)).toBeGreaterThan(600);
+      expect(observedAgeS(t, now, s.clockOffsetMs)).toBeGreaterThanOrEqual(600);
     }
-    const rx = sources.snapshot().find((v) => v.instanceId === "rx-tbs-01");
-    expect(rx === undefined ? null : sourceAgeS(rx, now)).toBeCloseTo(600.4, 6);
-    expect(server.sockets.length).toBe(1);
+    // Never left live, and the socket was never reopened.
+    expect(seen.length).toBeGreaterThan(0);
+    expect(seen.every((x) => x === "live")).toBe(true);
+    expect(server.sockets).toHaveLength(1);
+    expect(server.current.readyState).toBe(MockSocket.OPEN);
+    expect(liveCounters().silent_closed).toBe(0);
+  });
+});
+
+describe("a silent feed is not live (F2)", () => {
+  it("an open socket that delivers nothing leaves live at the bound, closes and retries", async () => {
+    const { client: c } = start();
+    server.accept();
+    server.send(labExample(STATUS));
+    const first = server.current;
+    await advance(SILENT_AFTER_MS - 1);
+    // Up to the bound: live (the pair of what follows).
+    expect(c.getStatus().connection).toBe("live");
+    expect(c.getStatus().silent).toBe(false);
+    await advance(1);
+    const s = c.getStatus();
+    expect(s.connection).toBe("down");
+    expect(s.silent).toBe(true);
+    expect(s.silentAfterS).toBe(5);
+    expect(s.sinceMs).toBe(Date.now());
+    expect(s.lastStatusAtMs).toBe(Date.now() - SILENT_AFTER_MS);
+    // A half-open socket gives no close event: the client closed it.
+    expect(first.closedByClient).toBe(1000);
+    expect(first.onmessage).toBeNull();
+    expect(liveCounters().silent_closed).toBe(1);
+    expect(liveCounters().closed).toBe(0);
+    // And it retries: a live spell under STABLE_AFTER_MS keeps the run.
+    expect((s.nextRetryAtMs ?? 0) - Date.now()).toBe(1000);
+    await advance(1000);
+    expect(server.sockets).toHaveLength(2);
+    expect(c.getStatus().connection).toBe("connecting");
+    expect(c.getStatus().silent).toBe(true);
   });
 
-  it("replays the recorded 60 s silence: live throughout, last frame 60 s old", async () => {
+  it("frames resuming restore live and clear silent", async () => {
+    const { client: c } = start();
+    server.accept();
+    server.send(labExample(STATUS));
+    await advance(SILENT_AFTER_MS);
+    expect(c.getStatus().connection).toBe("down");
+    await advance(1000);
+    server.accept();
+    server.send(labExample(STATUS));
+    const s = c.getStatus();
+    expect(s.connection).toBe("live");
+    expect(s.silent).toBe(false);
+    expect(s.sinceMs).toBe(Date.now());
+    // And it stays live while the heartbeat goes on.
+    await beat(20_000);
+    expect(c.getStatus().connection).toBe("live");
+    expect(server.sockets).toHaveLength(2);
+    expect(liveCounters().silent_closed).toBe(1);
+  });
+
+  it("a frame from the socket the client gave up on is not applied", async () => {
+    const { client: c } = start();
+    server.accept();
+    server.send(labExample(STATUS));
+    const first = server.current;
+    await advance(SILENT_AFTER_MS);
+    // The handlers are gone: a late delivery or close changes nothing.
+    expect(first.onmessage).toBeNull();
+    expect(first.onclose).toBeNull();
+    expect(c.getStatus().connection).toBe("down");
+    expect(liveCounters().frames_received).toBe(1);
+  });
+
+  it("data frames without a status frame do not keep it live", async () => {
+    const { client: c, frames } = start();
+    server.accept();
+    server.send(labExample(STATUS));
+    const other = {
+      ...labExample(STATUS),
+      schema: "track/telemetry/v1",
+      body: {},
+    };
+    for (let i = 0; i < 4; i++) {
+      await advance(1000);
+      server.send(other);
+    }
+    expect(c.getStatus().connection).toBe("live");
+    await advance(1000);
+    // The status ticker died: thresholds and sources are frozen, so the
+    // feed is not shown as live although data still arrives.
+    expect(frames).toHaveLength(4);
+    expect(c.getStatus().connection).toBe("down");
+    expect(c.getStatus().silent).toBe(true);
+    expect(c.getStatus().lastFrameAtMs).toBe(Date.now() - 1000);
+  });
+
+  it("a status frame that breaks the schema is not a heartbeat", async () => {
+    const { client: c } = start();
+    server.accept();
+    server.send(labExample(STATUS));
+    const bad = { ...labExample(STATUS), body: { nope: 1 } };
+    for (let i = 0; i < 2; i++) {
+      await advance(HEARTBEAT_MS);
+      server.send(bad);
+    }
+    await advance(SILENT_AFTER_MS - 2 * HEARTBEAT_MS);
+    expect(liveCounters().status_malformed).toBe(2);
+    expect(c.getStatus().connection).toBe("down");
+    expect(c.getStatus().silent).toBe(true);
+  });
+
+  it("a socket that opens and never sends a status frame is retried once a bound is known", async () => {
+    const { client: c } = start();
+    server.accept();
+    server.send(labExample(STATUS));
+    await advance(SILENT_AFTER_MS + 1000);
+    // The second socket: accepted, and silent from the start.
+    server.accept();
+    expect(c.getStatus().connection).toBe("connecting");
+    await advance(SILENT_AFTER_MS - 1);
+    expect(c.getStatus().connection).toBe("connecting");
+    await advance(1);
+    expect(c.getStatus().connection).toBe("down");
+    expect(server.current.closedByClient).toBe(1000);
+    expect(liveCounters().silent_closed).toBe(2);
+    // Backoff goes on: attempt 2 waits 2 s.
+    expect((c.getStatus().nextRetryAtMs ?? 0) - Date.now()).toBe(2000);
+  });
+
+  it("before any bound is known an open socket without a status frame stays connecting", async () => {
+    const { client: c } = start();
+    server.accept();
+    await advance(600_000);
+    // No option and no status frame yet: no threshold is assumed
+    // (CLAUDE.md rule 3). It is `connecting`, which is not shown as live.
+    expect(c.getStatus().connection).toBe("connecting");
+    expect(c.getStatus().silentAfterS).toBeNull();
+    expect(liveCounters().silent_closed).toBe(0);
+  });
+
+  it("the consumer's bound applies before the first status frame (the twin)", async () => {
+    const { client: c } = start({ silentAfterS: 8 });
+    server.accept();
+    await advance(7999);
+    expect(c.getStatus().connection).toBe("connecting");
+    expect(c.getStatus().silentAfterS).toBe(8);
+    await advance(1);
+    expect(c.getStatus().connection).toBe("down");
+    expect(c.getStatus().silent).toBe(true);
+  });
+
+  it("the consumer's number overrides the status frame's stale_after_s", async () => {
+    const { client: c } = start({ silentAfterS: 12 });
+    server.accept();
+    server.send(labExample(STATUS));
+    await advance(11_999);
+    expect(c.getStatus().connection).toBe("live");
+    expect(c.getStatus().silentAfterS).toBe(12);
+    await advance(1);
+    expect(c.getStatus().connection).toBe("down");
+  });
+
+  it("live_max_age_s can be named as the bound (the lab example's is 2 s)", async () => {
+    const { client: c } = start({ silentAfterS: "live_max_age_s" });
+    server.accept();
+    server.send(labExample(STATUS));
+    expect(c.getStatus().silentAfterS).toBe(2);
+    await advance(1999);
+    expect(c.getStatus().connection).toBe("live");
+    await advance(1);
+    expect(c.getStatus().connection).toBe("down");
+  });
+
+  it("a number that is not a positive finite bound falls back to stale_after_s", async () => {
+    for (const bad of [0, -3, Number.NaN, Number.POSITIVE_INFINITY]) {
+      const { client: c } = start({ silentAfterS: bad });
+      server.accept();
+      server.send(labExample(STATUS));
+      expect(c.getStatus().silentAfterS).toBe(5);
+      await advance(SILENT_AFTER_MS);
+      expect(c.getStatus().connection).toBe("down");
+      c.stop();
+    }
+  });
+
+  it("a bound raised while the watchdog is armed is the one that counts", async () => {
+    const { client: c } = start();
+    server.accept();
+    server.send(labExample(STATUS));
+    await advance(3000);
+    // The app re-renders with its own, longer bound (useFeed hands the
+    // newest options over on every render).
+    c.setOptions({
+      url: "/v1/picture/ws",
+      onFrame: () => undefined,
+      random: () => 1,
+      silentAfterS: 12,
+    });
+    await advance(2000);
+    // The timer armed for 5 s has fired; the clock says 5 s of 12.
+    expect(c.getStatus().connection).toBe("live");
+    expect(c.getStatus().silentAfterS).toBe(12);
+    expect(liveCounters().silent_closed).toBe(0);
+    await advance(6999);
+    expect(c.getStatus().connection).toBe("live");
+    await advance(1);
+    expect(c.getStatus().connection).toBe("down");
+    expect(liveCounters().silent_closed).toBe(1);
+  });
+
+  it("stop() while the watchdog is armed leaves no timer", async () => {
+    const { client: c } = start();
+    server.accept();
+    server.send(labExample(STATUS));
+    c.stop();
+    await advance(60_000);
+    expect(liveCounters().silent_closed).toBe(0);
+    expect(server.sockets).toHaveLength(1);
+  });
+
+  it("replays the recorded 60 s silence: down at the bound, live again when the server answers", async () => {
     const { client: c } = start();
     const seq = loadSequence("silence-60s");
     // Up to the silence, then through it, then the rest.
     const cut = seq.steps.findIndex((s) => s.op === "wait");
     await server.replay({ ...seq, steps: seq.steps.slice(0, cut) }, advance);
     expect(c.getStatus().connection).toBe("live");
+    const first = server.current;
     const seen: string[] = [];
     c.subscribe(() => seen.push(c.getStatus().connection));
     await server.replay({ ...seq, steps: [seq.steps[cut] as never] }, advance);
     const s = c.getStatus();
-    expect(s.connection).toBe("live");
+    expect(s.connection).not.toBe("live");
+    expect(s.silent).toBe(true);
     expect(Date.now() - (s.lastFrameAtMs ?? 0)).toBe(60_000);
+    // Live was left at the bound, and never shown again while silent.
+    expect(seen[0]).toBe("down");
+    expect(seen).not.toContain("live");
+    expect(first.closedByClient).toBe(1000);
+    // The recorded socket is gone; the server answers on the next one.
+    while (server.current.readyState !== MockSocket.CONNECTING)
+      await advance(100);
+    server.accept();
     await server.replay({ ...seq, steps: seq.steps.slice(cut + 1) }, advance);
+    expect(c.getStatus().connection).toBe("live");
+    expect(c.getStatus().silent).toBe(false);
     expect(c.getStatus().lastFrameAtMs).toBe(Date.now());
-    // Never left live, and the socket was never reopened.
-    expect(seen.every((x) => x === "live")).toBe(true);
-    expect(seen.length).toBeGreaterThan(0);
-    expect(server.current.readyState).toBe(MockSocket.OPEN);
-    expect(server.sockets).toHaveLength(1);
   });
 });
 

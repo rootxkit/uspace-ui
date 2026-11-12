@@ -675,3 +675,71 @@ describe("FrozenOverlay", () => {
     expect(text(container)).toContain("Frozen: no update for 30 s");
   });
 });
+
+describe("a feed that went silent (review 2026-11-12, F2)", () => {
+  const silent = {
+    ...status({ connection: "down" }),
+    lastFrameAtMs: NOW - 8000,
+    silent: true,
+    silentAfterS: 5,
+  };
+
+  it.each(LANGS)(
+    "the bar says why it is down, never lost, %s",
+    async (lang) => {
+      const { container } = renderWithKit(
+        <FeedStatusBar status={silent} nowMs={NOW} />,
+        { lang },
+      );
+      const part = container.querySelector("[data-part=silent]");
+      expect(part).not.toBeNull();
+      expect(text(container)).not.toMatch(LOST);
+      expect(container.querySelector("[data-connection=down]")).not.toBeNull();
+      if (lang === "en")
+        expect(text(part)).toBe("Server silent: no status frame for 5 s");
+      else expect(text(part)).toContain("5");
+      await axeCheck(container);
+    },
+  );
+
+  it("a feed that is down for another reason has no such part (the pair)", () => {
+    const { container } = renderWithKit(
+      <FeedStatusBar status={status({ connection: "down" })} nowMs={NOW} />,
+    );
+    expect(container.querySelector("[data-part=silent]")).toBeNull();
+    cleanup();
+    const again = renderWithKit(
+      <FeedStatusBar
+        status={{ ...status(), silent: false, silentAfterS: 5 }}
+        nowMs={NOW}
+      />,
+    );
+    expect(again.container.querySelector("[data-part=silent]")).toBeNull();
+  });
+
+  it.each(LANGS)("the overlay covers the map and says so, %s", (lang) => {
+    const { container } = renderWithKit(
+      <div className="relative">
+        <FrozenOverlay status={silent} nowMs={NOW} />
+      </div>,
+      { lang },
+    );
+    const overlay = container.querySelector("[data-overlay=frozen]");
+    expect(overlay).not.toBeNull();
+    expect(overlay?.querySelector("[data-part=silent]")).not.toBeNull();
+    expect(text(overlay)).not.toMatch(LOST);
+    if (lang === "en") {
+      expect(text(overlay)).toContain("Feed down, retrying");
+      expect(text(overlay)).toContain("no status frame for 5 s");
+      expect(text(overlay)).toContain("received 8 s ago");
+    }
+  });
+
+  it("the overlay of an ordinary outage has no silent line (the pair)", () => {
+    const { container } = renderWithKit(
+      <FrozenOverlay status={status({ connection: "down" })} nowMs={NOW} />,
+    );
+    expect(container.querySelector("[data-overlay=frozen]")).not.toBeNull();
+    expect(container.querySelector("[data-part=silent]")).toBeNull();
+  });
+});
