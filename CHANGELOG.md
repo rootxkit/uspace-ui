@@ -7,6 +7,20 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
+## 1.8.0 - 2026-11-21
+
+A minor on 1.7.0: `live` gains `usePolling`, for the REST reads a
+console repeats on a period, and `usePageVisible`; `useNowMs` no longer
+ticks on a hidden page. Prepared on `main`, not tagged: the owner tags
+`v1.8.0` (docs/RELEASING.md). Pin it exactly:
+
+```jsonc
+"@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.8.0/rootxkit-uspace-ui-1.8.0.tgz"
+```
+
+`docs/CONSUMING.md` ("From `1.7.0` to `1.8.0`") lists what a console
+does when it upgrades.
+
 - `live` gains `usePolling`, for the REST reads a console repeats on a
   period (additive). One read at a time, the next timed from the moment
   the last one settled, so a slow API is never asked twice at once. A
@@ -39,7 +53,15 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 `@public` lines are added to `docs/api/uspace-ui.api.md`; none is
 removed or changed. No catalogue key, legend value, dependency or budget
-changes.
+changes. This is a minor on 1.7.0.
+
+### Entry points that ship
+
+`model`, `theme`, `ui`, `i18n`, `fonts`, `map`, `api` (with the
+`uspace-ui-gen-api` bin), `auth/server`, `auth/client`, `symbology`,
+`layers`, `legend`, `live`, `status`, `alerts`, `table`, `form`,
+`eslint`, `test`, and `styles/tokens.css`, `styles/map.css`,
+`fonts/fonts.css` with the woff2 files, as in 1.7.0.
 
 ## 1.7.0 - 2026-11-12
 
