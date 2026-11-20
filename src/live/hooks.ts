@@ -11,6 +11,7 @@ import {
 
 import { FeedClient, type FeedOptions, type LiveStatus } from "./client.js";
 import type { SubscribeFrame } from "./frame.js";
+import { pageVisible, subscribePageVisible } from "./visibility.js";
 
 /**
  * What `useFeed` returns: the status, and the subscribe sender.
@@ -93,6 +94,10 @@ export function useStore<T>(store: ExternalStore<T>): T {
  * value an app passes as `nowMs` to the status components and the track
  * layer, so every age on the page counts on the same tick.
  *
+ * While the page is hidden nothing is drawn, so it does not tick; it
+ * re-reads the clock the moment the page is shown again and ticks on from
+ * there. Do not time anything but a display with it.
+ *
  * @public
  */
 export function useNowMs(
@@ -101,11 +106,23 @@ export function useNowMs(
 ): number {
   const [nowMs, setNowMs] = useState(now);
   useEffect(() => {
-    const id = setInterval(() => {
-      setNowMs(now());
-    }, periodMs);
+    let id: ReturnType<typeof setInterval> | null = null;
+    const sync = (): void => {
+      if (id !== null) clearInterval(id);
+      id = null;
+      if (!pageVisible()) return;
+      id = setInterval(() => {
+        setNowMs(now());
+      }, periodMs);
+    };
+    const unsubscribe = subscribePageVisible(() => {
+      if (pageVisible()) setNowMs(now());
+      sync();
+    });
+    sync();
     return () => {
-      clearInterval(id);
+      unsubscribe();
+      if (id !== null) clearInterval(id);
     };
   }, [periodMs, now]);
   return nowMs;

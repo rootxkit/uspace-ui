@@ -1,7 +1,8 @@
 // The React hooks of `live` (WP-8): useFeed goes live on a status frame
 // and back down on a close, sends subscribe frames, closes its socket on
 // unmount; useStore re-renders on a store change and not without one;
-// useNowMs ticks on its period and stops on unmount (E-11).
+// useNowMs ticks on its period, not while the page is hidden, and stops
+// on unmount (E-11).
 import { act, cleanup, renderHook } from "@testing-library/react";
 import { StrictMode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -166,5 +167,59 @@ describe("useNowMs", () => {
     });
     expect(result.current).toBe(T0 + 3000);
     unmount();
+  });
+
+  it("does not tick while the page is hidden, and re-reads the clock at once when shown", () => {
+    const setVisibility = (state: "visible" | "hidden") => {
+      Object.defineProperty(document, "visibilityState", {
+        configurable: true,
+        get: () => state,
+      });
+      document.dispatchEvent(new Event("visibilitychange"));
+    };
+    try {
+      const { result } = renderHook(() => useNowMs(1000));
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      expect(result.current).toBe(T0 + 1000);
+      act(() => {
+        setVisibility("hidden");
+      });
+      // No interval is left running behind a page nobody sees.
+      expect(vi.getTimerCount()).toBe(0);
+      act(() => {
+        vi.advanceTimersByTime(60_500);
+      });
+      expect(result.current).toBe(T0 + 1000);
+      // Shown: the clock is read before the first period has passed.
+      act(() => {
+        setVisibility("visible");
+      });
+      expect(result.current).toBe(T0 + 61_500);
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      expect(result.current).toBe(T0 + 62_500);
+    } finally {
+      cleanup();
+      Reflect.deleteProperty(document, "visibilityState");
+    }
+    expect(document.visibilityState).toBe("visible");
+  });
+
+  it("does not start ticking when it mounts hidden", () => {
+    Object.defineProperty(document, "visibilityState", {
+      configurable: true,
+      get: () => "hidden",
+    });
+    try {
+      const { result } = renderHook(() => useNowMs(1000));
+      expect(vi.getTimerCount()).toBe(0);
+      expect(result.current).toBe(T0);
+    } finally {
+      cleanup();
+      Reflect.deleteProperty(document, "visibilityState");
+    }
   });
 });
