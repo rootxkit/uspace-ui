@@ -223,6 +223,44 @@ A non-2xx answer rejects with an `ApiError`; the client never retries.
 elsewhere with a pick, such as `updatedAt: "metadata.issued"` for the
 authority's export).
 
+### Periodic reads
+
+What no console frame carries (a summary, a queue, a list) is read on a
+period with `usePolling`, not with a `setInterval` of your own:
+
+```tsx
+import { usePolling } from "@rootxkit/uspace-ui/live";
+
+const summary = usePolling(
+  async (signal) => (await api.GET("/v1/requests/summary", { signal })).data ?? null,
+  SUMMARY_READ_PERIOD_MS, // a display period of yours, not a threshold
+  { enabled: signedIn, key: "summary:requests" },
+);
+// summary.data, summary.error, summary.loading, summary.lastOkAtMs,
+// summary.failingSinceMs, summary.reload()
+```
+
+- Pass the `signal` to the request: it is aborted on unmount, when
+  `enabled` goes false and when `key` or the period changes.
+- Pass `enabled` from your session. A page that polls without one asks
+  for a `401` every period.
+- `read` may be an inline function; put what it closes over (an id, a
+  filter, a cursor) in `key`, and a change starts over. Until the new
+  read settles, `loading` is true and `data` is still the previous
+  key's: do not draw it as the new key's.
+- A failure does not clear `data`. Show `error` beside it, with
+  `failingSinceMs` and `lastOkAtMs`, so a page that cannot read says
+  since when; it is never an empty page.
+- After your own `POST` or `PUT`, call `reload()`.
+- A hidden page does not read. That is what lets the server's idle
+  sign-out fire for a tab left open in the background; `whileHidden:
+  "poll"` gives that up, for the one display that must stay current
+  unseen. Reads resume by themselves when the page is shown.
+- It only reads. Never hand it a request with a side effect.
+
+`useNowMs` pauses the same way: no tick while the page is hidden, one
+at once when it is shown.
+
 ## 8. Adapters: the one hand-written mapping
 
 Each `web/` maps its generated types onto the kit's view models
