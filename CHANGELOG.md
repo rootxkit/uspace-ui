@@ -7,6 +7,40 @@ Releases are GitHub Release assets, not npm versions (docs/RELEASING.md).
 
 ## Unreleased
 
+- `live` gains `usePolling`, for the REST reads a console repeats on a
+  period (additive). One read at a time, the next timed from the moment
+  the last one settled, so a slow API is never asked twice at once. A
+  hidden page starts no read and runs no timer; shown again, it reads at
+  once if its wait has run out, else waits the rest. `enabled: false`
+  (a console passes "signed in") stops everything and aborts the read in
+  flight, as do unmount and a change of `key` or of the period; an answer
+  that arrives after that is dropped. A failure keeps the last `data`,
+  sets `error` and `failingSinceMs`, and slows the reads down: never
+  sooner than the period nor than the `Retry-After` of an `ApiError`
+  (`retryAfterS`), twice as long on every consecutive failure up to a
+  cap (`DEFAULT_POLLING_BACKOFF`), back to the period on the first
+  answer. Every wait is lengthened by up to 10 %
+  (`DEFAULT_POLLING_JITTER`) so the tabs of a room do not ask in step.
+  `reload()` reads now and, during a read in flight, asks for exactly
+  one more read after it. `whileHidden: "poll"` keeps a hidden page
+  reading; every read is a request on the session, so it keeps the
+  server session active and an idle sign-out never fires for that tab.
+  **What a console should do:** replace its own `setInterval` or chained
+  `setTimeout` reads with `usePolling`, pass the request the
+  `AbortSignal`, and pass `enabled` from its session
+  (`docs/CONSUMING.md` §7, "Periodic reads").
+- `live` gains `usePageVisible`: whether the document is visible
+  (additive).
+- **A change of behaviour within the contract:** `useNowMs` does not tick
+  while the page is hidden. It re-reads the clock the moment the page is
+  shown again and ticks on, so no age is drawn from an old tick; its
+  signature is unchanged. A console that timed anything but a display
+  with it (a read, a sign-out) must use a timer of its own.
+
+`@public` lines are added to `docs/api/uspace-ui.api.md`; none is
+removed or changed. No catalogue key, legend value, dependency or budget
+changes.
+
 ## 1.7.0 - 2026-11-12
 
 A minor on 1.6.1: a track's age is the age of its observation, the feed

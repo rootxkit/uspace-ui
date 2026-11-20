@@ -1355,6 +1355,12 @@ const DEFAULT_LANG: Lang;
 // @beta
 const DEFAULT_PAGE_SIZE = 25;
 
+// @public
+const DEFAULT_POLLING_BACKOFF: Readonly<PollingBackoff>;
+
+// @public
+const DEFAULT_POLLING_JITTER: number;
+
 // @beta
 const DEFAULT_TIMEOUT_MS = 30000;
 
@@ -3016,6 +3022,12 @@ declare namespace live {
         useStore,
         ExternalStore,
         LiveFeed,
+        DEFAULT_POLLING_BACKOFF,
+        DEFAULT_POLLING_JITTER,
+        usePolling,
+        Polling,
+        PollingBackoff,
+        PollingOptions,
         SOURCE_STORE_LIMIT,
         createSourceStore,
         sourceAgeS,
@@ -3032,6 +3044,7 @@ declare namespace live {
         Observed,
         ObservedAge,
         ObservedAgeBasis,
+        usePageVisible,
         RECENTLY_REMOVED_LIMIT,
         createMannedStore,
         createTrackStore,
@@ -3815,6 +3828,33 @@ interface PointerHover {
     x: number;
     // (undocumented)
     y: number;
+}
+
+// @public
+interface Polling<T> {
+    data: T | null;
+    error: unknown;
+    failingSinceMs: number | null;
+    lastOkAtMs: number | null;
+    loading: boolean;
+    reload(): void;
+}
+
+// @public
+interface PollingBackoff {
+    factor: number;
+    maxMs: number;
+}
+
+// @public
+interface PollingOptions {
+    backoff?: PollingBackoff;
+    enabled?: boolean;
+    jitter?: number;
+    key?: string;
+    now?: () => number;
+    random?: () => number;
+    whileHidden?: "pause" | "poll";
 }
 
 // @public (undocumented)
@@ -5879,6 +5919,12 @@ function useOptionalI18n(): I18nContextValue | null;
 
 // @beta
 function useOptionalTheme(): ThemeContextValue | null;
+
+// @public
+function usePageVisible(): boolean;
+
+// @public
+function usePolling<T>(read: (signal: AbortSignal) => Promise<T>, periodMs: number, options?: PollingOptions): Polling<T>;
 
 // @public
 function UserMenu(props: UserMenuProps): ReactNode;
