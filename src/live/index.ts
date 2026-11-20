@@ -64,6 +64,14 @@ export {
   type LiveFeed,
 } from "./hooks.js";
 export {
+  DEFAULT_POLLING_BACKOFF,
+  DEFAULT_POLLING_JITTER,
+  usePolling,
+  type Polling,
+  type PollingBackoff,
+  type PollingOptions,
+} from "./polling.js";
+export {
   SOURCE_STORE_LIMIT,
   createSourceStore,
   sourceAgeS,
@@ -83,6 +91,7 @@ export {
   type ObservedAge,
   type ObservedAgeBasis,
 } from "./time.js";
+export { usePageVisible } from "./visibility.js";
 export {
   RECENTLY_REMOVED_LIMIT,
   createMannedStore,
