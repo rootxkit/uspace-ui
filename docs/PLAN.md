@@ -1,7 +1,7 @@
 # uspace-ui implementation plan
 
 Status: plan for parallel implementation by independent agents; WP-0 to
-WP-14 are merged and the latest release is `v1.7.0`. Written on branch
+WP-14 are merged and the latest release is `v1.8.0`. Written on branch
 `plan/initial`. Inputs: the spec at `uspace-lab/docs/spec/` (especially
 `00 §6`, `00 §6.2`, `00 §6.3` (the `rootxkit/uspace-ui` paragraph), `01`
 (users and roles per system), `02 §1` (conventions: time, geometry,
@@ -451,13 +451,13 @@ export function ageS(t: { receivedAtMs: number } | { times: Times }, nowMs: numb
 // 1.7.0 (additive; review 2026-11-12, F1): the track and manned stores stamp `sampleReceivedAtMs` when a `capturedAt` first arrives and keep it when the same sample is delivered again (`receivedAtMs` still moves on every delivery)
 export function observedAge(t: { receivedAtMs: number; sampleReceivedAtMs?: number; serverAgeS?: number | null; times?: Times }, nowMs: number, clockOffsetMs?: number | null): { ageS: number; basis: "server" | "captured" | "received" } | null   // 1.7.0: the age a track is drawn with, the largest of up to three readings, each on one clock: the server's `age_s` counted on since its frame arrived; `capturedAt` on the server's clock through the status frame's offset; the browser clock since this `capturedAt` first arrived. `capturedAt` is never read against the browser clock alone; without a server age or an offset the age is too young by what the sample was old on arrival, never by more. `observedAgeS` returns the number
 // 1.7.0 (additive; review 2026-11-12, F2): `FeedOptions.silentAfterS?: number | "stale_after_s" | "live_max_age_s"` (default: the status frame's `stale_after_s`; no bound is assumed before one is known, INV-03). The status frame is the heartbeat: an open socket with no valid `console/status/v1` for that long is closed by the client, which goes `down` with `LiveStatus.silent: true` (and `silentAfterS`, the bound in force) and retries like any close; `silent` clears on the next valid status frame. A feed with no tracks and status frames arriving stays `live`. Counter `silent_closed`
-// Unreleased (additive): periodic REST reads, for what no console frame carries. One read at a time, the next timed from the moment the last settled; nothing is read while the page is hidden (default) or while `enabled` is false; a failure keeps `data`, sets `error` and slows the reads down, never sooner than the period nor than an `ApiError`'s `retryAfterS`. It only reads: the rule that the client never retries a request with a side effect (§3.7) stands
+// 1.8.0 (additive): periodic REST reads, for what no console frame carries. One read at a time, the next timed from the moment the last settled; nothing is read while the page is hidden (default) or while `enabled` is false; a failure keeps `data`, sets `error` and slows the reads down, never sooner than the period nor than an `ApiError`'s `retryAfterS`. It only reads: the rule that the client never retries a request with a side effect (§3.7) stands
 export function usePolling<T>(read: (signal: AbortSignal) => Promise<T>, periodMs: number, options?: PollingOptions): Polling<T>   // `periodMs` is a display period, not a threshold; the latest `read` is called and its identity may change between renders; the read in flight is aborted on unmount, on `enabled: false` and on a change of `key` or `periodMs`, and a late answer is dropped
 export interface PollingOptions { enabled?: boolean; whileHidden?: "pause" | "poll"; key?: string; backoff?: PollingBackoff; jitter?: number; now?: () => number; random?: () => number }   // `enabled` (default true): a console passes "signed in". `whileHidden` (default `"pause"`): a hidden page starts no read and runs no timer, and on return reads at once if its wait ran out, else waits the rest; `"poll"` keeps reading and so keeps the server session active behind a hidden tab, which defeats an idle sign-out. `key`: a change starts over. `backoff` (`DEFAULT_POLLING_BACKOFF`: factor 2, cap 60 s, never below the period) and `jitter` (`DEFAULT_POLLING_JITTER`: up to 10 % added to every wait, never subtracted) are transport constants
 export interface PollingBackoff { maxMs: number; factor: number }
 export interface Polling<T> { data: T | null; error: unknown; loading: boolean; lastOkAtMs: number | null; failingSinceMs: number | null; reload(): void }   // `loading`: until the first read settles, and from a `reload()` or a change of `key` until its read settles; not during a periodic read. `reload()` reads now; during a read in flight it asks for exactly one more read after it, however often it is called
 export function usePageVisible(): boolean   // `document.visibilityState !== "hidden"` (useSyncExternalStore); true on the server
-// Unreleased (a change of behaviour within the contract): `useNowMs` does not tick while the page is hidden; it re-reads the clock the moment the page is shown and ticks on. It times a display only
+// 1.8.0 (a change of behaviour within the contract): `useNowMs` does not tick while the page is hidden; it re-reads the clock the moment the page is shown and ticks on. It times a display only
 ```
 
 ### 3.12 `status` (WP-8)
@@ -1116,6 +1116,23 @@ D10).
   `live`, `status`, `alerts`, `table`, `form`, `eslint` and `test`.
   `@public` lines added, none removed or changed; five catalogue keys
   added in `en` and `ka`; no legend value changed; no budget changed.
+- `v1.8.0`: a minor, periodic reads and the visibility of the page.
+  `live` gains `usePolling` (one read at a time, the next timed from
+  the moment the last settled; no read from a hidden page or without a
+  session; the read in flight aborted on unmount, on `enabled: false`
+  and on a change of `key` or of the period; a failure keeps the last
+  answer and slows the reads down, never sooner than the period nor
+  than an `ApiError`'s `retryAfterS`) with `PollingOptions`,
+  `PollingBackoff`, `Polling`, `DEFAULT_POLLING_BACKOFF` and
+  `DEFAULT_POLLING_JITTER`, and `usePageVisible`. `useNowMs` does not
+  tick while the page is hidden and re-reads the clock when it is
+  shown, a change of behaviour within its contract (a display period).
+  *Prepared on `main`, tagged by the owner:* every entry point of §2
+  as in `v1.7.0`, `model`, `theme`, `ui`, `i18n`, `fonts`, `map`,
+  `api`, `auth/server`, `auth/client`, `symbology`, `layers`,
+  `legend`, `live`, `status`, `alerts`, `table`, `form`, `eslint` and
+  `test`. `@public` lines added, none removed or changed; no catalogue
+  key added; no legend value changed; no budget changed.
 - From `v1`: within a major only additive changes (new exports, new
   optional props, new catalogue keys, new enumeration values *rendered*
   because `model` gained them). The following are a **major**: removing

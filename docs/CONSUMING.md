@@ -6,7 +6,7 @@ is shown working in [`examples/next-app/`](../examples/next-app/), which
 CI builds against the kit's current source and smokes in Chromium on
 every pull request. The rules behind the steps are `docs/PLAN.md` §6.3
 (the contracts), §7 (security) and §11 (consumption). This guide is for
-`1.7.0`.
+`1.8.0`.
 
 ## 1. Install the release tarball with pnpm
 
@@ -22,7 +22,7 @@ install --frozen-lockfile`.
 {
   "packageManager": "pnpm@11.9.0",
   "dependencies": {
-    "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.7.0/rootxkit-uspace-ui-1.7.0.tgz",
+    "@rootxkit/uspace-ui": "https://github.com/rootxkit/uspace-ui/releases/download/v1.8.0/rootxkit-uspace-ui-1.8.0.tgz",
     "maplibre-gl": "5.24.0",
     "next": "16.3.8",
     "react": "19.3.0",
@@ -45,8 +45,8 @@ install --frozen-lockfile`.
 - Before pinning, check the asset's signed build provenance:
 
   ```sh
-  gh release download v1.7.0 --repo rootxkit/uspace-ui --pattern 'rootxkit-uspace-ui-1.7.0.tgz'
-  gh attestation verify rootxkit-uspace-ui-1.7.0.tgz --repo rootxkit/uspace-ui \
+  gh release download v1.8.0 --repo rootxkit/uspace-ui --pattern 'rootxkit-uspace-ui-1.8.0.tgz'
+  gh attestation verify rootxkit-uspace-ui-1.8.0.tgz --repo rootxkit/uspace-ui \
     --signer-workflow rootxkit/uspace-ui/.github/workflows/release.yml
   ```
 
@@ -505,6 +505,41 @@ Five catalogue keys are added (`feed.silent`, `detail.server_state`
 and `detail.server_state.live`, `.stale`, `.source_disabled`); an app
 that overrides the catalogue adds them in `en` and `ka`. The tarball
 is licensed under Apache-2.0 (`license` in its `package.json`).
+
+From `1.7.0` to `1.8.0` (periodic reads; a hidden page stops asking
+and stops ticking): replace the asset URL and commit the lockfile. No
+export or prop is removed or changed, so the upgrade compiles as it is,
+but a console that stops there still reads behind a hidden tab, which
+keeps its server session active so that an idle sign-out never fires
+for it. Do these four things:
+
+1. Replace the console's own periodic reads (a `setInterval` around a
+   load hook, a chained `setTimeout`) with `usePolling` (`live`; §7,
+   "Periodic reads"). The read becomes the reader, the period stays the
+   console's own display period, and what the reader closes over (an
+   id, a filter, a cursor) goes in `key`. `data`, `error`, `loading`,
+   `lastOkAtMs`, `failingSinceMs` and `reload()` take the place of the
+   console's own state; a failure keeps `data`, so show `error` beside
+   it with the time since which the reads fail.
+2. Pass the reader's `AbortSignal` to the request
+   (`api.GET(path, { signal })`), so a read is cancelled on unmount, on
+   sign-out and on a change of `key` or of the period.
+3. Pass `enabled` from the session ("signed in"). Without it a page
+   whose session has ended asks for a `401` on every period.
+4. Check what the console does with `useNowMs`. **A change of
+   behaviour:** it does not tick while the page is hidden; it re-reads
+   the clock the moment the page is shown again and ticks on. Every age
+   drawn from it is right when it is seen. A console that timed
+   anything but a display with it (a read, a sign-out, a rule that
+   decides whether a stream is still live) gets that tick on return
+   and not before; give such a rule a timer of its own.
+
+A hidden page that must stay current unseen passes `whileHidden:
+"poll"` and accepts that its session stays active. After a failure the
+reads slow down by themselves (never sooner than the period nor than
+the API's `Retry-After`) and return to the period on the first answer;
+a console's own retry or backoff around a periodic read can go. No
+catalogue key is added.
 
 ## Minimum version per consumer
 
